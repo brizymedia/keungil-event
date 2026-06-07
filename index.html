@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>큰길이벤트기획 — 기억에 남는 행사를 만듭니다</title>
+  <meta name="description" content="큰길이벤트기획은 기업 컨퍼런스, 브랜드 론칭, 문화 행사를 기획하고 실행합니다. 17년의 경험으로 당신의 브랜드를 빛나게 합니다.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard','system-ui','sans-serif'] },
+        },
+      },
+    }
+  </script>
+  <style>
+    *          { font-family:'Pretendard',system-ui,sans-serif; word-break:keep-all; }
+    body       { background:#09090b; color:#fff; -webkit-font-smoothing:antialiased; }
+
+    /* ── Grain ── */
+    .noise-overlay{
+      position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.035;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px 200px;
+    }
+
+    /* ── Glass ── */
+    .glass{
+      background:rgba(255,255,255,.04);
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    /* ── Buttons ── */
+    .btn-primary{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:1rem 2rem;background:#F59E0B;color:#0a0a0a;
+      font-weight:700;font-size:1rem;border-radius:9999px;
+      transition:all .4s cubic-bezier(.16,1,.3,1);
+      cursor:pointer;white-space:nowrap;text-decoration:none;
+    }
+    .btn-primary:hover { transform:scale(1.02) translateY(-1px);background:#FBBF24;box-shadow:0 8px 32px rgba(245,158,11,.28); }
+    .btn-primary:active{ transform:scale(.98); }
+
+    .btn-ghost{
+      display:inline-flex;align-items:center;gap:.5rem;
+      padding:1rem 2rem;background:transparent;color:#fff;
+      font-weight:600;font-size:1rem;border-radius:9999px;
+      border:1px solid rgba(255,255,255,.18);
+      transition:all .4s cubic-bezier(.16,1,.3,1);
+      cursor:pointer;white-space:nowrap;text-decoration:none;
+    }
+    .btn-ghost:hover{ transform:scale(1.02);border-color:rgba(255,255,255,.38);background:rgba(255,255,255,.05); }
+
+    /* ── Icon badge ── */
+    .icon-badge{
+      width:2.75rem;height:2.75rem;border-radius:.875rem;
+      background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+
+    /* ── Bento card ── */
+    .bento-card{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:1.25rem;
+      transition:all .4s cubic-bezier(.16,1,.3,1);
+      overflow:hidden;
+    }
+    .bento-card:hover{ border-color:rgba(245,158,11,.22);background:rgba(245,158,11,.03);transform:translateY(-2px); }
+
+    /* ── Scroll reveal ── */
+    .reveal{
+      opacity:0;transform:translateY(2.5rem);
+      transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1);
+    }
+    .reveal.visible{ opacity:1;transform:translateY(0); }
+
+    /* ── Keyframe animations ── */
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(2rem);}
+      to  {opacity:1;transform:translateY(0);}
+    }
+    @keyframes float{
+      0%,100%{transform:translateY(0);}
+      50%    {transform:translateY(-10px);}
+    }
+    @keyframes marquee{
+      0%  {transform:translateX(0);}
+      100%{transform:translateX(-50%);}
+    }
+    @keyframes brandLineGrow{
+      from{transform:scaleX(0);}
+      to  {transform:scaleX(1);}
+    }
+    @keyframes brandCharUp{
+      from{opacity:0;transform:translateY(60%) skewY(6deg);}
+      to  {opacity:1;transform:translateY(0) skewY(0deg);}
+    }
+    @keyframes brandSubFade{
+      from{opacity:0;letter-spacing:.4em;}
+      to  {opacity:1;letter-spacing:.18em;}
+    }
+    @keyframes brandGlowPulse{
+      0%,100%{opacity:.18;}
+      50%    {opacity:.35;}
+    }
+
+    /* Brand reveal container */
+    #hero-brand-reveal{
+      flex-shrink:0;
+      opacity:0;pointer-events:none;
+      text-align:right;
+      transition:opacity .1s;
+      /* top-offset = label pill height (~2.55rem) + margin-bottom (2rem) = ~4.6rem */
+      margin-top:4.6rem;
+    }
+    #hero-brand-reveal.show{ opacity:1; }
+
+    /* Char mask wrapper */
+    .brand-char-wrap{ overflow:hidden;display:inline-block; }
+
+    .brand-char{
+      display:inline-block;
+      opacity:0;
+    }
+    #hero-brand-reveal.show .brand-char{
+      animation:brandCharUp .8s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    #hero-brand-reveal .brand-line{
+      height:2px;
+      background:linear-gradient(to right,transparent,#F59E0B,transparent);
+      transform-origin:right center;
+      transform:scaleX(0);
+    }
+    #hero-brand-reveal.show .brand-line{
+      animation:brandLineGrow .9s cubic-bezier(.16,1,.3,1) .7s both;
+    }
+
+    #hero-brand-reveal .brand-sub{
+      opacity:0;
+    }
+    #hero-brand-reveal.show .brand-sub{
+      animation:brandSubFade .8s cubic-bezier(.16,1,.3,1) 1s both;
+    }
+
+    /* Ambient glow behind the reveal text */
+    #hero-brand-glow{
+      position:absolute;
+      right:2%;top:40%;
+      width:480px;height:360px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(245,158,11,.55),transparent 68%);
+      filter:blur(90px);
+      opacity:0;pointer-events:none;
+      animation:brandGlowPulse 4s ease-in-out infinite;
+      transition:opacity 1.2s ease;
+      z-index:1;
+    }
+    #hero-brand-glow.show{ opacity:1; }
+
+    /* Hero image — revealed when video ends */
+    #hero-image-reveal{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+      object-fit:cover;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 1.2s ease;
+      z-index:1;
+      filter:brightness(.45);
+    }
+    #hero-image-reveal.show{ opacity:1; }
+
+    .animate-fade-up { animation:fadeInUp .7s cubic-bezier(.16,1,.3,1) both; }
+    .animate-float   { animation:float 4s ease-in-out infinite; }
+    .animate-marquee { animation:marquee 30s linear infinite; }
+
+    /* ── HERO video ── */
+    #hero-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;pointer-events:none;
+    }
+
+    /* ── SCROLL SCRUB section ── */
+    #scrub-section{ position:relative; }
+    #scrub-sticky{
+      position:sticky;top:0;
+      width:100%;min-height:100dvh;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    #scrub-canvas{
+      width:100%;height:100%;
+      object-fit:cover;
+      position:absolute;inset:0;
+    }
+    #scrub-overlay{
+      position:relative;z-index:2;
+      max-width:56rem;margin:0 auto;
+      padding:0 1.5rem;
+      text-align:center;
+      pointer-events:none;
+    }
+
+    /* scrub text fades driven by JS */
+    .scrub-text{
+      opacity:0;
+      transform:translateY(1.5rem);
+      transition:opacity .5s ease,transform .5s ease;
+    }
+    .scrub-text.show{
+      opacity:1;transform:translateY(0);
+    }
+
+    /* ── Stat pill inside hero ── */
+    .stat-pill{
+      display:flex;flex-direction:column;align-items:center;
+      padding:1.1rem 1.6rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Grain -->
+<div class="noise-overlay"></div>
+
+<!-- ══════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════ -->
+<nav class="fixed top-4 left-0 right-0 z-40 flex justify-center px-4">
+  <div class="glass rounded-full px-5 py-3 flex items-center justify-between w-full max-w-4xl">
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <img src="logo-kgm-transparent.png" alt="큰길이벤트기획" style="height:2rem;width:auto;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(245,158,11,.55));vertical-align:middle;transform:translateY(-2px);">
+      <span style="font-size:.95rem;font-weight:700;letter-spacing:-.02em;white-space:nowrap;line-height:1;">큰길이벤트기획</span>
+    </div>
+    <div class="hidden md:flex items-center gap-7" style="font-size:.875rem;color:#a1a1aa;">
+      <a href="#services"  style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">서비스</a>
+      <a href="#portfolio" style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">포트폴리오</a>
+      <a href="#about"     style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">소개</a>
+      <a href="#contact"   style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">연락처</a>
+    </div>
+    <a href="#contact" class="btn-primary" style="padding:.55rem 1.25rem;font-size:.875rem;">무료 상담</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     HERO — MP4 background video
+══════════════════════════════════════════════════ -->
+<section style="position:relative;min-height:100dvh;display:flex;align-items:flex-end;overflow:hidden;">
+
+  <!-- Video background -->
+  <video id="hero-video" autoplay muted playsinline preload="auto"
+         poster="frames/frame_0001.webp">
+    <source src="hero-video.mp4" type="video/mp4">
+  </video>
+
+  <!-- Hero image — shown when video ends -->
+  <img id="hero-image-reveal" src="hero-image.png" alt="큰길이벤트기획 히어로 이미지">
+
+  <!-- Gradient overlays -->
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,#09090b 0%,rgba(9,9,11,.65) 50%,rgba(9,9,11,.18) 100%);pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(9,9,11,.78) 0%,rgba(9,9,11,.18) 55%,transparent 100%);pointer-events:none;"></div>
+
+  <!-- Ambient orb -->
+  <div style="position:absolute;top:32%;right:22%;width:420px;height:420px;border-radius:50%;
+              background:radial-gradient(circle,rgba(245,158,11,.5),transparent 70%);
+              filter:blur(80px);opacity:.11;pointer-events:none;
+              animation:float 5s ease-in-out infinite;"></div>
+
+  <!-- Content -->
+  <div style="position:relative;z-index:2;max-width:80rem;margin:0 auto;
+              padding:0 1.5rem 6rem;padding-top:9rem;width:100%;
+              display:flex;align-items:flex-start;justify-content:space-between;gap:3rem;">
+    <div style="max-width:38rem;flex-shrink:0;">
+
+      <!-- Label pill -->
+      <div class="glass animate-fade-up" style="animation-delay:.1s;
+           display:inline-flex;align-items:center;gap:.75rem;
+           border-radius:9999px;padding:.4rem 1rem .4rem .5rem;
+           font-size:.875rem;color:#FBBF24;font-weight:500;margin-bottom:2rem;">
+        <img src="logo-kgm-transparent.png" alt="큰길이벤트기획" style="height:1.75rem;width:auto;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 0 5px rgba(245,158,11,.5));">
+        <span style="font-weight:700;font-size:.8rem;letter-spacing:-.01em;white-space:nowrap;">큰길이벤트기획</span>
+        <span style="opacity:.4;">|</span>
+        2007년부터 함께한 행사 전문가
+      </div>
+
+      <h1 class="animate-fade-up" style="animation-delay:.22s;
+          font-size:clamp(2.6rem,6vw,4.5rem);font-weight:700;
+          line-height:1.12;letter-spacing:-.03em;margin-bottom:1.5rem;">
+        당신의 행사,<br>
+        <span style="color:#F59E0B;">오래 기억될</span><br>
+        순간으로
+      </h1>
+
+      <p class="animate-fade-up" style="animation-delay:.36s;
+         font-size:1.125rem;color:#a1a1aa;line-height:1.7;
+         max-width:46ch;margin-bottom:2.5rem;">
+        기업 컨퍼런스부터 브랜드 론칭, 문화 행사까지. 기획부터 현장 운영까지 큰길이벤트기획가 완벽하게 책임집니다.
+      </p>
+
+      <div class="animate-fade-up" style="animation-delay:.5s;display:flex;flex-wrap:wrap;gap:1rem;">
+        <a href="#contact" class="btn-primary">
+          무료 상담 신청하기
+          <iconify-icon icon="solar:arrow-right-linear" style="font-size:18px;"></iconify-icon>
+        </a>
+        <a href="#scrub-section" class="btn-ghost">
+          현장 영상 보기
+          <iconify-icon icon="solar:play-circle-linear" style="font-size:18px;"></iconify-icon>
+        </a>
+      </div>
+    </div>
+
+    <!-- Brand reveal — appears when video ends (flex sibling of left content) -->
+    <div id="hero-brand-reveal">
+      <!-- Main brand name -->
+      <div style="line-height:1;margin-bottom:1.2rem;">
+        <div class="brand-char-wrap" style="display:block;margin-bottom:.1em;">
+          <span class="brand-char" style="font-size:clamp(3rem,7vw,5.5rem);font-weight:800;letter-spacing:-.04em;color:#fff;animation-delay:.05s;">큰길</span>
+        </div>
+        <div class="brand-char-wrap" style="display:block;">
+          <span class="brand-char" style="font-size:clamp(3rem,7vw,5.5rem);font-weight:800;letter-spacing:-.04em;color:#F59E0B;animation-delay:.22s;">이벤트</span>
+        </div>
+        <div class="brand-char-wrap" style="display:block;margin-top:.05em;">
+          <span class="brand-char" style="font-size:clamp(3rem,7vw,5.5rem);font-weight:800;letter-spacing:-.04em;color:#fff;animation-delay:.38s;">기획</span>
+        </div>
+      </div>
+      <!-- Amber divider line -->
+      <div class="brand-line" style="width:100%;margin-bottom:1rem;"></div>
+      <!-- Subtitle -->
+      <p class="brand-sub" style="font-size:.75rem;color:#a1a1aa;letter-spacing:.18em;text-transform:uppercase;">Since 2007 &nbsp;·&nbsp; Event Professionals</p>
+    </div>
+
+    <!-- Floating stats — desktop -->
+    <div class="hidden lg:flex" style="position:absolute;bottom:6rem;right:2rem;gap:.7rem;">
+      <div class="glass animate-fade-up" style="animation-delay:.62s;border-radius:.75rem;display:flex;flex-direction:column;align-items:center;padding:.75rem 1.1rem;">
+        <span style="font-size:1.2rem;font-weight:700;color:#FBBF24;">1,847+</span>
+        <span style="font-size:.6rem;color:#71717a;margin-top:.15rem;">완료한 행사</span>
+      </div>
+      <div class="glass animate-fade-up" style="animation-delay:.72s;border-radius:.75rem;display:flex;flex-direction:column;align-items:center;padding:.75rem 1.1rem;">
+        <span style="font-size:1.2rem;font-weight:700;color:#FBBF24;">17년</span>
+        <span style="font-size:.6rem;color:#71717a;margin-top:.15rem;">업계 경력</span>
+      </div>
+      <div class="glass animate-fade-up" style="animation-delay:.82s;border-radius:.75rem;display:flex;flex-direction:column;align-items:center;padding:.75rem 1.1rem;">
+        <span style="font-size:1.2rem;font-weight:700;color:#FBBF24;">4.93</span>
+        <span style="font-size:.6rem;color:#71717a;margin-top:.15rem;">고객 만족도</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ambient glow for brand reveal -->
+  <div id="hero-brand-glow"></div>
+
+  <!-- Scroll cue arrow -->
+  <div class="animate-fade-up" style="animation-delay:1.1s;
+       position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+       display:flex;flex-direction:column;align-items:center;gap:.5rem;
+       color:#52525b;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;">
+    <iconify-icon icon="solar:alt-arrow-down-linear"
+                  style="font-size:22px;animation:float 2s ease-in-out infinite;"></iconify-icon>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SCROLL SCRUB — WebP frame sequence
+     (Apple-style: scroll drives frame playback)
+══════════════════════════════════════════════════ -->
+<section id="scrub-section" style="height:600vh;">
+  <div id="scrub-sticky">
+
+    <!-- Canvas: frame images rendered here -->
+    <img id="scrub-canvas" src="frames/frame_0001.webp"
+         alt="큰길이벤트기획 현장 영상" draggable="false"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;">
+
+    <!-- Dark overlays for text legibility -->
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(9,9,11,.82) 0%,rgba(9,9,11,.18) 50%,rgba(9,9,11,.18) 100%);z-index:1;pointer-events:none;"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(9,9,11,.55) 0%,transparent 60%);z-index:1;pointer-events:none;"></div>
+
+    <!-- Overlay text — five phases -->
+    <div id="scrub-overlay" style="position:absolute;inset:0;z-index:3;
+         display:flex;align-items:flex-end;padding:0 2rem 5rem;
+         max-width:80rem;margin:0 auto;left:0;right:0;">
+
+      <!-- Phase 1 -->
+      <div id="scrub-p1" class="scrub-text" style="position:absolute;bottom:5rem;left:2rem;max-width:36rem;">
+        <div style="font-size:.75rem;color:#FBBF24;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.8rem;">STEP 01</div>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.15;letter-spacing:-.025em;">
+          무대 설치
+        </h2>
+      </div>
+
+      <!-- Phase 2 -->
+      <div id="scrub-p2" class="scrub-text" style="position:absolute;bottom:5rem;left:2rem;max-width:36rem;">
+        <div style="font-size:.75rem;color:#FBBF24;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.8rem;">STEP 02</div>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.15;letter-spacing:-.025em;">
+          레이허, 트러스 등<br>구조물 설치
+        </h2>
+      </div>
+
+      <!-- Phase 3 -->
+      <div id="scrub-p3" class="scrub-text" style="position:absolute;bottom:5rem;left:2rem;max-width:36rem;">
+        <div style="font-size:.75rem;color:#FBBF24;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.8rem;">STEP 03</div>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.15;letter-spacing:-.025em;">
+          음향 · 조명 설치
+        </h2>
+      </div>
+
+      <!-- Phase 4 -->
+      <div id="scrub-p4" class="scrub-text" style="position:absolute;bottom:5rem;left:2rem;max-width:36rem;">
+        <div style="font-size:.75rem;color:#FBBF24;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.8rem;">STEP 04</div>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.15;letter-spacing:-.025em;">
+          LED 스크린 설치
+        </h2>
+      </div>
+
+      <!-- Phase 5 — 마지막 -->
+      <div id="scrub-p5" class="scrub-text" style="position:absolute;bottom:5rem;left:2rem;max-width:42rem;">
+        <div style="font-size:.75rem;color:#FBBF24;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.8rem;">행사대행 실적 1위</div>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.15;letter-spacing:-.025em;">
+          기술과 경험이<br><span style="color:#F59E0B;">성공적인 행사</span>를 만듭니다
+        </h2>
+        <a href="#contact" class="btn-primary" style="margin-top:2rem;pointer-events:auto;">
+          지금 문의하기
+          <iconify-icon icon="solar:arrow-right-linear" style="font-size:18px;"></iconify-icon>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Progress bar -->
+    <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.08);z-index:4;">
+      <div id="scrub-progress" style="height:100%;background:#F59E0B;width:0%;transition:width .05s linear;"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     CLIENT MARQUEE
+══════════════════════════════════════════════════ -->
+<section style="padding:2.5rem 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);overflow:hidden;">
+  <p style="text-align:center;font-size:.7rem;color:#3f3f46;text-transform:uppercase;letter-spacing:.14em;margin-bottom:1.75rem;">함께한 클라이언트</p>
+  <div style="display:flex;">
+    <div class="animate-marquee" style="display:flex;gap:4rem;align-items:center;white-space:nowrap;flex-shrink:0;">
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">SK</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">포스코</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">현대엔지니어링</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">아마존닷컴</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">SBS</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">보건복지부</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">중소기업청</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">BMW파이낸셜코리아</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">한국쉘석유</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">(주)폴리미래</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">AIA생명</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">삼성화재</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">메리츠</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">JW엘리어트</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">베네치아</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">소노캄</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">교원공제조합</span>
+      <!-- duplicate -->
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">SK</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">포스코</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">현대엔지니어링</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">아마존닷컴</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">SBS</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">보건복지부</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">중소기업청</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">BMW파이낸셜코리아</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">한국쉘석유</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">(주)폴리미래</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">AIA생명</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">삼성화재</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">메리츠</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">JW엘리어트</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">베네치아</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">소노캄</span>
+      <span style="color:#52525b;font-weight:700;font-size:1.1rem;">교원공제조합</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SERVICES — Bento
+══════════════════════════════════════════════════ -->
+<section id="services" style="padding:6rem 1.5rem;">
+  <div style="max-width:80rem;margin:0 auto;">
+
+    <div class="reveal" style="margin-bottom:4rem;">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;margin-bottom:1rem;">
+        어떤 행사든<br>완벽하게
+      </h2>
+      <p style="color:#a1a1aa;font-size:1.125rem;max-width:46ch;">
+        기획 단계부터 현장 마무리까지, 큰길이벤트기획의 전문가들이 함께합니다.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+
+      <!-- Hero card col-span-2 -->
+      <div class="bento-card reveal" style="grid-column:span 2;min-height:380px;position:relative;">
+        <img src="conference.jpg"
+             alt="컨퍼런스 & 포럼"
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.32;"
+             loading="lazy" decoding="async">
+        <div style="position:relative;z-index:1;padding:2rem;height:100%;display:flex;flex-direction:column;justify-content:space-between;min-height:380px;">
+          <div class="icon-badge">
+            <iconify-icon icon="solar:buildings-2-bold" style="color:#F59E0B;font-size:22px;"></iconify-icon>
+          </div>
+          <div>
+            <h3 style="font-size:1.5rem;font-weight:700;margin-bottom:.75rem;">컨퍼런스 &amp; 포럼</h3>
+            <p style="color:#a1a1aa;line-height:1.7;max-width:50ch;">
+              수백 명이 참석하는 대형 컨퍼런스부터 소규모 임원 포럼까지. 공간 설계, 연사 관리, 회의용 마이크 시스템을 원스톱으로 제공합니다.
+            </p>
+            <div style="margin-top:1.5rem;display:flex;align-items:center;gap:.5rem;color:#FBBF24;font-size:.875rem;font-weight:600;cursor:pointer;">
+              <span>사례 보기</span>
+              <iconify-icon icon="solar:arrow-right-linear" style="font-size:16px;"></iconify-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- sm card 1 -->
+      <div class="bento-card reveal" style="padding:1.75rem;animation-delay:.1s;">
+        <div class="icon-badge" style="margin-bottom:1.25rem;">
+          <iconify-icon icon="solar:rocket-bold" style="color:#F59E0B;font-size:20px;"></iconify-icon>
+        </div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">기공식, 오픈식 &amp; 브랜드 론칭</h3>
+        <p style="color:#71717a;font-size:.875rem;line-height:1.65;">기공식, 준공식, 신제품 론칭까지. 현장의 첫 삽부터 브랜드의 첫인상까지 완벽하게 연출합니다.</p>
+      </div>
+
+      <!-- sm card 2 -->
+      <div class="bento-card reveal" style="padding:1.75rem;animation-delay:.15s;">
+        <div class="icon-badge" style="margin-bottom:1.25rem;">
+          <iconify-icon icon="solar:cup-star-bold" style="color:#F59E0B;font-size:20px;"></iconify-icon>
+        </div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">시상식 &amp; 이취임식</h3>
+        <p style="color:#71717a;font-size:.875rem;line-height:1.65;">수상의 감동과 취임의 무게를 격식 있게 연출합니다. 식순 기획부터 무대·음향·영상까지 일괄 진행합니다.</p>
+      </div>
+
+      <!-- sm card 3 -->
+      <div class="bento-card reveal" style="padding:1.75rem;animation-delay:.2s;">
+        <div class="icon-badge" style="margin-bottom:1.25rem;">
+          <iconify-icon icon="solar:music-note-bold" style="color:#F59E0B;font-size:20px;"></iconify-icon>
+        </div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">지역축제 &amp; 공연행사</h3>
+        <p style="color:#71717a;font-size:.875rem;line-height:1.65;">지자체 축제부터 대형 공연까지. 무대 설치·음향·조명·인력 운영을 현장 경험으로 완성합니다.</p>
+      </div>
+
+      <!-- wide card col-span-2 -->
+      <div class="bento-card reveal" style="grid-column:span 2;padding:1.75rem;animation-delay:.25s;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem;">
+          <div>
+            <div class="icon-badge" style="margin-bottom:1.25rem;">
+              <iconify-icon icon="solar:global-bold" style="color:#F59E0B;font-size:20px;"></iconify-icon>
+            </div>
+            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;">카메라 중계 &amp; 라이브 스트리밍</h3>
+            <p style="color:#71717a;font-size:.875rem;line-height:1.65;max-width:44ch;">
+              다중 카메라 현장 중계부터 유튜브·줌 실시간 송출까지. 현장과 온라인을 동시에 연결합니다.
+            </p>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:3.5rem;font-weight:700;color:rgba(245,158,11,.18);">316</div>
+            <div style="font-size:.7rem;color:#52525b;margin-top:.25rem;">온라인 행사 운영</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     METRICS
+══════════════════════════════════════════════════ -->
+<section style="padding:4rem 1.5rem;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);background:linear-gradient(90deg,rgba(39,39,42,.5),#09090b,rgba(39,39,42,.5));">
+  <div style="max-width:80rem;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:2.5rem;text-align:center;">
+    <div class="reveal"><div style="font-size:clamp(2rem,5vw,3.25rem);font-weight:700;color:#FBBF24;margin-bottom:.5rem;">1,847+</div><div style="color:#71717a;font-size:.9rem;">성공적으로 완료한 행사</div></div>
+    <div class="reveal" style="animation-delay:.1s;"><div style="font-size:clamp(2rem,5vw,3.25rem);font-weight:700;color:#FBBF24;margin-bottom:.5rem;">240만+</div><div style="color:#71717a;font-size:.9rem;">누적 행사 참가자 수</div></div>
+    <div class="reveal" style="animation-delay:.2s;"><div style="font-size:clamp(2rem,5vw,3.25rem);font-weight:700;color:#FBBF24;margin-bottom:.5rem;">98.3%</div><div style="color:#71717a;font-size:.9rem;">고객 재계약률</div></div>
+    <div class="reveal" style="animation-delay:.3s;"><div style="font-size:clamp(2rem,5vw,3.25rem);font-weight:700;color:#FBBF24;margin-bottom:.5rem;">17년</div><div style="color:#71717a;font-size:.9rem;">업계 전문 경력</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PORTFOLIO — zig-zag
+══════════════════════════════════════════════════ -->
+<section id="portfolio" style="padding:6rem 1.5rem;">
+  <div style="max-width:80rem;margin:0 auto;">
+
+    <div class="reveal" style="margin-bottom:4rem;">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;margin-bottom:1rem;">직접 보여드립니다</h2>
+      <p style="color:#a1a1aa;font-size:1.125rem;">말보다 결과로 증명합니다.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:5rem;">
+
+      <!-- Case 1: image left -->
+      <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
+        <div style="border-radius:1.25rem;overflow:hidden;aspect-ratio:4/3;position:relative;">
+          <img src="festival-nokdong.jpg"
+               alt="녹동바다불꽃축제"
+               style="width:100%;height:100%;object-fit:cover;transition:transform .7s ease;"
+               onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"
+               loading="lazy" decoding="async">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(9,9,11,.5),transparent);"></div>
+          <span class="glass" style="position:absolute;bottom:1rem;left:1rem;font-size:.7rem;color:#d4d4d8;padding:.3rem .9rem;border-radius:9999px;">지역축제 &amp; 공연행사</span>
+        </div>
+        <div>
+          <div style="font-size:.8rem;color:#FBBF24;font-weight:600;margin-bottom:.75rem;">2025 — 2026 · 2년 연속 선정</div>
+          <h3 style="font-size:clamp(1.5rem,2.5vw,2rem);font-weight:700;line-height:1.2;margin-bottom:1rem;">녹동바다불꽃축제</h3>
+          <p style="color:#a1a1aa;line-height:1.7;margin-bottom:1.75rem;">
+            2년 연속 이벤트 대행사 선정. 관광객 합계 추산 53,000명, 4일간의 대장정. 무대 설치부터 트러스·레이허·음향·조명·LED 영상까지 종합 대행.
+          </p>
+          <div style="display:flex;gap:1.75rem;">
+            <div><div style="font-size:1.4rem;font-weight:700;">53,000명+</div><div style="font-size:.7rem;color:#71717a;margin-top:.2rem;">방문객</div></div>
+            <div><div style="font-size:1.4rem;font-weight:700;">150억</div><div style="font-size:.7rem;color:#71717a;margin-top:.2rem;">지역경제유발효과</div></div>
+            <div><div style="font-size:1.4rem;font-weight:700;">4일</div><div style="font-size:.7rem;color:#71717a;margin-top:.2rem;">행사 기간</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case 2: text left, image right -->
+      <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
+        <div>
+          <div style="font-size:.8rem;color:#FBBF24;font-weight:600;margin-bottom:.75rem;">2026 · 보건복지부</div>
+          <h3 style="font-size:clamp(1.5rem,2.5vw,2rem);font-weight:700;line-height:1.2;margin-bottom:1rem;">국립 소록도병원 110주년 기념<br>및 제23회 한센인의 날 행사</h3>
+          <p style="color:#a1a1aa;line-height:1.7;margin-bottom:1.75rem;">
+            보건복지부 산하 국립소록도병원 110주년을 기념하여 정은경 장관님을 모시고 행사를 수행했습니다. 기획 단계부터 철저한 상담과 미팅을 통해 완벽한 행사로 마무리했으며, 행사 이후 전직원 기념촬영 및 보도자료 배포로 더욱 의미 있는 행사였습니다.
+          </p>
+          <div style="display:flex;gap:1.75rem;">
+            <div><div style="font-size:1.4rem;font-weight:700;">1,200명</div><div style="font-size:.7rem;color:#71717a;margin-top:.2rem;">참석자</div></div>
+            <div><div style="font-size:1.4rem;font-weight:700;">47개</div><div style="font-size:.7rem;color:#71717a;margin-top:.2rem;">관련 보도</div></div>
+          </div>
+        </div>
+        <div style="border-radius:1.25rem;overflow:hidden;aspect-ratio:4/3;position:relative;">
+          <img src="sorokdo.jpg"
+               alt="국립 소록도병원 110주년 기념행사"
+               style="width:100%;height:100%;object-fit:cover;object-position:center 60%;transform:scale(1.3);transition:transform .7s ease;"
+               onmouseover="this.style.transform='scale(1.35)'" onmouseout="this.style.transform='scale(1.3)'"
+               loading="lazy" decoding="async">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(9,9,11,.5),transparent);"></div>
+          <span class="glass" style="position:absolute;bottom:1rem;left:1rem;font-size:.7rem;color:#d4d4d8;padding:.3rem .9rem;border-radius:9999px;">정부기관 행사</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="reveal" style="margin-top:3.5rem;text-align:center;">
+      <a href="#" class="btn-ghost">
+        전체 포트폴리오 보기
+        <iconify-icon icon="solar:arrow-right-linear" style="font-size:18px;"></iconify-icon>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     TESTIMONIALS — masonry
+══════════════════════════════════════════════════ -->
+<section style="padding:6rem 1.5rem;background:rgba(39,39,42,.22);">
+  <div style="max-width:80rem;margin:0 auto;">
+
+    <div class="reveal" style="margin-bottom:4rem;">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;">클라이언트가 먼저 말합니다</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
+
+      <!-- Tall card (row-span-2) -->
+      <div class="bento-card reveal" style="grid-row:span 2;padding:1.75rem;display:flex;flex-direction:column;gap:1.25rem;">
+        <div style="display:flex;gap:.25rem;">
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+        </div>
+        <p style="color:#d4d4d8;line-height:1.75;flex:1;">
+          "6년째 모든 연간 행사를 큰길이벤트기획에 맡기고 있습니다. 처음에는 단순히 진행사를 구하던 것이었는데, 지금은 전략적 파트너가 됐어요. 행사 기획 단계부터 이런 방향이 더 효과적일 것이라고 먼저 제안해주는 팀이에요. 우리 회사의 행사 퀄리티가 큰길이벤트기획을 만나고 나서 확실히 달라졌습니다."
+        </p>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <img src="https://ui-avatars.com/api/?name=김민준&background=F59E0B&color=0a0a0a&bold=true&size=128&font-size=0.45&rounded=true" alt="김민준"
+               style="width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">김민준</div>
+            <div style="color:#71717a;font-size:.75rem;">행사기획팀장, 포스코</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card reveal" style="padding:1.75rem;display:flex;flex-direction:column;gap:1.25rem;animation-delay:.1s;">
+        <div style="display:flex;gap:.25rem;">
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+        </div>
+        <p style="color:#d4d4d8;line-height:1.75;">
+          "행사 당일 갑작스러운 일정 변경에도 전혀 당황하지 않고 침착하게 처리해줬습니다. 현장 대응 능력이 정말 인상적이었어요."
+        </p>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <img src="https://ui-avatars.com/api/?name=이수진&background=F59E0B&color=0a0a0a&bold=true&size=128&font-size=0.45&rounded=true" alt="이수진"
+               style="width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">이수진</div>
+            <div style="color:#71717a;font-size:.75rem;">홍보팀장, 삼성화재</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card reveal" style="padding:1.75rem;display:flex;flex-direction:column;gap:1.25rem;animation-delay:.2s;">
+        <div style="display:flex;gap:.25rem;">
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+        </div>
+        <p style="color:#d4d4d8;line-height:1.75;">
+          "무대 설치부터 음향·조명·LED 영상까지 원스톱으로 해결됩니다. 업체를 여럿 쓸 필요가 없어서 정말 편했어요."
+        </p>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <img src="https://ui-avatars.com/api/?name=박성호&background=F59E0B&color=0a0a0a&bold=true&size=128&font-size=0.45&rounded=true" alt="박성호"
+               style="width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">박성호</div>
+            <div style="color:#71717a;font-size:.75rem;">총무팀장, BMW파이낸셜코리아</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wide bottom -->
+      <div class="bento-card reveal" style="grid-column:span 2;padding:1.75rem;display:flex;flex-direction:column;gap:1.25rem;animation-delay:.15s;">
+        <div style="display:flex;gap:.25rem;">
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+          <iconify-icon icon="solar:star-bold" style="color:#F59E0B;font-size:14px;"></iconify-icon>
+        </div>
+        <p style="color:#d4d4d8;line-height:1.75;">
+          "처음 의뢰할 때 예산과 규모를 솔직하게 말씀드렸는데, 핵심만 살린 최적의 플랜을 제안해줬어요. 결과적으로 참석자들 반응이 역대 최고였습니다. 예산보다 결과에 집중하는 팀이라 계속 함께하고 싶습니다."
+        </p>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <img src="https://ui-avatars.com/api/?name=최지영&background=F59E0B&color=0a0a0a&bold=true&size=128&font-size=0.45&rounded=true" alt="최지영"
+               style="width:2.5rem;height:2.5rem;border-radius:50%;object-fit:cover;">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">최지영</div>
+            <div style="color:#71717a;font-size:.75rem;">경영지원본부장, 교원공제조합</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     PROCESS — split
+══════════════════════════════════════════════════ -->
+<section id="about" style="padding:6rem 1.5rem;">
+  <div style="max-width:80rem;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;">
+
+    <div class="reveal">
+      <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.15;margin-bottom:1.5rem;">큰길이벤트기획가 일하는 방식</h2>
+      <p style="color:#a1a1aa;font-size:1.125rem;line-height:1.7;margin-bottom:2.5rem;">
+        17년간 쌓아온 노하우로 만든 4단계 프로세스. 처음 의뢰하시는 분도 마지막까지 불안함 없이 진행할 수 있습니다.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:1.75rem;">
+        <div style="display:flex;gap:1.25rem;align-items:flex-start;">
+          <div style="width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.07);display:flex;align-items:center;justify-content:center;color:#FBBF24;font-size:.8rem;font-weight:700;flex-shrink:0;">01</div>
+          <div><h4 style="font-weight:700;margin-bottom:.3rem;">목표 파악 상담</h4><p style="color:#71717a;font-size:.875rem;line-height:1.65;">행사의 목적, 대상, 예산, 일정을 함께 정리합니다. 30분 무료 상담으로 시작하세요.</p></div>
+        </div>
+        <div style="display:flex;gap:1.25rem;align-items:flex-start;">
+          <div style="width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.07);display:flex;align-items:center;justify-content:center;color:#FBBF24;font-size:.8rem;font-weight:700;flex-shrink:0;">02</div>
+          <div><h4 style="font-weight:700;margin-bottom:.3rem;">기획안 제안</h4><p style="color:#71717a;font-size:.875rem;line-height:1.65;">목표에 최적화된 기획안과 세부 예산안을 7일 내로 제안합니다.</p></div>
+        </div>
+        <div style="display:flex;gap:1.25rem;align-items:flex-start;">
+          <div style="width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.07);display:flex;align-items:center;justify-content:center;color:#FBBF24;font-size:.8rem;font-weight:700;flex-shrink:0;">03</div>
+          <div><h4 style="font-weight:700;margin-bottom:.3rem;">사전 준비 &amp; 리허설</h4><p style="color:#71717a;font-size:.875rem;line-height:1.65;">현장 세팅, 장비 점검, 진행자 리허설까지 철저하게 준비합니다.</p></div>
+        </div>
+        <div style="display:flex;gap:1.25rem;align-items:flex-start;">
+          <div style="width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.07);display:flex;align-items:center;justify-content:center;color:#FBBF24;font-size:.8rem;font-weight:700;flex-shrink:0;">04</div>
+          <div><h4 style="font-weight:700;margin-bottom:.3rem;">현장 운영 &amp; 사후 보고</h4><p style="color:#71717a;font-size:.875rem;line-height:1.65;">전담 PM이 현장 전체를 지휘하고, 행사 후 참석자 피드백 리포트를 제공합니다.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" style="position:relative;animation-delay:.2s;">
+      <div style="border-radius:1.25rem;overflow:hidden;aspect-ratio:1;">
+        <img src="equipment.jpg"
+             alt="큰길이벤트기획 음향·영상 장비"
+             style="width:100%;height:100%;object-fit:cover;" loading="lazy" decoding="async">
+      </div>
+      <div class="glass animate-float" style="animation-delay:1s;position:absolute;bottom:-1.5rem;left:-1.5rem;border-radius:1rem;padding:1.1rem 1.4rem;display:flex;align-items:center;gap:.75rem;">
+        <div class="icon-badge">
+          <iconify-icon icon="solar:shield-check-bold" style="color:#F59E0B;font-size:20px;"></iconify-icon>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:.9rem;">100% 일정 준수</div>
+          <div style="color:#71717a;font-size:.7rem;margin-top:.15rem;">1,847건 단 한 건의 지연 없음</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     CTA
+══════════════════════════════════════════════════ -->
+<section id="contact" style="padding:8rem 1.5rem;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,158,11,.04),#09090b,#09090b);"></div>
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:640px;height:320px;pointer-events:none;background:radial-gradient(ellipse,rgba(245,158,11,.55),transparent 70%);filter:blur(90px);opacity:.13;"></div>
+
+  <div class="reveal" style="position:relative;max-width:48rem;margin:0 auto;text-align:center;">
+    <h2 style="font-size:clamp(2.25rem,5vw,3.75rem);font-weight:700;line-height:1.12;margin-bottom:1.5rem;">
+      지금 바로 시작하세요
+    </h2>
+    <p style="color:#a1a1aa;font-size:1.25rem;line-height:1.7;margin-bottom:2.5rem;">
+      30분 무료 상담으로 행사의 방향을 잡아드립니다.<br>부담 없이 연락주세요.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;align-items:stretch;">
+      <!-- 전화 버튼 -->
+      <a href="tel:15337295" class="btn-primary" style="flex-direction:column;align-items:center;gap:.15rem;padding:.85rem 2rem;">
+        <span style="display:flex;align-items:center;gap:.45rem;">
+          <iconify-icon icon="solar:phone-bold" style="font-size:16px;"></iconify-icon>
+          <span style="font-size:1.45rem;font-weight:800;letter-spacing:.02em;">1533-7295</span>
+        </span>
+        <span style="font-size:.72rem;font-weight:400;opacity:.8;letter-spacing:.04em;">무료 전화 상담</span>
+      </a>
+      <!-- 이메일 버튼 -->
+      <a href="mailto:gilcaro@naver.com" class="btn-ghost" style="flex-direction:column;align-items:center;gap:.15rem;padding:.85rem 2rem;">
+        <span style="display:flex;align-items:center;gap:.45rem;">
+          <iconify-icon icon="solar:letter-linear" style="font-size:16px;"></iconify-icon>
+          <span style="font-size:.95rem;font-weight:600;">이메일 문의</span>
+        </span>
+        <span style="font-size:.72rem;color:#71717a;font-weight:400;letter-spacing:.01em;">gilcaro@naver.com</span>
+      </a>
+    </div>
+    <div style="margin-top:3rem;display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;font-size:.875rem;color:#52525b;">
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <iconify-icon icon="solar:check-circle-bold" style="color:#F59E0B;font-size:15px;"></iconify-icon>
+        30분 무료 상담
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <iconify-icon icon="solar:check-circle-bold" style="color:#F59E0B;font-size:15px;"></iconify-icon>
+        7일 내 기획안 제안
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <iconify-icon icon="solar:check-circle-bold" style="color:#F59E0B;font-size:15px;"></iconify-icon>
+        전담 PM 배정
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════ -->
+<footer style="border-top:1px solid rgba(255,255,255,.05);padding:2.5rem 1.5rem;">
+  <div style="max-width:80rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem;">
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <img src="logo-kgm-transparent.png" alt="큰길이벤트기획" style="height:2.4rem;width:auto;object-fit:contain;filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(245,158,11,.55));">
+      <span style="font-size:.9rem;font-weight:700;letter-spacing:-.02em;white-space:nowrap;">큰길이벤트기획</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:1.75rem;font-size:.875rem;color:#71717a;">
+      <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">서비스 소개</a>
+      <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">포트폴리오</a>
+      <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">채용</a>
+      <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">개인정보처리방침</a>
+    </div>
+    <div style="display:flex;gap:.75rem;">
+      <!-- 1. 네이버 블로그 -->
+      <a href="https://blog.naver.com/gilcaro" target="_blank" rel="noopener" class="glass"
+         style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a1a1aa;text-decoration:none;transition:color .2s;"
+         onmouseover="this.style.color='#03C75A'" onmouseout="this.style.color='#a1a1aa'" title="네이버 블로그">
+        <iconify-icon icon="simple-icons:naver" style="font-size:15px;"></iconify-icon>
+      </a>
+      <!-- 2. 카카오톡 오픈채팅 -->
+      <a href="https://open.kakao.com/o/keungil" target="_blank" rel="noopener" class="glass"
+         style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a1a1aa;text-decoration:none;transition:color .2s;"
+         onmouseover="this.style.color='#FEE500'" onmouseout="this.style.color='#a1a1aa'" title="카카오톡 상담">
+        <iconify-icon icon="simple-icons:kakao" style="font-size:15px;"></iconify-icon>
+      </a>
+      <!-- 3. 인스타그램 -->
+      <a href="https://instagram.com/keungilevent" target="_blank" rel="noopener" class="glass"
+         style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a1a1aa;text-decoration:none;transition:color .2s;"
+         onmouseover="this.style.color='#E1306C'" onmouseout="this.style.color='#a1a1aa'" title="인스타그램">
+        <iconify-icon icon="simple-icons:instagram" style="font-size:15px;"></iconify-icon>
+      </a>
+    </div>
+  </div>
+  <div style="max-width:80rem;margin:1.75rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.05);display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;font-size:.75rem;color:#3f3f46;">
+    <span>광주전남특별시 광양 강변동길 1. 큰길이벤트기획</span>
+    <span>© 2024 큰길이벤트기획. 모든 권리 보유.</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════ -->
+<script>
+// ──────────────────────────────────────────────────
+// 1. SCROLL SCRUB — WebP frame sequence
+//    Apple-style: scrolling through #scrub-section
+//    drives the frame displayed on #scrub-canvas
+// ──────────────────────────────────────────────────
+(function() {
+  const TOTAL_FRAMES = 120;
+  const canvas  = document.getElementById('scrub-canvas');
+  const section = document.getElementById('scrub-section');
+  const progress= document.getElementById('scrub-progress');
+  const p1 = document.getElementById('scrub-p1');
+  const p2 = document.getElementById('scrub-p2');
+  const p3 = document.getElementById('scrub-p3');
+  const p4 = document.getElementById('scrub-p4');
+  const p5 = document.getElementById('scrub-p5');
+
+  // Pre-load all frames into Image objects
+  const frames = [];
+  let loadedCount = 0;
+  const ready = new Promise(resolve => {
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      const num  = String(i).padStart(4,'0');
+      img.src    = `frames/frame_${num}.webp`;
+      img.onload = () => { loadedCount++; if (loadedCount === TOTAL_FRAMES) resolve(); };
+      img.onerror= () => { loadedCount++; if (loadedCount === TOTAL_FRAMES) resolve(); };
+      frames.push(img);
+    }
+  });
+
+  let currentFrame = 0;
+  let rafPending   = false;
+
+  function showFrame(idx) {
+    const clamped = Math.max(0, Math.min(TOTAL_FRAMES - 1, idx));
+    if (clamped === currentFrame && canvas.src === frames[clamped].src) return;
+    currentFrame = clamped;
+    canvas.src   = frames[clamped].src;
+  }
+
+  function updateScrub() {
+    rafPending = false;
+
+    const rect   = section.getBoundingClientRect();
+    const total  = section.offsetHeight - window.innerHeight;
+    // raw progress 0-1 through the sticky section
+    const raw    = Math.max(0, Math.min(1, -rect.top / total));
+
+    // Frame index (ease: smoothstep for silkier feel)
+    const eased  = raw * raw * (3 - 2 * raw);           // smoothstep
+    const idx    = Math.round(eased * (TOTAL_FRAMES - 1));
+    showFrame(idx);
+
+    // Progress bar
+    progress.style.width = (raw * 100).toFixed(2) + '%';
+
+    // Text phases: 5 equal segments (0-20 / 20-40 / 40-60 / 60-80 / 80-100%)
+    const show = el => el.classList.add('show');
+    const hide = el => el.classList.remove('show');
+    const all  = [p1, p2, p3, p4, p5];
+
+    let active;
+    if      (raw < 0.20) active = p1;
+    else if (raw < 0.40) active = p2;
+    else if (raw < 0.60) active = p3;
+    else if (raw < 0.80) active = p4;
+    else                 active = p5;
+
+    all.forEach(el => el === active ? show(el) : hide(el));
+  }
+
+  // Use IntersectionObserver to activate listener only when section is visible
+  let active = false;
+  const io = new IntersectionObserver(entries => {
+    active = entries[0].isIntersecting;
+    if (active) updateScrub();
+  }, { threshold: 0 });
+  io.observe(section);
+
+  // Throttle via rAF — never use window.scroll listener directly
+  document.addEventListener('scroll', () => {
+    if (!active || rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(updateScrub);
+  }, { passive: true });
+
+  // Show first frame once images are ready
+  ready.then(() => {
+    showFrame(0);
+    p1.classList.add('show');
+  });
+})();
+
+
+// ──────────────────────────────────────────────────
+// 2. REVEAL on scroll (IntersectionObserver)
+// ──────────────────────────────────────────────────
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => obs.observe(el));
+})();
+
+/* ── Hero video: play once then freeze on last frame ── */
+(function(){
+  const v = document.getElementById('hero-video');
+  if(!v) return;
+  v.addEventListener('ended', function(){
+    // Freeze on last frame
+    v.currentTime = v.duration;
+    v.pause();
+    // Trigger brand reveal
+    const reveal = document.getElementById('hero-brand-reveal');
+    const glow   = document.getElementById('hero-brand-glow');
+    const heroImg = document.getElementById('hero-image-reveal');
+    if(reveal)  reveal.classList.add('show');
+    if(glow)    glow.classList.add('show');
+    if(heroImg) heroImg.classList.add('show');
+  }, { once: true });
+})();
+</script>
+
+</body>
+</html>
