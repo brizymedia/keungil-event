@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>제10회 여수진남초등학교 총동문 한마음체육대회</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    overflow: hidden;
+  }
+
+  #stage {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ── 슬라이드 ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: kenburns 7s ease-in-out forwards;
+  }
+  @keyframes kenburns {
+    0%   { transform: scale(1)    translate(0, 0); }
+    100% { transform: scale(1.12) translate(-2%, -1%); }
+  }
+  @keyframes kenburns2 {
+    0%   { transform: scale(1.1)  translate(2%, 1%); }
+    100% { transform: scale(1)    translate(0, 0); }
+  }
+  @keyframes kenburns3 {
+    0%   { transform: scale(1)    translate(2%, -2%); }
+    100% { transform: scale(1.1)  translate(-1%, 1%); }
+  }
+  .slide:nth-child(even) img    { animation-name: kenburns2; }
+  .slide:nth-child(3n+1) img   { animation-name: kenburns3; }
+
+  /* 어둡게 오버레이 */
+  .slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+      rgba(0,0,0,0.15) 0%,
+      rgba(0,0,0,0.05) 40%,
+      rgba(0,0,0,0.5)  100%);
+    pointer-events: none;
+  }
+
+  /* ── 인트로 슬라이드 ── */
+  #intro {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #1565c0 70%, #0d47a1 100%);
+    flex-direction: column;
+    gap: 0;
+  }
+  #intro::after { display: none; }
+
+  .intro-decoration {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .c1 { width: 600px; height: 600px; background: #fff; top: -200px; right: -150px; }
+  .c2 { width: 400px; height: 400px; background: #ffd54f; bottom: -180px; left: -100px; }
+  .c3 { width: 200px; height: 200px; background: #ef5350; top: 40%; left: 5%; }
+
+  .intro-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: fadeUp 1.5s ease forwards;
+  }
+  @keyframes fadeUp {
+    0%   { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .intro-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6f00, #ffa000, #ffca28);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    padding: 8px 28px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 20px rgba(255,160,0,0.5);
+    animation: fadeUp 1.5s 0.3s ease both;
+  }
+
+  .intro-school {
+    font-size: 36px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+    animation: fadeUp 1.5s 0.5s ease both;
+  }
+
+  .intro-title {
+    font-size: 80px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 6px;
+    line-height: 1.1;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    animation: fadeUp 1.5s 0.7s ease both;
+  }
+  .intro-title span { color: #ffd54f; }
+
+  .intro-divider {
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #ffd54f, transparent);
+    margin: 24px auto;
+    animation: fadeUp 1.5s 0.9s ease both;
+  }
+
+  .intro-info {
+    font-size: 24px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 3px;
+    animation: fadeUp 1.5s 1.1s ease both;
+  }
+  .intro-info b { color: #ffd54f; }
+
+  .intro-slogan {
+    font-size: 20px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 16px;
+    letter-spacing: 4px;
+    animation: fadeUp 1.5s 1.3s ease both;
+  }
+
+  /* ── 캡션 오버레이 ── */
+  .caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 20px 40px 28px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+    animation: slideUp 0.8s 0.5s ease both;
+  }
+  @keyframes slideUp {
+    0%   { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .caption-tag {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff6f00, #ffa000);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .caption-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
+  }
+
+  /* ── 아웃트로 ── */
+  #outro-early,
+  #outro {
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 40%, #388e3c 70%, #1b5e20 100%);
+    flex-direction: column;
+  }
+  #outro-early::after,
+  #outro::after { display: none; }
+
+  .outro-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: fadeUp 1.5s ease forwards;
+  }
+  .outro-emoji { font-size: 60px; margin-bottom: 20px; }
+  .outro-main {
+    font-size: 52px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 4px;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    margin-bottom: 16px;
+  }
+  .outro-sub {
+    font-size: 22px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 3px;
+    margin-bottom: 30px;
+  }
+  .outro-date {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 12px 36px;
+    border-radius: 50px;
+    letter-spacing: 3px;
+    backdrop-filter: blur(10px);
+  }
+
+  /* ── 진행바 ── */
+  #progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ffd54f, #ff6f00);
+    width: 0%;
+    z-index: 100;
+    transition: width linear;
+    box-shadow: 0 0 8px rgba(255,213,79,0.6);
+  }
+
+  /* ── 컨트롤 ── */
+  #controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 200;
+    background: rgba(0,0,0,0.6);
+    padding: 10px 20px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+  }
+  #controls button {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  #controls button:hover { background: rgba(255,255,255,0.3); }
+  #music-btn { min-width: 90px; }
+
+  #slide-counter {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    z-index: 100;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+
+  /* ── 좌측 상단 타이틀 (인트로 이후) ── */
+  #left-title {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+  }
+  #left-title.visible { opacity: 1; }
+  #left-title .lt-school {
+    font-size: 19.5px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.6);
+    line-height: 1.5;
+  }
+  #left-title .lt-event {
+    font-size: 15.6px;
+    font-weight: 700;
+    color: rgba(255,213,79,0.95);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+
+  /* ── 상시 초대 뱃지 ── */
+  #invite-badge {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    animation: badgePulse 2.5s ease-in-out infinite;
+  }
+  #invite-badge.visible { opacity: 1; }
+  @keyframes badgePulse {
+    0%, 100% { transform: scale(1);    filter: brightness(1); }
+    50%       { transform: scale(1.06); filter: brightness(1.15); }
+  }
+  .badge-main {
+    background: linear-gradient(135deg, #ff6f00, #ffa000, #ffca28);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    padding: 7px 18px;
+    border-radius: 50px;
+    letter-spacing: 3px;
+    box-shadow: 0 4px 18px rgba(255,111,0,0.55), 0 0 0 3px rgba(255,202,40,0.3);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    white-space: nowrap;
+  }
+  .badge-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 2px;
+    text-align: right;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- 진행바 -->
+  <div id="progress-bar"></div>
+  <div id="slide-counter"></div>
+
+  <!-- 좌측 상단 타이틀 (인트로 이후 표시) -->
+  <div id="left-title">
+    <div class="lt-school">여수진남초등학교</div>
+    <div class="lt-event">총동문 한마음체육대회</div>
+  </div>
+
+  <!-- 상시 초대 뱃지 -->
+  <div id="invite-badge">
+    <div class="badge-main">🎉 초대합니다!</div>
+    <div class="badge-sub">2026. 6. 13.(토) · 모교 실내체육관</div>
+  </div>
+
+  <!-- 슬라이드 0: 인트로 -->
+  <div class="slide" id="intro">
+    <div class="intro-decoration">
+      <div class="circle c1"></div>
+      <div class="circle c2"></div>
+      <div class="circle c3"></div>
+    </div>
+    <div class="intro-content">
+      <div class="intro-badge">제 10 회</div>
+      <div class="intro-school">여수진남초등학교</div>
+      <div class="intro-title">총동문<br><span>한마음</span>체육대회</div>
+      <div class="intro-divider"></div>
+      <div class="intro-info">
+        <b>2026. 6. 13.(토)</b> &nbsp;09:00~&nbsp;&nbsp;|&nbsp;&nbsp;장소: <b>모교 실내체육관</b>
+      </div>
+      <div class="intro-slogan">⚽ 함께 그리는 미래 · Happy Friends 🏀</div>
+    </div>
+  </div>
+
+  <!-- 슬라이드 1: 인트로 직후 초대 화면 -->
+  <div class="slide" id="outro-early">
+    <div class="intro-decoration">
+      <div class="circle c1" style="background:#ffd54f; opacity:0.07;"></div>
+      <div class="circle c2" style="background:#fff; opacity:0.06;"></div>
+    </div>
+    <div class="outro-content">
+      <div class="outro-emoji">🎉</div>
+      <div class="outro-main">여러분을 초대합니다!</div>
+      <div class="outro-sub">제10회 여수진남초등학교 총동문 한마음체육대회</div>
+      <div class="outro-date">📅 2026년 6월 13일(토) 오전 9시 · 모교 실내체육관</div>
+    </div>
+  </div>
+
+  <!-- 슬라이드 2 ~ 21: 사진들 -->
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_01.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">개회식</div>
+      <div class="caption-text">역대 동문들이 한자리에 모인 성대한 개회식</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_04.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">개회식 · 입장</div>
+      <div class="caption-text">기수별 입장 — 설레는 만남의 시작</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">단체 경기</div>
+      <div class="caption-text">신나는 풍선 게임 — 동문들의 열정이 폭발!</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_05.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">팀워크</div>
+      <div class="caption-text">배구 경기 전 파이팅! — 우리는 하나</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_08.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">재미 경기</div>
+      <div class="caption-text">업고 달리기 — 웃음과 함께하는 운동회</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_06.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">뜨거운 경쟁, 더 뜨거운 우정</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_07.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">즐거운 체육대회의 하이라이트</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_09.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">동문들의 열띤 활약</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_10.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">하나가 되어 함께 뛰는 우리</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_11.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">잊을 수 없는 추억을 만들어가는 시간</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_19.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">단체 게임</div>
+      <div class="caption-text">모두가 하나 — 신나는 단체 경기</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_13.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">땀과 웃음이 넘치는 진남초 체육대회</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_14.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">뭉치면 이긴다 — 동문의 힘</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_15.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">경기</div>
+      <div class="caption-text">즐거운 경쟁, 아름다운 동행</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_03.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">친목 · 식사</div>
+      <div class="caption-text">함께 나누는 음식, 더 깊어지는 동문 우정</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_02.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">친목</div>
+      <div class="caption-text">오랜 친구들과 나누는 행복한 시간</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_16.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">친목</div>
+      <div class="caption-text">노란 물결 — 동문들의 활기찬 모습</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_12.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">공연</div>
+      <div class="caption-text">색소폰 공연 — 음악이 있어 더욱 풍성한 체육대회</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_17.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">행사</div>
+      <div class="caption-text">함께여서 더 빛나는 진남초의 하루</div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <img src="KakaoTalk_20260606_184048772_18.jpg" alt="">
+    <div class="caption">
+      <div class="caption-tag">추억</div>
+      <div class="caption-text">이 순간이 소중한 추억이 됩니다</div>
+    </div>
+  </div>
+
+  <!-- 슬라이드 21: 아웃트로 -->
+  <div class="slide" id="outro">
+    <div class="intro-decoration">
+      <div class="circle c1" style="background:#ffd54f; opacity:0.07;"></div>
+      <div class="circle c2" style="background:#fff; opacity:0.06;"></div>
+    </div>
+    <div class="outro-content">
+      <div class="outro-emoji">🏅</div>
+      <div class="outro-main">여러분을 초대합니다!</div>
+      <div class="outro-sub">제10회 여수진남초등학교 총동문 한마음체육대회</div>
+      <div class="outro-date">📅 2026년 6월 13일(토) 오전 9시 · 모교 실내체육관</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 컨트롤 -->
+<div id="controls">
+  <button onclick="prevSlide()">◀ 이전</button>
+  <button onclick="togglePlay()" id="playBtn">⏸ 일시정지</button>
+  <button onclick="nextSlide()">다음 ▶</button>
+  <button onclick="toggleMusic()" id="music-btn">🎵 음악 켜기</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const SLIDE_DURATION = 5500; // ms per slide
+const TRANSITION = 1200;
+
+let current = 0;
+let playing = true;
+let timer = null;
+let progressTimer = null;
+let startTime = null;
+
+function showSlide(idx) {
+  slides.forEach(s => s.classList.remove('active'));
+  current = (idx + slides.length) % slides.length;
+  slides[current].classList.add('active');
+
+  // Re-trigger ken burns
+  const img = slides[current].querySelector('img');
+  if (img) {
+    img.style.animation = 'none';
+    img.offsetHeight; // reflow
+    img.style.animation = '';
+  }
+
+  // 좌측 타이틀 + 우측 초대 뱃지: 첫번째 사진(index 2)부터 표시
+  const showOverlays = current >= 2 && current < slides.length - 1;
+  document.getElementById('left-title').classList.toggle('visible', showOverlays);
+  document.getElementById('invite-badge').classList.toggle('visible', showOverlays);
+
+  // Counter
+  const isSpecial = current === 0 || current === 1 || current === slides.length - 1;
+  document.getElementById('slide-counter').textContent =
+    isSpecial ? '' : `${current - 1} / ${slides.length - 3}`;
+
+  // Progress bar
+  startProgressBar();
+}
+
+function startProgressBar() {
+  const bar = document.getElementById('progress-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  bar.offsetHeight;
+  bar.style.transition = `width ${SLIDE_DURATION}ms linear`;
+  bar.style.width = '100%';
+}
+
+function nextSlide() {
+  if (current >= slides.length - 1) return; // 마지막 슬라이드에서 정지
+  showSlide(current + 1);
+  if (current >= slides.length - 1) {
+    // 마지막 슬라이드 도달 시 자동 진행 중단
+    clearInterval(timer);
+    playing = false;
+    document.getElementById('playBtn').textContent = '▶ 재생';
+    document.getElementById('progress-bar').style.transition = 'none';
+    document.getElementById('progress-bar').style.width = '100%';
+    return;
+  }
+  if (playing) resetTimer();
+}
+
+function prevSlide() {
+  showSlide(current - 1);
+  if (playing) resetTimer();
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timer = setInterval(nextSlide, SLIDE_DURATION);
+}
+
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸ 일시정지' : '▶ 재생';
+  if (playing) {
+    resetTimer();
+    startProgressBar();
+  } else {
+    clearInterval(timer);
+    document.getElementById('progress-bar').style.transition = 'none';
+  }
+}
+
+// 키보드 컨트롤
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  if (e.key === 'ArrowLeft') prevSlide();
+  if (e.key === 'p' || e.key === 'P') togglePlay();
+});
+
+// 시작
+showSlide(0);
+timer = setInterval(nextSlide, SLIDE_DURATION);
+
+/* ── 배경음악 (Web Audio API) ── */
+let audioCtx = null;
+let masterGain = null;
+let musicPlaying = false;
+let loopTimeout = null;
+
+const BPM = 96;
+const B = 60 / BPM; // 한 박자 길이(초)
+
+// C장조 기반 밝고 경쾌한 멜로디 (주파수, 박수, 시작박)
+const MELODY = [
+  // 마디 1 – 도미솔 올라가기
+  [523.25,0.5,0],[659.25,0.5,0.5],[783.99,1,1],[659.25,0.5,2],[587.33,0.5,2.5],[523.25,1,3],
+  // 마디 2
+  [493.88,0.5,4],[440,0.5,4.5],[523.25,1,5],[587.33,0.5,6],[659.25,0.5,6.5],[523.25,1,7],
+  // 마디 3 – 높이 올라가기
+  [783.99,0.5,8],[880,0.5,8.5],[1046.5,1,9],[880,0.5,10],[783.99,0.5,10.5],[698.46,1,11],
+  // 마디 4 – 내려오며 마무리
+  [659.25,0.5,12],[587.33,0.5,12.5],[523.25,0.5,13],[440,0.5,13.5],[392,1,14],[523.25,1,15],
+];
+
+// 코드 진행: C – G – Am – F (각 4박)
+const CHORDS = [
+  [[261.63,329.63,392.00], 4, 0],
+  [[196.00,246.94,293.66], 4, 4],
+  [[220.00,277.18,329.63], 4, 8],
+  [[174.61,220.00,261.63], 4, 12],
+];
+
+// 베이스 라인
+const BASS = [
+  [130.81,1,0],[130.81,1,2],[98.00,1,4],[98.00,1,6],
+  [110.00,1,8],[110.00,1,10],[87.31,1,12],[87.31,1,14],
+];
+
+function note(freq, dur, start, type='sine', vol=0.22) {
+  const osc = audioCtx.createOscillator();
+  const g   = audioCtx.createGain();
+  osc.connect(g); g.connect(masterGain);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol, start + 0.03);
+  g.gain.setValueAtTime(vol, start + dur * B - 0.06);
+  g.gain.linearRampToValueAtTime(0, start + dur * B);
+  osc.start(start);
+  osc.stop(start + dur * B + 0.05);
+}
+
+function scheduleLoop(t0) {
+  const loopLen = 16 * B;
+  MELODY.forEach(([f,d,s]) => note(f, d, t0 + s*B, 'sine', 0.20));
+  CHORDS.forEach(([freqs,d,s]) => freqs.forEach(f => note(f, d, t0 + s*B, 'triangle', 0.055)));
+  BASS.forEach(([f,d,s]) => note(f, d, t0 + s*B, 'sawtooth', 0.13));
+  loopTimeout = setTimeout(() => scheduleLoop(t0 + loopLen), (loopLen - 0.5) * 1000);
+}
+
+function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  if (!musicPlaying) {
+    if (!audioCtx) {
+      audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    scheduleLoop(audioCtx.currentTime + 0.1);
+    musicPlaying = true;
+    btn.textContent = '🔇 음악 끄기';
+  } else {
+    clearTimeout(loopTimeout);
+    masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.3);
+    setTimeout(() => { audioCtx.suspend(); }, 500);
+    musicPlaying = false;
+    btn.textContent = '🎵 음악 켜기';
+  }
+}
+</script>
+</body>
+</html>
