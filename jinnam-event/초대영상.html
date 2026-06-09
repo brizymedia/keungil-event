@@ -360,6 +360,8 @@
 </head>
 <body>
 
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
 <div id="stage">
 
   <!-- 진행바 -->
@@ -593,6 +595,7 @@
   <button onclick="prevSlide()">◀ 이전</button>
   <button onclick="togglePlay()" id="playBtn">⏸ 일시정지</button>
   <button onclick="nextSlide()">다음 ▶</button>
+  <button onclick="toggleMusic()" id="music-btn">🔇 음악 끄기</button>
 </div>
 
 <script>
@@ -689,6 +692,28 @@ document.addEventListener('keydown', e => {
 // 시작
 showSlide(0);
 timer = setInterval(nextSlide, SLIDE_DURATION);
+
+// 배경음악 자동재생 (브라우저 정책상 첫 클릭 후 재생)
+const bgm = document.getElementById('bgm');
+bgm.volume = 0.7;
+function startBgm() {
+  bgm.play().catch(() => {});
+  document.removeEventListener('click', startBgm);
+  document.removeEventListener('keydown', startBgm);
+}
+document.addEventListener('click', startBgm);
+document.addEventListener('keydown', startBgm);
+
+function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  if (bgm.paused) {
+    bgm.play();
+    btn.textContent = '🔇 음악 끄기';
+  } else {
+    bgm.pause();
+    btn.textContent = '🎵 음악 켜기';
+  }
+}
 
 </script>
 </body>
