@@ -277,7 +277,6 @@
     transition: all 0.2s;
   }
   #controls button:hover { background: rgba(255,255,255,0.3); }
-  #music-btn { min-width: 90px; }
 
   #slide-counter {
     position: absolute;
@@ -594,7 +593,6 @@
   <button onclick="prevSlide()">◀ 이전</button>
   <button onclick="togglePlay()" id="playBtn">⏸ 일시정지</button>
   <button onclick="nextSlide()">다음 ▶</button>
-  <button onclick="toggleMusic()" id="music-btn">🎵 음악 켜기</button>
 </div>
 
 <script>
@@ -692,84 +690,6 @@ document.addEventListener('keydown', e => {
 showSlide(0);
 timer = setInterval(nextSlide, SLIDE_DURATION);
 
-/* ── 배경음악 (Web Audio API) ── */
-let audioCtx = null;
-let masterGain = null;
-let musicPlaying = false;
-let loopTimeout = null;
-
-const BPM = 96;
-const B = 60 / BPM; // 한 박자 길이(초)
-
-// C장조 기반 밝고 경쾌한 멜로디 (주파수, 박수, 시작박)
-const MELODY = [
-  // 마디 1 – 도미솔 올라가기
-  [523.25,0.5,0],[659.25,0.5,0.5],[783.99,1,1],[659.25,0.5,2],[587.33,0.5,2.5],[523.25,1,3],
-  // 마디 2
-  [493.88,0.5,4],[440,0.5,4.5],[523.25,1,5],[587.33,0.5,6],[659.25,0.5,6.5],[523.25,1,7],
-  // 마디 3 – 높이 올라가기
-  [783.99,0.5,8],[880,0.5,8.5],[1046.5,1,9],[880,0.5,10],[783.99,0.5,10.5],[698.46,1,11],
-  // 마디 4 – 내려오며 마무리
-  [659.25,0.5,12],[587.33,0.5,12.5],[523.25,0.5,13],[440,0.5,13.5],[392,1,14],[523.25,1,15],
-];
-
-// 코드 진행: C – G – Am – F (각 4박)
-const CHORDS = [
-  [[261.63,329.63,392.00], 4, 0],
-  [[196.00,246.94,293.66], 4, 4],
-  [[220.00,277.18,329.63], 4, 8],
-  [[174.61,220.00,261.63], 4, 12],
-];
-
-// 베이스 라인
-const BASS = [
-  [130.81,1,0],[130.81,1,2],[98.00,1,4],[98.00,1,6],
-  [110.00,1,8],[110.00,1,10],[87.31,1,12],[87.31,1,14],
-];
-
-function note(freq, dur, start, type='sine', vol=0.22) {
-  const osc = audioCtx.createOscillator();
-  const g   = audioCtx.createGain();
-  osc.connect(g); g.connect(masterGain);
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, start);
-  g.gain.setValueAtTime(0, start);
-  g.gain.linearRampToValueAtTime(vol, start + 0.03);
-  g.gain.setValueAtTime(vol, start + dur * B - 0.06);
-  g.gain.linearRampToValueAtTime(0, start + dur * B);
-  osc.start(start);
-  osc.stop(start + dur * B + 0.05);
-}
-
-function scheduleLoop(t0) {
-  const loopLen = 16 * B;
-  MELODY.forEach(([f,d,s]) => note(f, d, t0 + s*B, 'sine', 0.20));
-  CHORDS.forEach(([freqs,d,s]) => freqs.forEach(f => note(f, d, t0 + s*B, 'triangle', 0.055)));
-  BASS.forEach(([f,d,s]) => note(f, d, t0 + s*B, 'sawtooth', 0.13));
-  loopTimeout = setTimeout(() => scheduleLoop(t0 + loopLen), (loopLen - 0.5) * 1000);
-}
-
-function toggleMusic() {
-  const btn = document.getElementById('music-btn');
-  if (!musicPlaying) {
-    if (!audioCtx) {
-      audioCtx  = new (window.AudioContext || window.webkitAudioContext)();
-      masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-      masterGain.connect(audioCtx.destination);
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    scheduleLoop(audioCtx.currentTime + 0.1);
-    musicPlaying = true;
-    btn.textContent = '🔇 음악 끄기';
-  } else {
-    clearTimeout(loopTimeout);
-    masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.3);
-    setTimeout(() => { audioCtx.suspend(); }, 500);
-    musicPlaying = false;
-    btn.textContent = '🎵 음악 켜기';
-  }
-}
 </script>
 </body>
 </html>
