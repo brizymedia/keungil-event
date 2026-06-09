@@ -627,6 +627,17 @@ function showSlide(idx) {
   document.getElementById('left-title').classList.toggle('visible', showOverlays);
   document.getElementById('invite-badge').classList.toggle('visible', showOverlays);
 
+  // 음악: 첫번째 이미지(index 2)부터 시작, 마지막 슬라이드에서 종료
+  if (current === 2 && bgm.paused) {
+    bgm.play().catch(() => {});
+    document.getElementById('music-btn').textContent = '🔇 음악 끄기';
+  }
+  if (current === slides.length - 1 && !bgm.paused) {
+    bgm.pause();
+    bgm.currentTime = 0;
+    document.getElementById('music-btn').textContent = '🎵 음악 켜기';
+  }
+
   // Counter
   const isSpecial = current === 0 || current === 1 || current === slides.length - 1;
   document.getElementById('slide-counter').textContent =
@@ -693,16 +704,19 @@ document.addEventListener('keydown', e => {
 showSlide(0);
 timer = setInterval(nextSlide, SLIDE_DURATION);
 
-// 배경음악 자동재생 (브라우저 정책상 첫 클릭 후 재생)
+// 배경음악
 const bgm = document.getElementById('bgm');
 bgm.volume = 0.7;
-function startBgm() {
-  bgm.play().catch(() => {});
-  document.removeEventListener('click', startBgm);
-  document.removeEventListener('keydown', startBgm);
+
+// 브라우저 자동재생 정책: 첫 클릭/키 입력 시 AudioContext 활성화 대기
+let bgmReady = false;
+function unlockAudio() {
+  bgmReady = true;
+  document.removeEventListener('click', unlockAudio);
+  document.removeEventListener('keydown', unlockAudio);
 }
-document.addEventListener('click', startBgm);
-document.addEventListener('keydown', startBgm);
+document.addEventListener('click', unlockAudio);
+document.addEventListener('keydown', unlockAudio);
 
 function toggleMusic() {
   const btn = document.getElementById('music-btn');
