@@ -1,0 +1,46 @@
+[
+  {
+    "label": "오프닝 훅 — 문제 제기",
+    "duration": 5.5,
+    "narration": "자루를 이렇게 묶으면, 손을 놓는 순간 스르륵 풀려버리죠? 정말 답답합니다.",
+    "subs": [
+      "자루를 이렇게 묶으면…",
+      "손 놓는 순간 스르륵 풀려버리죠?"
+    ],
+    "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3EP2dDmrGzrXFRyZxAIUMyV8nbT/hf_20260721_031259_600ca01d-6755-4a69-b8bd-155f2d298d37.png"
+  },
+  {
+    "label": "올바른 매듭법 — 1차 매듭",
+    "duration": 14.0,
+    "narration": "올바른 방법은 이렇습니다. 먼저 줄에 아래로 향하는 고리를 만들고, 짧은 줄 끝을 고리 아래에서 위로 통과시킨 다음, 본 줄에 한 바퀴 감아 다시 고리 안으로 넣어 당겨주세요. 이러면 첫 번째 매듭 완성입니다.",
+    "subs": [
+      "올바른 방법은 이렇습니다",
+      "① 줄에 아래로 향하는 고리 만들기",
+      "② 줄 끝을 고리 아래에서 위로 통과",
+      "③ 본줄 한 바퀴 감아 다시 고리 속으로",
+      "당기면 1차 매듭 완성!"
+    ],
+    "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3EP2dDmrGzrXFRyZxAIUMyV8nbT/hf_20260721_031310_f5dab10e-423e-4f43-8526-f4554223cdf1.png"
+  },
+  {
+    "label": "잠금 매듭 — 자동 조임",
+    "duration": 11.0,
+    "narration": "이제 이 매듭을 손가락에 두 바퀴 감고, 줄 끝을 두 고리 사이로 통과시킨 뒤, 자리를 잡고 아래로 당기면 매듭이 즉시 조여지면서 자동으로 잠깁니다.",
+    "subs": [
+      "④ 손가락에 두 바퀴 감고",
+      "⑤ 줄 끝을 두 고리 사이로 통과",
+      "아래로 당기면 자동으로 잠깁니다"
+    ],
+    "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3EP2dDmrGzrXFRyZxAIUMyV8nbT/hf_20260721_031315_3e030373-d20b-42a2-b30d-2dcb212e0ede.png"
+  },
+  {
+    "label": "퀵 릴리즈 — 마무리",
+    "duration": 6.0,
+    "narration": "풀고 싶을 땐 줄 끝을 살짝 위로 당기기만 하면 한 번에 스르륵 풀립니다. 도움이 되셨다면 구독과 좋아요 부탁드려요!",
+    "subs": [
+      "풀 때는 줄 끝만 살짝 위로!",
+      "한 번에 스르륵~ 구독·좋아요 부탁드려요"
+    ],
+    "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3EP2dDmrGzrXFRyZxAIUMyV8nbT/hf_20260721_031320_d483a9ca-5c32-46a1-a3a9-34139273732d.png"
+  }
+]
