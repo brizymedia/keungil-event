@@ -272,21 +272,27 @@
   <div style="max-width:78rem;margin:0 auto;position:relative;z-index:1;">
     <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:3.5rem;align-items:center;" class="split-grid">
 
-      <!-- visual: YouTube 노래 영상 -->
+      <!-- visual: YouTube 노래 영상 (썸네일 클릭 → 유튜브로 이동, 임베드 차단과 무관하게 항상 동작) -->
       <div class="reveal" style="order:1;">
-        <div class="portrait" style="padding:0;background:#000;border-color:rgba(244,114,182,.25);">
-          <div style="position:relative;width:100%;aspect-ratio:16/9;">
-            <iframe src="https://www.youtube-nocookie.com/embed/8EJVYk69z9s" title="가수 정마리 노래 영상"
-              style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block;"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        <a href="https://youtu.be/8EJVYk69z9s" target="_blank" rel="noopener"
+           class="portrait" style="display:block;padding:0;background:#000;border-color:rgba(244,114,182,.25);text-decoration:none;color:inherit;">
+          <div style="position:relative;width:100%;aspect-ratio:16/9;background:linear-gradient(160deg,rgba(244,114,182,.4),rgba(147,51,234,.28));">
+            <img src="https://img.youtube.com/vi/8EJVYk69z9s/hqdefault.jpg" alt="가수 정마리 노래 영상 썸네일"
+                 style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+                 onerror="this.style.display='none'">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,.28);"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+              <span style="width:4.5rem;height:4.5rem;border-radius:9999px;background:rgba(244,114,182,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 34px rgba(0,0,0,.45);transition:transform .3s;">
+                <iconify-icon icon="ph:play-fill" style="color:#fff;font-size:2rem;margin-left:.18rem;"></iconify-icon>
+              </span>
+            </div>
           </div>
           <div style="display:flex;align-items:center;gap:.6rem;padding:.9rem 1.15rem;background:rgba(255,255,255,.02);">
             <iconify-icon icon="ph:youtube-logo-fill" style="color:#F472B6;font-size:1.5rem;"></iconify-icon>
             <span style="font-weight:700;font-size:.92rem;">가수 정마리 · 노래 영상</span>
-            <a href="https://youtu.be/8EJVYk69z9s" target="_blank" rel="noopener" style="margin-left:auto;color:#F9A8D4;font-size:.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:.25rem;">유튜브에서 보기 <iconify-icon icon="ph:arrow-up-right"></iconify-icon></a>
+            <span style="margin-left:auto;color:#F9A8D4;font-size:.82rem;display:inline-flex;align-items:center;gap:.25rem;">유튜브에서 재생 <iconify-icon icon="ph:arrow-up-right"></iconify-icon></span>
           </div>
-        </div>
+        </a>
       </div>
 
       <!-- text -->
