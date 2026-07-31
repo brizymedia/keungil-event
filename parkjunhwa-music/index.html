@@ -133,6 +133,9 @@
     /* ── Divider ── */
     .rule{ height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent); }
 
+    /* 모바일 하단 고정 CTA가 푸터를 가리지 않도록 여백 확보 */
+    @media (max-width:639px){ body{ padding-bottom:5rem; } }
+
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition-duration:.01ms !important; }
       .reveal{ opacity:1;transform:none; }
@@ -221,16 +224,27 @@
       첫 곡부터 무대까지 함께합니다.
     </p>
 
-    <div class="reveal flex flex-col sm:flex-row gap-3 sm:gap-4 mb-14" style="transition-delay:.24s">
+    <div class="reveal flex flex-col sm:flex-row gap-3 sm:gap-4 mb-5" style="transition-delay:.24s">
       <a href="#contact" class="btn btn-primary">
         <iconify-icon icon="ph:calendar-check-fill" width="19"></iconify-icon>
-        1:1 상담 · 체험 레슨 신청
+        1:1 상담 신청하기
       </a>
-      <a href="#lessons" class="btn btn-ghost">
-        <iconify-icon icon="ph:list-bullets-bold" width="19"></iconify-icon>
-        레슨 과목 살펴보기
+      <a href="tel:01062144588" class="btn btn-ghost" data-hero-tel>
+        <iconify-icon icon="ph:phone-fill" width="19"></iconify-icon>
+        010-6214-4588
       </a>
     </div>
+
+    <p class="reveal flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[.82rem] text-white/40 mb-14" style="transition-delay:.28s">
+      <span class="inline-flex items-center gap-1.5">
+        <iconify-icon icon="ph:seal-check-fill" width="15" class="text-violet-400"></iconify-icon>
+        전라남도교육청 등록 학원
+      </span>
+      <span class="text-white/15">·</span>
+      <span>2012년 개원</span>
+      <span class="text-white/15">·</span>
+      <span>동시 수업 정원 8명</span>
+    </p>
 
     <div class="reveal grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-6 max-w-3xl" style="transition-delay:.32s">
       <div>
@@ -376,6 +390,106 @@
   </div>
 </section>
 
+<!-- ══════════ OBJECTIONS ══════════ -->
+<section id="worries" class="relative py-24 sm:py-32 border-t border-white/[.06] overflow-hidden">
+  <div class="glow w-[30rem] h-[30rem] bg-fuchsia-700/18 top-10 right-0"></div>
+
+  <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="max-w-2xl mb-14">
+      <p class="eyebrow reveal mb-5">Worries</p>
+      <h2 class="reveal text-3xl sm:text-[2.7rem] font-black leading-[1.18] tracking-[-.025em] mb-5" style="transition-delay:.06s">
+        이 걱정 때문에<br>몇 년째 미루고 계셨다면.
+      </h2>
+      <p class="reveal text-white/55 leading-relaxed" style="transition-delay:.12s">
+        상담을 오시는 분들이 문 앞에서 가장 많이 하는 말들입니다. 하나씩 솔직하게 답해 드립니다.
+      </p>
+    </div>
+
+    <div class="space-y-3">
+
+      <div class="reveal card p-6 sm:p-7 grid sm:grid-cols-[auto_1fr] gap-5 sm:gap-7 items-start">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-white/[.05] border border-white/[.09]">
+          <iconify-icon icon="ph:smiley-nervous-fill" width="22" class="text-white/40"></iconify-icon>
+        </span>
+        <div>
+          <p class="font-bold text-[1.05rem] mb-2.5 text-white/85">“저는 진짜 음치라서요.”</p>
+          <p class="text-[.92rem] text-white/55 leading-relaxed">
+            음을 못 맞추는 것과 음을 못 듣는 것은 다릅니다. 대부분은 듣고는 있지만
+            그 음을 몸으로 내는 훈련을 안 해봤을 뿐입니다. 그래서 첫 수업에서는 노래를 시키지 않고,
+            지금 목소리가 어디까지 편하게 나오는지부터 같이 확인합니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal card p-6 sm:p-7 grid sm:grid-cols-[auto_1fr] gap-5 sm:gap-7 items-start" style="transition-delay:.05s">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-white/[.05] border border-white/[.09]">
+          <iconify-icon icon="ph:clock-countdown-fill" width="22" class="text-white/40"></iconify-icon>
+        </span>
+        <div>
+          <p class="font-bold text-[1.05rem] mb-2.5 text-white/85">“꾸준히 못 다닐 것 같아요.”</p>
+          <p class="text-[.92rem] text-white/55 leading-relaxed">
+            그만두는 가장 큰 이유는 의지가 아니라 <strong class="text-white/80 font-semibold">진도가 지루해서</strong>입니다.
+            기초 연습만 두 달 하면 누구든 그만둡니다. 그래서 처음부터 좋아하는 곡을 목표로 잡고,
+            그 곡에 필요한 기초만 골라서 붙입니다. 눈에 보이는 게 있어야 다음 주에도 옵니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal card p-6 sm:p-7 grid sm:grid-cols-[auto_1fr] gap-5 sm:gap-7 items-start" style="transition-delay:.1s">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-white/[.05] border border-white/[.09]">
+          <iconify-icon icon="ph:user-focus-fill" width="22" class="text-white/40"></iconify-icon>
+        </span>
+        <div>
+          <p class="font-bold text-[1.05rem] mb-2.5 text-white/85">“나이가 많은데 지금 시작해도 될까요?”</p>
+          <p class="text-[.92rem] text-white/55 leading-relaxed">
+            악기는 어릴수록 빨리 늡니다. 다만 성인은 왜 이걸 하는지 알고 시작하기 때문에
+            연습의 밀도가 다릅니다. 취미로 배우는 데 늦은 나이는 없습니다.
+            실제로 40대·50대에 처음 기타를 잡는 분들이 계속 오십니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal card p-6 sm:p-7 grid sm:grid-cols-[auto_1fr] gap-5 sm:gap-7 items-start" style="transition-delay:.15s">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-white/[.05] border border-white/[.09]">
+          <iconify-icon icon="ph:currency-krw-fill" width="22" class="text-white/40"></iconify-icon>
+        </span>
+        <div>
+          <p class="font-bold text-[1.05rem] mb-2.5 text-white/85">“악기부터 사야 하는 거 아닌가요?”</p>
+          <p class="text-[.92rem] text-white/55 leading-relaxed">
+            아닙니다. 수업은 학원 악기로 진행합니다. 몇 달 배워보고 계속하겠다는 확신이 섰을 때
+            사셔도 늦지 않습니다. 그때 예산에 맞는 모델을 같이 골라 드립니다.
+            처음부터 비싼 악기를 권하지 않습니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="reveal card p-6 sm:p-7 grid sm:grid-cols-[auto_1fr] gap-5 sm:gap-7 items-start" style="transition-delay:.2s">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center bg-white/[.05] border border-white/[.09]">
+          <iconify-icon icon="ph:users-fill" width="22" class="text-white/40"></iconify-icon>
+        </span>
+        <div>
+          <p class="font-bold text-[1.05rem] mb-2.5 text-white/85">“학원 가면 잘하는 사람들 사이에서 주눅들 것 같아요.”</p>
+          <p class="text-[.92rem] text-white/55 leading-relaxed">
+            동시 수업 정원이 8명입니다. 남들 앞에서 연주할 일도, 비교당할 일도 없습니다.
+            수업은 강사와 둘이서 진행되고, 무대에 서는 건 본인이 원할 때만 합니다.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="reveal mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+      <p class="text-white/50 text-[.93rem]">
+        아직 걱정이 남아 있다면, 그 걱정을 그대로 물어보셔도 됩니다.
+      </p>
+      <a href="#contact" class="btn btn-primary !py-3 !px-6 !text-[.9rem]">
+        <iconify-icon icon="ph:chat-circle-dots-fill" width="18"></iconify-icon>
+        편하게 물어보기
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ LESSONS ══════════ -->
 <section id="lessons" class="relative py-24 sm:py-32 border-t border-white/[.06]">
   <div class="absolute inset-0 bg-gradient-to-b from-violet-950/20 to-transparent pointer-events-none"></div>
@@ -511,6 +625,88 @@
 
     <p class="reveal text-center text-[.85rem] text-white/35 mt-10">
       과목 구성과 진도는 상담 시 개인에 맞춰 조정됩니다.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════ ROADMAP ══════════ -->
+<section id="roadmap" class="relative py-24 sm:py-32 border-t border-white/[.06] overflow-hidden">
+  <div class="glow w-[28rem] h-[28rem] bg-violet-700/20 bottom-0 -left-40"></div>
+
+  <div class="relative max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="max-w-2xl mb-14">
+      <p class="eyebrow reveal mb-5">Roadmap</p>
+      <h2 class="reveal text-3xl sm:text-[2.7rem] font-black leading-[1.18] tracking-[-.025em] mb-5" style="transition-delay:.06s">
+        “그래서 언제쯤<br><span class="grad">한 곡을 칠 수 있나요?</span>”
+      </h2>
+      <p class="reveal text-white/55 leading-relaxed" style="transition-delay:.12s">
+        완전 입문자가 주 1~2회 수업을 꾸준히 받았을 때의 일반적인 흐름입니다.
+        속도는 사람마다 다르지만, 무엇을 향해 가고 있는지는 처음부터 알고 시작해야 합니다.
+      </p>
+    </div>
+
+    <div class="relative">
+      <!-- timeline line -->
+      <div class="hidden sm:block absolute left-[1.35rem] top-3 bottom-3 w-px bg-gradient-to-b from-violet-500/60 via-fuchsia-500/35 to-transparent"></div>
+
+      <div class="space-y-4">
+
+        <div class="reveal relative sm:pl-16">
+          <span class="hidden sm:grid absolute left-0 top-5 w-11 h-11 place-items-center rounded-full bg-violet-500/20 border border-violet-400/40 backdrop-blur">
+            <span class="text-[.78rem] font-black text-violet-200">1M</span>
+          </span>
+          <div class="card p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="sm:hidden px-2.5 py-1 rounded-full text-[.7rem] font-extrabold bg-violet-500/20 text-violet-200 border border-violet-400/25">1개월</span>
+              <h3 class="font-bold text-lg">첫 한 곡이 끝까지 나옵니다</h3>
+            </div>
+            <p class="text-[.91rem] text-white/55 leading-relaxed">
+              기타라면 코드 몇 개로 곡 하나를 처음부터 끝까지 넘기고, 드럼이라면 8비트로 한 곡을 따라칩니다.
+              보컬은 자기 음역대를 알고 편하게 부를 수 있는 곡이 생깁니다. 완성도보다
+              <strong class="text-white/80 font-semibold">끝까지 간다</strong>는 감각이 목표입니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="reveal relative sm:pl-16" style="transition-delay:.06s">
+          <span class="hidden sm:grid absolute left-0 top-5 w-11 h-11 place-items-center rounded-full bg-violet-500/20 border border-violet-400/40 backdrop-blur">
+            <span class="text-[.78rem] font-black text-violet-200">3M</span>
+          </span>
+          <div class="card p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="sm:hidden px-2.5 py-1 rounded-full text-[.7rem] font-extrabold bg-violet-500/20 text-violet-200 border border-violet-400/25">3개월</span>
+              <h3 class="font-bold text-lg">남들 앞에서 한 곡 들려줄 수 있습니다</h3>
+            </div>
+            <p class="text-[.91rem] text-white/55 leading-relaxed">
+              레퍼토리가 서너 곡으로 늘고, 박자가 흔들리지 않습니다. 새 곡을 받았을 때
+              어디부터 손대야 하는지 스스로 감이 옵니다. 모임이나 가족 앞에서 한 곡 정도는
+              부담 없이 꺼낼 수 있는 시점입니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="reveal relative sm:pl-16" style="transition-delay:.12s">
+          <span class="hidden sm:grid absolute left-0 top-5 w-11 h-11 place-items-center rounded-full bg-violet-500/20 border border-violet-400/40 backdrop-blur">
+            <span class="text-[.78rem] font-black text-violet-200">6M</span>
+          </span>
+          <div class="card p-6 sm:p-7">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="sm:hidden px-2.5 py-1 rounded-full text-[.7rem] font-extrabold bg-violet-500/20 text-violet-200 border border-violet-400/25">6개월~</span>
+              <h3 class="font-bold text-lg">듣고 싶은 곡을 스스로 찾아 연습합니다</h3>
+            </div>
+            <p class="text-[.91rem] text-white/55 leading-relaxed">
+              여기서부터는 배우는 사람이 아니라 <strong class="text-white/80 font-semibold">하는 사람</strong>이 됩니다.
+              좋아하는 곡을 직접 찾아 코드를 따고, 합주나 발표에 참여하고, 원한다면 입시나
+              자작곡으로 방향을 넓힐 수도 있습니다.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="reveal text-[.83rem] text-white/35 mt-8 sm:pl-16">
+      ※ 개인의 연습량과 시작 시점의 경험에 따라 달라질 수 있습니다.
     </p>
   </div>
 </section>
@@ -659,6 +855,25 @@
   </div>
 </section>
 
+<!-- ══════════ REVIEWS (REVIEWS 배열에 실제 후기를 넣으면 자동 표시) ══════════ -->
+<section id="reviews" class="relative py-24 sm:py-32 border-t border-white/[.06] hidden">
+  <div class="max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="max-w-2xl mb-14">
+      <p class="eyebrow reveal mb-5">Reviews</p>
+      <h2 class="reveal text-3xl sm:text-[2.7rem] font-black leading-[1.18] tracking-[-.025em]" style="transition-delay:.06s">
+        먼저 다녀간 분들의 이야기
+      </h2>
+    </div>
+    <div id="reviews-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <div class="text-center mt-10">
+      <a href="https://naver.me/FSvD89ZY" target="_blank" rel="noopener noreferrer" class="btn btn-ghost !py-3 !px-6 !text-[.9rem]">
+        <iconify-icon icon="ph:arrow-square-out-bold" width="18"></iconify-icon>
+        네이버 플레이스에서 전체 후기 보기
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ FAQ ══════════ -->
 <section id="faq" class="relative py-24 sm:py-32 border-t border-white/[.06]">
   <div class="max-w-3xl mx-auto px-5 sm:px-8">
@@ -753,17 +968,65 @@
           <h2 class="text-3xl sm:text-[2.6rem] font-black leading-[1.16] tracking-[-.025em] mb-5">
             일단 한 번<br><span class="grad">들러 보세요.</span>
           </h2>
-          <p class="text-white/55 leading-relaxed mb-9 max-w-md">
+          <p class="text-white/55 leading-relaxed mb-7 max-w-md">
             상담은 부담 없이 오셔도 됩니다. 배우고 싶은 곡이나 악기가 아직 정해지지 않았어도 괜찮습니다.
             어떤 것부터 시작하면 좋을지 함께 정해 드립니다.
           </p>
 
-          <div class="flex flex-col sm:flex-row gap-3" id="cta-buttons">
+          <div class="flex flex-col sm:flex-row gap-3 mb-8" id="cta-buttons">
             <a href="https://naver.me/FSvD89ZY" target="_blank" rel="noopener noreferrer" id="naver-cta" class="btn btn-ghost">
               <iconify-icon icon="ph:map-pin-fill" width="19"></iconify-icon>
               네이버 플레이스에서 보기
             </a>
           </div>
+
+          <!-- 상담 신청 폼 — 입력값으로 문자를 작성해 전송합니다 (별도 서버 불필요) -->
+          <form id="inquiry-form" class="rounded-2xl bg-white/[.03] border border-white/[.07] p-6">
+            <p class="font-bold text-[1.02rem] mb-1.5">전화가 부담스러우세요?</p>
+            <p class="text-[.85rem] text-white/45 leading-relaxed mb-5">
+              아래를 채우면 문자 앱에 내용이 그대로 적힌 채로 열립니다. 보내기만 누르시면 됩니다.
+            </p>
+
+            <div class="space-y-3">
+              <div>
+                <label for="f-name" class="block text-[.78rem] font-bold tracking-[.1em] text-white/40 mb-1.5">이름</label>
+                <input id="f-name" type="text" autocomplete="name" placeholder="홍길동"
+                       class="w-full rounded-xl bg-white/[.04] border border-white/[.1] px-4 py-3 text-[.92rem] placeholder:text-white/25 focus:outline-none focus:border-violet-400/60 focus:bg-white/[.06] transition">
+              </div>
+
+              <div>
+                <label for="f-subject" class="block text-[.78rem] font-bold tracking-[.1em] text-white/40 mb-1.5">배우고 싶은 것</label>
+                <select id="f-subject"
+                        class="w-full rounded-xl bg-white/[.04] border border-white/[.1] px-4 py-3 text-[.92rem] focus:outline-none focus:border-violet-400/60 transition">
+                  <option value="아직 정하지 못했어요">아직 정하지 못했어요</option>
+                  <option value="보컬">보컬</option>
+                  <option value="통기타 / 일렉기타">통기타 / 일렉기타</option>
+                  <option value="베이스">베이스</option>
+                  <option value="드럼">드럼</option>
+                  <option value="피아노 / 키보드">피아노 / 키보드</option>
+                  <option value="작곡 / 미디">작곡 / 미디</option>
+                  <option value="입시 준비">입시 준비</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="f-memo" class="block text-[.78rem] font-bold tracking-[.1em] text-white/40 mb-1.5">
+                  하고 싶은 말 <span class="font-medium tracking-normal text-white/25">(선택)</span>
+                </label>
+                <textarea id="f-memo" rows="3" placeholder="가능한 요일이나 시간대, 궁금한 점을 적어주세요."
+                          class="w-full rounded-xl bg-white/[.04] border border-white/[.1] px-4 py-3 text-[.92rem] leading-relaxed placeholder:text-white/25 focus:outline-none focus:border-violet-400/60 focus:bg-white/[.06] transition resize-none"></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full mt-5">
+              <iconify-icon icon="ph:paper-plane-tilt-fill" width="19"></iconify-icon>
+              문자로 상담 신청하기
+            </button>
+
+            <p class="text-[.76rem] text-white/30 leading-relaxed mt-3.5">
+              입력하신 내용은 이 페이지에 저장되지 않으며, 문자 앱으로 바로 전달됩니다.
+            </p>
+          </form>
         </div>
 
         <div class="space-y-2">
@@ -846,9 +1109,25 @@
 </footer>
 
 <button id="toTop" aria-label="맨 위로"
-        class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full glass grid place-items-center opacity-0 pointer-events-none transition-all duration-500 hover:bg-white/10">
+        class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full glass hidden sm:grid place-items-center opacity-0 pointer-events-none transition-all duration-500 hover:bg-white/10">
   <iconify-icon icon="ph:arrow-up-bold" width="18" class="text-white/70"></iconify-icon>
 </button>
+
+<!-- ══════════ 모바일 하단 고정 CTA ══════════ -->
+<div id="mobile-bar"
+     class="sm:hidden fixed bottom-0 inset-x-0 z-50 translate-y-full transition-transform duration-500"
+     style="padding-bottom:env(safe-area-inset-bottom)">
+  <div class="glass border-t border-white/10 px-4 py-3 flex gap-2.5">
+    <a href="#contact" class="btn btn-ghost flex-1 !py-3 !px-3 !text-[.88rem]">
+      <iconify-icon icon="ph:note-pencil-fill" width="17"></iconify-icon>
+      상담 신청
+    </a>
+    <a id="mobile-call" href="tel:01062144588" class="btn btn-primary flex-1 !py-3 !px-3 !text-[.88rem]">
+      <iconify-icon icon="ph:phone-fill" width="17"></iconify-icon>
+      전화 걸기
+    </a>
+  </div>
+</div>
 
 <script>
   /* ─────────────────────────────────────────────
@@ -862,6 +1141,12 @@
     naver: 'https://naver.me/FSvD89ZY',
   };
 
+  /* ─────────────────────────────────────────────
+     후기 — 실제로 받은 후기만 넣어주세요. 비어 있으면 섹션이 표시되지 않습니다.
+     { text: '후기 내용', name: '김OO', meta: '보컬 · 6개월' }
+     ───────────────────────────────────────────── */
+  const REVIEWS = [];
+
   (function applyContact() {
     const ctaRow = document.getElementById('cta-buttons');
 
@@ -871,16 +1156,32 @@
       document.getElementById('phone-text').innerHTML =
         '<a href="' + tel + '" class="hover:text-violet-300 transition">' + CONTACT.phone + '</a>';
 
+      /* 하드코딩된 tel: 링크들을 설정값과 동기화 */
+      document.querySelectorAll('[data-hero-tel]').forEach((el) => {
+        el.href = tel;
+        el.lastChild.textContent = ' ' + CONTACT.phone;
+      });
+      document.getElementById('mobile-call').href = tel;
+      document.querySelectorAll('footer a[href^="tel:"]').forEach((el) => {
+        el.href = tel;
+        el.textContent = CONTACT.phone;
+      });
+
       const btn = document.createElement('a');
       btn.href = tel;
       btn.className = 'btn btn-primary';
       btn.innerHTML = '<iconify-icon icon="ph:phone-fill" width="19"></iconify-icon> ' + CONTACT.phone;
       ctaRow.prepend(btn);
     } else {
-      /* 전화번호가 없으면 네이버 플레이스 버튼이 주 CTA 자리를 지킵니다. */
+      /* 전화번호가 없으면 네이버 플레이스 버튼이 주 CTA 자리를 지키고,
+         전화에 의존하는 UI는 모두 감춥니다. */
       const naverBtn = document.getElementById('naver-cta');
       naverBtn.classList.remove('btn-ghost');
       naverBtn.classList.add('btn-primary');
+
+      document.querySelectorAll('[data-hero-tel], #mobile-call, footer a[href^="tel:"]')
+        .forEach((el) => el.remove());
+      document.getElementById('inquiry-form').remove();
     }
 
     if (CONTACT.kakao) {
@@ -892,6 +1193,52 @@
       btn.innerHTML = '<iconify-icon icon="ph:chat-circle-dots-fill" width="19"></iconify-icon> 카카오톡 상담';
       document.getElementById('cta-buttons').appendChild(btn);
     }
+  })();
+
+  /* ── 후기 렌더링 (REVIEWS가 비어 있으면 섹션 자체가 숨겨진 상태로 유지) ── */
+  (function renderReviews() {
+    if (!REVIEWS.length) return;
+
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    document.getElementById('reviews-grid').innerHTML = REVIEWS.map((r) => `
+      <figure class="reveal card p-7 flex flex-col">
+        <iconify-icon icon="ph:quotes-fill" width="26" class="text-violet-400/40 mb-4"></iconify-icon>
+        <blockquote class="text-[.92rem] text-white/65 leading-relaxed mb-5">${esc(r.text)}</blockquote>
+        <figcaption class="mt-auto text-[.84rem]">
+          <span class="font-bold text-white/80">${esc(r.name || '')}</span>
+          ${r.meta ? '<span class="text-white/35"> · ' + esc(r.meta) + '</span>' : ''}
+        </figcaption>
+      </figure>`).join('');
+
+    document.getElementById('reviews').classList.remove('hidden');
+  })();
+
+  /* ── 상담 신청 폼 → 문자(SMS) 작성 ── */
+  (function inquiryForm() {
+    const form = document.getElementById('inquiry-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('f-name').value.trim();
+      const subject = document.getElementById('f-subject').value;
+      const memo = document.getElementById('f-memo').value.trim();
+
+      const lines = ['[박준화실용음악학원 상담 신청]'];
+      if (name) lines.push('이름: ' + name);
+      lines.push('배우고 싶은 것: ' + subject);
+      if (memo) lines.push('내용: ' + memo);
+
+      const body = lines.join('\n');
+      const num = CONTACT.phone.replace(/[^0-9+]/g, '');
+      /* iOS는 &, 그 외에는 ? 로 body를 붙입니다. */
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      window.location.href =
+        'sms:' + num + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body);
+    });
   })();
 
   /* ── Scroll reveal ── */
@@ -909,6 +1256,8 @@
   /* ── Nav background on scroll ── */
   const nav = document.getElementById('nav');
   const toTop = document.getElementById('toTop');
+  const mobileBar = document.getElementById('mobile-bar');
+  const contactSection = document.getElementById('contact');
 
   function onScroll() {
     const y = window.scrollY;
@@ -916,6 +1265,11 @@
     nav.classList.toggle('shadow-lg', y > 20);
     toTop.classList.toggle('opacity-0', y < 600);
     toTop.classList.toggle('pointer-events-none', y < 600);
+
+    /* 히어로를 지나면 올라오고, 연락처 섹션에 닿으면 다시 내려갑니다(중복 CTA 방지). */
+    const past = y > window.innerHeight * 0.85;
+    const atContact = contactSection.getBoundingClientRect().top < window.innerHeight * 0.9;
+    mobileBar.classList.toggle('translate-y-full', !past || atContact);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
