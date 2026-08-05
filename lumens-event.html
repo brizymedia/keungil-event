@@ -1193,6 +1193,7 @@
       <input type="hidden" name="_template" value="table">
       <input type="hidden" name="_next" value="">
       <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_replyto" id="kg-replyto" value="">
 
       <div>
         <label class="inq-label" for="inq-name">이름 <span style="color:#F59E0B;">*</span></label>
@@ -1257,6 +1258,8 @@ document.addEventListener('keydown',function(e){
 document.getElementById('inquiry-form').addEventListener('submit',function(){
   // FormSubmit이 리다이렉트하므로 _next URL을 현재 페이지로 설정
   this.querySelector('[name="_next"]').value = window.location.href + '?sent=1';
+  // 문의자 이메일을 Reply-To 로 넣어, 받은 메일에서 바로 답장할 수 있게 한다
+  this.querySelector('[name="_replyto"]').value = document.getElementById('inq-email').value.trim();
 });
 // 페이지 로드 시 ?sent=1 파라미터 확인
 (function(){
