@@ -47,6 +47,27 @@
     .btn-primary:hover { transform:scale(1.02) translateY(-1px);background:#FBBF24;box-shadow:0 8px 32px rgba(245,158,11,.28); }
     .btn-primary:active{ transform:scale(.98); }
 
+    /* ── YM토탈이벤트 카테고리 칩 ── */
+    .ym-chip{
+      display:inline-flex;align-items:center;gap:.35rem;
+      padding:.42rem .75rem;border-radius:9999px;
+      border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);
+      color:#FCA5A5;font-size:.8rem;font-weight:700;letter-spacing:-.01em;
+      text-decoration:none;white-space:nowrap;transition:all .25s;
+    }
+    .ym-chip:hover{ background:rgba(239,68,68,.22);color:#fff;border-color:rgba(239,68,68,.7); }
+    .ym-chip-short{ display:none; }
+    @media (max-width:639px){
+      .ym-chip{ padding:.42rem .6rem; }
+      .ym-chip-label{ display:none; }
+      .ym-chip-short{ display:inline; }
+    }
+    /* 아주 좁은 화면에서는 아이콘만 남겨 상단바가 넘치지 않게 */
+    @media (max-width:400px){
+      .ym-chip{ padding:.42rem .5rem; }
+      .ym-chip-short{ display:none; }
+    }
+
     .btn-ghost{
       display:inline-flex;align-items:center;gap:.5rem;
       padding:1rem 2rem;background:transparent;color:#fff;
@@ -343,7 +364,14 @@
       <a href="#about"     style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">소개</a>
       <a href="#contact"   style="text-decoration:none;color:inherit;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">연락처</a>
     </div>
-    <a href="#contact" class="btn-primary" style="padding:.55rem 1.25rem;font-size:.875rem;">무료 상담</a>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <a href="ym-event/" class="ym-chip" title="YM토탈이벤트 — 음향·조명·LED·특수효과">
+        <iconify-icon icon="solar:volume-loud-bold" style="font-size:14px;"></iconify-icon>
+        <span class="ym-chip-label">YM토탈이벤트</span>
+        <span class="ym-chip-short">YM</span>
+      </a>
+      <a href="#contact" class="btn-primary" style="padding:.55rem 1.25rem;font-size:.875rem;">무료 상담</a>
+    </div>
   </div>
 </nav>
 
@@ -973,6 +1001,7 @@
       <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">포트폴리오</a>
       <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">채용</a>
       <a href="#" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">개인정보처리방침</a>
+      <a href="ym-event/" style="color:#FCA5A5;text-decoration:none;font-weight:600;white-space:nowrap;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#FCA5A5'">YM토탈이벤트</a>
     </div>
     <div style="display:flex;gap:.75rem;">
       <!-- 1. 네이버 블로그 -->
@@ -992,6 +1021,12 @@
          style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a1a1aa;text-decoration:none;transition:color .2s;"
          onmouseover="this.style.color='#E1306C'" onmouseout="this.style.color='#a1a1aa'" title="인스타그램">
         <iconify-icon icon="simple-icons:instagram" style="font-size:15px;"></iconify-icon>
+      </a>
+      <!-- 4. 페이스북 -->
+      <a href="https://www.facebook.com/profile.php?id=100004988525335" target="_blank" rel="noopener" class="glass"
+         style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#a1a1aa;text-decoration:none;transition:color .2s;"
+         onmouseover="this.style.color='#1877F2'" onmouseout="this.style.color='#a1a1aa'" title="페이스북">
+        <iconify-icon icon="simple-icons:facebook" style="font-size:15px;"></iconify-icon>
       </a>
     </div>
   </div>
