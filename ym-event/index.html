@@ -106,6 +106,55 @@
     .svc:hover{ transform:translateY(-6px);border-color:rgba(239,68,68,.35); }
     .svc:hover::after{ opacity:1; }
 
+    /* ── Gallery ── */
+    .gal-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      grid-auto-rows:11rem;gap:.75rem;
+    }
+    .gal-item{
+      position:relative;margin:0;overflow:hidden;border-radius:1rem;cursor:zoom-in;
+      border:1px solid rgba(255,255,255,.07);background:#111113;
+    }
+    .gal-item img{
+      width:100%;height:100%;object-fit:cover;
+      transition:transform .7s cubic-bezier(.16,1,.3,1),filter .5s;
+      filter:saturate(.92);
+    }
+    .gal-item:hover img{ transform:scale(1.06);filter:saturate(1.05); }
+    .gal-item figcaption{
+      position:absolute;left:0;right:0;bottom:0;padding:2.2rem .95rem .8rem;
+      font-size:.82rem;font-weight:600;letter-spacing:-.01em;color:#f4f4f5;
+      background:linear-gradient(180deg,transparent,rgba(0,0,0,.82));
+      opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s;
+    }
+    .gal-item:hover figcaption{ opacity:1;transform:none; }
+    @media (max-width:640px){
+      .gal-grid{ grid-template-columns:1fr;grid-auto-rows:14rem; }
+      .gal-item{ grid-column:span 1!important;grid-row:span 1!important; }
+      .gal-item figcaption{ opacity:1;transform:none; }
+    }
+
+    /* ── Lightbox ── */
+    .lb{
+      position:fixed;inset:0;z-index:90;display:none;
+      background:rgba(0,0,0,.93);align-items:center;justify-content:center;
+    }
+    .lb.open{ display:flex; }
+    .lb img{ max-width:92vw;max-height:80svh;object-fit:contain;border-radius:.5rem; }
+    .lb-cap{
+      position:absolute;left:0;right:0;bottom:1.75rem;text-align:center;
+      font-size:.92rem;color:#d4d4d8;padding:0 1.5rem;
+    }
+    .lb-btn{
+      position:absolute;top:50%;transform:translateY(-50%);
+      width:3rem;height:3rem;border-radius:50%;border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);color:#fff;cursor:pointer;
+      display:grid;place-items:center;font-size:1.4rem;line-height:1;transition:background .25s;
+    }
+    .lb-btn:hover{ background:rgba(255,255,255,.16); }
+    .lb-prev{ left:1rem; } .lb-next{ right:1rem; }
+    .lb-close{ position:absolute;top:1rem;right:1rem;transform:none; }
+
     /* ── Timeline ── */
     .tl-item{ position:relative;padding-left:1.75rem;padding-bottom:1.5rem; }
     .tl-item::before{
@@ -174,6 +223,7 @@
       <a href="#about"   style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">회사소개</a>
       <a href="#service" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">서비스</a>
       <a href="#work"    style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">행사이력</a>
+      <a href="#gallery" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">갤러리</a>
       <a href="#partner" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">파트너</a>
       <a href="#contact" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">문의</a>
     </nav>
@@ -547,6 +597,52 @@
 </section>
 
 <!-- ══════════════════════════════════════════════════
+     GALLERY — 현장 스케치
+
+     ▸ 사진 교체 방법
+       1) 사진 파일을 ym-event/photos/ 폴더에 넣습니다.
+       2) 아래 <figure> 의 src 를 "photos/파일이름.jpg" 로 바꿉니다.
+       3) <figcaption> 문구를 해당 행사 이름으로 바꿉니다.
+       칸을 더 늘리려면 <figure> 블록을 통째로 복사해 붙여넣으면 됩니다.
+══════════════════════════════════════════════════ -->
+<section id="gallery" style="padding:5rem 1.5rem 7rem;">
+  <div style="max-width:80rem;margin:0 auto;">
+    <div class="reveal" style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.25rem;margin-bottom:3rem;">
+      <div>
+        <span class="eyebrow">Gallery</span>
+        <h2 style="font-size:clamp(2rem,4.5vw,3.1rem);font-weight:900;letter-spacing:-.04em;margin-top:1rem;">현장 스케치</h2>
+        <p style="color:#a1a1aa;margin-top:.9rem;font-size:1rem;max-width:32rem;">
+          무대가 올라가고, 소리가 채워지고, 불이 켜지는 순간들.
+        </p>
+      </div>
+      <a href="https://www.facebook.com/profile.php?id=100004988525335" target="_blank" rel="noopener" class="btn-ghost" style="padding:.8rem 1.5rem;font-size:.9rem;">
+        <iconify-icon icon="simple-icons:facebook" style="font-size:17px;"></iconify-icon>
+        페이스북에서 전체 보기
+      </a>
+    </div>
+
+    <div class="gal-grid reveal">
+      <figure class="gal-item" style="grid-column:span 2;grid-row:span 2;">
+        <img src="../festival-nokdong.jpg" alt="야외 축제 메인 무대" loading="lazy">
+        <figcaption>야외 축제 메인 무대 · 음향 · 조명</figcaption>
+      </figure>
+      <figure class="gal-item">
+        <img src="../equipment.jpg" alt="음향 콘솔 운용" loading="lazy">
+        <figcaption>음향 콘솔 · 현장 오퍼레이팅</figcaption>
+      </figure>
+      <figure class="gal-item">
+        <img src="../conference.jpg" alt="실내 행사 LED 스크린" loading="lazy">
+        <figcaption>실내 행사 · LED 스크린</figcaption>
+      </figure>
+      <figure class="gal-item" style="grid-column:span 2;">
+        <img src="../sorokdo.jpg" alt="야외 행사 현장" loading="lazy">
+        <figcaption>야외 행사 · 무대 설치</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
      PROCESS
 ══════════════════════════════════════════════════ -->
 <section style="padding:5rem 1.5rem 7rem;">
@@ -715,6 +811,7 @@
       <a href="#about"   style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">회사소개</a>
       <a href="#service" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">서비스</a>
       <a href="#work"    style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">행사이력</a>
+      <a href="#gallery" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">갤러리</a>
       <a href="#contact" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">문의</a>
       <a href="../index.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">큰길이벤트기획</a>
     </div>
@@ -737,6 +834,17 @@
     <iconify-icon icon="solar:letter-bold" style="font-size:17px;"></iconify-icon>
     문의 남기기
   </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════════════════════ -->
+<div class="lb" id="lightbox" onclick="if(event.target===this)closeLb()">
+  <button type="button" class="lb-btn lb-close" onclick="closeLb()" aria-label="닫기">×</button>
+  <button type="button" class="lb-btn lb-prev"  onclick="stepLb(-1)" aria-label="이전 사진">‹</button>
+  <img id="lb-img" src="" alt="">
+  <button type="button" class="lb-btn lb-next"  onclick="stepLb(1)"  aria-label="다음 사진">›</button>
+  <div class="lb-cap" id="lb-cap"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -862,7 +970,34 @@ document.querySelectorAll('.svc').forEach((card) => {
 const modal = document.getElementById('modal');
 function openModal()  { modal.classList.add('open');    document.body.style.overflow = 'hidden'; }
 function closeModal() { modal.classList.remove('open'); document.body.style.overflow = ''; }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// ── 5. Gallery lightbox ──
+const lb     = document.getElementById('lightbox');
+const lbImg  = document.getElementById('lb-img');
+const lbCap  = document.getElementById('lb-cap');
+const shots  = [...document.querySelectorAll('.gal-item')];
+let lbIndex  = 0;
+
+function showLb(i) {
+  lbIndex = (i + shots.length) % shots.length;
+  const fig = shots[lbIndex];
+  const img = fig.querySelector('img');
+  lbImg.src = img.getAttribute('src');
+  lbImg.alt = img.getAttribute('alt') || '';
+  lbCap.textContent = (fig.querySelector('figcaption') || {}).textContent || '';
+}
+function openLb(i)  { showLb(i); lb.classList.add('open');    document.body.style.overflow = 'hidden'; }
+function closeLb()  { lb.classList.remove('open');            document.body.style.overflow = ''; }
+function stepLb(d)  { showLb(lbIndex + d); }
+
+shots.forEach((fig, i) => fig.addEventListener('click', () => openLb(i)));
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeModal(); closeLb(); }
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowLeft')  stepLb(-1);
+  if (e.key === 'ArrowRight') stepLb(1);
+});
 </script>
 
 </body>
