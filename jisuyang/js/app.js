@@ -1,0 +1,400 @@
+/* ============================================================
+   지수양 공식 홍보 사이트 — 인터랙션
+   ============================================================ */
+(function () {
+  'use strict';
+
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ytSearch = (q) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent('지수양 ' + q);
+  const thumb = (id) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+  /* ── 링크 · 텍스트 주입 ─────────────────────────── */
+  ['ytChannel', 'ytChannel2', 'ytChannel3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.href = CONFIG.youtube;
+  });
+  $('#year').textContent = new Date().getFullYear();
+
+  const phoneEl = $('#bookPhone');
+  phoneEl.textContent = CONFIG.phone;
+  phoneEl.href = 'tel:' + CONFIG.phone.replace(/[^0-9+]/g, '');
+
+  $('#copyPhone').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    try {
+      await navigator.clipboard.writeText(CONFIG.phone);
+      btn.textContent = '복사됨 ✓';
+    } catch { btn.textContent = CONFIG.phone; }
+    setTimeout(() => (btn.textContent = '번호 복사'), 1800);
+  });
+
+  /* ── 프로필 사진: assets/profile.jpg 가 있으면 교체 ── */
+  (function () {
+    const probe = new Image();
+    probe.onload = () => {
+      $('#profileImg').src = 'assets/profile.jpg';
+      $('#profileFrame').classList.remove('is-fallback');
+    };
+    probe.src = 'assets/profile.jpg';
+  })();
+
+  /* ── 마퀴 ───────────────────────────────────────── */
+  const mqWords = [
+    '사랑을 하는걸까', '우연한 만남', '깍쟁이 내사랑', '달아 달아',
+    '밤차', '나불도 연가', '마량에 가고싶다', '천년지기', '빈손', '지나야',
+  ];
+  const mqHtml = mqWords.map(w => `<span>${w}</span>`).join('');
+  $('#marquee').innerHTML = mqHtml + mqHtml;
+
+  /* ── 프로필 팩트 ───────────────────────────────── */
+  const FACTS = [
+    ['활동명', '지수양 (JI SUYANG)'],
+    ['장르', '성인가요 · 트로트'],
+    ['데뷔', '2018년 「달아 달아」'],
+    ['정규 1집', '2025.09.09 「사랑을 하는걸까」'],
+    ['활동 무대', '전국 축제 · 방송 · 노래교실'],
+    ['거점', '전남 고흥'],
+  ];
+  $('#facts').innerHTML = FACTS.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+
+  /* ── 대표곡 카드 ───────────────────────────────── */
+  $('#titles').innerHTML = TITLES.map((t, i) => `
+    <a class="tcard reveal" data-acc="${t.accent}" style="--d:${i * 90}ms"
+       href="${ytSearch(t.title)}" target="_blank" rel="noopener">
+      <div class="tcard__top">
+        <span class="tcard__year">${t.year}</span>
+        ${t.badge ? `<span class="tcard__badge">${t.badge}</span>` : ''}
+      </div>
+      <h3 class="tcard__title">${t.title}</h3>
+      <p class="tcard__type">${t.type}</p>
+      <p class="tcard__desc">${t.desc}</p>
+      <p class="tcard__meta"><span>${t.meta}</span><span class="tcard__go">듣기 →</span></p>
+    </a>`).join('');
+
+  // 카드 위 커서 스포트라이트
+  $$('.tcard').forEach(card => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    });
+  });
+
+  /* ── 수록곡 탐색기 ─────────────────────────────── */
+  const tracksEl = $('#tracks');
+  function renderTracks(q = '') {
+    const kw = q.trim().toLowerCase();
+    const html = TRACKS.map((t, i) => ({ t, i }))
+      .filter(({ t }) => !kw || t.toLowerCase().includes(kw))
+      .map(({ t, i }) => `
+        <li class="${HOT_TRACKS.includes(t) ? 'is-hot' : ''} ${i === 0 ? 'is-title' : ''}" data-track="${t}">
+          <button type="button">
+            <span class="n">${String(i + 1).padStart(2, '0')}</span>
+            <span class="t">${t}</span>
+          </button>
+        </li>`).join('');
+    tracksEl.innerHTML = html || '';
+    $('#trackNote').textContent = html
+      ? '곡을 누르면 유튜브에서 해당 곡 무대를 찾아 드립니다.'
+      : `「${q}」와(과) 일치하는 수록곡이 없습니다.`;
+  }
+  renderTracks();
+
+  $('#trackSearch').addEventListener('input', (e) => renderTracks(e.target.value));
+
+  tracksEl.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-track]');
+    if (li) window.open(ytSearch(li.dataset.track), '_blank', 'noopener');
+  });
+
+  $('#randomTrack').addEventListener('click', () => {
+    $('#trackSearch').value = '';
+    renderTracks();
+    const items = $$('#tracks li');
+    const pick = items[Math.floor(Math.random() * items.length)];
+    if (!pick) return;
+    pick.classList.remove('is-flash');
+    void pick.offsetWidth;
+    pick.classList.add('is-flash');
+    pick.scrollIntoView({ block: 'nearest', behavior: REDUCED ? 'auto' : 'smooth' });
+    setTimeout(() => window.open(ytSearch(pick.dataset.track), '_blank', 'noopener'), 420);
+  });
+
+  /* ── 무대 영상 갤러리 ──────────────────────────── */
+  const CATS = ['전체', ...new Set(VIDEOS.map(v => v.cat))];
+  let curCat = '전체';
+
+  $('#chips').innerHTML = CATS.map((c, i) => {
+    const n = c === '전체' ? VIDEOS.length : VIDEOS.filter(v => v.cat === c).length;
+    return `<button class="chip${i === 0 ? ' is-on' : ''}" data-cat="${c}">${c} <span style="opacity:.6">${n}</span></button>`;
+  }).join('');
+
+  const gridEl = $('#videoGrid');
+  function renderVideos() {
+    const list = VIDEOS.filter(v => curCat === '전체' || v.cat === curCat);
+    gridEl.innerHTML = list.map((v, i) => `
+      <article class="vcard" style="animation-delay:${Math.min(i, 12) * 45}ms"
+               data-id="${v.id}" data-song="${v.song}" data-event="${v.event} · ${v.date}">
+        <div class="vcard__thumb" style="--thumb:url(${thumb(v.id)})">
+          <img src="${thumb(v.id)}" alt="${v.song} — ${v.event}" loading="lazy">
+          <span class="vcard__cat">${v.cat}</span>
+          <span class="vcard__play"><i><svg viewBox="0 0 24 24" width="15" height="15"><path d="M6 4l14 8-14 8z"/></svg></i></span>
+        </div>
+        <div class="vcard__body">
+          <h3 class="vcard__song">${v.song}</h3>
+          <p class="vcard__ev">${v.event}</p>
+          <span class="vcard__date">${v.date}</span>
+        </div>
+      </article>`).join('');
+    $('#gridEmpty').hidden = list.length > 0;
+  }
+  renderVideos();
+
+  $('#chips').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    $$('.chip').forEach(c => c.classList.toggle('is-on', c === b));
+    curCat = b.dataset.cat;
+    renderVideos();
+  });
+
+  /* ── 라이트박스 ────────────────────────────────── */
+  const lb = $('#lb'), lbFrame = $('#lbFrame');
+  let lastFocus = null;
+
+  function openLB(id, song, event) {
+    lastFocus = document.activeElement;
+    lbFrame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0"
+      title="${song}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+      allowfullscreen></iframe>`;
+    $('#lbTitle').textContent = song;
+    $('#lbEvent').textContent = event;
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('#lbClose').focus();
+  }
+  function closeLB() {
+    lb.hidden = true;
+    lbFrame.innerHTML = '';
+    document.body.style.overflow = '';
+    lastFocus?.focus();
+  }
+
+  gridEl.addEventListener('click', (e) => {
+    const c = e.target.closest('.vcard');
+    if (c) openLB(c.dataset.id, c.dataset.song, c.dataset.event);
+  });
+  $$('[data-play]').forEach(b => b.addEventListener('click', () =>
+    openLB(b.dataset.play, b.dataset.title, b.dataset.event)));
+  $('#lbClose').addEventListener('click', closeLB);
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLB(); });
+
+  /* ── 경력 타임라인 ─────────────────────────────── */
+  $('#timeline').innerHTML = CAREER.map((g, i) => `
+    <div class="tl reveal" style="--d:${i * 70}ms">
+      <div class="tl__y">${g.year}</div>
+      <ul class="tl__list">
+        ${g.items.map(it => `<li><span class="tl__t">${it.t}</span>${it.d ? `<span class="tl__d">${it.d}</span>` : ''}</li>`).join('')}
+      </ul>
+    </div>`).join('');
+
+  $('#awards').innerHTML = AWARDS.map(a =>
+    `<li><span class="y">${a.y || '—'}</span><span class="t">${a.t}</span></li>`).join('');
+
+  $('#media').innerHTML = MEDIA.map(m =>
+    `<div><dt>${m.k}</dt><dd>${m.v}</dd></div>`).join('');
+
+  /* ── 스크롤 리빌 ───────────────────────────────── */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('is-in');
+        if (en.target.classList.contains('tl')) en.target.classList.add('is-in');
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  $$('.reveal, .tl').forEach(el => io.observe(el));
+
+  /* ── 숫자 카운트업 ─────────────────────────────── */
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target, to = +el.dataset.to;
+      cio.unobserve(el);
+      if (REDUCED) { el.textContent = to; return; }
+      const dur = 1400, t0 = performance.now();
+      const step = (now) => {
+        const p = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.5 });
+  $$('.count').forEach(el => cio.observe(el));
+
+  /* ── 네비 · 진행바 · 패럴랙스 ─────────────────── */
+  const nav = $('#nav'), bar = $('#navProgress'), heroImg = $('#heroImg'), totop = $('#totop');
+  const links = $$('.nav__links a');
+  const secs = links.map(a => $('#' + a.dataset.sec)).filter(Boolean);
+  let lastY = 0, ticking = false;
+
+  function onScroll() {
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+
+    nav.classList.toggle('is-hidden', y > lastY && y > 400 && lb.hidden);
+    lastY = y;
+
+    totop.classList.toggle('is-on', y > 700);
+
+    if (heroImg && y < innerHeight * 1.2 && !REDUCED) {
+      heroImg.style.transform = `scale(1.12) translateY(${y * 0.16}px)`;
+    }
+
+    let active = null;
+    secs.forEach(s => { if (s.getBoundingClientRect().top <= 140) active = s.id; });
+    links.forEach(a => a.classList.toggle('is-active', a.dataset.sec === active));
+    ticking = false;
+  }
+  addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
+  totop.addEventListener('click', () =>
+    window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }));
+
+  /* ── 모바일 메뉴 ───────────────────────────────── */
+  const burger = $('#burger'), navLinks = $('#navLinks');
+  burger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('is-open');
+    burger.classList.toggle('is-open', open);
+    burger.setAttribute('aria-expanded', open);
+  });
+  links.forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('is-open');
+    burger.classList.remove('is-open');
+    burger.setAttribute('aria-expanded', 'false');
+  }));
+
+  /* ── 커서 글로우 ───────────────────────────────── */
+  const glow = $('#cursorGlow');
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    let gx = 0, gy = 0, cx = 0, cy = 0;
+    addEventListener('pointermove', (e) => { gx = e.clientX; gy = e.clientY; });
+    (function loop() {
+      cx += (gx - cx) * 0.12; cy += (gy - cy) * 0.12;
+      glow.style.transform = `translate(${cx}px, ${cy}px)`;
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ── 히어로 캔버스: 불꽃 + 금가루 ──────────────── */
+  const cv = $('#fx');
+  if (cv && !REDUCED) {
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+    const sparks = [], dust = [];
+    const GOLD = ['#fff3c9', '#f0cd77', '#c9992f'];
+    const NEON = ['#ff2e93', '#35dcff', '#fff3c9'];
+
+    function size() {
+      const r = cv.getBoundingClientRect();
+      W = r.width; H = r.height;
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    size();
+    addEventListener('resize', size);
+
+    for (let i = 0; i < 46; i++) {
+      dust.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 1.5 + 0.4,
+        vy: -(Math.random() * 0.28 + 0.06),
+        vx: (Math.random() - 0.5) * 0.16,
+        a: Math.random() * 0.5 + 0.15,
+        p: Math.random() * Math.PI * 2,
+      });
+    }
+
+    function burst(x, y) {
+      const n = 28 + Math.floor(Math.random() * 20);
+      const pal = Math.random() > 0.45 ? GOLD : NEON;
+      const col = pal[Math.floor(Math.random() * pal.length)];
+      for (let i = 0; i < n; i++) {
+        const ang = (Math.PI * 2 * i) / n + Math.random() * 0.2;
+        const sp = Math.random() * 2.6 + 0.9;
+        sparks.push({
+          x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+          life: 1, decay: Math.random() * 0.012 + 0.008, col,
+          r: Math.random() * 1.6 + 0.7,
+        });
+      }
+    }
+
+    let next = 900;
+    let raf, running = true;
+
+    function tick(dt) {
+      ctx.clearRect(0, 0, W, H);
+
+      // 금가루
+      ctx.globalCompositeOperation = 'lighter';
+      dust.forEach(d => {
+        d.p += 0.015;
+        d.y += d.vy; d.x += d.vx + Math.sin(d.p) * 0.18;
+        if (d.y < -6) { d.y = H + 6; d.x = Math.random() * W; }
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(240,205,119,${d.a})`;
+        ctx.arc(d.x, d.y, d.r, 0, 7);
+        ctx.fill();
+      });
+
+      // 불꽃
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx; s.y += s.vy;
+        s.vy += 0.022; s.vx *= 0.988; s.vy *= 0.988;
+        s.life -= s.decay;
+        if (s.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.globalAlpha = Math.max(s.life, 0) * 0.85;
+        ctx.fillStyle = s.col;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r * s.life, 0, 7);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+
+      next -= dt;
+      if (next <= 0 && sparks.length < 420) {
+        burst(W * (0.12 + Math.random() * 0.76), H * (0.08 + Math.random() * 0.38));
+        next = 1100 + Math.random() * 1800;
+      }
+    }
+
+    let prev = performance.now();
+    (function loop(now) {
+      const dt = Math.min(now - prev, 50); prev = now;
+      if (running) tick(dt);
+      raf = requestAnimationFrame(loop);
+    })(prev);
+
+    // 화면 밖으로 나가면 정지
+    new IntersectionObserver(([e]) => { running = e.isIntersecting; }, { threshold: 0 })
+      .observe(cv);
+
+    // 클릭하면 그 자리에서 폭죽
+    $('.hero').addEventListener('pointerdown', (e) => {
+      const r = cv.getBoundingClientRect();
+      burst(e.clientX - r.left, e.clientY - r.top);
+    });
+  }
+})();
