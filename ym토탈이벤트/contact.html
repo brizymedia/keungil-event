@@ -328,6 +328,8 @@
       <input type="hidden" name="_template" value="table">
       <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
       <input type="hidden" name="필요항목" id="selected-tags" value="">
+      <!-- 문의자 이메일을 Reply-To 로 넣어, 받은 메일에서 바로 답장할 수 있게 한다 -->
+      <input type="hidden" name="_replyto" id="replyto" value="">
 
       <!-- ── 01. 기본 정보 ── -->
       <div class="block-title"><span class="n">01</span>기본 정보</div>
@@ -717,6 +719,7 @@ agree.addEventListener('change', () => { submitBtn.disabled = !agree.checked; })
 
 form.addEventListener('submit', (e) => {
   syncTags();
+  document.getElementById('replyto').value = document.getElementById('f-email').value.trim();
   if (!agree.checked) {
     e.preventDefault();
     openPop();
