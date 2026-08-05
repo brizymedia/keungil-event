@@ -8,9 +8,11 @@
 | 파일 | 쓰임 | 행사 |
 |---|---|---|
 | `hero-nokdong-fireworks.jpg` | **메인 히어로 배경** | 제24회 녹동바다불꽃축제 무대 |
+| `festival-night-crowd.jpg` | **회사소개(About us)** | 야간 축제 무대 · 관객석 |
+| `ceremony-indoor.jpg` | **회사소개(About us)** | 실내 기념식 음향 오퍼레이팅 |
+| `gohung-farmers-hall.jpg` | **회사소개(About us)** | 제23회 고흥군 농업경영인 대회 |
 | `nokdong-drone-violin.jpg` | 갤러리 | 2026 고흥 녹동항 드론쇼 버스킹 · 특수효과 |
 | `truss-rigging.jpg` | 갤러리 | 조명 트러스 시공 · 무빙라이트 설치 |
-| `festival-night-crowd.jpg` | 갤러리 | 야간 축제 무대 · 관객석 |
 | `gohung-farmers-violin.jpg` | 갤러리 | 제23회 고흥군 농업경영인 대회 · 전자바이올린 공연 |
 | `nokdong-drone-booth.jpg` | 갤러리 | 녹동항 드론쇼 버스킹 · 현장 음향 |
 | `rose-festa.jpg` | 갤러리 | 제5회 봉덕동 장미축제 LOVE ROSE FESTA |
@@ -18,7 +20,6 @@
 | `namyeol-sunrise-open.jpg` | 갤러리 | 2026 고흥 남열 해맞이 행사 · 개막 |
 | `led-wall-build.jpg` | 갤러리 | LED 전광판 설치 |
 | `gohung-farmers-stage.jpg` | 갤러리 | 제23회 고흥군 농업경영인 대회 · 무대 조명 |
-| `gohung-farmers-hall.jpg` | 갤러리 | 제23회 고흥군 농업경영인 대회 · 객석 |
 | `hanmaum-groundbreaking.jpg` | 갤러리 | 한마음선원 목포지원 새 도량 기공법회 |
 | `jeonnam-coop-launch.jpg` | 갤러리 | 전라남도이벤트협동조합 발대식 |
 | `nokdong-lions.jpg` | 갤러리 | 녹동라이온스클럽 회장단 이·취임식 |
@@ -27,7 +28,6 @@
 | `nokdong-drone-street.jpg` | 갤러리 | 녹동항 드론쇼 버스킹 · 무대 음향 |
 | `damyang-hall.jpg` | 갤러리 | 담양문화복지회관 실내 행사 · 음향 · 영상 |
 | `banquet-hall.jpg` | 갤러리 | 실내 연회장 행사 음향 |
-| `ceremony-indoor.jpg` | 갤러리 | 실내 기념식 음향 오퍼레이팅 |
 | `lions-gym.jpg` | 갤러리 | 라이온스클럽 실내 행사 음향 |
 | `night-rack-setup.jpg` | 갤러리 | 야간 행사 음향 · 조명 랙 세팅 |
 | `street-booth-staff.jpg` | 갤러리 | 야외 행사 음향 부스 |
@@ -54,6 +54,14 @@
    - 2칸×2줄 크게: `style="grid-column:span 2;grid-row:span 2;"`
    - 가로로 길게: `style="grid-column:span 2;"`
    - 모바일에서는 배치와 상관없이 한 장씩 세로로 표시됩니다.
+
+4. **갤러리는 앞의 6장만 먼저 보이고, 나머지는 `사진 N장 더 보기` 버튼을 눌러야 펼쳐집니다.**
+   7번째부터는 `<figure class="gal-item gal-more">` 처럼 `gal-more` 를 꼭 붙여주세요.
+   붙이지 않으면 접힌 상태에서도 그대로 노출됩니다.
+   버튼에 뜨는 장수는 자동으로 계산되니 따로 고치지 않아도 됩니다.
+
+   맨 앞 6장에 넣고 싶으면, 그 자리에 `gal-more` 없이 넣고
+   대신 밀려나는 사진에 `gal-more` 를 붙이면 됩니다.
 
 ## 메인 히어로 사진 바꾸는 법
 

@@ -134,6 +134,8 @@
       .gal-item figcaption{ opacity:1;transform:none; }
     }
 
+    .gal-grid:not(.expanded) .gal-more{ display:none; }
+
     /* ── Lightbox ── */
     .lb{
       position:fixed;inset:0;z-index:90;display:none;
@@ -355,9 +357,12 @@
       </div>
 
       <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;">
-        <img src="../equipment.jpg" alt="음향·조명 장비" style="width:100%;height:100%;min-height:13rem;object-fit:cover;border-radius:1.1rem;grid-row:span 2;">
-        <img src="../conference.jpg" alt="행사 현장" style="width:100%;height:100%;min-height:8rem;object-fit:cover;border-radius:1.1rem;">
-        <img src="../sorokdo.jpg" alt="야외 행사 현장" style="width:100%;height:100%;min-height:8rem;object-fit:cover;border-radius:1.1rem;">
+        <img src="photos/festival-night-crowd.jpg" alt="야간 축제 무대와 관객석"
+             style="grid-column:span 2;width:100%;height:100%;min-height:14rem;object-fit:cover;border-radius:1.1rem;">
+        <img src="photos/ceremony-indoor.jpg" alt="실내 기념식 음향 오퍼레이팅"
+             style="width:100%;height:100%;min-height:10rem;object-fit:cover;border-radius:1.1rem;">
+        <img src="photos/gohung-farmers-hall.jpg" alt="제23회 고흥군 농업경영인 대회 무대"
+             style="width:100%;height:100%;min-height:10rem;object-fit:cover;border-radius:1.1rem;">
       </div>
 
     </div>
@@ -621,10 +626,6 @@
         <img src="photos/truss-rigging.jpg" alt="조명 트러스 시공 · 무빙라이트 설치" loading="lazy">
         <figcaption>조명 트러스 시공 · 무빙라이트 설치</figcaption>
       </figure>
-      <figure class="gal-item">
-        <img src="photos/festival-night-crowd.jpg" alt="야간 축제 무대 · 관객석" loading="lazy">
-        <figcaption>야간 축제 무대 · 관객석</figcaption>
-      </figure>
       <figure class="gal-item" style="grid-column:span 2;">
         <img src="photos/gohung-farmers-violin.jpg" alt="제23회 고흥군 농업경영인 대회 · 전자바이올린 공연" loading="lazy">
         <figcaption>제23회 고흥군 농업경영인 대회 · 전자바이올린 공연</figcaption>
@@ -641,70 +642,69 @@
         <img src="photos/namyeol-sunrise-stage.jpg" alt="2026 고흥 남열 해맞이 행사 · 무대 설치" loading="lazy">
         <figcaption>2026 고흥 남열 해맞이 행사 · 무대 설치</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/namyeol-sunrise-open.jpg" alt="2026 고흥 남열 해맞이 행사 · 개막" loading="lazy">
         <figcaption>2026 고흥 남열 해맞이 행사 · 개막</figcaption>
       </figure>
-      <figure class="gal-item" style="grid-column:span 2;grid-row:span 2;">
+      <figure class="gal-item gal-more" style="grid-column:span 2;grid-row:span 2;">
         <img src="photos/led-wall-build.jpg" alt="LED 전광판 설치" loading="lazy">
         <figcaption>LED 전광판 설치</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/gohung-farmers-stage.jpg" alt="제23회 고흥군 농업경영인 대회 · 무대 조명" loading="lazy">
         <figcaption>제23회 고흥군 농업경영인 대회 · 무대 조명</figcaption>
       </figure>
-      <figure class="gal-item" style="grid-column:span 2;">
-        <img src="photos/gohung-farmers-hall.jpg" alt="제23회 고흥군 농업경영인 대회 · 객석" loading="lazy">
-        <figcaption>제23회 고흥군 농업경영인 대회 · 객석</figcaption>
-      </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/hanmaum-groundbreaking.jpg" alt="한마음선원 목포지원 새 도량 기공법회" loading="lazy">
         <figcaption>한마음선원 목포지원 새 도량 기공법회</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/jeonnam-coop-launch.jpg" alt="전라남도이벤트협동조합 발대식" loading="lazy">
         <figcaption>전라남도이벤트협동조합 발대식</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/nokdong-lions.jpg" alt="녹동라이온스클럽 회장단 이·취임식" loading="lazy">
         <figcaption>녹동라이온스클럽 회장단 이·취임식</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/mg-parkgolf.jpg" alt="2026 MG새마을금고 파크골프 어울림 한마당" loading="lazy">
         <figcaption>2026 MG새마을금고 파크골프 어울림 한마당</figcaption>
       </figure>
-      <figure class="gal-item" style="grid-column:span 2;">
+      <figure class="gal-item gal-more" style="grid-column:span 2;">
         <img src="photos/outdoor-console-sky.jpg" alt="야외 행사 음향 오퍼레이팅" loading="lazy">
         <figcaption>야외 행사 음향 오퍼레이팅</figcaption>
       </figure>
-      <figure class="gal-item" style="grid-column:span 2;grid-row:span 2;">
+      <figure class="gal-item gal-more" style="grid-column:span 2;grid-row:span 2;">
         <img src="photos/nokdong-drone-street.jpg" alt="녹동항 드론쇼 버스킹 · 무대 음향" loading="lazy">
         <figcaption>녹동항 드론쇼 버스킹 · 무대 음향</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/damyang-hall.jpg" alt="담양문화복지회관 실내 행사 · 음향 · 영상" loading="lazy">
         <figcaption>담양문화복지회관 실내 행사 · 음향 · 영상</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/banquet-hall.jpg" alt="실내 연회장 행사 음향" loading="lazy">
         <figcaption>실내 연회장 행사 음향</figcaption>
       </figure>
-      <figure class="gal-item">
-        <img src="photos/ceremony-indoor.jpg" alt="실내 기념식 음향 오퍼레이팅" loading="lazy">
-        <figcaption>실내 기념식 음향 오퍼레이팅</figcaption>
-      </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/lions-gym.jpg" alt="라이온스클럽 실내 행사 음향" loading="lazy">
         <figcaption>라이온스클럽 실내 행사 음향</figcaption>
       </figure>
-      <figure class="gal-item" style="grid-column:span 2;">
+      <figure class="gal-item gal-more" style="grid-column:span 2;">
         <img src="photos/night-rack-setup.jpg" alt="야간 행사 음향 · 조명 랙 세팅" loading="lazy">
         <figcaption>야간 행사 음향 · 조명 랙 세팅</figcaption>
       </figure>
-      <figure class="gal-item">
+      <figure class="gal-item gal-more">
         <img src="photos/street-booth-staff.jpg" alt="야외 행사 음향 부스" loading="lazy">
         <figcaption>야외 행사 음향 부스</figcaption>
       </figure>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin-top:2rem;">
+      <button type="button" id="gal-toggle" class="btn-ghost" style="padding:.9rem 2rem;font-size:.95rem;">
+        <iconify-icon icon="solar:gallery-add-bold" style="font-size:18px;color:#F87171;"></iconify-icon>
+        <span id="gal-toggle-text">사진 14장 더 보기</span>
+      </button>
     </div>
   </div>
 </section>
@@ -957,14 +957,32 @@ document.querySelectorAll('.svc').forEach((card) => {
   });
 });
 
-// ── 4. Gallery lightbox ──
+// ── 4. Gallery — 6장만 먼저 보여주고 나머지는 버튼으로 펼치기 ──
+const galGrid   = document.querySelector('.gal-grid');
+const galToggle = document.getElementById('gal-toggle');
+const galLabel  = document.getElementById('gal-toggle-text');
+const galHidden = document.querySelectorAll('.gal-more').length;
+
+galToggle.addEventListener('click', () => {
+  const opened = galGrid.classList.toggle('expanded');
+  galLabel.textContent = opened ? '사진 접기' : `사진 ${galHidden}장 더 보기`;
+  if (!opened) galGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ── 5. Gallery lightbox ──
 const lb     = document.getElementById('lightbox');
 const lbImg  = document.getElementById('lb-img');
 const lbCap  = document.getElementById('lb-cap');
-const shots  = [...document.querySelectorAll('.gal-item')];
+let shots    = [];
 let lbIndex  = 0;
 
+// 화면에 보이는 사진만 좌우 이동 대상으로 삼는다 (접혀 있으면 6장)
+function visibleShots() {
+  return [...document.querySelectorAll('.gal-item')].filter((el) => el.offsetParent !== null);
+}
+
 function showLb(i) {
+  if (!shots.length) return;
   lbIndex = (i + shots.length) % shots.length;
   const fig = shots[lbIndex];
   const img = fig.querySelector('img');
@@ -972,11 +990,16 @@ function showLb(i) {
   lbImg.alt = img.getAttribute('alt') || '';
   lbCap.textContent = (fig.querySelector('figcaption') || {}).textContent || '';
 }
-function openLb(i)  { showLb(i); lb.classList.add('open');    document.body.style.overflow = 'hidden'; }
-function closeLb()  { lb.classList.remove('open');            document.body.style.overflow = ''; }
+function openLb(fig) {
+  shots = visibleShots();
+  showLb(shots.indexOf(fig));
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLb()  { lb.classList.remove('open'); document.body.style.overflow = ''; }
 function stepLb(d)  { showLb(lbIndex + d); }
 
-shots.forEach((fig, i) => fig.addEventListener('click', () => openLb(i)));
+document.querySelectorAll('.gal-item').forEach((fig) => fig.addEventListener('click', () => openLb(fig)));
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLb();
