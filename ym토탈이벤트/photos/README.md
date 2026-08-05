@@ -4,12 +4,12 @@
 
 ## 사진 넣는 법
 
-1. 사진 파일을 이 폴더(`ym-event/photos/`)에 업로드합니다.
+1. 사진 파일을 이 폴더(`ym토탈이벤트/photos/`)에 업로드합니다.
    - 권장 형식: `.jpg`
    - 권장 크기: 가로 1600px 내외 (한 장당 500KB 이하면 페이지가 빠릅니다)
    - 파일 이름은 영문·숫자로 (예: `nokdong-fireworks-2025.jpg`)
 
-2. `ym-event/index.html` 에서 `GALLERY` 주석을 찾아 아래 부분을 고칩니다.
+2. `ym토탈이벤트/index.html` 에서 `GALLERY` 주석을 찾아 아래 부분을 고칩니다.
 
    ```html
    <figure class="gal-item">
