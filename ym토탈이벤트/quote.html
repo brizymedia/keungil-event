@@ -311,6 +311,21 @@
           견적서 PDF 를 함께 보내시려면 <strong style="color:#d4d4d8;">「인쇄 · PDF 저장」</strong> 으로 저장한 파일을 메일에 첨부해 주세요.
         </span>
       </p>
+
+      <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(245,158,11,.2);">
+        <div style="font-size:.8rem;color:#a1a1aa;line-height:1.7;margin-bottom:.55rem;">
+          문의 메일의 견적서 주소가 눌리지 않으면, 그 주소를 복사해 여기에 붙여넣고 불러오세요.
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <input type="text" id="admin-paste" placeholder="메일에 있는 견적서 주소 붙여넣기"
+                 style="flex:1;min-width:12rem;padding:.65rem .8rem;border-radius:.6rem;
+                        border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);
+                        color:#fff;font-family:inherit;font-size:.85rem;">
+          <button type="button" class="btn-ghost" id="admin-load" style="padding:.65rem 1.1rem;font-size:.85rem;">
+            불러오기
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- ── 01. 행사 정보 ── -->
@@ -830,34 +845,72 @@ function syncParty() {
 INFO.forEach((k) => $('#q-' + k).addEventListener('input', () => { syncParty(); saveHash(); }));
 
 /* ══ 상태 ↔ URL (서버 없이 저장 · 공유 · 재편집) ══ */
+/* 메일에서 링크가 끊기지 않도록 최대한 짧게 만든다.
+   · 정보 항목 이름을 한 글자로 줄이고, 비어 있는 항목은 아예 뺀다
+   · 수량 1 · 1일 · 단가 협의 인 항목은 id 한 개로만 저장한다
+   · base64 의 + / = 를 - _ 로 바꾼다 (메일 프로그램이 링크를 자를 때가 있다) */
+const INFO_KEY = { org:'o', name:'n', tel:'t', email:'e', title:'m', date:'d', place:'p', people:'c' };
+
+const b64u = (s) => btoa(unescape(encodeURIComponent(s)))
+                      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (s) => {
+  let t = String(s).replace(/-/g, '+').replace(/_/g, '/');
+  while (t.length % 4) t += '=';
+  return decodeURIComponent(escape(atob(t)));
+};
+
 function encodeState() {
-  // 카탈로그 그대로인 행은 [id, 수량, 일수, 단가] 4칸만 저장한다.
-  // 품목명·규격·단위는 id 로 복원되므로, 링크가 메일에서 잘릴 만큼 길어지지 않는다.
-  const state = {
-    i: INFO.reduce((o, k) => (o[k] = $('#q-' + k).value, o), {}),
-    r: rows.map((r) => {
-      const c = r.id && BY_ID[r.id];
-      const asIs = c && r.name === c.name && r.spec === c.spec && r.unit === c.unit;
-      return asIs ? [r.id, r.qty, r.days, r.price]
-                  : [r.id, r.name, r.spec, r.qty, r.unit, r.days, r.price];
-    }),
-    d: +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0,
-  };
-  return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  // 이름표 없이 순서대로만 담는다 ("org":"…" 같은 군더더기가 사라진다)
+  const i = INFO.map((k) => $('#q-' + k).value.trim());
+  while (i.length && !i[i.length - 1]) i.pop();     // 뒤쪽 빈칸은 버린다
+
+  const r = rows.map((row) => {
+    const c = row.id && BY_ID[row.id];
+    const asIs = c && row.name === c.name && row.spec === c.spec && row.unit === c.unit;
+    if (!asIs) return [row.id, row.name, row.spec, row.qty, row.unit, row.days, row.price];
+    // 기본값(1개 · 1일 · 협의)은 저장하지 않는다
+    if (row.price !== null)          return [row.id, row.qty, row.days, row.price];
+    if (+row.days !== 1)             return [row.id, row.qty, row.days];
+    if (+row.qty  !== 1)             return [row.id, row.qty];
+    return row.id;
+  });
+
+  const state = { i, r };
+  const d = +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0;
+  if (d) state.d = d;
+  return b64u(JSON.stringify(state));
 }
+
 function decodeState(str) {
   try {
-    const s = JSON.parse(decodeURIComponent(escape(atob(str))));
-    INFO.forEach((k) => { if (s.i && s.i[k] != null) $('#q-' + k).value = s.i[k]; });
+    const s = JSON.parse(unb64u(str));
+    // 순서만 담은 새 링크와, 이름표가 붙은 예전 링크를 모두 읽는다
+    INFO.forEach((k, idx) => {
+      const i = s.i;
+      if (!i) return;
+      const v = Array.isArray(i) ? i[idx]
+              : (i[INFO_KEY[k]] != null ? i[INFO_KEY[k]] : i[k]);
+      if (v != null) $('#q-' + k).value = v;
+    });
     rows = (s.r || []).map((a) => {
-      if (a.length === 4) {                       // 압축 저장된 카탈로그 행
-        const c = BY_ID[a[0]] || { name: '', spec: '', unit: '식' };
+      const cat = (id) => BY_ID[id] || { name: '', spec: '', unit: '식' };
+      if (typeof a === 'string') {                // id 하나 — 1개 · 1일 · 협의
+        const c = cat(a);
+        return { key: ++seq, id: a, name: c.name, spec: c.spec,
+                 qty: 1, unit: c.unit, days: 1, price: null };
+      }
+      if (a.length <= 4) {                        // 압축 저장된 카탈로그 행
+        const c = cat(a[0]);
         return { key: ++seq, id: a[0], name: c.name, spec: c.spec,
-                 qty: a[1], unit: c.unit, days: a[2], price: a[3] };
+                 qty: a[1] != null ? a[1] : 1, unit: c.unit,
+                 days: a[2] != null ? a[2] : 1,
+                 price: a[3] != null ? a[3] : null };
       }
       return { key: ++seq, id: a[0], name: a[1], spec: a[2],
                qty: a[3], unit: a[4], days: a[5], price: a[6] };
     });
+    // 이미 켜져 있던 체크는 끄고 새로 맞춘다 (견적서를 새로 불러올 때 필요하다)
+    document.querySelectorAll('#catalog input[data-id]').forEach((cb) => { cb.checked = false; });
     rows.forEach((r) => {
       if (!r.id) return;
       const cb = document.querySelector(`#catalog input[data-id="${r.id}"]`);
@@ -892,9 +945,16 @@ function totalsLine() {
   return `공급가액 ${$('#s-supply').textContent} / 부가세 ${$('#s-vat').textContent} / 합계 ${$('#s-total').textContent}`;
 }
 
-// admin = true 면 관리자용(?admin=1) 링크, 아니면 고객이 보는 링크
+/* admin = true 면 관리자용(?admin=1) 링크, 아니면 고객이 보는 링크
+
+   주소는 한글 폴더(/ym토탈이벤트/) 대신 영문 /ym-event/ 로 만든다.
+   한글은 주소에서 %ED%86%A0 같은 글자로 바뀌어 링크가 세 배로 길어지고,
+   그만큼 메일에서 줄바꿈으로 끊어질 확률이 높아진다.
+   /ym-event/quote.html 은 물음표·주소 뒤 내용을 그대로 넘겨준다. */
 function quoteURL(admin) {
-  return location.origin + location.pathname + (admin ? '?admin=1' : '') + '#q=' + encodeState();
+  const here  = location.href.replace(/[?#].*$/, '');
+  const short = here.replace(/\/[^/]+\/quote\.html$/, '/ym-event/quote.html');
+  return short + (admin ? '?admin=1' : '') + '#q=' + encodeState();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1123,18 +1183,25 @@ $('#btn-send').addEventListener('click', () => {
   // 문의 메일에는 관리자 링크가 들어간다.
   // 이 링크로 다시 들어가면 금액을 채운 뒤 고객에게 바로 보낼 수 있다.
   const 링크 = quoteURL(true);
+  // 메일 프로그램이 긴 주소를 링크로 만들어주지 않을 때를 위한 짧은 주소
+  const 관리자페이지 = 링크.replace(/#.*$/, '');
 
+  // 링크를 맨 위에 둔다 — 표 아래쪽에 있으면 메일에서 찾기 어렵다
   const payload = {
     _subject: '[YM토탈이벤트] 자동 견적서 문의',
     _template: 'table',
     _replyto: $('#q-email').value.trim(),
+    '견적서 열기 (금액 채워 고객에게 발송)': 링크,
+    '위 주소가 안 눌리면': 관리자페이지 + ' 를 연 뒤 위 주소를 복사해 붙여넣으세요',
     단체명: g('org'), 담당자: g('name'), 연락처: g('tel'), 이메일: g('email'),
     행사명: g('title'), 행사일: g('date'), 행사장소: g('place'), 예상인원: g('people'),
-    견적내역: 내역, 합계: 합계, 견적서_편집링크: 링크,
+    견적내역: 내역, 합계: 합계,
   };
 
   const mailBody = [
     '[YM토탈이벤트 견적 문의]', '',
+    '▶ 견적서 열기', 링크, '',
+    '  (주소가 안 눌리면 ' + 관리자페이지 + ' 를 열고 위 주소를 붙여넣으세요)', '',
     '단체·회사명 : ' + g('org'),
     '담당자      : ' + g('name'),
     '연락처      : ' + g('tel'),
@@ -1145,7 +1212,6 @@ $('#btn-send').addEventListener('click', () => {
     '예상인원    : ' + g('people'),
     '', '── 견적 내역 ──', 내역,
     '', 합계,
-    '', '── 견적서 편집 링크 (관리자) ──', 링크,
   ].join('\n');
 
   sendForm(payload, '[견적문의] ' + g('org') + ' / ' + g('title'), mailBody,
@@ -1254,6 +1320,23 @@ $('#send-recopy').addEventListener('click', async () => {
   const ok = await copyRich(견적HTML(), 고객메일텍스트());
   toast(ok ? '견적서를 다시 복사했습니다' : '복사가 안 됩니다 · 아래 「글자만 넣어 보내기」를 눌러주세요');
   if (ok) { $('#send-ok').hidden = false; $('#send-fail').hidden = true; }
+});
+
+/* 메일에서 링크가 눌리지 않을 때 — 주소를 붙여넣어 견적서를 불러온다.
+   주소 전체를 넣어도 되고 #q= 뒤의 글자만 넣어도 된다. */
+$('#admin-load').addEventListener('click', () => {
+  const 입력 = $('#admin-paste').value.trim().replace(/\s+/g, '');
+  if (!입력) { toast('견적서 주소를 붙여넣어 주세요'); return; }
+  const m = 입력.match(/[#?&]q=([^&\s]+)/);
+  const code = m ? m[1] : 입력;
+  if (decodeState(code)) {
+    render();
+    $('#admin-paste').value = '';
+    관리자표시();
+    toast('견적서를 불러왔습니다');
+  } else {
+    toast('읽을 수 없는 주소입니다 · 주소 전체를 복사해 주세요');
+  }
 });
 
 function 관리자표시() {
