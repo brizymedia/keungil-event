@@ -162,6 +162,19 @@
     .party b{ color:#fff;font-weight:700; }
     .party .lbl{ display:inline-block;min-width:4.6rem;color:#71717a; }
 
+    /* 대표 직인 — 인쇄·PDF 에만 찍힌다.
+       도장은 흰 바탕에 빨간 인영이라 어두운 화면에서는 흰 네모로 보인다.
+       종이 위에서만 제대로 보이므로 인쇄할 때만 내보낸다.
+       파일은 ym토탈이벤트/stamp.png · 없으면 스크립트가 지운다. */
+    .stamp{
+      position:absolute;right:0;top:5mm;width:23mm;height:auto;
+      pointer-events:none;
+      /* 도장 파일 바탕이 흰색이어도 아래 글자가 비쳐 보이게 한다.
+         종이 위에 실제로 찍은 것처럼 겹친다. */
+      mix-blend-mode:multiply;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    }
+
     .tbl-wrap{ overflow-x:auto; }
     table.q{ width:100%;border-collapse:collapse;min-width:46rem; }
     table.q th{
@@ -389,10 +402,10 @@
             견적일 <span id="doc-date">-</span> · 견적 유효기간 발행일로부터 30일
           </div>
         </div>
-        <div class="party">
+        <div class="party" style="position:relative;">
           <div style="font-size:.7rem;letter-spacing:.16em;color:#F87171;font-weight:700;margin-bottom:.35rem;">공급자</div>
           <div><span class="lbl">상호</span><b>YM토탈이벤트</b></div>
-          <div><span class="lbl">대표</span><b>이영훈</b></div>
+          <div><span class="lbl">대표</span><b>이영훈</b><img id="stamp" class="stamp print-only" src="stamp.png" alt="대표 직인"></div>
           <div><span class="lbl">연락처</span><b>010-8623-9294</b></div>
           <div><span class="lbl">이메일</span><b>iau1032@naver.com</b></div>
           <div><span class="lbl">소재지</span><b>전남 고흥</b></div>
@@ -476,7 +489,13 @@
       </button>
     </div>
 
-    <p class="no-print" style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;line-height:1.8;">
+    <p class="no-print" id="stamp-note" hidden
+       style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;">
+      <iconify-icon icon="solar:stamp-bold" style="font-size:15px;color:#71717a;vertical-align:-2px;"></iconify-icon>
+      인쇄 · PDF 저장 시 <strong style="color:#71717a;">대표 직인</strong>이 함께 찍힙니다.
+    </p>
+
+    <p class="no-print" id="send-note" style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;line-height:1.8;">
       누르시면 <strong style="color:#71717a;">견적 내용이 그대로 접수됩니다.</strong>
       작성하신 견적서는 <strong style="color:#71717a;">「견적서 링크 복사」</strong> 로 따로 보관하거나
       카카오톡 · 문자로 공유하실 수 있습니다.<br>
@@ -962,15 +981,17 @@ function totalsLine() {
    한글은 주소에서 %ED%86%A0 같은 글자로 바뀌어 링크가 세 배로 길어지고,
    그만큼 메일에서 줄바꿈으로 끊어질 확률이 높아진다.
    /ym-event/quote.html 은 물음표·주소 뒤 내용을 그대로 넘겨준다. */
-function quoteURL(admin, 물음표방식) {
+function quoteURL(admin, 물음표방식, 발송본) {
   const here  = location.href.replace(/[?#].*$/, '');
   const short = here.replace(/\/[^/]+\/quote\.html$/, '/ym-event/quote.html');
   const code  = encodeState();
+  // 발송본: 고객에게 보낸 견적서. 이미 답을 드린 건이라 문의 버튼을 감춘다.
+  const 표시 = admin ? 'admin=1' : (발송본 ? 'sent=1' : '');
   // 물음표방식: 메일에 글자로 들어가는 주소용.
   // 휴대폰 메일 앱은 # 뒤를 주소로 안 쳐줘서 링크가 안 눌린다.
   return 물음표방식
-    ? short + '?' + (admin ? 'admin=1&' : '') + 'q=' + code
-    : short + (admin ? '?admin=1' : '') + '#q=' + code;
+    ? short + '?' + (표시 ? 표시 + '&' : '') + 'q=' + code
+    : short + (표시 ? '?' + 표시 : '') + '#q=' + code;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -989,7 +1010,7 @@ function 견적HTML() {
   const 행사 = gv('title') === '-' ? '요청하신 행사' : gv('title');
   const 할인 = Math.max(0, +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0);
   const 협의건수 = rows.filter((r) => r.price === null).length;
-  const 고객링크 = quoteURL(false);
+  const 고객링크 = quoteURL(false, false, true);   // 발송본
 
   const F  = "'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
   const TD = 'padding:11px 10px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827;';
@@ -1261,6 +1282,8 @@ $('#btn-send').addEventListener('click', () => {
 ══════════════════════════════════════════════════════════════ */
 const 주소값 = new URLSearchParams(location.search);
 const IS_ADMIN = 주소값.get('admin') === '1';
+// 관리자가 고객에게 보낸 견적서를 열었을 때
+const IS_SENT  = 주소값.get('sent')  === '1';
 
 function 고객메일제목() {
   return '[YM토탈이벤트] ' + (gv('title') === '-' ? '견적서' : gv('title') + ' 견적서');
@@ -1290,7 +1313,7 @@ function 고객메일텍스트() {
     '※ 부가세 10% 별도 기준이며, 현장 여건(전원 · 진입로 · 설치 시간)에 따라 조정될 수 있습니다.',
     '',
     '아래 링크에서 견적서를 그대로 보실 수 있습니다.',
-    quoteURL(false),
+    quoteURL(false, false, true),
     '',
     '궁금하신 점은 편하게 회신 주시거나 아래 번호로 연락 주세요.',
     '',
@@ -1424,12 +1447,29 @@ $('#admin-clip').addEventListener('click', async () => {
 });
 
 function 관리자표시() {
+  /* 「이 견적으로 문의 보내기」는 고객이 처음 문의할 때 쓰는 버튼이다.
+     발송 흐름 — 관리자가 금액을 채우는 화면, 그리고 고객이 받은 견적서 —
+     에서는 쓸 일이 없고 잘못 누르면 문의가 하나 더 접수되므로 감춘다. */
+  if (IS_ADMIN || IS_SENT) {
+    $('#btn-send').hidden = true;
+    $('#send-note').hidden = true;
+  }
   if (!IS_ADMIN) return;
   $('#admin-bar').hidden = false;
   $('#btn-to-customer').hidden = false;
   const to = $('#q-email').value.trim();
   $('#admin-to').textContent = to || '고객 이메일 (미입력)';
 }
+
+/* 대표 직인 — 파일이 없으면 인쇄할 때 깨진 그림이 나오므로 미리 지운다 */
+(function 직인확인() {
+  const el = $('#stamp');
+  if (!el) return;
+  const 시험 = new Image();
+  시험.onload  = () => { const n = $('#stamp-note'); if (n) n.hidden = false; };
+  시험.onerror = () => { el.remove(); };
+  시험.src = el.getAttribute('src');
+})();
 $('#q-email').addEventListener('input', 관리자표시);
 
 /* ══ 시작 ══ */
