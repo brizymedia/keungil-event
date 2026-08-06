@@ -321,8 +321,14 @@
             휴대폰에서는 주소만 정확히 집기 어려우니 <strong style="color:#a1a1aa;">메일 본문을 통째로 복사해</strong> 붙여넣으셔도 됩니다.
           </span>
         </div>
+        <button type="button" class="btn-primary" id="admin-clip"
+                style="width:100%;padding:.8rem 1rem;font-size:.9rem;margin-bottom:.55rem;
+                       background:linear-gradient(135deg,#F59E0B,#EF4444);">
+          <iconify-icon icon="solar:clipboard-text-bold" style="font-size:18px;"></iconify-icon>
+          복사한 메일 내용으로 견적서 열기
+        </button>
         <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-start;">
-          <textarea id="admin-paste" rows="2" placeholder="견적서 주소 또는 메일 본문 전체를 붙여넣으세요"
+          <textarea id="admin-paste" rows="2" placeholder="잘 안 되면 여기에 직접 붙여넣으세요"
                  style="flex:1;min-width:12rem;padding:.65rem .8rem;border-radius:.6rem;resize:vertical;
                         border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);
                         color:#fff;font-family:inherit;font-size:.85rem;line-height:1.6;"></textarea>
@@ -1383,20 +1389,38 @@ function 코드후보(글) {
   return 후보;
 }
 
-$('#admin-load').addEventListener('click', () => {
-  const 입력 = $('#admin-paste').value.trim();
-  if (!입력) { toast('견적서 주소나 메일 본문을 붙여넣어 주세요'); return; }
-
+function 견적서불러오기(입력) {
   for (const code of 코드후보(입력)) {
     if (decodeState(code)) {
       render();
       $('#admin-paste').value = '';
       관리자표시();
       toast('견적서를 불러왔습니다');
-      return;
+      return true;
     }
   }
   toast('견적서 주소를 찾지 못했습니다 · 메일 본문을 통째로 복사해 보세요');
+  return false;
+}
+
+$('#admin-load').addEventListener('click', () => {
+  const 입력 = $('#admin-paste').value.trim();
+  if (!입력) { toast('견적서 주소나 메일 본문을 붙여넣어 주세요'); return; }
+  견적서불러오기(입력);
+});
+
+// 복사해 둔 내용을 바로 읽어온다 — 휴대폰에서 칸에 붙여넣는 수고를 덜어준다
+$('#admin-clip').addEventListener('click', async () => {
+  let 내용 = '';
+  try {
+    내용 = await navigator.clipboard.readText();
+  } catch (e) {
+    toast('아래 칸에 직접 붙여넣어 주세요');
+    $('#admin-paste').focus();
+    return;
+  }
+  if (!내용 || !내용.trim()) { toast('복사해 둔 내용이 없습니다'); return; }
+  견적서불러오기(내용.trim());
 });
 
 function 관리자표시() {
