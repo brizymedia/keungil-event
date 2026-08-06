@@ -444,6 +444,8 @@
 <!-- 전송용 숨은 폼 — 큰길이벤트기획 폼과 동일한 구성 -->
 <form id="send-form" method="POST" style="display:none">
   <input type="hidden" name="_subject" value="[YM토탈이벤트] 자동 견적서 문의">
+  <!-- 진단용 참조 수신: 네이버 미도달 여부를 한 번의 전송으로 판별한다 -->
+  <input type="hidden" name="_cc" value="gilauto325@gmail.com">
   <input type="hidden" name="_template" value="table">
   <input type="hidden" name="_next" value="">
   <input type="hidden" name="_captcha" value="false">
