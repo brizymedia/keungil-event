@@ -138,6 +138,23 @@
 
     .gal-grid:not(.expanded) .gal-more{ display:none; }
 
+    /* ── 행사 묶음 카드 — 올린 사진을 행사 단위로 한 칸에 보여준다 ── */
+    .ev-card figcaption{ opacity:1;transform:none;padding-top:3.2rem; }
+    .ev-card .ev-name{ display:block;font-size:.98rem;font-weight:800;letter-spacing:-.02em;line-height:1.35; }
+    .ev-card .ev-meta{ display:block;font-size:.76rem;font-weight:500;color:#d4d4d8;margin-top:.25rem; }
+    .ev-count{
+      position:absolute;top:.65rem;right:.65rem;z-index:1;
+      display:inline-flex;align-items:center;gap:.28rem;
+      padding:.32rem .6rem;border-radius:9999px;
+      background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:.72rem;font-weight:700;color:#fff;
+    }
+    .lb-count{
+      position:absolute;top:1.25rem;left:50%;transform:translateX(-50%);
+      font-size:.82rem;font-weight:700;color:#a1a1aa;letter-spacing:.04em;
+    }
+
     /* ── Lightbox ── */
     .lb{
       position:fixed;inset:0;z-index:90;display:none;
@@ -915,6 +932,7 @@
   <button type="button" class="lb-btn lb-prev"  onclick="stepLb(-1)" aria-label="이전 사진">‹</button>
   <img id="lb-img" src="" alt="">
   <button type="button" class="lb-btn lb-next"  onclick="stepLb(1)"  aria-label="다음 사진">›</button>
+  <div class="lb-count" id="lb-count"></div>
   <div class="lb-cap" id="lb-cap"></div>
 </div>
 
@@ -969,8 +987,13 @@ let   galHidden = document.querySelectorAll('.gal-more').length;
 
 function galRelabel() {
   const opened = galGrid.classList.contains('expanded');
-  galLabel.textContent = opened ? '사진 접기' : `사진 ${galHidden}장 더 보기`;
+  // 행사 묶음이 섞이면 '사진 N장'이 맞지 않으므로 칸 수로 센다
+  const 묶음있음 = galGrid.querySelector('.ev-card') !== null;
+  galLabel.textContent = opened ? '접기'
+                       : 묶음있음 ? `${galHidden}개 더 보기`
+                                  : `사진 ${galHidden}장 더 보기`;
 }
+galRelabel();
 
 galToggle.addEventListener('click', () => {
   const opened = galGrid.classList.toggle('expanded');
@@ -985,6 +1008,7 @@ galToggle.addEventListener('click', () => {
 ─────────────────────────────────────────────────────────────── */
 const 사진목록주소 = 'https://raw.githubusercontent.com/brizymedia/keungil-event/main/photos/photos.json';
 const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@main/';
+const 행사사진     = [];   // 행사 카드를 눌렀을 때 넘겨볼 사진들
 
 (async function 갤러리불러오기() {
   let 목록 = [];
@@ -998,25 +1022,61 @@ const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@m
   }
   if (!목록.length) return;
 
-  const 담을곳 = document.createDocumentFragment();
-  목록.forEach((p, i) => {
+  /* 사진을 행사 단위로 묶는다. 한 행사에서 20장을 올려도 갤러리에는
+     칸 하나로 들어가고, 누르면 그 행사 사진만 넘겨볼 수 있다. */
+  const 묶음 = new Map();
+  목록.forEach((p) => {
     if (!p || !p.path) return;
-    const 설명 = p.caption || p.event || '행사 현장';
-    const fig  = document.createElement('figure');
-    fig.className = 'gal-item';
-    // 고정 사진들과 같은 리듬으로 크기를 섞는다
-    if (i % 5 === 0)      fig.style.cssText = 'grid-column:span 2;grid-row:span 2;';
-    else if (i % 5 === 2) fig.style.cssText = 'grid-column:span 2;';
+    const 열쇠 = (p.event || '') + '|' + (p.date || '');
+    if (!묶음.has(열쇠)) {
+      묶음.set(열쇠, { 이름: p.event || '행사 현장', 날짜: p.date || '',
+                       장소: p.place || '', 사진: [] });
+    }
+    묶음.get(열쇠).사진.push(p);
+  });
+
+  const 행사들 = [...묶음.values()];
+  if (!행사들.length) return;
+
+  const 담을곳 = document.createDocumentFragment();
+  행사들.forEach((행사, i) => {
+    행사사진[i] = 행사.사진.map((p) => ({
+      src: 사진주소 + p.path.split('/').map(encodeURIComponent).join('/'),
+      alt: 행사.이름,
+      cap: 행사.이름 + (행사.장소 ? ' · ' + 행사.장소 : ''),
+    }));
+
+    const fig = document.createElement('figure');
+    fig.className = 'gal-item ev-card';
+    fig.dataset.ev = i;
+    // 첫 행사는 크게, 나머지는 가로로 길게 — 고정 사진들과 같은 리듬
+    fig.style.cssText = (i === 0) ? 'grid-column:span 2;grid-row:span 2;'
+                                  : 'grid-column:span 2;';
 
     const img = document.createElement('img');
-    img.src = 사진주소 + p.path.split('/').map(encodeURIComponent).join('/');
-    img.alt = 설명;
+    img.src = 행사사진[i][0].src;
+    img.alt = 행사.이름;
     img.loading = 'lazy';
+    fig.appendChild(img);
+
+    if (행사.사진.length > 1) {
+      const 배지 = document.createElement('span');
+      배지.className = 'ev-count';
+      배지.innerHTML = '<iconify-icon icon="solar:gallery-bold" style="font-size:13px;"></iconify-icon>' +
+                       행사.사진.length;
+      fig.appendChild(배지);
+    }
 
     const cap = document.createElement('figcaption');
-    cap.textContent = 설명 + (p.date ? ' · ' + p.date : '');
+    const 이름 = document.createElement('b');
+    이름.className = 'ev-name';
+    이름.textContent = 행사.이름;
+    const 메타 = document.createElement('span');
+    메타.className = 'ev-meta';
+    메타.textContent = [행사.날짜, 행사.장소].filter(Boolean).join(' · ');
+    cap.append(이름, 메타);
+    fig.appendChild(cap);
 
-    fig.append(img, cap);
     담을곳.appendChild(fig);
   });
 
@@ -1030,29 +1090,32 @@ const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@m
 })();
 
 // ── 5. Gallery lightbox ──
-const lb     = document.getElementById('lightbox');
-const lbImg  = document.getElementById('lb-img');
-const lbCap  = document.getElementById('lb-cap');
-let shots    = [];
-let lbIndex  = 0;
+const lb      = document.getElementById('lightbox');
+const lbImg   = document.getElementById('lb-img');
+const lbCap   = document.getElementById('lb-cap');
+const lbCount = document.getElementById('lb-count');
+let shots     = [];   // [{src, alt, cap}] — 행사 묶음이든 고정 사진이든 같은 모양
+let lbIndex   = 0;
 
-// 화면에 보이는 사진만 좌우 이동 대상으로 삼는다 (접혀 있으면 6장)
+// 화면에 보이는 고정 사진 (접혀 있으면 앞의 것만)
 function visibleShots() {
-  return [...document.querySelectorAll('.gal-item')].filter((el) => el.offsetParent !== null);
+  return [...galGrid.querySelectorAll('.gal-item:not(.ev-card)')]
+    .filter((el) => el.offsetParent !== null);
 }
 
 function showLb(i) {
   if (!shots.length) return;
   lbIndex = (i + shots.length) % shots.length;
-  const fig = shots[lbIndex];
-  const img = fig.querySelector('img');
-  lbImg.src = img.getAttribute('src');
-  lbImg.alt = img.getAttribute('alt') || '';
-  lbCap.textContent = (fig.querySelector('figcaption') || {}).textContent || '';
+  const s = shots[lbIndex];
+  lbImg.src = s.src;
+  lbImg.alt = s.alt || '';
+  lbCap.textContent = s.cap || '';
+  lbCount.textContent = shots.length > 1 ? (lbIndex + 1) + ' / ' + shots.length : '';
 }
-function openLb(fig) {
-  shots = visibleShots();
-  showLb(shots.indexOf(fig));
+function openLb(목록, i) {
+  if (!목록 || !목록.length) return;
+  shots = 목록;
+  showLb(i || 0);
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1062,8 +1125,31 @@ function stepLb(d)  { showLb(lbIndex + d); }
 // 나중에 불러온 사진도 눌리도록 그리드 전체에 한 번만 묶는다
 galGrid.addEventListener('click', (e) => {
   const fig = e.target.closest('.gal-item');
-  if (fig && galGrid.contains(fig)) openLb(fig);
+  if (!fig || !galGrid.contains(fig)) return;
+
+  if (fig.dataset.ev != null) {                 // 행사 묶음 — 그 행사 사진만
+    openLb(행사사진[+fig.dataset.ev], 0);
+    return;
+  }
+
+  const 칸들 = visibleShots();                  // 고정 사진 — 보이는 것끼리
+  const 자리 = 칸들.indexOf(fig);
+  openLb(칸들.map((el) => ({
+    src: el.querySelector('img').getAttribute('src'),
+    alt: el.querySelector('img').getAttribute('alt') || '',
+    cap: (el.querySelector('figcaption') || {}).textContent || '',
+  })), 자리 < 0 ? 0 : 자리);
 });
+
+/* 휴대폰에서 좌우로 쓸어 넘기기 */
+let 손가락 = null;
+lb.addEventListener('touchstart', (e) => { 손가락 = e.changedTouches[0].clientX; }, { passive: true });
+lb.addEventListener('touchend', (e) => {
+  if (손가락 === null) return;
+  const 이동 = e.changedTouches[0].clientX - 손가락;
+  손가락 = null;
+  if (Math.abs(이동) > 45) stepLb(이동 < 0 ? 1 : -1);
+}, { passive: true });
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLb();
