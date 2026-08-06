@@ -1186,8 +1186,14 @@
       <button onclick="closeInquiryModal()" style="background:rgba(255,255,255,.07);border:none;color:#a1a1aa;width:2rem;height:2rem;border-radius:.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;" aria-label="닫기">✕</button>
     </div>
 
-    <!-- 문의 폼 — 메일 앱으로 직접 전송 -->
-    <form id="inquiry-form" style="display:flex;flex-direction:column;gap:1rem;">
+    <!-- FormSubmit 폼 -->
+    <form id="inquiry-form" action="https://formsubmit.co/gilcaro@naver.com" method="POST" style="display:flex;flex-direction:column;gap:1rem;">
+      <!-- FormSubmit 설정 -->
+      <input type="hidden" name="_subject" value="[큰길이벤트기획] 새 견적문의가 도착했습니다">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_replyto" id="kg-replyto" value="">
 
       <div>
         <label class="inq-label" for="inq-name">이름 <span style="color:#F59E0B;">*</span></label>
@@ -1227,10 +1233,6 @@
         <iconify-icon icon="solar:paper-plane-bold" style="font-size:1.1rem;"></iconify-icon>
         편하게 문의하기
       </button>
-      <p style="font-size:.72rem;color:#52525b;text-align:center;line-height:1.8;margin-top:.25rem;">
-        누르시면 내용이 채워진 메일이 열립니다. 확인 후 보내주세요.<br>
-        메일 앱이 열리지 않으면 <a href="mailto:gilcaro@naver.com" style="color:#F59E0B;text-decoration:none;">gilcaro@naver.com</a> 으로 보내주셔도 됩니다.
-      </p>
     </form>
   </div>
 </div>
@@ -1252,34 +1254,20 @@ document.getElementById('inquiry-overlay').addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape') closeInquiryModal();
 });
-// 제출 — 방문자의 메일 앱을 열어 내용을 채워 넣는다.
-// 외부 폼 서비스를 거치지 않으므로 중간에 유실될 구간이 없다.
-var 문의_수신_이메일 = 'gilcaro@naver.com';
-
-document.getElementById('inquiry-form').addEventListener('submit',function(e){
-  e.preventDefault();
-  if(!this.reportValidity()) return;
-
-  var v = function(id){ var el=document.getElementById(id); return (el&&el.value.trim())||'-'; };
-  var agreeEl = this.querySelector('input[name="개인정보동의"]:checked');
-  var body = [
-    '[큰길이벤트기획 견적 문의]',
-    '',
-    '이름     : ' + v('inq-name'),
-    '연락처   : ' + v('inq-phone'),
-    '이메일   : ' + v('inq-email'),
-    '개인정보 : ' + (agreeEl ? agreeEl.value : '-'),
-    '',
-    '── 상담 내용 ──',
-    v('inq-content'),
-    '',
-    '※ 참고 자료가 있으시면 이 메일에 첨부해 주세요.'
-  ].join('\n');
-
-  window.location.href = 'mailto:' + 문의_수신_이메일 +
-    '?subject=' + encodeURIComponent('[견적문의] ' + v('inq-name')) +
-    '&body='    + encodeURIComponent(body);
+// 제출 성공 후 처리
+document.getElementById('inquiry-form').addEventListener('submit',function(){
+  // FormSubmit이 리다이렉트하므로 _next URL을 현재 페이지로 설정
+  this.querySelector('[name="_next"]').value = window.location.href + '?sent=1';
+  // 문의자 이메일을 Reply-To 로 넣어, 받은 메일에서 바로 답장할 수 있게 한다
+  this.querySelector('[name="_replyto"]').value = document.getElementById('inq-email').value.trim();
 });
+// 페이지 로드 시 ?sent=1 파라미터 확인
+(function(){
+  if(window.location.search.includes('sent=1')){
+    alert('문의가 접수되었습니다!\n빠른 시간 안에 연락드리겠습니다. 감사합니다 😊');
+    history.replaceState(null,'',window.location.pathname);
+  }
+})();
 </script>
 
 </body>
