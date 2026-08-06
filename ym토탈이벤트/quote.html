@@ -426,6 +426,10 @@
       </button>
     </div>
 
+    <p class="no-print" style="text-align:center;font-size:.72rem;color:#3f3f46;margin-top:.9rem;">
+      접수 메일 <span id="recv-hint">-</span>
+    </p>
+
     <p class="no-print" style="text-align:center;font-size:.82rem;color:#52525b;margin-top:1.25rem;line-height:1.8;">
       <strong style="color:#71717a;">단가가 &lsquo;협의&rsquo;로 표시된 항목</strong>은 현장 여건에 따라 크게 달라지는 항목입니다.
       담당자 확인 후 확정 견적을 보내드립니다.<br>
@@ -441,7 +445,6 @@
   <input type="hidden" name="_template" value="table">
   <input type="hidden" name="_next" id="f-next">
   <input type="hidden" name="_replyto" id="f-replyto">
-  <input type="text"   name="_honey" tabindex="-1" autocomplete="off">
   <input type="hidden" name="단체명"   id="f-org">
   <input type="hidden" name="담당자"   id="f-name">
   <input type="hidden" name="연락처"   id="f-tel">
@@ -494,6 +497,14 @@ const 견적_수신_이메일 = 'gilauto325@gmail.com';
 
 document.getElementById('send-form').action =
   'https://formsubmit.co/' + 견적_수신_이메일;
+
+// 지금 이 페이지가 어느 주소로 보내는지 화면에 표시한다 (주소는 가림).
+// 캐시된 옛 페이지를 보고 있으면 여기 값이 다르게 나온다.
+document.addEventListener('DOMContentLoaded', () => {
+  const [id, domain] = 견적_수신_이메일.split('@');
+  const el = document.getElementById('recv-hint');
+  if (el) el.textContent = id.slice(0, 3) + '***@' + domain;
+});
 
 /* ══════════════════════════════════════════════════════════════
    품목 카탈로그
