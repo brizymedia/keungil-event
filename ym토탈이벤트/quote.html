@@ -305,8 +305,8 @@
       </div>
       <p style="color:#d4d4d8;font-size:.88rem;line-height:1.8;margin-top:.6rem;">
         단가와 항목을 확정한 뒤 아래 <strong style="color:#FCD34D;">「고객에게 견적서 발송」</strong> 을 누르시면
-        메일 앱이 열리고 <strong style="color:#fff;" id="admin-to">고객 이메일</strong> 앞으로 견적서 내용이 채워집니다.
-        그대로 보내시면 됩니다.<br>
+        표로 짜인 견적서가 복사됩니다. 메일 쓰기 창에 <strong style="color:#fff;">붙여넣기(Ctrl+V)</strong> 하고
+        <strong style="color:#fff;" id="admin-to">고객 이메일</strong> 앞으로 보내시면 됩니다.<br>
         <span style="color:#a1a1aa;font-size:.83rem;">
           견적서 PDF 를 함께 보내시려면 <strong style="color:#d4d4d8;">「인쇄 · PDF 저장」</strong> 으로 저장한 파일을 메일에 첨부해 주세요.
         </span>
@@ -483,6 +483,61 @@
     YM토탈이벤트 · 대표 이영훈 · 010-8623-9294 · iau1032@naver.com · 전남 고흥
   </div>
 </footer>
+
+<!-- ── 고객 발송 안내 (관리자) ── -->
+<div id="send-modal" class="no-print" hidden
+     style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
+            display:flex;align-items:center;justify-content:center;padding:1.25rem;">
+  <div class="glass" style="max-width:30rem;width:100%;border-radius:1.15rem;padding:1.6rem 1.5rem;
+                            max-height:88vh;overflow:auto;border:1px solid rgba(245,158,11,.28);">
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:1.05rem;font-weight:800;">
+      <iconify-icon icon="solar:clipboard-check-bold" style="font-size:21px;color:#FCD34D;"></iconify-icon>
+      견적서를 복사했습니다
+    </div>
+
+    <div id="send-ok" style="margin-top:.9rem;font-size:.88rem;color:#d4d4d8;line-height:1.85;">
+      메일 쓰기 창을 연 뒤 <strong style="color:#FCD34D;">본문에 붙여넣기</strong> 하시면
+      표와 색이 그대로 들어갑니다.<br>
+      <span style="color:#a1a1aa;font-size:.82rem;">붙여넣기 &nbsp;Windows <b style="color:#d4d4d8;">Ctrl + V</b> &nbsp;·&nbsp; Mac <b style="color:#d4d4d8;">⌘ + V</b></span>
+    </div>
+    <div id="send-fail" hidden style="margin-top:.9rem;font-size:.88rem;color:#FCA5A5;line-height:1.85;">
+      이 브라우저에서 복사가 막혀 있습니다.
+      아래 <strong>「글자만 넣어 보내기」</strong> 를 누르시면 예전처럼 글자로 채워진 메일이 열립니다.
+    </div>
+
+    <div style="margin-top:1.1rem;padding:.85rem 1rem;border-radius:.75rem;background:rgba(255,255,255,.04);
+                border:1px solid rgba(255,255,255,.07);font-size:.82rem;line-height:1.9;">
+      <div style="color:#71717a;">받는 사람 <span id="send-to" style="color:#fff;font-weight:700;">-</span></div>
+      <div style="color:#71717a;">제목 <span id="send-subj" style="color:#fff;font-weight:700;">-</span></div>
+    </div>
+
+    <div style="display:grid;gap:.55rem;margin-top:1.15rem;">
+      <button type="button" class="btn-primary" id="send-gmail" style="padding:.85rem 1rem;font-size:.92rem;width:100%;">
+        <iconify-icon icon="solar:letter-bold" style="font-size:18px;"></iconify-icon>
+        지메일에서 쓰기 창 열기
+      </button>
+      <button type="button" class="btn-ghost" id="send-mailapp" style="padding:.8rem 1rem;font-size:.88rem;width:100%;">
+        기본 메일 앱 열기
+      </button>
+      <div style="display:flex;gap:.55rem;">
+        <button type="button" class="btn-ghost" id="send-recopy" style="flex:1;padding:.75rem .5rem;font-size:.82rem;">
+          다시 복사
+        </button>
+        <button type="button" class="btn-ghost" id="send-plain" style="flex:1;padding:.75rem .5rem;font-size:.82rem;">
+          글자만 넣어 보내기
+        </button>
+      </div>
+    </div>
+
+    <p style="margin-top:1rem;font-size:.76rem;color:#52525b;line-height:1.8;">
+      네이버 · 다음 메일을 쓰신다면 평소처럼 쓰기 창을 열고 붙여넣기만 하시면 됩니다.<br>
+      PDF 견적서를 함께 보내시려면 <strong style="color:#71717a;">「인쇄 · PDF 저장」</strong> 파일을 첨부해 주세요.
+    </p>
+
+    <button type="button" id="send-close" style="margin-top:1rem;width:100%;background:none;border:none;
+            color:#71717a;font-size:.83rem;cursor:pointer;font-family:inherit;padding:.5rem;">닫기</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -842,6 +897,194 @@ function quoteURL(admin) {
   return location.origin + location.pathname + (admin ? '?admin=1' : '') + '#q=' + encodeState();
 }
 
+/* ══════════════════════════════════════════════════════════════
+   고객에게 보낼 견적서 — 메일용 HTML
+
+   메일 프로그램(지메일 · 네이버)은 최신 CSS 를 대부분 지워버립니다.
+   그래서 표(table)와 인라인 style 만으로, 흰 종이 견적서처럼 짭니다.
+   flex · grid · 외부 폰트 · 배경 이미지는 쓰지 않습니다.
+══════════════════════════════════════════════════════════════ */
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function 견적HTML() {
+  const 호칭 = [gv('org') === '-' ? '' : gv('org'), gv('name') === '-' ? '' : gv('name') + ' 님']
+                 .filter(Boolean).join(' ') || '고객님';
+  const 행사 = gv('title') === '-' ? '요청하신 행사' : gv('title');
+  const 할인 = Math.max(0, +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0);
+  const 협의건수 = rows.filter((r) => r.price === null).length;
+  const 고객링크 = quoteURL(false);
+
+  const F  = "'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
+  const TD = 'padding:11px 10px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827;';
+  const TH = 'padding:10px;background:#111827;color:#ffffff;font-size:12px;font-weight:700;letter-spacing:.02em;';
+
+  const 항목행 = rows.map((r, i) => {
+    const 금액 = r.price === null ? null : (+r.qty || 0) * (+r.days || 0) * (+r.price || 0);
+    // 좁은 화면에서 칸이 세로로 쪼개지지 않게 수량·일수를 한 칸에 묶는다
+    const 수량 = esc(r.qty) + esc(r.unit) + ((+r.days || 1) > 1 ? ' × ' + esc(r.days) + '일' : '');
+    return `<tr>
+      <td style="${TD}text-align:center;color:#9ca3af;">${i + 1}</td>
+      <td style="${TD}">
+        <span style="font-weight:700;">${esc(r.name || '(항목명 없음)')}</span>
+        ${r.spec ? `<br><span style="font-size:11.5px;color:#6b7280;">${esc(r.spec)}</span>` : ''}
+      </td>
+      <td style="${TD}text-align:center;white-space:nowrap;">${수량}</td>
+      <td style="${TD}text-align:right;white-space:nowrap;">${r.price === null
+        ? '<span style="color:#B45309;font-weight:700;">협의</span>'
+        : (+r.price).toLocaleString('ko-KR')}</td>
+      <td style="${TD}text-align:right;white-space:nowrap;font-weight:700;">${금액 === null
+        ? '<span style="color:#B45309;">협의</span>'
+        : 금액.toLocaleString('ko-KR')}</td>
+    </tr>`;
+  }).join('');
+
+  const 합계행 = (라벨, 값, 강조) => {
+    const 선 = 강조 ? 'border-top:2px solid #111827;' : '';
+    return `<tr>
+      <td style="${선}padding:${강조 ? '11px 16px 0 0' : '4px 16px 4px 0'};font-size:${강조 ? '14px' : '12.5px'};
+                 color:${강조 ? '#111827' : '#6b7280'};font-weight:${강조 ? '800' : '400'};white-space:nowrap;">${라벨}</td>
+      <td style="${선}padding:${강조 ? '11px 0 0' : '4px 0'};text-align:right;white-space:nowrap;
+                 font-size:${강조 ? '19px' : '13px'};font-weight:${강조 ? '900' : '700'};
+                 color:${강조 ? '#DC2626' : '#111827'};">${값}</td>
+    </tr>`;
+  };
+
+  // 라벨과 값을 한 줄에 두어, 폭이 좁아져도 글자가 한 자씩 쪼개지지 않게 한다
+  const 정보칸 = (라벨, 값) => `<div style="padding:2.5px 0;font-size:12.5px;line-height:1.55;">
+    <span style="color:#9ca3af;font-size:11px;">${라벨}</span>
+    <b style="color:#111827;padding-left:5px;">${esc(값)}</b>
+  </div>`;
+
+  return `<div style="background:#f3f4f6;padding:24px 10px;font-family:${F};">
+<table cellpadding="0" cellspacing="0" border="0" width="640" style="max-width:640px;width:100%;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;">
+
+  <tr><td style="background:#111827;padding:18px 24px;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+      <td style="font-size:0;">
+        <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;
+                     background:#EF4444;color:#ffffff;font-weight:900;font-size:12px;font-family:${F};">YM</span>
+        <span style="font-size:16px;font-weight:800;color:#ffffff;padding-left:9px;font-family:${F};
+                     vertical-align:middle;">YM토탈이벤트</span>
+      </td>
+      <td align="right" style="font-size:11.5px;color:#9ca3af;white-space:nowrap;">음향 · 조명 · LED · 무대</td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="padding:28px 24px 0;">
+    <div style="font-size:23px;font-weight:900;letter-spacing:7px;color:#111827;">견 적 서</div>
+    <div style="font-size:11.5px;color:#6b7280;margin-top:7px;">
+      견적일 ${esc($('#doc-date').textContent)} &nbsp;·&nbsp; 견적 유효기간 발행일로부터 30일
+    </div>
+    <div style="height:3px;background:#EF4444;width:56px;margin-top:14px;"></div>
+  </td></tr>
+
+  <tr><td style="padding:20px 24px 0;font-size:13.5px;color:#374151;line-height:1.75;">
+    안녕하세요, <b style="color:#111827;">${esc(호칭)}</b>.<br>
+    YM토탈이벤트입니다. 문의해 주신 <b style="color:#111827;">${esc(행사)}</b> 견적서를 보내드립니다.
+  </td></tr>
+
+  <tr><td style="padding:20px 24px 0;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+      <td width="50%" valign="top" style="padding:12px 14px;background:#f9fafb;border:1px solid #e5e7eb;">
+        <div style="font-size:10.5px;letter-spacing:.14em;color:#DC2626;font-weight:800;padding-bottom:6px;">공급자</div>
+        ${정보칸('상호', 'YM토탈이벤트')}${정보칸('대표', '이영훈')}
+        ${정보칸('연락처', '010-8623-9294')}${정보칸('이메일', 'iau1032@naver.com')}
+        ${정보칸('소재지', '전남 고흥')}
+      </td>
+      <td width="8"></td>
+      <td width="50%" valign="top" style="padding:12px 14px;background:#f9fafb;border:1px solid #e5e7eb;">
+        <div style="font-size:10.5px;letter-spacing:.14em;color:#DC2626;font-weight:800;padding-bottom:6px;">수요자</div>
+        ${정보칸('단체명', gv('org'))}${정보칸('담당자', gv('name'))}
+        ${정보칸('행사명', gv('title'))}${정보칸('행사일', gv('date'))}
+        ${정보칸('장소', gv('place'))}${정보칸('예상인원', gv('people'))}
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="padding:22px 24px 0;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+      <tr>
+        <th style="${TH}width:32px;text-align:center;white-space:nowrap;">No</th>
+        <th style="${TH}text-align:left;white-space:nowrap;">품목 · 규격</th>
+        <th style="${TH}width:70px;text-align:center;white-space:nowrap;">수량</th>
+        <th style="${TH}width:84px;text-align:right;white-space:nowrap;">단가(원)</th>
+        <th style="${TH}width:92px;text-align:right;white-space:nowrap;">금액(원)</th>
+      </tr>
+      ${항목행}
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:16px 24px 0;">
+    <table cellpadding="0" cellspacing="0" border="0" align="right">
+      ${합계행('공급가액', esc($('#s-supply').textContent), false)}
+      ${할인 ? 합계행('할인', '- ' + 할인.toLocaleString('ko-KR') + ' 원', false) : ''}
+      ${합계행('부가세 (10%)', esc($('#s-vat').textContent), false)}
+      <tr><td colspan="2" style="padding:5px 0 0;font-size:0;line-height:0;">&nbsp;</td></tr>
+      ${합계행('합계 금액', esc($('#s-total').textContent), true)}
+    </table>
+    <div style="clear:both;font-size:0;line-height:0;">&nbsp;</div>
+  </td></tr>
+
+  <tr><td style="padding:22px 24px 0;font-size:11.5px;color:#6b7280;line-height:1.85;">
+    ※ 부가세 10% 별도 기준이며, 현장 여건(전원 · 진입로 · 설치 시간)에 따라 조정될 수 있습니다.${협의건수
+      ? `<br>※ 단가가 <b style="color:#B45309;">협의</b>로 표시된 ${협의건수}건은 합계에 포함되지 않았습니다. 확인 후 확정 견적을 보내드립니다.`
+      : ''}
+  </td></tr>
+
+  <tr><td style="padding:20px 24px 0;" align="center">
+    <a href="${esc(고객링크)}"
+       style="display:inline-block;padding:13px 26px;background:#EF4444;color:#ffffff;
+              text-decoration:none;font-size:13.5px;font-weight:800;font-family:${F};">견적서 온라인으로 보기</a>
+  </td></tr>
+
+  <tr><td style="padding:24px 24px 0;font-size:13px;color:#374151;line-height:1.8;">
+    궁금하신 점은 편하게 회신 주시거나 아래 번호로 연락 주세요.<br>
+    좋은 행사로 보답드리겠습니다. 감사합니다.
+  </td></tr>
+
+  <tr><td style="padding:20px 24px 26px;">
+    <div style="border-top:1px solid #e5e7eb;padding-top:16px;font-size:12px;color:#6b7280;line-height:1.8;">
+      <b style="color:#111827;font-size:13px;">YM토탈이벤트</b> · 대표 이영훈<br>
+      010-8623-9294 · iau1032@naver.com · 전남 고흥<br>
+      음향 · 조명 · LED · 무대 · 특수효과 · 섭외 — 행사 전 과정을 한 곳에서
+    </div>
+  </td></tr>
+
+</table>
+</div>`;
+}
+
+/* ══ 서식을 살린 채로 복사 ══ */
+async function copyRich(html, text) {
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html' : new Blob([html], { type: 'text/html'  }),
+        'text/plain': new Blob([text], { type: 'text/plain' }),
+      })]);
+      return true;
+    }
+  } catch (e) { /* 아래 방식으로 다시 시도 */ }
+
+  try {
+    const box = document.createElement('div');
+    box.contentEditable = 'true';
+    box.style.cssText = 'position:fixed;left:-9999px;top:0;width:640px;opacity:0;';
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    const range = document.createRange();
+    range.selectNodeContents(box);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    const ok = document.execCommand('copy');
+    sel.removeAllRanges();
+    box.remove();
+    return ok;
+  } catch (e) { return false; }
+}
+
 /* ══ 도구 ══ */
 function toast(msg) {
   const t = $('#toast');
@@ -921,14 +1164,16 @@ $('#btn-send').addEventListener('click', () => {
 ══════════════════════════════════════════════════════════════ */
 const IS_ADMIN = new URLSearchParams(location.search).get('admin') === '1';
 
-function 고객메일URL() {
-  const 받는사람 = $('#q-email').value.trim();
+function 고객메일제목() {
+  return '[YM토탈이벤트] ' + (gv('title') === '-' ? '견적서' : gv('title') + ' 견적서');
+}
+
+// 서식 없이 글자만 넣어 보낼 때 쓰는 본문 (클립보드 복사가 막힌 환경용)
+function 고객메일텍스트() {
   const 호칭 = [gv('org') === '-' ? '' : gv('org'), gv('name') === '-' ? '' : gv('name') + ' 님']
                  .filter(Boolean).join(' ') || '고객님';
   const 행사 = gv('title') === '-' ? '요청하신 행사' : gv('title');
-
-  const subject = '[YM토탈이벤트] ' + (gv('title') === '-' ? '견적서' : gv('title') + ' 견적서');
-  const body = [
+  return [
     `안녕하세요, ${호칭}.`,
     'YM토탈이벤트입니다.',
     '',
@@ -955,13 +1200,38 @@ function 고객메일URL() {
     '010-8623-9294 · iau1032@naver.com',
     '전남 고흥',
   ].join('\n');
-
-  return 'mailto:' + encodeURIComponent(받는사람) +
-    '?subject=' + encodeURIComponent(subject) +
-    '&body='    + encodeURIComponent(body);
 }
 
-function 고객발송() {
+function 고객메일URL() {
+  return 'mailto:' + encodeURIComponent($('#q-email').value.trim()) +
+    '?subject=' + encodeURIComponent(고객메일제목()) +
+    '&body='    + encodeURIComponent(고객메일텍스트());
+}
+
+/* ══════════════════════════════════════════════════════════════
+   고객 발송
+
+   메일 주소(mailto:)로는 표·색이 들어간 견적서를 넘길 수 없습니다.
+   그래서 서식이 살아있는 견적서를 클립보드에 복사해 두고,
+   메일 쓰기 창을 열어 붙여넣기(Ctrl+V) 한 번만 하시게 합니다.
+
+   복사가 안 되는 환경이면 예전처럼 글자만 채워진 메일로 넘어갑니다.
+══════════════════════════════════════════════════════════════ */
+function 지메일URL() {
+  return 'https://mail.google.com/mail/?view=cm&fs=1'
+       + '&to=' + encodeURIComponent($('#q-email').value.trim())
+       + '&su=' + encodeURIComponent(고객메일제목());
+}
+
+function openSendModal(복사됨) {
+  $('#send-to').textContent   = $('#q-email').value.trim();
+  $('#send-subj').textContent = 고객메일제목();
+  $('#send-ok').hidden   = !복사됨;
+  $('#send-fail').hidden = !!복사됨;
+  $('#send-modal').hidden = false;
+}
+
+async function 고객발송() {
   if (!rows.length) { toast('견적 항목이 비어 있습니다'); return; }
   const 받는사람 = $('#q-email').value.trim();
   if (!받는사람 || !받는사람.includes('@')) {
@@ -969,11 +1239,22 @@ function 고객발송() {
     $('#q-email').focus();
     return;
   }
-  location.href = 고객메일URL();
-  toast('메일 앱에 견적서를 채웠습니다 · PDF 는 따로 첨부해 주세요');
+  const 복사됨 = await copyRich(견적HTML(), 고객메일텍스트());
+  openSendModal(복사됨);
 }
 
 $('#btn-to-customer').addEventListener('click', 고객발송);
+$('#send-close').addEventListener('click',   () => { $('#send-modal').hidden = true; });
+$('#send-modal').addEventListener('click', (e) => { if (e.target.id === 'send-modal') $('#send-modal').hidden = true; });
+$('#send-gmail').addEventListener('click',   () => { window.open(지메일URL(), '_blank', 'noopener'); });
+$('#send-mailapp').addEventListener('click', () => { location.href = 'mailto:' + encodeURIComponent($('#q-email').value.trim())
+                                                                   + '?subject=' + encodeURIComponent(고객메일제목()); });
+$('#send-plain').addEventListener('click',   () => { location.href = 고객메일URL(); });
+$('#send-recopy').addEventListener('click', async () => {
+  const ok = await copyRich(견적HTML(), 고객메일텍스트());
+  toast(ok ? '견적서를 다시 복사했습니다' : '복사가 안 됩니다 · 아래 「글자만 넣어 보내기」를 눌러주세요');
+  if (ok) { $('#send-ok').hidden = false; $('#send-fail').hidden = true; }
+});
 
 function 관리자표시() {
   if (!IS_ADMIN) return;
