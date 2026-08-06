@@ -167,7 +167,8 @@
        종이 위에서만 제대로 보이므로 인쇄할 때만 내보낸다.
        파일은 ym토탈이벤트/stamp.png · 없으면 스크립트가 지운다. */
     .stamp{
-      position:absolute;right:0;top:5mm;width:23mm;height:auto;
+      /* 대표 이름 줄에 걸치게 — 종이 견적서에 도장 찍는 자리 */
+      position:absolute;right:-1mm;top:8mm;width:21mm;height:auto;
       pointer-events:none;
       /* 도장 파일 바탕이 흰색이어도 아래 글자가 비쳐 보이게 한다.
          종이 위에 실제로 찍은 것처럼 겹친다. */
