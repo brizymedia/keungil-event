@@ -666,13 +666,24 @@ submitBtn.addEventListener('click', () => {
   const 항목 = document.getElementById('selected-tags').value || '-';
   const 내용 = (document.querySelector('textarea').value.trim()) || '-';
 
+  /* 칸을 잘게 나누면 표가 가로로 길어져 휴대폰에서 글씨가 작아진다.
+     box 서식으로 이름표를 위에 두고, 내용은 세 덩어리로만 묶는다. */
   const payload = {
     _subject: '[YM토탈이벤트] 홈페이지 행사 문의',
-    _template: 'table',
+    _template: 'box',
     _replyto: v('f-email'),
-    단체명: v('f-org'), 담당자: v('f-name'), 연락처: v('f-tel'), 이메일: v('f-email'),
-    예상일자: 일자, 행사장소: 장소, 예상예산: 예산, 예상인원: v('f-people'),
-    필요항목: 항목, 문의내용: 내용,
+    '문의하신 분': [
+      '단체 · 회사명 : ' + v('f-org'),
+      '담당자 : '       + v('f-name'),
+      '연락처 : '       + v('f-tel'),
+      '이메일 : '       + v('f-email'),
+      '예상일자 : '     + 일자,
+      '행사장소 : '     + 장소,
+      '예상예산 : '     + 예산,
+      '예상인원 : '     + v('f-people'),
+    ].join('\n'),
+    '필요 항목': 항목,
+    '문의 내용': 내용,
   };
 
   const mailBody = [
