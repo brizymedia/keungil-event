@@ -133,6 +133,15 @@
         <input type="text" id="ev-place" placeholder="예) 고흥군 녹동항 일원">
       </div>
     </div>
+
+    <label class="f" for="ev-desc">행사 설명 <span style="color:#52525b;font-weight:400;">(안 쓰셔도 됩니다)</span></label>
+    <textarea id="ev-desc" rows="4"
+              placeholder="어떤 행사였는지, 무엇을 준비했는지 두세 줄이면 충분합니다."
+              style="line-height:1.75;resize:vertical;"></textarea>
+    <p class="note" style="margin-top:.4rem;">
+      갤러리에서 이 행사를 눌렀을 때 사진과 함께 나오는 글입니다.
+      비워두면 기본 문구가 들어갑니다.
+    </p>
   </div>
 
   <!-- ── 02 사진 ── -->
@@ -251,6 +260,7 @@ function toast(msg) {
       const v = JSON.parse(지난행사);
       $('#ev-name').value = v.name || '';
       $('#ev-place').value = v.place || '';
+      $('#ev-desc').value = v.desc || '';
     } catch (e) { /* 무시 */ }
   }
 })();
@@ -354,10 +364,12 @@ $('#go').addEventListener('click', async () => {
   const pw = $('#pw').value.trim();
   if (!pw)                { toast('업로드 비밀번호를 넣어주세요'); $('#pw').focus(); return; }
 
-  저장.setItem('ym_ev', JSON.stringify({ name: 이름, place: $('#ev-place').value.trim() }));
+  저장.setItem('ym_ev', JSON.stringify({ name: 이름, place: $('#ev-place').value.trim(),
+                                          desc: $('#ev-desc').value.trim() }));
   if ($('#pw-save').checked) 저장.setItem('ym_pw', pw); else 저장.removeItem('ym_pw');
 
-  const 행사 = { name: 이름, date: $('#ev-date').value, place: $('#ev-place').value.trim() };
+  const 행사 = { name: 이름, date: $('#ev-date').value, place: $('#ev-place').value.trim(),
+                 desc: $('#ev-desc').value.trim() };
   const 원본포함 = $('#keep-orig').checked;
   const eventId = (행사.date || '').replace(/-/g, '') + '-' +
                   Math.random().toString(36).slice(2, 6);
@@ -393,7 +405,7 @@ $('#go').addEventListener('click', async () => {
       if (결과.원본경고) 경고 = 결과.원본경고;
       남길것.push({
         path: 결과.path, event: 행사.name, date: 행사.date,
-        place: 행사.place, caption: 행사.name,
+        place: 행사.place, caption: 행사.name, desc: 행사.desc,
       });
     } catch (err) {
       p.state = '실패'; 실패++;
