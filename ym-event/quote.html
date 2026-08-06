@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YM토탈이벤트 견적서 — 여는 중</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="../ym토탈이벤트/quote.html">
+  <style>
+    body{margin:0;min-height:100svh;display:grid;place-items:center;
+         background:#0a0a0b;color:#a1a1aa;font-family:system-ui,sans-serif;text-align:center;padding:1.5rem;}
+    a{color:#F87171;font-weight:700;}
+  </style>
+</head>
+<body>
+  <div>
+    <p>견적서를 여는 중입니다…</p>
+    <p>열리지 않으면 <a id="go" href="../ym토탈이벤트/quote.html">여기를 눌러주세요</a>.</p>
+  </div>
+  <script>
+    /* 메일에 들어가는 견적서 주소를 짧게 유지하기 위한 영문 경로입니다.
+       ?admin=1 과 #q=... 를 그대로 한글 경로로 넘겨줍니다.
+       (meta refresh 는 주소 뒤 내용을 보존하지 못해 쓰지 않습니다) */
+    var 목적지 = '../ym토탈이벤트/quote.html' + location.search + location.hash;
+    document.getElementById('go').href = 목적지;
+    location.replace(목적지);
+  </script>
+</body>
+</html>
