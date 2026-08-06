@@ -316,13 +316,16 @@
 
       <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(245,158,11,.2);">
         <div style="font-size:.8rem;color:#a1a1aa;line-height:1.7;margin-bottom:.55rem;">
-          문의 메일의 견적서 주소가 눌리지 않으면, 그 주소를 복사해 여기에 붙여넣고 불러오세요.
+          문의 메일의 견적서 주소가 눌리지 않으면, 여기에 붙여넣고 불러오세요.<br>
+          <span style="color:#71717a;font-size:.78rem;">
+            휴대폰에서는 주소만 정확히 집기 어려우니 <strong style="color:#a1a1aa;">메일 본문을 통째로 복사해</strong> 붙여넣으셔도 됩니다.
+          </span>
         </div>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-          <input type="text" id="admin-paste" placeholder="메일에 있는 견적서 주소 붙여넣기"
-                 style="flex:1;min-width:12rem;padding:.65rem .8rem;border-radius:.6rem;
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-start;">
+          <textarea id="admin-paste" rows="2" placeholder="견적서 주소 또는 메일 본문 전체를 붙여넣으세요"
+                 style="flex:1;min-width:12rem;padding:.65rem .8rem;border-radius:.6rem;resize:vertical;
                         border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);
-                        color:#fff;font-family:inherit;font-size:.85rem;">
+                        color:#fff;font-family:inherit;font-size:.85rem;line-height:1.6;"></textarea>
           <button type="button" class="btn-ghost" id="admin-load" style="padding:.65rem 1.1rem;font-size:.85rem;">
             불러오기
           </button>
@@ -1347,19 +1350,53 @@ $('#send-recopy').addEventListener('click', async () => {
 
 /* 메일에서 링크가 눌리지 않을 때 — 주소를 붙여넣어 견적서를 불러온다.
    주소 전체를 넣어도 되고 #q= 뒤의 글자만 넣어도 된다. */
-$('#admin-load').addEventListener('click', () => {
-  const 입력 = $('#admin-paste').value.trim().replace(/\s+/g, '');
-  if (!입력) { toast('견적서 주소를 붙여넣어 주세요'); return; }
-  const m = 입력.match(/[#?&]q=([^&\s]+)/);
-  const code = m ? m[1] : 입력;
-  if (decodeState(code)) {
-    render();
-    $('#admin-paste').value = '';
-    관리자표시();
-    toast('견적서를 불러왔습니다');
-  } else {
-    toast('읽을 수 없는 주소입니다 · 주소 전체를 복사해 주세요');
+/* 붙여넣은 글에서 견적서 코드를 뽑는다.
+   주소만 넣어도, 메일 본문을 통째로 넣어도, 코드만 넣어도 되게 한다.
+   가능성 높은 순서로 후보를 만들고 하나씩 읽어본다. */
+const B64 = /[A-Za-z0-9\-_]/;
+
+function 코드후보(글) {
+  const 후보 = [];
+  const 원문 = String(글);
+
+  // 1) 주소 안에 q= 가 한 줄로 들어있는 흔한 경우
+  const m = 원문.match(/[#?&]q=([A-Za-z0-9\-_]+)/);
+  if (m) 후보.push(m[1]);
+
+  // 2) 메일에서 복사하다 주소 중간에 줄바꿈이 끼어든 경우
+  const 시작 = 원문.search(/[#?&]q=/);
+  if (시작 >= 0) {
+    let s = '';
+    for (let j = 원문.indexOf('q=', 시작) + 2; j < 원문.length; j++) {
+      const c = 원문[j];
+      if (B64.test(c)) s += c;
+      else if (/\s/.test(c)) continue;   // 줄바꿈·공백은 건너뛴다
+      else break;                        // 다른 글자가 나오면 주소 끝
+    }
+    if (s && s !== 후보[0]) 후보.push(s);
   }
+
+  // 3) 코드만 붙여넣은 경우
+  const 통짜 = 원문.replace(/\s+/g, '');
+  if (통짜 && !통짜.includes('=') && B64.test(통짜[0])) 후보.push(통짜);
+
+  return 후보;
+}
+
+$('#admin-load').addEventListener('click', () => {
+  const 입력 = $('#admin-paste').value.trim();
+  if (!입력) { toast('견적서 주소나 메일 본문을 붙여넣어 주세요'); return; }
+
+  for (const code of 코드후보(입력)) {
+    if (decodeState(code)) {
+      render();
+      $('#admin-paste').value = '';
+      관리자표시();
+      toast('견적서를 불러왔습니다');
+      return;
+    }
+  }
+  toast('견적서 주소를 찾지 못했습니다 · 메일 본문을 통째로 복사해 보세요');
 });
 
 function 관리자표시() {
