@@ -25,6 +25,12 @@ function 설정(키) {
 const 저장경로 = 'photos';                    // 저장소 안에서 사진이 쌓이는 폴더
 const 목록파일 = 저장경로 + '/photos.json';
 
+/* 사진은 main 이 아니라 photos 브랜치에 쌓습니다.
+   main 에 넣으면 사진 한 장을 올릴 때마다 홈페이지 배포가 한 번씩 돌아
+   배포 대기열이 막힙니다. (16장 올리면 배포가 17번 도는 셈)
+   photos 브랜치는 배포와 무관하고, 갤러리는 이 브랜치에서 바로 읽습니다. */
+const 저장브랜치 = 'photos';
+
 /* ══════════════════════════════════════════════════════════════
    0. 권한 받기
 
@@ -152,7 +158,8 @@ function 목록읽기() {
 ══════════════════════════════════════════════════════════════ */
 function 깃허브(경로, 방법, 본문) {
   return UrlFetchApp.fetch(
-    'https://api.github.com/repos/' + 설정('GITHUB_REPO') + '/contents/' + 경로,
+    'https://api.github.com/repos/' + 설정('GITHUB_REPO') + '/contents/' + 경로 +
+      (방법 === 'get' ? '?ref=' + 저장브랜치 : ''),
     {
       method: 방법,
       headers: {
@@ -168,7 +175,7 @@ function 깃허브(경로, 방법, 본문) {
 }
 
 function 깃허브에올리기(경로, base64, 메모) {
-  const 본문 = { message: 메모, content: base64 };
+  const 본문 = { message: 메모, content: base64, branch: 저장브랜치 };
 
   // 이미 있는 파일이면 sha 를 같이 보내야 덮어쓸 수 있다
   const 기존 = 깃허브(경로, 'get');
