@@ -1069,8 +1069,10 @@ galToggle.addEventListener('click', () => {
    저장소에서 바로 읽기 때문에 사진이 늘어도 사이트를 다시 배포할 필요가 없다.
    목록을 못 읽으면 아래 고정 사진만 그대로 보인다.
 ─────────────────────────────────────────────────────────────── */
-const 사진목록주소 = 'https://raw.githubusercontent.com/brizymedia/keungil-event/main/photos/photos.json';
-const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@main/';
+/* 사진은 photos 브랜치에 쌓는다.
+   main 에 넣으면 사진 한 장마다 사이트 배포가 한 번씩 돌아 배포가 밀린다. */
+const 사진목록주소 = 'https://raw.githubusercontent.com/brizymedia/keungil-event/photos/photos/photos.json';
+const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/';
 const 행사사진     = [];   // 행사별 사진 목록
 const 행사목록     = [];   // 행사별 정보 (이름 · 날짜 · 장소 · 설명)
 
