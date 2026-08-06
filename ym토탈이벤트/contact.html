@@ -322,15 +322,8 @@
 ══════════════════════════════════════════════════ -->
 <section style="padding:1.5rem 1.5rem 6rem;">
   <div style="max-width:64rem;margin:0 auto;">
-    <form id="contact-form" action="https://formsubmit.co/iau1032@naver.com" method="POST"
-          enctype="multipart/form-data" class="glass form-card">
-      <input type="hidden" name="_subject" value="[YM토탈이벤트] 홈페이지 행사 문의">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_template" value="table">
-      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-      <input type="hidden" name="필요항목" id="selected-tags" value="">
-      <!-- 문의자 이메일을 Reply-To 로 넣어, 받은 메일에서 바로 답장할 수 있게 한다 -->
-      <input type="hidden" name="_replyto" id="replyto" value="">
+    <form id="contact-form" class="glass form-card" onsubmit="return false">
+      <input type="hidden" id="selected-tags" value="">
 
       <!-- ── 01. 기본 정보 ── -->
       <div class="block-title"><span class="n">01</span>기본 정보</div>
@@ -450,31 +443,16 @@
         <span class="opt-badge">선택</span>
       </div>
 
-      <div class="drop" id="drop">
-        <iconify-icon icon="solar:cloud-upload-bold" style="font-size:32px;color:#F87171;"></iconify-icon>
-        <p class="d-main">
-          여기로 파일을 끌어다 놓거나
-          <button type="button" class="d-pick" id="pick-btn">파일 선택</button>
+      <div class="drop" id="drop" style="cursor:default;">
+        <iconify-icon icon="solar:paperclip-bold" style="font-size:30px;color:#F87171;"></iconify-icon>
+        <p class="d-main" style="margin-top:.8rem;">
+          자료는 <strong style="color:#fff;">메일 앱이 열린 뒤 직접 첨부</strong>해 주세요
         </p>
         <p class="d-hint">
-          행사 계획서, 식순표, 도면, 현장 사진, 견적 요청서 등 무엇이든 좋습니다.<br>
-          사진(JPG · PNG · HEIC) · 문서(PDF · 한글 · 워드 · 엑셀 · 파워포인트 · ZIP)<br>
-          최대 5개 · 전체 합계 10MB 이내
+          아래 &lsquo;보내기&rsquo;를 누르면 내용이 채워진 메일이 열립니다.<br>
+          거기에 행사 계획서, 식순표, 도면, 현장 사진 등을 첨부해 보내주시면 됩니다.<br>
+          사진(JPG · PNG · HEIC) · 문서(PDF · 한글 · 워드 · 엑셀 · 파워포인트 · ZIP)
         </p>
-      </div>
-
-      <!-- 선택용 (전송되지 않음: name 없음) -->
-      <input type="file" id="file-picker" multiple hidden
-             accept=".jpg,.jpeg,.png,.gif,.webp,.heic,.heif,.pdf,.hwp,.hwpx,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,image/*">
-
-      <!-- 실제 전송되는 input 들이 여기에 생성됩니다 -->
-      <div id="file-inputs" hidden></div>
-
-      <div class="file-list" id="file-list"></div>
-      <div class="file-total" id="file-total" hidden></div>
-      <div class="file-warn" id="file-warn" hidden>
-        <iconify-icon icon="solar:danger-triangle-bold" style="font-size:15px;flex-shrink:0;margin-top:.15rem;"></iconify-icon>
-        <span id="file-warn-text"></span>
       </div>
 
       <!-- ── 동의 · 제출 ── -->
@@ -486,14 +464,16 @@
       </div>
 
       <div style="display:flex;justify-content:center;margin-top:1.5rem;">
-        <button type="submit" id="submit-btn" class="btn-primary" style="padding:1.1rem 3rem;font-size:1.02rem;" disabled>
+        <button type="button" id="submit-btn" class="btn-primary" style="padding:1.1rem 3rem;font-size:1.02rem;" disabled>
           <iconify-icon icon="solar:plain-bold" style="font-size:19px;"></iconify-icon>
           보내기
         </button>
       </div>
 
-      <p style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;">
-        급하신 경우 <a href="tel:01086239294" style="color:#F87171;text-decoration:none;font-weight:600;">010-8623-9294</a>로 바로 전화 주세요.
+      <p style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;line-height:1.9;">
+        &lsquo;보내기&rsquo;를 누르면 <strong style="color:#71717a;">내용이 채워진 메일이 열립니다.</strong> 확인 후 보내주세요.<br>
+        메일 앱이 열리지 않으면 <a href="mailto:iau1032@naver.com" style="color:#F87171;text-decoration:none;font-weight:600;">iau1032@naver.com</a> 으로 보내주셔도 됩니다.<br>
+        급하신 경우 <a href="tel:01086239294" style="color:#F87171;text-decoration:none;font-weight:600;">010-8623-9294</a> 로 바로 전화 주세요.
       </p>
     </form>
 
@@ -610,129 +590,73 @@ function syncTags() {
 }
 document.querySelectorAll('.tag-cb').forEach(cb => cb.addEventListener('change', syncTags));
 
-// ── 3. 관련자료 첨부 ──
-// FormSubmit 은 name="attachment" 인 file input 들을 첨부로 받고,
-// 파일 크기 합계 10MB 를 넘으면 전송이 실패한다.
-const MAX_FILES = 5;
-const MAX_TOTAL = 10 * 1024 * 1024;
-
-const drop       = document.getElementById('drop');
-const picker     = document.getElementById('file-picker');
-const inputsBox  = document.getElementById('file-inputs');
-const listBox    = document.getElementById('file-list');
-const totalBox   = document.getElementById('file-total');
-const warnBox    = document.getElementById('file-warn');
-const warnText   = document.getElementById('file-warn-text');
-let picked = [];
-
-const fmtSize = (n) =>
-  n >= 1024 * 1024 ? (n / 1024 / 1024).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB';
-
-function warn(msg) {
-  warnText.textContent = msg;
-  warnBox.hidden = !msg;
-}
-
-function renderFiles() {
-  const total = picked.reduce((sum, f) => sum + f.size, 0);
-
-  // 전송용 input 재생성 — 파일 하나당 input 하나
-  inputsBox.textContent = '';
-  picked.forEach((file) => {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.name = 'attachment';
-    input.files = dt.files;
-    inputsBox.appendChild(input);
-  });
-
-  // 목록 UI
-  listBox.textContent = '';
-  picked.forEach((file, i) => {
-    const row = document.createElement('div');
-    row.className = 'file-row';
-
-    const icon = document.createElement('iconify-icon');
-    icon.setAttribute('icon', file.type.startsWith('image/') ? 'solar:gallery-bold' : 'solar:document-text-bold');
-    icon.setAttribute('style', 'font-size:17px;color:#F87171;flex-shrink:0;');
-
-    const name = document.createElement('span');
-    name.className = 'f-name';
-    name.textContent = file.name;
-
-    const size = document.createElement('span');
-    size.className = 'f-size';
-    size.textContent = fmtSize(file.size);
-
-    const del = document.createElement('button');
-    del.type = 'button';
-    del.className = 'f-del';
-    del.setAttribute('aria-label', file.name + ' 삭제');
-    del.textContent = '×';
-    del.addEventListener('click', () => { picked.splice(i, 1); renderFiles(); });
-
-    row.append(icon, name, size, del);
-    listBox.appendChild(row);
-  });
-
-  totalBox.hidden = picked.length === 0;
-  totalBox.textContent = `${picked.length}개 · 합계 ${fmtSize(total)} / 10MB`;
-
-  if (total > MAX_TOTAL) {
-    warn(`첨부 파일 합계가 10MB를 넘었습니다 (현재 ${fmtSize(total)}). 파일을 줄이거나, 큰 자료는 ` +
-         `iau1032@naver.com 으로 따로 보내주세요.`);
-  } else {
-    warn('');
-  }
-  return total;
-}
-
-function addFiles(fileList) {
-  const incoming = [...fileList];
-  const room = MAX_FILES - picked.length;
-
-  if (room <= 0) {
-    warn(`첨부는 최대 ${MAX_FILES}개까지 가능합니다.`);
-    return;
-  }
-  picked = picked.concat(incoming.slice(0, room));
-  const over = renderFiles();
-  if (incoming.length > room && over <= MAX_TOTAL) {
-    warn(`첨부는 최대 ${MAX_FILES}개까지 가능해 ${incoming.length - room}개는 제외했습니다.`);
-  }
-}
-
-document.getElementById('pick-btn').addEventListener('click', (e) => { e.stopPropagation(); picker.click(); });
-drop.addEventListener('click', () => picker.click());
-picker.addEventListener('change', () => { addFiles(picker.files); picker.value = ''; });
-
-['dragenter', 'dragover'].forEach((t) =>
-  drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave', 'drop'].forEach((t) =>
-  drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', (e) => { if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
-
-// ── 4. 개인정보 동의 전에는 제출 잠금 ──
+// ── 3. 개인정보 동의 전에는 제출 잠금 ──
 const agree = document.getElementById('agree');
 const submitBtn = document.getElementById('submit-btn');
 agree.addEventListener('change', () => { submitBtn.disabled = !agree.checked; });
 
-form.addEventListener('submit', (e) => {
+// ── 4. 문의 내용을 메일 앱으로 넘긴다 ──
+// 외부 폼 서비스를 거치지 않으므로 중간에 유실될 구간이 없다.
+const 문의_수신_이메일 = 'iau1032@naver.com';
+
+function buildMailto() {
+  const v = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const undecided = (name) => {
+    const el = document.querySelector(`input[name="${name}"]`);
+    return el && el.checked;
+  };
+
+  const 일자 = undecided('일자미정') ? '날짜 미정' : (v('f-date')  || '-');
+  const 장소 = undecided('장소미정') ? '장소 미정' : (v('f-place') || '-');
+  const 예산 = undecided('예산미정') ? '예산 미정' : (v('f-budget')|| '-');
+  const 항목 = document.getElementById('selected-tags').value || '-';
+
+  const body = [
+    '[YM토탈이벤트 행사 문의]',
+    '',
+    '단체·회사명 : ' + (v('f-org')    || '-'),
+    '담당자      : ' + (v('f-name')   || '-'),
+    '연락처      : ' + (v('f-tel')    || '-'),
+    '이메일      : ' + (v('f-email')  || '-'),
+    '예상일자    : ' + 일자,
+    '행사장소    : ' + 장소,
+    '예상예산    : ' + 예산,
+    '예상인원    : ' + (v('f-people') || '-'),
+    '',
+    '── 필요 항목 ──',
+    항목,
+    '',
+    '── 문의 내용 ──',
+    document.querySelector('textarea').value.trim() || '-',
+    '',
+    '※ 행사 계획서 · 도면 · 현장 사진 등 자료가 있으시면 이 메일에 첨부해 주세요.',
+  ].join('\n');
+
+  const subject = '[행사문의] ' + (v('f-org') || v('f-name') || '홈페이지');
+  return 'mailto:' + 문의_수신_이메일 +
+         '?subject=' + encodeURIComponent(subject) +
+         '&body='    + encodeURIComponent(body);
+}
+
+submitBtn.addEventListener('click', () => {
+  if (!agree.checked) { openPop(); return; }
+  if (!v_required()) return;
   syncTags();
-  document.getElementById('replyto').value = document.getElementById('f-email').value.trim();
-  if (!agree.checked) {
-    e.preventDefault();
-    openPop();
-    return;
-  }
-  if (picked.reduce((sum, f) => sum + f.size, 0) > MAX_TOTAL) {
-    e.preventDefault();
-    renderFiles();
-    document.getElementById('drop').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+  location.href = buildMailto();
 });
+
+function v_required() {
+  for (const [id, msg] of [['f-org', '단체·회사명'], ['f-name', '담당자'], ['f-tel', '연락처']]) {
+    const el = document.getElementById(id);
+    if (el && !el.value.trim()) { el.focus(); el.reportValidity?.(); return false; }
+  }
+  for (const [id, name] of [['f-date', '일자미정'], ['f-place', '장소미정'], ['f-budget', '예산미정']]) {
+    const el = document.getElementById(id);
+    const cb = document.querySelector(`input[name="${name}"]`);
+    if (el && !el.value.trim() && !(cb && cb.checked)) { el.focus(); el.reportValidity?.(); return false; }
+  }
+  return true;
+}
 
 // ── 5. 개인정보 팝업 ──
 const pop = document.getElementById('privacy-pop');
