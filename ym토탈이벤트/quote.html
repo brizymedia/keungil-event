@@ -435,10 +435,11 @@
 </main>
 
 <!-- 전송용 숨은 폼 -->
-<form id="send-form" action="https://formsubmit.co/iau1032@naver.com" method="POST" style="display:none">
+<form id="send-form" method="POST" style="display:none">
   <input type="hidden" name="_subject" value="[YM토탈이벤트] 자동 견적서 문의">
   <input type="hidden" name="_captcha" value="false">
   <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_next" id="f-next">
   <input type="hidden" name="_replyto" id="f-replyto">
   <input type="text"   name="_honey" tabindex="-1" autocomplete="off">
   <input type="hidden" name="단체명"   id="f-org">
@@ -476,6 +477,23 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ══════════════════════════════════════════════════════════════
+   견적서 수신 이메일
+
+   「이 견적으로 문의 보내기」를 눌렀을 때 견적서가 도착하는 주소입니다.
+   여기 한 줄만 바꾸면 수신처가 바뀝니다.
+
+   현재  : gilcaro@naver.com   ← 테스트용
+   운영용: iau1032@naver.com   (테스트 끝나면 이 주소로 되돌리세요)
+
+   ※ FormSubmit 은 주소마다 최초 1회 인증이 필요합니다.
+     첫 전송 후 해당 메일함에 오는 활성화 링크를 눌러야 이후부터 수신됩니다.
+══════════════════════════════════════════════════════════════ */
+const 견적_수신_이메일 = 'gilcaro@naver.com';
+
+document.getElementById('send-form').action =
+  'https://formsubmit.co/' + 견적_수신_이메일;
+
 /* ══════════════════════════════════════════════════════════════
    품목 카탈로그
 
@@ -771,11 +789,19 @@ $('#btn-send').addEventListener('click', () => {
   $('#f-items').value = lines.join('\n');
   $('#f-total').value = `공급가액 ${$('#s-supply').textContent} / 부가세 ${$('#s-vat').textContent} / 합계 ${$('#s-total').textContent}`;
   $('#f-link').value  = location.origin + location.pathname + '#q=' + encodeState();
+  // 전송 후 FormSubmit 기본 안내 페이지 대신 이 페이지로 돌아오게 한다
+  $('#f-next').value  = location.origin + location.pathname + '?sent=1';
   $('#send-form').submit();
 });
 
 /* ══ 시작 ══ */
 $('#doc-date').textContent = new Date().toLocaleDateString('ko-KR');
+
+// 전송 후 돌아온 경우 안내 (?sent=1 은 지우고 견적서 내용(#q=)은 유지)
+if (new URLSearchParams(location.search).get('sent') === '1') {
+  history.replaceState(null, '', location.pathname + location.hash);
+  setTimeout(() => toast('견적 문의가 접수되었습니다. 확인 후 연락드리겠습니다.'), 300);
+}
 if (location.hash.startsWith('#q=')) decodeState(location.hash.slice(3));
 render();
 </script>
