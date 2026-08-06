@@ -322,7 +322,8 @@
 ══════════════════════════════════════════════════ -->
 <section style="padding:1.5rem 1.5rem 6rem;">
   <div style="max-width:64rem;margin:0 auto;">
-    <form id="contact-form" action="https://formsubmit.co/iau1032@naver.com" method="POST" class="glass form-card">
+    <!-- 수신 주소: 테스트용 gilcaro@naver.com / 운영용 iau1032@naver.com -->
+    <form id="contact-form" action="https://formsubmit.co/gilcaro@naver.com" method="POST" class="glass form-card">
       <input type="hidden" name="_subject" value="[YM토탈이벤트] 홈페이지 행사 문의">
       <input type="hidden" name="_template" value="table">
       <input type="hidden" name="_next" value="">
@@ -476,7 +477,8 @@
       </div>
 
       <p style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;line-height:1.9;">
-        급하신 경우 <a href="tel:01086239294" style="color:#F87171;text-decoration:none;font-weight:600;">010-8623-9294</a> 로 바로 전화 주세요.
+        급하신 경우 <a href="tel:01086239294" style="color:#F87171;text-decoration:none;font-weight:600;">010-8623-9294</a> 로 바로 전화 주세요.<br>
+        <span style="color:#3f3f46;font-size:.72rem;">접수 메일 <span id="recv-hint">-</span></span>
       </p>
     </form>
 
@@ -597,6 +599,13 @@ document.querySelectorAll('.tag-cb').forEach(cb => cb.addEventListener('change',
 const agree = document.getElementById('agree');
 const submitBtn = document.getElementById('submit-btn');
 agree.addEventListener('change', () => { submitBtn.disabled = !agree.checked; });
+
+// 지금 이 페이지가 어느 주소로 보내는지 표시한다.
+// 캐시된 옛 페이지를 보고 있으면 여기 값이 다르게 나온다.
+(() => {
+  const el = document.getElementById('recv-hint');
+  if (el) el.textContent = form.action.split('/').pop();
+})();
 
 // ── 4. 제출 (큰길이벤트기획 폼과 동일한 방식) ──
 form.addEventListener('submit', (e) => {
