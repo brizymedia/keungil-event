@@ -441,26 +441,6 @@
   </div>
 </main>
 
-<!-- 전송용 숨은 폼 — 큰길이벤트기획 폼과 동일한 구성 -->
-<form id="send-form" method="POST" style="display:none">
-  <input type="hidden" name="_subject" value="[YM토탈이벤트] 자동 견적서 문의">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_next" value="">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="hidden" name="_replyto" id="f-replyto">
-  <input type="hidden" name="단체명"   id="f-org">
-  <input type="hidden" name="담당자"   id="f-name">
-  <input type="hidden" name="연락처"   id="f-tel">
-  <input type="hidden" name="이메일"   id="f-email">
-  <input type="hidden" name="행사명"   id="f-title">
-  <input type="hidden" name="행사일"   id="f-date">
-  <input type="hidden" name="행사장소" id="f-place">
-  <input type="hidden" name="예상인원" id="f-people">
-  <input type="hidden" name="견적내역" id="f-items">
-  <input type="hidden" name="합계"     id="f-total">
-  <input type="hidden" name="견적서_편집링크" id="f-link">
-</form>
-
 <footer style="border-top:1px solid rgba(255,255,255,.06);padding:2.75rem 1.5rem;" class="no-print">
   <div style="max-width:80rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.5rem;">
     <div style="display:flex;align-items:center;gap:.6rem;">
@@ -494,8 +474,56 @@
 ══════════════════════════════════════════════════════════════ */
 const 견적_수신_이메일 = 'gilcaro@naver.com';
 
-document.getElementById('send-form').action =
-  'https://formsubmit.co/' + 견적_수신_이메일;
+const 수신_이메일 = 견적_수신_이메일;
+const BTN_ID = 'btn-send';
+
+/* ══════════════════════════════════════════════════════════════
+   전송 — FormSubmit AJAX 엔드포인트
+
+   페이지를 FormSubmit 으로 넘기지 않고 백그라운드로 보냅니다.
+   한글 경로(/ym토탈이벤트/)가 폼 식별에 끼어들지 않고,
+   실패하면 그 사실이 화면에 그대로 드러납니다.
+
+   전송이 실패하면 메일 앱을 열어 같은 내용을 채워주므로
+   문의가 조용히 사라지는 일은 없습니다.
+══════════════════════════════════════════════════════════════ */
+async function sendForm(payload, mailSubject, mailBody, doneMsg) {
+  const btn = document.getElementById(BTN_ID);
+  const old = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = '보내는 중…';
+
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/' + 수신_이메일, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && String(data.success) === 'true') {
+      alert(doneMsg);
+      btn.innerHTML = old;
+      btn.disabled = false;
+      return;
+    }
+    throw new Error(data.message || ('서버 응답 ' + res.status));
+  } catch (err) {
+    btn.innerHTML = old;
+    btn.disabled = false;
+    const go = confirm(
+      '자동 전송에 실패했습니다.\n\n' +
+      '사유: ' + (err && err.message ? err.message : '알 수 없음') + '\n\n' +
+      '확인을 누르시면 메일 앱이 열리고 내용이 그대로 채워집니다.\n' +
+      '거기서 보내주시면 접수됩니다.'
+    );
+    if (go) {
+      location.href = 'mailto:' + 수신_이메일 +
+        '?subject=' + encodeURIComponent(mailSubject) +
+        '&body='    + encodeURIComponent(mailBody);
+    }
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.getElementById('recv-hint');
@@ -800,31 +828,48 @@ $('#btn-send').addEventListener('click', () => {
     return;
   }
 
+  const g = (k) => $('#q-' + k).value.trim() || '-';
   const lines = rows.map((r, i) => {
     const amt = r.price === null
       ? '협의'
       : ((+r.qty || 0) * (+r.days || 0) * (+r.price || 0)).toLocaleString('ko-KR') + '원';
     return `${i + 1}. ${r.name || '(항목명 없음)'} / ${r.spec || '-'} / ${r.qty}${r.unit} / ${r.days}일 / ${amt}`;
   });
+  const 내역 = lines.join('\n');
+  const 합계 = `공급가액 ${$('#s-supply').textContent} / 부가세 ${$('#s-vat').textContent} / 합계 ${$('#s-total').textContent}`;
+  const 링크 = location.origin + location.pathname + '#q=' + encodeState();
 
-  INFO.forEach((k) => { const el = $('#f-' + k); if (el) el.value = $('#q-' + k).value.trim(); });
-  $('#f-replyto').value = $('#q-email').value.trim();
-  $('#f-items').value   = lines.join('\n');
-  $('#f-total').value   = `공급가액 ${$('#s-supply').textContent} / 부가세 ${$('#s-vat').textContent} / 합계 ${$('#s-total').textContent}`;
-  $('#f-link').value    = location.origin + location.pathname + '#q=' + encodeState();
-  $('#send-form').querySelector('[name="_next"]').value =
-    location.origin + location.pathname + '?sent=1';
-  $('#send-form').submit();
+  const payload = {
+    _subject: '[YM토탈이벤트] 자동 견적서 문의',
+    _template: 'table',
+    _replyto: $('#q-email').value.trim(),
+    단체명: g('org'), 담당자: g('name'), 연락처: g('tel'), 이메일: g('email'),
+    행사명: g('title'), 행사일: g('date'), 행사장소: g('place'), 예상인원: g('people'),
+    견적내역: 내역, 합계: 합계, 견적서_편집링크: 링크,
+  };
+
+  const mailBody = [
+    '[YM토탈이벤트 견적 문의]', '',
+    '단체·회사명 : ' + g('org'),
+    '담당자      : ' + g('name'),
+    '연락처      : ' + g('tel'),
+    '이메일      : ' + g('email'),
+    '행사명      : ' + g('title'),
+    '행사일      : ' + g('date'),
+    '행사장소    : ' + g('place'),
+    '예상인원    : ' + g('people'),
+    '', '── 견적 내역 ──', 내역,
+    '', 합계,
+    '', '── 견적서 편집 링크 ──', 링크,
+  ].join('\n');
+
+  sendForm(payload, '[견적문의] ' + g('org') + ' / ' + g('title'), mailBody,
+           '견적 문의가 접수되었습니다!\n확인 후 빠르게 연락드리겠습니다. 감사합니다 😊');
 });
 
 /* ══ 시작 ══ */
 $('#doc-date').textContent = new Date().toLocaleDateString('ko-KR');
 
-// 전송 후 돌아온 경우 안내 (?sent=1 은 지우고 견적서 내용(#q=)은 유지)
-if (new URLSearchParams(location.search).get('sent') === '1') {
-  history.replaceState(null, '', location.pathname + location.hash);
-  setTimeout(() => alert('견적 문의가 접수되었습니다!\n확인 후 빠르게 연락드리겠습니다. 감사합니다 😊'), 200);
-}
 
 if (location.hash.startsWith('#q=')) decodeState(location.hash.slice(3));
 render();

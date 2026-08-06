@@ -322,13 +322,8 @@
 ══════════════════════════════════════════════════ -->
 <section style="padding:1.5rem 1.5rem 6rem;">
   <div style="max-width:64rem;margin:0 auto;">
-    <form id="contact-form" action="https://formsubmit.co/gilcaro@naver.com" method="POST" class="glass form-card">
-      <input type="hidden" name="_subject" value="[YM토탈이벤트] 홈페이지 행사 문의">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_next" value="">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_replyto" id="replyto" value="">
-      <input type="hidden" name="필요항목" id="selected-tags" value="">
+    <form id="contact-form" class="glass form-card" onsubmit="return false">
+      <input type="hidden" id="selected-tags" value="">
 
       <!-- ── 01. 기본 정보 ── -->
       <div class="block-title"><span class="n">01</span>기본 정보</div>
@@ -469,7 +464,7 @@
       </div>
 
       <div style="display:flex;justify-content:center;margin-top:1.5rem;">
-        <button type="submit" id="submit-btn" class="btn-primary" style="padding:1.1rem 3rem;font-size:1.02rem;" disabled>
+        <button type="button" id="submit-btn" class="btn-primary" style="padding:1.1rem 3rem;font-size:1.02rem;" disabled>
           <iconify-icon icon="solar:plain-bold" style="font-size:19px;"></iconify-icon>
           보내기
         </button>
@@ -603,23 +598,113 @@ agree.addEventListener('change', () => { submitBtn.disabled = !agree.checked; })
 // 캐시된 옛 페이지를 보고 있으면 여기 값이 다르게 나온다.
 (() => {
   const el = document.getElementById('recv-hint');
-  if (el) el.textContent = form.action.split('/').pop();
+  if (el) el.textContent = 'gilcaro@naver.com';
 })();
 
-// ── 4. 제출 (큰길이벤트기획 폼과 동일한 방식) ──
-form.addEventListener('submit', (e) => {
-  if (!agree.checked) { e.preventDefault(); openPop(); return; }
+
+/* ══════════════════════════════════════════════════════════════
+   전송 — FormSubmit AJAX 엔드포인트
+
+   페이지를 FormSubmit 으로 넘기지 않고 백그라운드로 보냅니다.
+   한글 경로(/ym토탈이벤트/)가 폼 식별에 끼어들지 않고,
+   실패하면 그 사실이 화면에 그대로 드러납니다.
+
+   전송이 실패하면 메일 앱을 열어 같은 내용을 채워주므로
+   문의가 조용히 사라지는 일은 없습니다.
+══════════════════════════════════════════════════════════════ */
+const 수신_이메일 = 'gilcaro@naver.com';
+
+async function sendForm(payload, mailSubject, mailBody, doneMsg) {
+  const btn = document.getElementById('submit-btn');
+  const old = btn.innerHTML;
+  btn.disabled = true;
+  btn.textContent = '보내는 중…';
+
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/' + 수신_이메일, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && String(data.success) === 'true') {
+      alert(doneMsg);
+      btn.innerHTML = old;
+      btn.disabled = false;
+      return;
+    }
+    throw new Error(data.message || ('서버 응답 ' + res.status));
+  } catch (err) {
+    btn.innerHTML = old;
+    btn.disabled = false;
+    const go = confirm(
+      '자동 전송에 실패했습니다.\n\n' +
+      '사유: ' + (err && err.message ? err.message : '알 수 없음') + '\n\n' +
+      '확인을 누르시면 메일 앱이 열리고 내용이 그대로 채워집니다.\n' +
+      '거기서 보내주시면 접수됩니다.'
+    );
+    if (go) {
+      location.href = 'mailto:' + 수신_이메일 +
+        '?subject=' + encodeURIComponent(mailSubject) +
+        '&body='    + encodeURIComponent(mailBody);
+    }
+  }
+}
+
+// ── 4. 제출 ──
+submitBtn.addEventListener('click', () => {
+  if (!agree.checked) { openPop(); return; }
+  if (!checkRequired()) return;
   syncTags();
-  // 받은 메일에서 바로 답장할 수 있게 문의자 이메일을 Reply-To 로
-  form.querySelector('[name="_replyto"]').value = document.getElementById('f-email').value.trim();
-  // 전송 후 이 페이지로 돌아오게
-  form.querySelector('[name="_next"]').value = location.origin + location.pathname + '?sent=1';
+
+  const v = (id) => { const el = document.getElementById(id); return (el && el.value.trim()) || '-'; };
+  const und = (name) => { const el = document.querySelector(`input[name="${name}"]`); return el && el.checked; };
+  const 일자 = und('일자미정') ? '날짜 미정' : v('f-date');
+  const 장소 = und('장소미정') ? '장소 미정' : v('f-place');
+  const 예산 = und('예산미정') ? '예산 미정' : v('f-budget');
+  const 항목 = document.getElementById('selected-tags').value || '-';
+  const 내용 = (document.querySelector('textarea').value.trim()) || '-';
+
+  const payload = {
+    _subject: '[YM토탈이벤트] 홈페이지 행사 문의',
+    _template: 'table',
+    _replyto: v('f-email'),
+    단체명: v('f-org'), 담당자: v('f-name'), 연락처: v('f-tel'), 이메일: v('f-email'),
+    예상일자: 일자, 행사장소: 장소, 예상예산: 예산, 예상인원: v('f-people'),
+    필요항목: 항목, 문의내용: 내용,
+  };
+
+  const mailBody = [
+    '[YM토탈이벤트 행사 문의]', '',
+    '단체·회사명 : ' + v('f-org'),
+    '담당자      : ' + v('f-name'),
+    '연락처      : ' + v('f-tel'),
+    '이메일      : ' + v('f-email'),
+    '예상일자    : ' + 일자,
+    '행사장소    : ' + 장소,
+    '예상예산    : ' + 예산,
+    '예상인원    : ' + v('f-people'),
+    '', '── 필요 항목 ──', 항목,
+    '', '── 문의 내용 ──', 내용,
+    '', '※ 자료가 있으시면 이 메일에 첨부해 주세요.',
+  ].join('\n');
+
+  sendForm(payload, '[행사문의] ' + v('f-org'), mailBody,
+           '문의가 접수되었습니다!\n확인 후 빠르게 연락드리겠습니다. 감사합니다 😊');
 });
 
-// 전송 후 돌아온 경우 안내
-if (location.search.includes('sent=1')) {
-  history.replaceState(null, '', location.pathname);
-  setTimeout(() => alert('문의가 접수되었습니다!\n확인 후 빠르게 연락드리겠습니다. 감사합니다 😊'), 200);
+function checkRequired() {
+  for (const id of ['f-org', 'f-name', 'f-tel']) {
+    const el = document.getElementById(id);
+    if (el && !el.value.trim()) { el.focus(); el.reportValidity?.(); return false; }
+  }
+  for (const [id, name] of [['f-date','일자미정'], ['f-place','장소미정'], ['f-budget','예산미정']]) {
+    const el = document.getElementById(id);
+    const cb = document.querySelector(`input[name="${name}"]`);
+    if (el && !el.value.trim() && !(cb && cb.checked)) { el.focus(); el.reportValidity?.(); return false; }
+  }
+  return true;
 }
 
 // ── 5. 개인정보 팝업 ──
