@@ -951,10 +951,15 @@ function totalsLine() {
    한글은 주소에서 %ED%86%A0 같은 글자로 바뀌어 링크가 세 배로 길어지고,
    그만큼 메일에서 줄바꿈으로 끊어질 확률이 높아진다.
    /ym-event/quote.html 은 물음표·주소 뒤 내용을 그대로 넘겨준다. */
-function quoteURL(admin) {
+function quoteURL(admin, 물음표방식) {
   const here  = location.href.replace(/[?#].*$/, '');
   const short = here.replace(/\/[^/]+\/quote\.html$/, '/ym-event/quote.html');
-  return short + (admin ? '?admin=1' : '') + '#q=' + encodeState();
+  const code  = encodeState();
+  // 물음표방식: 메일에 글자로 들어가는 주소용.
+  // 휴대폰 메일 앱은 # 뒤를 주소로 안 쳐줘서 링크가 안 눌린다.
+  return 물음표방식
+    ? short + '?' + (admin ? 'admin=1&' : '') + 'q=' + code
+    : short + (admin ? '?admin=1' : '') + '#q=' + code;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1182,20 +1187,31 @@ $('#btn-send').addEventListener('click', () => {
   const 합계 = totalsLine();
   // 문의 메일에는 관리자 링크가 들어간다.
   // 이 링크로 다시 들어가면 금액을 채운 뒤 고객에게 바로 보낼 수 있다.
-  const 링크 = quoteURL(true);
-  // 메일 프로그램이 긴 주소를 링크로 만들어주지 않을 때를 위한 짧은 주소
-  const 관리자페이지 = 링크.replace(/#.*$/, '');
+  // 메일에 글자로 들어가는 주소는 ?q= 방식 — 휴대폰에서 링크로 잡히게
+  const 링크 = quoteURL(true, true);
+  // 그래도 안 눌릴 때를 위한 짧은 주소 (붙여넣기용)
+  const 관리자페이지 = 링크.replace(/[?#].*$/, '') + '?admin=1';
 
-  // 링크를 맨 위에 둔다 — 표 아래쪽에 있으면 메일에서 찾기 어렵다
+  /* 칸을 잘게 나누면 표가 가로로 길어져 글씨가 작아진다.
+     box 서식으로 이름표를 위에 두고, 내용은 네 덩어리로만 묶는다. */
   const payload = {
     _subject: '[YM토탈이벤트] 자동 견적서 문의',
-    _template: 'table',
+    _template: 'box',
     _replyto: $('#q-email').value.trim(),
-    '견적서 열기 (금액 채워 고객에게 발송)': 링크,
-    '위 주소가 안 눌리면': 관리자페이지 + ' 를 연 뒤 위 주소를 복사해 붙여넣으세요',
-    단체명: g('org'), 담당자: g('name'), 연락처: g('tel'), 이메일: g('email'),
-    행사명: g('title'), 행사일: g('date'), 행사장소: g('place'), 예상인원: g('people'),
-    견적내역: 내역, 합계: 합계,
+    '견적서 열기': 링크,
+    '문의하신 분': [
+      '단체 · 회사명 : ' + g('org'),
+      '담당자 : '       + g('name'),
+      '연락처 : '       + g('tel'),
+      '이메일 : '       + g('email'),
+      '행사명 : '       + g('title'),
+      '행사일 : '       + g('date'),
+      '행사장소 : '     + g('place'),
+      '예상인원 : '     + g('people'),
+    ].join('\n'),
+    '견적 내역': 내역,
+    '합계': 합계,
+    '주소가 안 눌릴 때': 관리자페이지 + ' 를 열고, 위 견적서 주소를 복사해 붙여넣으세요',
   };
 
   const mailBody = [
@@ -1228,7 +1244,8 @@ $('#btn-send').addEventListener('click', () => {
    견적 내용이 그대로 채워집니다. 그대로 보내시면 됩니다.
    (보내는 사람이 YM토탈이벤트 본인 메일이라 고객이 바로 회신할 수 있습니다)
 ══════════════════════════════════════════════════════════════ */
-const IS_ADMIN = new URLSearchParams(location.search).get('admin') === '1';
+const 주소값 = new URLSearchParams(location.search);
+const IS_ADMIN = 주소값.get('admin') === '1';
 
 function 고객메일제목() {
   return '[YM토탈이벤트] ' + (gv('title') === '-' ? '견적서' : gv('title') + ' 견적서');
@@ -1352,7 +1369,19 @@ $('#q-email').addEventListener('input', 관리자표시);
 $('#doc-date').textContent = new Date().toLocaleDateString('ko-KR');
 
 
-if (location.hash.startsWith('#q=')) decodeState(location.hash.slice(3));
+/* 견적서 내용은 ?q= 로도, #q= 로도 들어올 수 있다.
+   ?q= 로 들어왔으면 읽은 뒤 주소를 #q= 형태로 정리한다.
+   (?admin=1 은 남기고, 편집할 때마다 주소가 길어지지 않게 한다) */
+const 물음표코드 = 주소값.get('q');
+if (물음표코드) {
+  decodeState(물음표코드);
+  주소값.delete('q');
+  const 남은값 = 주소값.toString();
+  history.replaceState(null, '',
+    location.pathname + (남은값 ? '?' + 남은값 : '') + '#q=' + 물음표코드);
+} else if (location.hash.startsWith('#q=')) {
+  decodeState(location.hash.slice(3));
+}
 관리자표시();
 render();
 </script>
