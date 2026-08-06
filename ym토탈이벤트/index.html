@@ -965,13 +965,69 @@ document.querySelectorAll('.svc').forEach((card) => {
 const galGrid   = document.querySelector('.gal-grid');
 const galToggle = document.getElementById('gal-toggle');
 const galLabel  = document.getElementById('gal-toggle-text');
-const galHidden = document.querySelectorAll('.gal-more').length;
+let   galHidden = document.querySelectorAll('.gal-more').length;
+
+function galRelabel() {
+  const opened = galGrid.classList.contains('expanded');
+  galLabel.textContent = opened ? '사진 접기' : `사진 ${galHidden}장 더 보기`;
+}
 
 galToggle.addEventListener('click', () => {
   const opened = galGrid.classList.toggle('expanded');
-  galLabel.textContent = opened ? '사진 접기' : `사진 ${galHidden}장 더 보기`;
+  galRelabel();
   if (!opened) galGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
+
+/* ── 4-1. 새로 올린 행사 사진 불러오기 ──────────────────────────
+   업로드 페이지에서 올린 사진 목록(photos.json)을 읽어 갤러리 앞에 붙인다.
+   저장소에서 바로 읽기 때문에 사진이 늘어도 사이트를 다시 배포할 필요가 없다.
+   목록을 못 읽으면 아래 고정 사진만 그대로 보인다.
+─────────────────────────────────────────────────────────────── */
+const 사진목록주소 = 'https://raw.githubusercontent.com/brizymedia/keungil-event/main/photos/photos.json';
+const 사진주소     = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@main/';
+
+(async function 갤러리불러오기() {
+  let 목록 = [];
+  try {
+    const 응답 = await fetch(사진목록주소 + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!응답.ok) return;
+    const 값 = await 응답.json();
+    목록 = (값 && 값.photos) || [];
+  } catch (err) {
+    return;   // 조용히 넘어간다 — 고정 사진은 이미 화면에 있다
+  }
+  if (!목록.length) return;
+
+  const 담을곳 = document.createDocumentFragment();
+  목록.forEach((p, i) => {
+    if (!p || !p.path) return;
+    const 설명 = p.caption || p.event || '행사 현장';
+    const fig  = document.createElement('figure');
+    fig.className = 'gal-item';
+    // 고정 사진들과 같은 리듬으로 크기를 섞는다
+    if (i % 5 === 0)      fig.style.cssText = 'grid-column:span 2;grid-row:span 2;';
+    else if (i % 5 === 2) fig.style.cssText = 'grid-column:span 2;';
+
+    const img = document.createElement('img');
+    img.src = 사진주소 + p.path.split('/').map(encodeURIComponent).join('/');
+    img.alt = 설명;
+    img.loading = 'lazy';
+
+    const cap = document.createElement('figcaption');
+    cap.textContent = 설명 + (p.date ? ' · ' + p.date : '');
+
+    fig.append(img, cap);
+    담을곳.appendChild(fig);
+  });
+
+  galGrid.insertBefore(담을곳, galGrid.firstChild);
+
+  // 앞의 6장만 보이도록 다시 나눈다
+  const 전부 = [...galGrid.querySelectorAll('.gal-item')];
+  전부.forEach((el, i) => el.classList.toggle('gal-more', i >= 6));
+  galHidden = Math.max(0, 전부.length - 6);
+  galRelabel();
+})();
 
 // ── 5. Gallery lightbox ──
 const lb     = document.getElementById('lightbox');
@@ -1003,7 +1059,11 @@ function openLb(fig) {
 function closeLb()  { lb.classList.remove('open'); document.body.style.overflow = ''; }
 function stepLb(d)  { showLb(lbIndex + d); }
 
-document.querySelectorAll('.gal-item').forEach((fig) => fig.addEventListener('click', () => openLb(fig)));
+// 나중에 불러온 사진도 눌리도록 그리드 전체에 한 번만 묶는다
+galGrid.addEventListener('click', (e) => {
+  const fig = e.target.closest('.gal-item');
+  if (fig && galGrid.contains(fig)) openLb(fig);
+});
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeLb();
