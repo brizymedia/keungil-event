@@ -73,6 +73,8 @@ function doPost(e) {
 
     if (요청.action === 'photo')  return 응답(사진저장(요청));
     if (요청.action === 'finish') return 응답(목록갱신(요청));
+    if (요청.action === 'edit')   return 응답(행사수정(요청));
+    if (요청.action === 'delete') return 응답(사진삭제(요청));
 
     return 응답({ ok: false, error: '알 수 없는 요청입니다: ' + 요청.action });
 
@@ -132,12 +134,88 @@ function 목록갱신(요청) {
 
   if (추가 === 0) return { ok: true, added: 0 };
 
-  const 본문 = Utilities.base64Encode(
-    Utilities.newBlob(JSON.stringify(지금, null, 1)).getBytes()
-  );
-  const 결과 = 깃허브에올리기(목록파일, 본문, '사진 목록 갱신 (' + 추가 + '장)');
+  const 결과 = 목록쓰기(지금, '사진 목록 갱신 (' + 추가 + '장)');
   if (!결과.ok) return 결과;
   return { ok: true, added: 추가, total: 지금.photos.length };
+}
+
+function 목록쓰기(값, 메모) {
+  const 본문 = Utilities.base64Encode(
+    Utilities.newBlob(JSON.stringify(값, null, 1)).getBytes()
+  );
+  return 깃허브에올리기(목록파일, 본문, 메모);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. 올린 뒤 고치기 — 행사 정보 수정 · 사진 삭제
+══════════════════════════════════════════════════════════════ */
+
+/* 행사명·날짜·장소·설명 고치기.
+   어느 행사인지는 「고치기 전」 행사명+날짜로 찾는다. */
+function 행사수정(요청) {
+  const 옛것 = 요청.old || {};
+  const 새것 = 요청.new || {};
+  if (!새것.event) return { ok: false, error: '행사명은 비울 수 없습니다' };
+
+  const 지금 = 목록읽기();
+  let 바뀜 = 0;
+  지금.photos.forEach((p) => {
+    if ((p.event || '') !== (옛것.event || '')) return;
+    if ((p.date  || '') !== (옛것.date  || '')) return;
+    p.event   = 새것.event;
+    p.date    = 새것.date  || '';
+    p.place   = 새것.place || '';
+    p.desc    = 새것.desc  || '';
+    p.caption = 새것.event;
+    바뀜++;
+  });
+
+  if (!바뀜) return { ok: false, error: '그 행사를 찾지 못했습니다. 목록을 다시 불러와 주세요.' };
+
+  const 결과 = 목록쓰기(지금, '행사 정보 수정: ' + 새것.event);
+  if (!결과.ok) return 결과;
+  return { ok: true, changed: 바뀜 };
+}
+
+/* 사진 지우기 — 파일과 목록에서 함께 지운다 */
+function 사진삭제(요청) {
+  const 지울것 = 요청.paths || [];
+  if (!지울것.length) return { ok: false, error: '지울 사진이 없습니다' };
+
+  const 못지운것 = [];
+  지울것.forEach((경로) => {
+    const r = 깃허브파일삭제(경로);
+    if (!r.ok) 못지운것.push(경로.split('/').pop() + ' (' + r.error + ')');
+  });
+
+  const 지금 = 목록읽기();
+  const 남길것 = 지금.photos.filter((p) => 지울것.indexOf(p.path) < 0);
+  const 지운수 = 지금.photos.length - 남길것.length;
+
+  if (지운수) {
+    const 결과 = 목록쓰기({ photos: 남길것 }, '사진 삭제 (' + 지운수 + '장)');
+    if (!결과.ok) return 결과;
+  }
+  // 파일 삭제에 실패한 게 있으면 숨기지 않고 알린다
+  return { ok: true, deleted: 지운수, 남은문제: 못지운것.join(', ') };
+}
+
+function 깃허브파일삭제(경로) {
+  const 기존 = 깃허브(경로, 'get');
+  if (기존.getResponseCode() === 404) return { ok: true };   // 이미 없다
+  if (기존.getResponseCode() !== 200) return { ok: false, error: '찾기 실패 ' + 기존.getResponseCode() };
+
+  let sha;
+  try { sha = JSON.parse(기존.getContentText()).sha; }
+  catch (err) { return { ok: false, error: 'sha 읽기 실패' }; }
+
+  const 응 = 깃허브(경로, 'delete',
+                   { message: '사진 삭제: ' + 경로, sha: sha, branch: 저장브랜치 });
+  if (응.getResponseCode() === 200) return { ok: true };
+
+  let 사유 = 응.getContentText();
+  try { 사유 = JSON.parse(사유).message || 사유; } catch (err) { /* 그대로 */ }
+  return { ok: false, error: 응.getResponseCode() + ' ' + 사유 };
 }
 
 function 목록읽기() {
