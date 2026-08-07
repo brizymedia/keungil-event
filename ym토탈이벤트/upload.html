@@ -85,6 +85,32 @@
 
     textarea.cap{ min-height:9rem;line-height:1.7;font-size:.88rem;resize:vertical; }
 
+    /* 올린 행사 관리 */
+    .mg-row{
+      border:1px solid rgba(255,255,255,.09);border-radius:.8rem;
+      padding:.85rem .95rem;margin-bottom:.55rem;background:rgba(0,0,0,.22);
+    }
+    .mg-head{ display:flex;align-items:flex-start;gap:.6rem;justify-content:space-between; }
+    .mg-name{ font-size:.92rem;font-weight:700;line-height:1.45; }
+    .mg-meta{ font-size:.76rem;color:#71717a;margin-top:.2rem; }
+    .mg-edit{
+      flex-shrink:0;padding:.45rem .85rem;border-radius:9999px;cursor:pointer;
+      border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:.78rem;
+    }
+    .mg-body{ margin-top:.9rem;padding-top:.9rem;border-top:1px solid rgba(255,255,255,.08); }
+    .mg-shots{ display:grid;grid-template-columns:repeat(auto-fill,minmax(4.2rem,1fr));gap:.4rem;margin-top:.7rem; }
+    .mg-shot{ position:relative;aspect-ratio:1;border-radius:.5rem;overflow:hidden;background:#18181b; }
+    .mg-shot img{ width:100%;height:100%;object-fit:cover; }
+    .mg-shot button{
+      position:absolute;top:.15rem;right:.15rem;width:1.3rem;height:1.3rem;border-radius:50%;
+      background:rgba(0,0,0,.7);color:#fff;border:none;cursor:pointer;
+      display:grid;place-items:center;font-size:.8rem;line-height:1;padding:0;
+    }
+    .mg-shot.gone{ opacity:.25; }
+    .btn-danger{
+      background:transparent;color:#FCA5A5;border:1px solid rgba(239,68,68,.4);font-weight:600;
+    }
+
     .toast{
       position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(1.5rem);
       background:#fff;color:#0a0a0b;padding:.8rem 1.3rem;border-radius:9999px;
@@ -210,6 +236,20 @@
       「사진과 함께 공유」를 누르면 휴대폰 공유창이 열립니다. 거기서 네이버 블로그나 인스타그램을 고르면
       사진이 딸려갑니다. 문구는 복사도 같이 되니 붙여넣기만 하시면 됩니다.
     </p>
+  </div>
+
+  <!-- ── 05 올린 행사 관리 ── -->
+  <div class="card">
+    <div class="card-title"><span class="n">05</span>올린 행사 고치기 · 지우기</div>
+    <p class="note" style="margin-top:0;">
+      이미 올린 행사의 이름 · 날짜 · 장소 · 설명을 고치거나, 사진을 지울 수 있습니다.
+    </p>
+    <button class="btn btn-sub" id="mg-load" style="margin-top:.8rem;">
+      <iconify-icon icon="solar:refresh-bold" style="font-size:18px;color:#F87171;"></iconify-icon>
+      올린 행사 목록 불러오기
+    </button>
+    <div id="mg-list" style="margin-top:.9rem;"></div>
+    <p class="note" id="mg-status"></p>
   </div>
 
   <p class="note" style="text-align:center;">
@@ -471,6 +511,186 @@ async function 보내기(몸통) {
     // 로그인 화면 같은 게 돌아온 경우 — 배포 설정이 잘못된 것이다
     throw new Error('서버가 이상한 답을 보냈습니다. 웹 앱을 「모든 사용자」로 배포했는지 확인해 주세요.');
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   올린 행사 고치기 · 지우기
+
+   목록은 저장소에서 바로 읽고, 고치거나 지우는 것만 서버에 맡깁니다.
+══════════════════════════════════════════════════════════════ */
+const 목록주소 = 'https://raw.githubusercontent.com/brizymedia/keungil-event/photos/photos/photos.json';
+const 사진주소 = 'https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/';
+
+function 관리안내(글, 종류) {
+  const el = $('#mg-status');
+  el.className = 'note' + (종류 ? ' ' + 종류 : '');
+  el.textContent = 글;
+}
+
+// 클릭 이벤트가 앞말 자리로 들어가지 않게 감싼다
+$('#mg-load').addEventListener('click', () => 관리목록불러오기());
+
+// 앞말: 방금 한 일(고쳤습니다 등). 목록을 다시 읽어도 그 결과가 안 지워지게 한다.
+async function 관리목록불러오기(앞말, 종류) {
+  if (!앞말) 관리안내('불러오는 중…');
+  let 목록;
+  try {
+    const 응답 = await fetch(목록주소 + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!응답.ok) throw new Error('서버 응답 ' + 응답.status);
+    목록 = (await 응답.json()).photos || [];
+  } catch (err) {
+    관리안내('목록을 읽지 못했습니다: ' + (err.message || err), 'warn');
+    return;
+  }
+
+  // 행사별로 묶는다 (갤러리와 같은 기준: 행사명 + 날짜)
+  const 묶음 = new Map();
+  목록.forEach((p) => {
+    const 열쇠 = (p.event || '') + '|' + (p.date || '');
+    if (!묶음.has(열쇠)) {
+      묶음.set(열쇠, { event: p.event || '', date: p.date || '',
+                       place: p.place || '', desc: p.desc || '', 사진: [] });
+    }
+    const g = 묶음.get(열쇠);
+    if (p.desc && !g.desc) g.desc = p.desc;
+    g.사진.push(p);
+  });
+
+  const 칸 = $('#mg-list');
+  칸.innerHTML = '';
+  if (!묶음.size) { 관리안내((앞말 ? 앞말 + ' · ' : '') + '남은 행사가 없습니다.', 종류); return; }
+
+  [...묶음.values()].forEach((행사) => 칸.appendChild(관리줄(행사)));
+  관리안내((앞말 ? 앞말 + ' · ' : '') +
+           묶음.size + '개 행사 · 사진 ' + 목록.length + '장', 종류);
+}
+
+function 관리줄(행사) {
+  const 줄 = document.createElement('div');
+  줄.className = 'mg-row';
+
+  const 머리 = document.createElement('div');
+  머리.className = 'mg-head';
+  머리.innerHTML =
+    '<div><div class="mg-name"></div><div class="mg-meta"></div></div>' +
+    '<button type="button" class="mg-edit">고치기</button>';
+  머리.querySelector('.mg-name').textContent = 행사.event || '(행사명 없음)';
+  머리.querySelector('.mg-meta').textContent =
+    [행사.date, 행사.place, 행사.사진.length + '장'].filter(Boolean).join(' · ');
+  줄.appendChild(머리);
+
+  const 몸 = document.createElement('div');
+  몸.className = 'mg-body';
+  몸.hidden = true;
+  줄.appendChild(몸);
+
+  머리.querySelector('.mg-edit').addEventListener('click', () => {
+    몸.hidden = !몸.hidden;
+    머리.querySelector('.mg-edit').textContent = 몸.hidden ? '고치기' : '접기';
+    if (!몸.hidden && !몸.dataset.차림) { 관리폼(몸, 행사, 줄); 몸.dataset.차림 = '1'; }
+  });
+
+  return 줄;
+}
+
+function 관리폼(몸, 행사, 줄) {
+  const 만들기 = (라벨, id, 값, 태그, 종류) => {
+    const l = document.createElement('label'); l.className = 'f'; l.textContent = 라벨;
+    const i = document.createElement(태그 || 'input');
+    if (태그 !== 'textarea') i.type = 종류 || 'text';
+    else { i.rows = 3; i.style.lineHeight = '1.7'; }
+    i.value = 값 || '';
+    몸.append(l, i);
+    return i;
+  };
+
+  const 이름칸 = 만들기('행사명', 0, 행사.event);
+  const 날짜칸 = 만들기('행사일', 0, 행사.date, 'input', 'date');
+  const 장소칸 = 만들기('장소',   0, 행사.place);
+  const 설명칸 = 만들기('행사 설명', 0, 행사.desc, 'textarea');
+
+  const 사진칸 = document.createElement('div');
+  사진칸.className = 'mg-shots';
+  const 지울것 = new Set();
+  행사.사진.forEach((p) => {
+    const d = document.createElement('div');
+    d.className = 'mg-shot';
+    d.innerHTML = '<img src="' + 사진주소 + p.path.split('/').map(encodeURIComponent).join('/') +
+                  '" alt="" loading="lazy"><button type="button" title="이 사진 지우기">×</button>';
+    d.querySelector('button').addEventListener('click', () => {
+      if (지울것.has(p.path)) { 지울것.delete(p.path); d.classList.remove('gone'); }
+      else                    { 지울것.add(p.path);    d.classList.add('gone'); }
+      지우기버튼.textContent = 지울것.size ? '표시한 사진 ' + 지울것.size + '장 지우기'
+                                          : '행사 통째로 지우기';
+    });
+    사진칸.appendChild(d);
+  });
+  const 사진안내 = document.createElement('p');
+  사진안내.className = 'note';
+  사진안내.textContent = '× 를 눌러 지울 사진을 표시하세요. 아무것도 표시하지 않으면 행사 전체가 지워집니다.';
+  몸.append(사진칸, 사진안내);
+
+  const 버튼줄 = document.createElement('div');
+  버튼줄.className = 'row2';
+  버튼줄.style.marginTop = '.9rem';
+
+  const 저장버튼 = document.createElement('button');
+  저장버튼.className = 'btn btn-main';
+  저장버튼.type = 'button';
+  저장버튼.textContent = '저장';
+
+  const 지우기버튼 = document.createElement('button');
+  지우기버튼.className = 'btn btn-danger';
+  지우기버튼.type = 'button';
+  지우기버튼.textContent = '행사 통째로 지우기';
+
+  버튼줄.append(저장버튼, 지우기버튼);
+  몸.appendChild(버튼줄);
+
+  저장버튼.addEventListener('click', async () => {
+    const pw = $('#pw').value.trim();
+    if (!pw) { toast('업로드 비밀번호를 넣어주세요'); $('#pw').focus(); return; }
+    if (!이름칸.value.trim()) { toast('행사명은 비울 수 없습니다'); 이름칸.focus(); return; }
+
+    저장버튼.disabled = true;
+    관리안내('저장하는 중…');
+    try {
+      const 답 = await 보내기({
+        pw: pw, action: 'edit',
+        old: { event: 행사.event, date: 행사.date },
+        new: { event: 이름칸.value.trim(), date: 날짜칸.value,
+               place: 장소칸.value.trim(), desc: 설명칸.value.trim() },
+      });
+      if (!답.ok) throw new Error(답.error || '알 수 없는 오류');
+      await 관리목록불러오기('고쳤습니다 (사진 ' + 답.changed + '장 반영)', 'ok');
+    } catch (err) {
+      관리안내('저장 실패: ' + (err.message || err), 'warn');
+    }
+    저장버튼.disabled = false;
+  });
+
+  지우기버튼.addEventListener('click', async () => {
+    const pw = $('#pw').value.trim();
+    if (!pw) { toast('업로드 비밀번호를 넣어주세요'); $('#pw').focus(); return; }
+
+    const 대상 = 지울것.size ? [...지울것] : 행사.사진.map((p) => p.path);
+    const 말 = 지울것.size ? '표시한 사진 ' + 대상.length + '장을 지웁니다.'
+                           : '「' + (행사.event || '이 행사') + '」 사진 ' + 대상.length + '장을 모두 지웁니다.';
+    if (!confirm(말 + '\n되돌릴 수 없습니다. 진행할까요?')) return;
+
+    지우기버튼.disabled = true;
+    관리안내('지우는 중… (사진이 많으면 시간이 걸립니다)');
+    try {
+      const 답 = await 보내기({ pw: pw, action: 'delete', paths: 대상 });
+      if (!답.ok) throw new Error(답.error || '알 수 없는 오류');
+      await 관리목록불러오기(
+        답.deleted + '장 지웠습니다' + (답.남은문제 ? ' (다만 ' + 답.남은문제 + ')' : ''),
+        답.남은문제 ? 'warn' : 'ok');
+    } catch (err) {
+      관리안내('삭제 실패: ' + (err.message || err), 'warn');
+    }
+    지우기버튼.disabled = false;
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════
