@@ -268,8 +268,7 @@
       <a href="#work"    style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">행사이력</a>
       <a href="#gallery" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">갤러리</a>
       <a href="#partner" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">파트너</a>
-      <a href="quote.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">견적</a>
-      <a href="contact.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">문의</a>
+      <a href="quote.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">견적 · 문의</a>
     </nav>
 
     <a href="tel:01086239294" class="btn-primary" style="padding:.6rem 1.15rem;font-size:.85rem;">
@@ -752,11 +751,22 @@
       </figure>
     </div>
 
-    <div style="display:flex;justify-content:center;margin-top:2rem;">
+    <div style="display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;align-items:center;margin-top:2rem;">
       <button type="button" id="gal-toggle" class="btn-ghost" style="padding:.9rem 2rem;font-size:.95rem;">
-        <iconify-icon icon="solar:gallery-add-bold" style="font-size:18px;color:#F87171;"></iconify-icon>
+        <iconify-icon icon="solar:gallery-bold" style="font-size:18px;color:#F87171;"></iconify-icon>
         <span id="gal-toggle-text">사진 14장 더 보기</span>
       </button>
+      <!-- 운영자용 — 비밀번호를 아는 사람만 올릴 수 있습니다 -->
+      <a href="upload.html" id="gal-upload"
+         style="display:inline-flex;align-items:center;gap:.4rem;padding:.9rem 1.4rem;
+                border-radius:9999px;border:1px dashed rgba(255,255,255,.16);
+                color:#71717a;font-size:.85rem;font-weight:600;text-decoration:none;
+                transition:color .25s,border-color .25s;"
+         onmouseover="this.style.color='#d4d4d8';this.style.borderColor='rgba(255,255,255,.34)'"
+         onmouseout="this.style.color='#71717a';this.style.borderColor='rgba(255,255,255,.16)'">
+        <iconify-icon icon="solar:gallery-add-bold" style="font-size:17px;"></iconify-icon>
+        사진 올리기
+      </a>
     </div>
   </div>
 </section>
@@ -858,9 +868,9 @@
         <iconify-icon icon="solar:phone-calling-bold" style="font-size:21px;"></iconify-icon>
         010-8623-9294
       </a>
-      <a href="contact.html" class="btn-ghost" style="padding:1.15rem 2.25rem;font-size:1.05rem;">
+      <a href="quote.html" class="btn-ghost" style="padding:1.15rem 2.25rem;font-size:1.05rem;">
         <iconify-icon icon="solar:letter-bold" style="font-size:21px;"></iconify-icon>
-        온라인 문의하기
+        견적 · 문의 남기기
       </a>
     </div>
 
@@ -932,7 +942,7 @@
       <a href="#work"    style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">행사이력</a>
       <a href="#gallery" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">갤러리</a>
       <a href="quote.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">견적</a>
-      <a href="contact.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">문의</a>
+      <a href="quote.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">견적 · 문의</a>
       <a href="../index.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">큰길이벤트기획</a>
     </div>
   </div>
@@ -950,9 +960,9 @@
     <iconify-icon icon="solar:phone-calling-bold" style="font-size:17px;"></iconify-icon>
     전화 상담
   </a>
-  <a href="contact.html" class="btn-ghost">
+  <a href="quote.html" class="btn-ghost">
     <iconify-icon icon="solar:letter-bold" style="font-size:17px;"></iconify-icon>
-    문의 남기기
+    견적 · 문의
   </a>
 </div>
 
