@@ -286,7 +286,7 @@
       <a href="index.html#work"    style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">행사이력</a>
       <a href="index.html#gallery" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">갤러리</a>
       <a href="quote.html"   style="color:#fff;font-weight:700;text-decoration:none;">견적</a>
-      <a href="contact.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">문의</a>
+
     </nav>
     <a href="tel:01086239294" class="btn-primary" style="padding:.6rem 1.15rem;font-size:.85rem;">
       <iconify-icon icon="solar:phone-calling-bold" style="font-size:16px;"></iconify-icon>
@@ -377,6 +377,15 @@
 
         <label class="fld-label" for="q-title">행사명</label>
         <div class="fld-value span3"><input type="text" id="q-title" placeholder="예) 제25회 녹동바다불꽃축제"></div>
+
+        <label class="fld-label" for="q-memo">문의 내용</label>
+        <div class="fld-value span3">
+          <textarea id="q-memo" rows="3"
+                    placeholder="필요한 것, 궁금한 점을 편하게 적어주세요. 항목을 고르지 않고 이것만 보내셔도 됩니다."
+                    style="width:100%;padding:.75rem .9rem;border-radius:.65rem;resize:vertical;
+                           background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+                           color:#fff;font-size:.94rem;line-height:1.75;font-family:inherit;"></textarea>
+        </div>
       </div>
     </section>
 
@@ -520,8 +529,7 @@
     <div style="display:flex;flex-wrap:wrap;gap:1.5rem;font-size:.85rem;color:#71717a;">
       <a href="index.html#service" style="color:inherit;text-decoration:none;">서비스</a>
       <a href="index.html#gallery" style="color:inherit;text-decoration:none;">갤러리</a>
-      <a href="quote.html" style="color:#FCA5A5;text-decoration:none;font-weight:600;">견적</a>
-      <a href="contact.html" style="color:inherit;text-decoration:none;">문의</a>
+      <a href="quote.html" style="color:#FCA5A5;text-decoration:none;font-weight:600;">견적 · 문의</a>
       <a href="../index.html" style="color:inherit;text-decoration:none;">큰길이벤트기획</a>
     </div>
   </div>
@@ -864,7 +872,7 @@ discEl.addEventListener('blur',  () => {
 });
 
 /* ══ 수요자 정보 반영 ══ */
-const INFO = ['org','name','tel','email','title','date','place','people'];
+const INFO = ['org','name','tel','email','title','date','place','people','memo'];
 function syncParty() {
   const g = (k) => $('#q-' + k).value.trim();
   $('#v-org').textContent   = g('org')   || '-';
@@ -880,7 +888,8 @@ INFO.forEach((k) => $('#q-' + k).addEventListener('input', () => { syncParty(); 
    · 정보 항목 이름을 한 글자로 줄이고, 비어 있는 항목은 아예 뺀다
    · 수량 1 · 1일 · 단가 협의 인 항목은 id 한 개로만 저장한다
    · base64 의 + / = 를 - _ 로 바꾼다 (메일 프로그램이 링크를 자를 때가 있다) */
-const INFO_KEY = { org:'o', name:'n', tel:'t', email:'e', title:'m', date:'d', place:'p', people:'c' };
+const INFO_KEY = { org:'o', name:'n', tel:'t', email:'e', title:'m', date:'d', place:'p', people:'c',
+                   memo:'x' };
 
 const b64u = (s) => btoa(unescape(encodeURIComponent(s)))
                       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -1208,7 +1217,12 @@ $('#btn-link').addEventListener('click', async () => {
 });
 
 $('#btn-send').addEventListener('click', () => {
-  if (!rows.length)          { toast('견적 항목을 먼저 선택해 주세요'); return; }
+  // 항목을 안 고르고 문의 내용만 적어 보내도 된다 (문의 페이지를 여기로 합쳤다)
+  if (!rows.length && !$('#q-memo').value.trim()) {
+    toast('항목을 고르거나, 문의 내용을 적어주세요');
+    $('#q-memo').focus();
+    return;
+  }
   if (!$('#q-name').value.trim() || !$('#q-tel').value.trim()) {
     toast('담당자와 연락처를 입력해 주세요');
     $('#q-name').focus();
@@ -1242,8 +1256,9 @@ $('#btn-send').addEventListener('click', () => {
       '행사장소 : '     + g('place'),
       '예상인원 : '     + g('people'),
     ].join('\n'),
-    '견적 내역': 내역,
-    '합계': 합계,
+    '문의 내용': $('#q-memo').value.trim() || '(적지 않으심)',
+    '견적 내역': rows.length ? 내역 : '(항목을 고르지 않으심)',
+    '합계': rows.length ? 합계 : '-',
     '▶ 견적서 열기 (눌러서 금액 작성 → 고객에게 발송)': [
       링크,
       '',
@@ -1263,8 +1278,9 @@ $('#btn-send').addEventListener('click', () => {
     '행사일      : ' + g('date'),
     '행사장소    : ' + g('place'),
     '예상인원    : ' + g('people'),
-    '', '── 견적 내역 ──', 내역,
-    '', 합계,
+    '', '── 문의 내용 ──', ($('#q-memo').value.trim() || '(적지 않으심)'),
+    '', '── 견적 내역 ──', (rows.length ? 내역 : '(항목을 고르지 않으심)'),
+    '', (rows.length ? 합계 : ''),
   ].join('\n');
 
   sendForm(payload, '[견적문의] ' + g('org') + ' / ' + g('title'), mailBody,
