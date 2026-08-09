@@ -184,6 +184,15 @@
     <p class="note" id="pick-info" hidden></p>
 
     <label class="chk" style="margin-top:1rem;">
+      <input type="checkbox" id="watermark" checked>
+      사진 가운데에 <strong style="color:#fff;">YM토탈이벤트</strong> 워터마크 넣기
+    </label>
+    <p class="note" style="margin-top:.35rem;">
+      홈페이지에 올라가는 사진에만 들어갑니다.
+      <strong style="color:#a1a1aa;">드라이브에 보관되는 원본은 깨끗하게</strong> 남습니다.
+    </p>
+
+    <label class="chk" style="margin-top:1rem;">
       <input type="checkbox" id="keep-orig" checked>
       원본도 구글 드라이브에 백업
     </label>
@@ -333,7 +342,7 @@ $('#pick').addEventListener('change', async (e) => {
 
   for (const f of 파일들) {
     try {
-      const web = await 줄이기(f, 1600, 0.82);
+      const web = await 줄이기(f, 1600, 0.82, $('#watermark').checked);
       const 항목 = { file: f, web, state: '대기' };
       항목.thumb = URL.createObjectURL(web);
       사진들.push(항목);
@@ -345,7 +354,7 @@ $('#pick').addEventListener('change', async (e) => {
   정보갱신();
 });
 
-function 줄이기(file, 최대변, 품질) {
+function 줄이기(file, 최대변, 품질, 워터마크) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -355,13 +364,57 @@ function 줄이기(file, 최대변, 품질) {
       const c = document.createElement('canvas');
       c.width  = Math.round(img.width  * 비율);
       c.height = Math.round(img.height * 비율);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      if (워터마크) 워터마크그리기(ctx, c.width, c.height);
       c.toBlob((b) => b ? resolve(b) : reject(new Error('변환 실패')), 'image/jpeg', 품질);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('열 수 없는 파일')); };
     img.src = url;
   });
 }
+
+/* 사진 가운데에 회사 이름을 옅게 얹는다.
+   밝은 사진에서도 묻히지 않게 어두운 테두리를 먼저 그린다. */
+function 워터마크그리기(ctx, w, h) {
+  const 글자 = 'YM토탈이벤트';
+  const 크기 = Math.max(14, Math.round(Math.min(w, h) * 0.085));
+
+  ctx.save();
+  ctx.font = '800 ' + 크기 + "px system-ui, -apple-system, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif";
+  try { ctx.letterSpacing = Math.round(크기 * 0.06) + 'px'; } catch (e) { /* 지원 안 하면 그냥 */ }
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(2, 크기 * 0.09);
+  ctx.strokeStyle = 'rgba(0,0,0,.42)';
+  ctx.globalAlpha = 0.55;
+  ctx.strokeText(글자, w / 2, h / 2);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.globalAlpha = 0.42;
+  ctx.fillText(글자, w / 2, h / 2);
+  ctx.restore();
+}
+
+/* 워터마크를 켜거나 끄면, 이미 고른 사진을 다시 만든다.
+   (올린 사진은 건드리지 않는다) */
+$('#watermark').addEventListener('change', async () => {
+  const 남은것 = 사진들.filter((p) => p.state !== '완료');
+  if (!남은것.length) return;
+  $('#pick-info').hidden = false;
+  $('#pick-info').textContent = '사진을 다시 만드는 중…';
+  for (const p of 남은것) {
+    try {
+      URL.revokeObjectURL(p.thumb);
+      p.web = await 줄이기(p.file, 1600, 0.82, $('#watermark').checked);
+      p.thumb = URL.createObjectURL(p.web);
+    } catch (err) { /* 이 장은 그대로 둔다 */ }
+  }
+  그리기();
+  정보갱신();
+});
 
 function 그리기() {
   const box = $('#shots');
