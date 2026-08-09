@@ -185,7 +185,7 @@
 
     <label class="chk" style="margin-top:1rem;">
       <input type="checkbox" id="watermark" checked>
-      사진 가운데에 <strong style="color:#fff;">YM토탈이벤트</strong> 워터마크 넣기
+      사진 오른쪽 위에 <strong style="color:#fff;">YM토탈이벤트</strong> 워터마크 넣기
     </label>
     <p class="note" style="margin-top:.35rem;">
       홈페이지에 올라가는 사진에만 들어갑니다.
@@ -374,27 +374,30 @@ function 줄이기(file, 최대변, 품질, 워터마크) {
   });
 }
 
-/* 사진 가운데에 회사 이름을 옅게 얹는다.
+/* 사진 오른쪽 위 구석에 회사 이름을 얹는다.
+   가운데에 넣으면 정작 사진이 안 보여서 구석으로 옮겼다.
    밝은 사진에서도 묻히지 않게 어두운 테두리를 먼저 그린다. */
 function 워터마크그리기(ctx, w, h) {
   const 글자 = 'YM토탈이벤트';
-  const 크기 = Math.max(14, Math.round(Math.min(w, h) * 0.085));
+  const 짧은변 = Math.min(w, h);
+  const 크기 = Math.max(13, Math.round(짧은변 * 0.055));
+  const 여백 = Math.round(짧은변 * 0.04);
 
   ctx.save();
   ctx.font = '800 ' + 크기 + "px system-ui, -apple-system, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif";
   try { ctx.letterSpacing = Math.round(크기 * 0.06) + 'px'; } catch (e) { /* 지원 안 하면 그냥 */ }
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
 
   ctx.lineJoin = 'round';
-  ctx.lineWidth = Math.max(2, 크기 * 0.09);
-  ctx.strokeStyle = 'rgba(0,0,0,.42)';
-  ctx.globalAlpha = 0.55;
-  ctx.strokeText(글자, w / 2, h / 2);
+  ctx.lineWidth = Math.max(2, 크기 * 0.11);
+  ctx.strokeStyle = 'rgba(0,0,0,.5)';
+  ctx.globalAlpha = 0.6;
+  ctx.strokeText(글자, w - 여백, 여백);
 
   ctx.fillStyle = '#ffffff';
-  ctx.globalAlpha = 0.42;
-  ctx.fillText(글자, w / 2, h / 2);
+  ctx.globalAlpha = 0.7;
+  ctx.fillText(글자, w - 여백, 여백);
   ctx.restore();
 }
 
