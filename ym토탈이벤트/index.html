@@ -83,6 +83,35 @@
     }
     .eyebrow::before{ content:'';width:1.75rem;height:1px;background:linear-gradient(90deg,transparent,#EF4444); }
 
+    /* ── FAQ ──
+       <details> 를 그대로 쓴다. 자바스크립트 없이도 열리고 닫히고,
+       검색엔진도 질문·답을 그대로 읽어간다. */
+    .faq{
+      border:1px solid rgba(255,255,255,.09);border-radius:1rem;
+      background:rgba(255,255,255,.022);overflow:hidden;
+      transition:border-color .3s,background .3s;
+    }
+    .faq[open]{ border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.035); }
+    .faq:hover { border-color:rgba(255,255,255,.2); }
+    .faq summary{
+      list-style:none;cursor:pointer;
+      padding:1.25rem 1.4rem;
+      font-size:1rem;font-weight:700;letter-spacing:-.02em;color:#fff;
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    }
+    .faq summary::-webkit-details-marker{ display:none; }
+    .faq summary::after{
+      content:'';flex-shrink:0;width:.6rem;height:.6rem;
+      border-right:2px solid #F87171;border-bottom:2px solid #F87171;
+      transform:rotate(45deg) translate(-2px,-2px);transition:transform .3s;
+    }
+    .faq[open] summary::after{ transform:rotate(-135deg) translate(-2px,-2px); }
+    .faq p{
+      margin:0;padding:0 1.4rem 1.4rem;
+      font-size:.94rem;line-height:1.85;color:#a1a1aa;
+    }
+    .faq p strong{ color:#fff;font-weight:700; }
+
     /* ── Reveal on scroll ── */
     .reveal{ opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
     .reveal.in{ opacity:1;transform:none; }
@@ -134,6 +163,29 @@
       .gal-grid{ grid-template-columns:1fr;grid-auto-rows:14rem; }
       .gal-item{ grid-column:span 1!important;grid-row:span 1!important; }
       .gal-item figcaption{ opacity:1;transform:none; }
+    }
+
+    /* ── 모바일 여백 ──
+       섹션 여백이 PC 기준(5~7rem)으로 고정돼 있으면, 폰에서는 아무것도 없는
+       화면이 계속 넘어간다. 인라인 style 을 이기려면 !important 가 필요하다. */
+    @media (max-width:640px){
+      section:not(#top):not(#spec){
+        padding-top:3.2rem!important;
+        padding-bottom:3.6rem!important;
+        padding-left:1.15rem!important;
+        padding-right:1.15rem!important;
+      }
+      .stack-tight{ gap:2rem!important; }
+      .card-tight { padding:1.4rem 1.25rem!important; }
+      .svc        { padding:1.5rem 1.3rem; }
+      .spec-band  { padding:0 1.15rem 3.6rem!important; }
+      /* 대표 사례 — 폰에서는 사진을 위로 올리고 세로로 쌓는다 */
+      .case       { grid-template-columns:1fr!important; }
+      .case > div:first-child { order:2;padding:1.75rem 1.4rem!important; }
+      .case > div:last-child  { order:1;min-height:13rem!important; }
+      .case > div:last-child > div{
+        background:linear-gradient(180deg,rgba(10,10,11,.15),#0a0a0b 96%)!important;
+      }
     }
 
     .gal-grid:not(.expanded) .gal-more{ display:none; }
@@ -267,7 +319,7 @@
       <a href="#service" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">서비스</a>
       <a href="#work"    style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">행사이력</a>
       <a href="#gallery" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">갤러리</a>
-      <a href="#partner" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">파트너</a>
+      <a href="#faq" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">자주 묻는 질문</a>
       <a href="quote.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">견적 · 문의</a>
     </nav>
 
@@ -284,7 +336,7 @@
 <section id="top" style="position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;">
   <div style="position:absolute;inset:0;overflow:hidden;">
     <img src="photos/hero-nokdong-fireworks.jpg" alt="제24회 녹동바다불꽃축제 무대" class="kenburns"
-         style="width:100%;height:100%;object-fit:cover;opacity:.62;filter:saturate(1.18) contrast(1.08);">
+         style="width:100%;height:100%;object-fit:cover;opacity:.72;filter:saturate(1.18) contrast(1.08);">
   </div>
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,11,.82) 0%,rgba(10,10,11,.46) 45%,rgba(10,10,11,.88) 88%,#0a0a0b 100%);"></div>
   <div style="position:absolute;top:-14rem;left:-10rem;width:34rem;height:34rem;border-radius:50%;background:radial-gradient(circle,rgba(239,68,68,.2),transparent 68%);filter:blur(40px);"></div>
@@ -307,7 +359,7 @@
       <strong style="color:#fff;font-weight:700;">토탈 이벤트 에이전시</strong>입니다.
     </p>
 
-    <div class="reveal cta-row" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:4rem;">
+    <div class="reveal cta-row" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.1rem;">
       <a href="tel:01086239294" class="btn-primary">
         <iconify-icon icon="solar:phone-calling-bold" style="font-size:19px;"></iconify-icon>
         지금 바로 상담하기
@@ -318,22 +370,29 @@
       </a>
     </div>
 
+    <!-- 버튼 바로 아래에서 부담을 덜어준다 — 무엇을 알려주면 되는지, 비용은 드는지 -->
+    <p class="reveal" style="margin:0 0 3.25rem;font-size:.88rem;color:#8b8b93;line-height:1.7;max-width:34rem;">
+      <strong style="color:#d4d4d8;font-weight:700;">날짜 · 장소 · 예상 인원</strong>만 알려주시면
+      <strong style="color:#d4d4d8;font-weight:700;">당일 안에</strong> 개략 견적을 드립니다.
+      상담과 견적은 무료입니다.
+    </p>
+
     <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:1rem;overflow:hidden;max-width:46rem;">
       <div style="background:#0a0a0b;padding:1.35rem 1.25rem;">
         <div style="font-size:1.85rem;font-weight:900;letter-spacing:-.03em;white-space:nowrap;" class="accent-grad">100+</div>
-        <div style="font-size:.78rem;color:#71717a;margin-top:.2rem;">연간 진행 행사</div>
+        <div style="font-size:.78rem;color:#8b8b93;margin-top:.2rem;">연간 진행 행사</div>
       </div>
       <div style="background:#0a0a0b;padding:1.35rem 1.25rem;">
         <div style="font-size:1.85rem;font-weight:900;letter-spacing:-.03em;white-space:nowrap;" class="accent-grad">ALL-IN-1</div>
-        <div style="font-size:.78rem;color:#71717a;margin-top:.2rem;">음향·조명·LED·무대</div>
+        <div style="font-size:.78rem;color:#8b8b93;margin-top:.2rem;">음향·조명·LED·무대</div>
       </div>
       <div style="background:#0a0a0b;padding:1.35rem 1.25rem;">
         <div style="font-size:1.85rem;font-weight:900;letter-spacing:-.03em;white-space:nowrap;" class="accent-grad">400"</div>
-        <div style="font-size:.78rem;color:#71717a;margin-top:.2rem;">LED 대형 스크린</div>
+        <div style="font-size:.78rem;color:#8b8b93;margin-top:.2rem;">LED 대형 스크린</div>
       </div>
       <div style="background:#0a0a0b;padding:1.35rem 1.25rem;">
         <div style="font-size:1.85rem;font-weight:900;letter-spacing:-.03em;white-space:nowrap;" class="accent-grad">FBT</div>
-        <div style="font-size:.78rem;color:#71717a;margin-top:.2rem;">라인어레이 음향 보유</div>
+        <div style="font-size:.78rem;color:#8b8b93;margin-top:.2rem;">라인어레이 음향 보유</div>
       </div>
     </div>
   </div>
@@ -379,7 +438,7 @@
 ══════════════════════════════════════════════════ -->
 <section id="about" style="padding:7rem 1.5rem;">
   <div style="max-width:80rem;margin:0 auto;">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(20rem,1fr));gap:4rem;align-items:center;">
+    <div class="stack-tight" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(20rem,1fr));gap:4rem;align-items:center;">
 
       <div class="reveal">
         <span class="eyebrow">About us</span>
@@ -408,7 +467,7 @@
       </div>
 
       <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;">
-        <img src="photos/festival-night-crowd.jpg" alt="야간 축제 무대와 관객석"
+        <img src="photos/nokdong-drone-violin.jpg" alt="녹동항 드론쇼 버스킹 무대 공연"
              style="grid-column:span 2;width:100%;height:100%;min-height:14rem;object-fit:cover;border-radius:1.1rem;">
         <img src="photos/ceremony-indoor.jpg" alt="실내 기념식 음향 오퍼레이팅"
              style="width:100%;height:100%;min-height:10rem;object-fit:cover;border-radius:1.1rem;">
@@ -495,9 +554,52 @@
 
     </div>
 
-    <p class="reveal" style="text-align:center;color:#71717a;font-size:.9rem;margin-top:2.25rem;">
+    <p class="reveal" style="text-align:center;color:#8b8b93;font-size:.9rem;margin-top:2.25rem;">
       단일 품목 렌탈만도 가능합니다 — 음향만, 조명만, LED만 필요하셔도 편하게 문의 주세요.
     </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     규격 — "어디까지 되나요"에 숫자로 답하는 자리
+     (윗쪽 서비스 카드와 내용이 겹치지 않도록, 숫자만 둔다)
+══════════════════════════════════════════════════ -->
+<section id="spec" style="padding:0 1.5rem 6rem;" class="spec-band">
+  <div style="max-width:80rem;margin:0 auto;">
+    <div class="reveal glass card-tight" style="border-radius:1.5rem;padding:2.5rem 2.25rem;">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:.9rem;margin-bottom:2rem;">
+        <span style="font-size:.72rem;letter-spacing:.2em;color:#F87171;font-weight:700;">SPEC</span>
+        <h3 style="font-size:1.15rem;font-weight:800;letter-spacing:-.025em;margin:0;">어디까지 되는지, 숫자로 말씀드립니다</h3>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1.9rem 2rem;">
+        <div>
+          <div style="font-size:.76rem;font-weight:700;color:#F87171;letter-spacing:.04em;margin-bottom:.55rem;">LED 전광판</div>
+          <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;line-height:1.3;">200 · 300 · 400<span style="font-size:.95rem;font-weight:700;color:#a1a1aa;">인치</span></div>
+          <div style="font-size:.82rem;color:#8b8b93;margin-top:.4rem;line-height:1.7;">실내외 겸용 · 대형 행사</div>
+        </div>
+        <div>
+          <div style="font-size:.76rem;font-weight:700;color:#F87171;letter-spacing:.04em;margin-bottom:.55rem;">조립식 무대</div>
+          <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;line-height:1.3;">10 · 20 · 30 · 40<span style="font-size:.95rem;font-weight:700;color:#a1a1aa;">평 이상</span></div>
+          <div style="font-size:.82rem;color:#8b8b93;margin-top:.4rem;line-height:1.7;">높이 30~120cm 현장 조정</div>
+        </div>
+        <div>
+          <div style="font-size:.76rem;font-weight:700;color:#F87171;letter-spacing:.04em;margin-bottom:.55rem;">트러스 · 텐트</div>
+          <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;line-height:1.3;">4m×8m<span style="font-size:.95rem;font-weight:700;color:#a1a1aa;"> 백드롭</span></div>
+          <div style="font-size:.82rem;color:#8b8b93;margin-top:.4rem;line-height:1.7;">자바라 3×3 · 3×6m · 몽골텐트</div>
+        </div>
+        <div>
+          <div style="font-size:.76rem;font-weight:700;color:#F87171;letter-spacing:.04em;margin-bottom:.55rem;">전원</div>
+          <div style="font-size:1.35rem;font-weight:900;letter-spacing:-.03em;line-height:1.3;">발전차<span style="font-size:.95rem;font-weight:700;color:#a1a1aa;"> 준비</span></div>
+          <div style="font-size:.82rem;color:#8b8b93;margin-top:.4rem;line-height:1.7;">전원 확보 어려운 야외 현장</div>
+        </div>
+      </div>
+
+      <p style="margin:2rem 0 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.07);font-size:.88rem;color:#8b8b93;line-height:1.75;">
+        규모가 이보다 크거나 애매하시면 그것도 말씀해 주세요 — 현장을 보고 맞춰 드립니다.
+        품목별 상세 구성은 <a href="quote.html" style="color:#F87171;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(248,113,113,.4);">견적 페이지</a>에서 직접 골라보실 수 있습니다.
+      </p>
+    </div>
   </div>
 </section>
 
@@ -516,7 +618,63 @@
       </p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:3rem;">
+    <!-- ── 대표 사례 ──
+         이력 11건이 전부 같은 굵기로 나열되면 눈이 갈 곳이 없다.
+         가장 큰 행사 하나를 크게 세워 나머지의 기준점으로 삼는다. -->
+    <a href="#gallery" class="reveal case" style="display:grid;grid-template-columns:1.05fr .95fr;gap:0;
+       border-radius:1.5rem;overflow:hidden;border:1px solid rgba(239,68,68,.28);
+       background:linear-gradient(140deg,rgba(239,68,68,.09),rgba(245,158,11,.045) 55%,transparent);
+       text-decoration:none;color:inherit;margin-bottom:4rem;transition:border-color .4s,transform .4s cubic-bezier(.16,1,.3,1);"
+       onmouseover="this.style.borderColor='rgba(239,68,68,.6)';this.style.transform='translateY(-4px)'"
+       onmouseout="this.style.borderColor='rgba(239,68,68,.28)';this.style.transform='none'">
+
+      <div style="padding:2.75rem 2.5rem;display:flex;flex-direction:column;justify-content:center;">
+        <div style="display:inline-flex;align-items:center;gap:.45rem;align-self:flex-start;
+                    padding:.35rem .8rem;border-radius:9999px;background:#EF4444;color:#0a0a0a;
+                    font-size:.7rem;font-weight:800;letter-spacing:.08em;margin-bottom:1.25rem;">
+          <iconify-icon icon="solar:star-bold" style="font-size:13px;"></iconify-icon>
+          대표 사례
+        </div>
+
+        <h3 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;letter-spacing:-.04em;line-height:1.2;margin:0 0 .85rem;">
+          녹동바다불꽃축제
+        </h3>
+        <p style="font-size:.95rem;line-height:1.75;color:#a1a1aa;margin:0 0 1.75rem;">
+          고흥 녹동항의 대표 축제입니다. 제24회(2025)와 제25회(2026)를
+          <strong style="color:#fff;font-weight:700;">2년 연속 전체 대행</strong>했습니다.
+          무대 설치부터 음향 · 조명 · LED · 특수효과, 그리고 3일간의 현장 운영과 철수까지
+          한 팀이 맡았습니다.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(3,auto);gap:1.75rem;justify-content:start;margin-bottom:1.75rem;">
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:#F87171;">2년</div>
+            <div style="font-size:.74rem;color:#8b8b93;margin-top:.15rem;">연속 전체 대행</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:#F87171;">3일</div>
+            <div style="font-size:.74rem;color:#8b8b93;margin-top:.15rem;">연속 현장 운영</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:#F87171;">전 부문</div>
+            <div style="font-size:.74rem;color:#8b8b93;margin-top:.15rem;">음향·조명·LED·무대</div>
+          </div>
+        </div>
+
+        <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.88rem;font-weight:700;color:#F87171;">
+          현장 사진 보기
+          <iconify-icon icon="solar:alt-arrow-right-linear" style="font-size:15px;"></iconify-icon>
+        </span>
+      </div>
+
+      <div style="position:relative;min-height:20rem;">
+        <img src="photos/festival-night-crowd.jpg" alt="녹동바다불꽃축제 야간 무대와 관객석"
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,#0a0a0b 0%,rgba(10,10,11,.35) 38%,transparent 100%);"></div>
+      </div>
+    </a>
+
+    <div class="stack-tight" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));gap:3rem;">
 
       <!-- 2026 -->
       <div class="reveal">
@@ -528,37 +686,43 @@
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">07.20</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">제23회 고흥군 농업경영인 대회</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 · LED · 무대 · 특수효과 · 퍼포먼스</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 · LED · 무대 · 특수효과 · 퍼포먼스</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">07.11</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">한마음선원 목포지원 새 도량 기공법회</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">전체 행사대행 · 1·2층 음향 · LED 300인치 · 트러스 4m×8m · 자바라 텐트</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">전체 행사대행 · 1·2층 음향 · LED 300인치 · 트러스 4m×8m · 자바라 텐트</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">06.14</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">병오생 연합잔치</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 · LED 전광판</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 · LED 전광판</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">06.06</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">2026 고흥 녹동항 드론쇼</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 렌탈 · 현장 운영</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 렌탈 · 현장 운영</div>
+        </div>
+
+        <div class="tl-item">
+          <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">05.01–03</div>
+          <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">제25회 녹동바다불꽃축제</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">전체 행사대행 · 음향 · 조명 · LED · 특수효과 · 무대 <span style="color:#a1a1aa;">(2년 연속 진행)</span></div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">03.25</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">원광대학교 공공인재대학 해오름식</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 · 조명 · 특수효과 <span style="color:#a1a1aa;">(2년 연속 진행)</span></div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 · 조명 · 특수효과 <span style="color:#a1a1aa;">(2년 연속 진행)</span></div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">03.03</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">과역 석촌마을 달집태우기 (정월대보름)</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 · 조명 · LED 스크린 · 무대 설치</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 · 조명 · LED 스크린 · 무대 설치</div>
         </div>
       </div>
 
@@ -571,31 +735,31 @@
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">08.23</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">부산코러스합창단 여름 야유회</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">경남 함양 · 음향 · 조명 렌탈</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">경남 함양 · 음향 · 조명 렌탈</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">07.25</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">고흥 녹동항 드론쇼 버스킹</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">음향 · 조명 · 특수효과 · 공연 구성</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">음향 · 조명 · 특수효과 · 공연 구성</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">05.01–03</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">제24회 녹동바다불꽃축제</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">전체 행사대행 · 음향 · 조명 · LED · 특수효과 · 무대</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">전체 행사대행 · 음향 · 조명 · LED · 특수효과 · 무대</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#EF4444;font-weight:700;letter-spacing:.06em;">04.19</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">2025 평화통일기원 걷기대회</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">행사대행 · 음향 · 무대</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">행사대행 · 음향 · 무대</div>
         </div>
 
         <div class="tl-item">
           <div style="font-size:.72rem;color:#52525b;font-weight:700;letter-spacing:.06em;">상시</div>
           <div style="font-weight:700;letter-spacing:-.01em;margin-top:.2rem;">녹동사슴골 쌈지마켓 · 지역 장미축제 외</div>
-          <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">마을 행사 · 플리마켓 · 버스킹 무대 다수</div>
+          <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">마을 행사 · 플리마켓 · 버스킹 무대 다수</div>
         </div>
       </div>
 
@@ -760,10 +924,10 @@
       <a href="upload.html" id="gal-upload"
          style="display:inline-flex;align-items:center;gap:.4rem;padding:.9rem 1.4rem;
                 border-radius:9999px;border:1px dashed rgba(255,255,255,.16);
-                color:#71717a;font-size:.85rem;font-weight:600;text-decoration:none;
+                color:#8b8b93;font-size:.85rem;font-weight:600;text-decoration:none;
                 transition:color .25s,border-color .25s;"
          onmouseover="this.style.color='#d4d4d8';this.style.borderColor='rgba(255,255,255,.34)'"
-         onmouseout="this.style.color='#71717a';this.style.borderColor='rgba(255,255,255,.16)'">
+         onmouseout="this.style.color='#8b8b93';this.style.borderColor='rgba(255,255,255,.16)'">
         <iconify-icon icon="solar:gallery-add-bold" style="font-size:17px;"></iconify-icon>
         사진 올리기
       </a>
@@ -784,26 +948,133 @@
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;">
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
         <div style="font-size:2.6rem;font-weight:900;letter-spacing:-.06em;color:rgba(239,68,68,.28);line-height:1;">01</div>
         <h3 style="font-weight:800;letter-spacing:-.02em;margin:.9rem 0 .55rem;">상담 · 견적</h3>
         <p style="font-size:.9rem;line-height:1.7;color:#a1a1aa;">행사 일정, 장소, 인원, 예산을 알려주시면 당일 내 개략 견적을 드립니다.</p>
       </div>
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
         <div style="font-size:2.6rem;font-weight:900;letter-spacing:-.06em;color:rgba(239,68,68,.28);line-height:1;">02</div>
         <h3 style="font-weight:800;letter-spacing:-.02em;margin:.9rem 0 .55rem;">현장 답사 · 설계</h3>
         <p style="font-size:.9rem;line-height:1.7;color:#a1a1aa;">직접 현장을 확인해 전원, 동선, 무대 위치, 장비 물량을 확정합니다.</p>
       </div>
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
         <div style="font-size:2.6rem;font-weight:900;letter-spacing:-.06em;color:rgba(239,68,68,.28);line-height:1;">03</div>
         <h3 style="font-weight:800;letter-spacing:-.02em;margin:.9rem 0 .55rem;">설치 · 리허설</h3>
         <p style="font-size:.9rem;line-height:1.7;color:#a1a1aa;">행사 전 충분한 시간을 두고 설치하고, 사운드 체크와 큐시트 리허설을 진행합니다.</p>
       </div>
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.75rem 1.5rem;">
         <div style="font-size:2.6rem;font-weight:900;letter-spacing:-.06em;color:rgba(239,68,68,.28);line-height:1;">04</div>
         <h3 style="font-weight:800;letter-spacing:-.02em;margin:.9rem 0 .55rem;">현장 운영 · 철수</h3>
         <p style="font-size:.9rem;line-height:1.7;color:#a1a1aa;">담당 오퍼레이터가 끝까지 상주하고, 행사 종료 후 정리·철수까지 마칩니다.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     FAQ — 문의 전에 실제로 걸리는 것들
+
+     ▸ 문답을 고치거나 추가하려면 <details class="faq"> 블록을
+       통째로 복사해 질문(summary)과 답(p)만 바꾸면 됩니다.
+══════════════════════════════════════════════════ -->
+<section id="faq" style="padding:5rem 1.5rem 7rem;border-top:1px solid rgba(255,255,255,.06);">
+  <div style="max-width:52rem;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:2.75rem;">
+      <span class="eyebrow">FAQ</span>
+      <h2 style="font-size:clamp(2rem,4.5vw,3.1rem);font-weight:900;letter-spacing:-.04em;margin-top:1rem;">
+        문의 전에 <span class="accent-grad">궁금하신 것</span>
+      </h2>
+      <p style="color:#a1a1aa;margin-top:.9rem;font-size:1rem;">
+        담당자님들께서 가장 많이 물어보시는 내용을 모았습니다.
+      </p>
+    </div>
+
+    <div class="reveal" style="display:flex;flex-direction:column;gap:.7rem;">
+
+      <details class="faq">
+        <summary>견적은 얼마나 걸리나요?</summary>
+        <p>
+          날짜 · 장소 · 예상 인원, 이 세 가지만 알려주시면
+          <strong>당일 안에</strong> 개략 견적을 드립니다.
+          정확한 금액은 현장 답사로 전원과 동선, 장비 물량을 확정한 뒤 확정 견적으로 다시 드립니다.
+          상담과 견적에는 비용이 들지 않습니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>필요한 것 하나만 빌릴 수도 있나요?</summary>
+        <p>
+          가능합니다. 음향만, 조명만, LED 전광판만 필요하셔도 편하게 문의 주세요.
+          전체 대행이 아니어도 단일 품목 렌탈로 진행해 드립니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>전남 밖으로도 나가시나요?</summary>
+        <p>
+          전국 출장 가능합니다. 전남 고흥 · 목포를 기반으로 하지만
+          경남 함양(부산코러스합창단 야유회), 전북 익산(원광대학교 해오름식) 등
+          타 지역 행사도 진행해 왔습니다.
+          거리에 따른 출장비는 견적서에 별도 항목으로 표시해 드립니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>비가 오면 어떻게 되나요?</summary>
+        <p>
+          야외 행사는 계약 전에 우천 시 기준(그대로 진행 / 축소 / 연기)을 먼저 함께 정합니다.
+          자바라 텐트와 몽골텐트로 무대와 음향 · 조명 콘솔을 덮는 우천 대비 구성도
+          견적에 함께 넣어 드릴 수 있습니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>설치와 철수도 포함인가요?</summary>
+        <p>
+          네. 장비 설치와 행사 후 철수는 기본으로 포함됩니다.
+          운반 · 설치 인건비와 출장비처럼 규모에 따라 달라지는 항목은
+          견적서에 별도 줄로 표시해, 무엇에 얼마가 드는지 보이도록 드립니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>행사 당일에 담당자가 현장에 있나요?</summary>
+        <p>
+          담당 오퍼레이터가 설치부터 철수까지 현장에 상주합니다.
+          행사 전 사운드 체크와 큐시트 리허설을 함께 진행하기 때문에,
+          담당자님은 행사 진행만 보시면 됩니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>전기는 어떻게 하나요?</summary>
+        <p>
+          현장 전원을 먼저 확인합니다. 답사 때 사용 가능한 용량을 점검하고,
+          전원 확보가 어려운 야외 현장은 발전차를 함께 준비해 드립니다.
+          이 경우에도 별도 항목으로 견적에 명시합니다.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>무대는 어느 규모까지 가능한가요?</summary>
+        <p>
+          조립식 무대는 10평 · 20평 · 30평 · 40평 이상까지 구성 가능하며,
+          높이는 30~120cm 범위에서 현장에 맞춰 정합니다.
+          백드롭 트러스, 포토존 구조물, LED 전광판은 최대 400인치까지 함께 시공합니다.
+        </p>
+      </details>
+
+    </div>
+
+    <div class="reveal" style="margin-top:2.5rem;text-align:center;">
+      <p style="color:#8b8b93;font-size:.92rem;margin-bottom:1.1rem;">
+        찾으시는 답이 없으시면 편하게 물어봐 주세요.
+      </p>
+      <a href="quote.html" class="btn-ghost" style="padding:.9rem 1.9rem;font-size:.92rem;">
+        <iconify-icon icon="solar:chat-round-line-bold" style="font-size:18px;"></iconify-icon>
+        견적 · 문의 남기기
+      </a>
     </div>
   </div>
 </section>
@@ -822,26 +1093,26 @@
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem;">
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
         <iconify-icon icon="solar:users-group-rounded-bold" style="font-size:26px;color:#F87171;"></iconify-icon>
         <div style="font-weight:800;margin-top:.75rem;letter-spacing:-.02em;">전라남도이벤트협동조합</div>
-        <div style="font-size:.8rem;color:#71717a;margin-top:.3rem;">조합장 이영훈</div>
+        <div style="font-size:.8rem;color:#8b8b93;margin-top:.3rem;">조합장 이영훈</div>
       </div>
-      <a href="../index.html" class="glass reveal" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;text-decoration:none;color:inherit;display:block;transition:border-color .3s;"
+      <a href="../index.html" class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;text-decoration:none;color:inherit;display:block;transition:border-color .3s;"
          onmouseover="this.style.borderColor='rgba(239,68,68,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
         <iconify-icon icon="solar:confetti-minimalistic-bold" style="font-size:26px;color:#F87171;"></iconify-icon>
         <div style="font-weight:800;margin-top:.75rem;letter-spacing:-.02em;">큰길이벤트기획</div>
-        <div style="font-size:.8rem;color:#71717a;margin-top:.3rem;">행사 기획 · 연출 파트너</div>
+        <div style="font-size:.8rem;color:#8b8b93;margin-top:.3rem;">행사 기획 · 연출 파트너</div>
       </a>
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
         <iconify-icon icon="solar:music-notes-bold" style="font-size:26px;color:#F87171;"></iconify-icon>
         <div style="font-weight:800;margin-top:.75rem;letter-spacing:-.02em;">벨라르떼앙상블 · 이벨리</div>
-        <div style="font-size:.8rem;color:#71717a;margin-top:.3rem;">연주 · 공연 팀</div>
+        <div style="font-size:.8rem;color:#8b8b93;margin-top:.3rem;">연주 · 공연 팀</div>
       </div>
-      <div class="glass reveal" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
+      <div class="glass reveal card-tight" style="border-radius:1.1rem;padding:1.6rem 1.4rem;text-align:center;">
         <iconify-icon icon="solar:microphone-large-bold" style="font-size:26px;color:#F87171;"></iconify-icon>
         <div style="font-weight:800;margin-top:.75rem;letter-spacing:-.02em;">전문 사회자 · 아티스트</div>
-        <div style="font-size:.8rem;color:#71717a;margin-top:.3rem;">전자바이올린 · MC · 댄스팀</div>
+        <div style="font-size:.8rem;color:#8b8b93;margin-top:.3rem;">전자바이올린 · MC · 댄스팀</div>
       </div>
     </div>
   </div>
@@ -878,22 +1149,22 @@
       <div style="background:#0a0a0b;padding:1.6rem 1.5rem;">
         <div style="font-size:.7rem;letter-spacing:.16em;color:#F87171;font-weight:700;">REPRESENTATIVE</div>
         <div style="font-weight:800;margin-top:.6rem;letter-spacing:-.02em;">이영훈 대표</div>
-        <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">전라남도이벤트협동조합 조합장</div>
+        <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">전라남도이벤트협동조합 조합장</div>
       </div>
       <div style="background:#0a0a0b;padding:1.6rem 1.5rem;">
         <div style="font-size:.7rem;letter-spacing:.16em;color:#F87171;font-weight:700;">TEL</div>
         <a href="tel:01086239294" style="display:block;font-weight:800;margin-top:.6rem;letter-spacing:-.02em;color:#fff;text-decoration:none;">010-8623-9294</a>
-        <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">연중무휴 상담</div>
+        <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">연중무휴 상담</div>
       </div>
       <div style="background:#0a0a0b;padding:1.6rem 1.5rem;">
         <div style="font-size:.7rem;letter-spacing:.16em;color:#F87171;font-weight:700;">E-MAIL</div>
         <a href="mailto:iau1032@naver.com" style="display:block;font-weight:800;margin-top:.6rem;letter-spacing:-.02em;color:#fff;text-decoration:none;word-break:break-all;">iau1032@naver.com</a>
-        <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">견적 요청 · 서류 접수</div>
+        <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">견적 요청 · 서류 접수</div>
       </div>
       <div style="background:#0a0a0b;padding:1.6rem 1.5rem;">
         <div style="font-size:.7rem;letter-spacing:.16em;color:#F87171;font-weight:700;">AREA</div>
         <div style="font-weight:800;margin-top:.6rem;letter-spacing:-.02em;">전남 고흥 · 목포 기반</div>
-        <div style="font-size:.85rem;color:#71717a;margin-top:.25rem;">전국 출장 가능</div>
+        <div style="font-size:.85rem;color:#8b8b93;margin-top:.25rem;">전국 출장 가능</div>
       </div>
     </div>
 
@@ -936,14 +1207,15 @@
       <span style="display:grid;place-items:center;width:2.1rem;height:2.1rem;border-radius:.6rem;background:linear-gradient(135deg,#EF4444,#F59E0B);font-weight:900;font-size:.78rem;color:#0a0a0a;">YM</span>
       <span style="font-size:.9rem;font-weight:700;letter-spacing:-.02em;">YM토탈이벤트</span>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:1.5rem;font-size:.85rem;color:#71717a;">
-      <a href="#about"   style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">회사소개</a>
-      <a href="#service" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">서비스</a>
-      <a href="#work"    style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">행사이력</a>
-      <a href="#gallery" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">갤러리</a>
-      <a href="quote.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">견적</a>
-      <a href="quote.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">견적 · 문의</a>
-      <a href="../index.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#71717a'">큰길이벤트기획</a>
+    <div style="display:flex;flex-wrap:wrap;gap:1.5rem;font-size:.85rem;color:#8b8b93;">
+      <a href="#about"   style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">회사소개</a>
+      <a href="#service" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">서비스</a>
+      <a href="#work"    style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">행사이력</a>
+      <a href="#gallery" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">갤러리</a>
+      <a href="#faq"     style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">자주 묻는 질문</a>
+      <a href="#partner" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">파트너</a>
+      <a href="quote.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">견적 · 문의</a>
+      <a href="../index.html" style="color:inherit;text-decoration:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#8b8b93'">큰길이벤트기획</a>
     </div>
   </div>
   <div style="max-width:80rem;margin:1.75rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;font-size:.75rem;color:#3f3f46;">
