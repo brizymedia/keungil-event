@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>지수양 프로필 — A4 한장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Gowun+Batang:wght@400;700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#06070f; --ink-2:#0d1122; --panel:#11162c;
+  --cream:#f3ead9; --mute:#9aa0b8;
+  --g1:#fff3c9; --g2:#f0cd77; --g3:#c9992f; --g4:#7d5c12;
+  --neon-m:#ff2e93; --neon-c:#35dcff;
+  --f-disp:'Gasoek One',serif; --f-serif:'Gowun Batang',serif;
+  --f-body:'Pretendard Variable',Pretendard,sans-serif; --f-lat:'Bodoni Moda',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{ background:#333; font-family:var(--f-body); -webkit-font-smoothing:antialiased; }
+
+.page{
+  width:210mm; height:297mm; margin:0 auto; position:relative; overflow:hidden;
+  background:
+    radial-gradient(ellipse 70% 40% at 82% 0%, rgba(201,153,47,.20), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 8% 100%, rgba(255,46,147,.13), transparent 65%),
+    linear-gradient(170deg,#0a0d1c 0%, #06070f 46%, #090c1a 100%);
+  color:var(--cream); display:flex; flex-direction:column;
+}
+.page::after{ /* 금박 테두리 */
+  content:''; position:absolute; inset:5mm; pointer-events:none; z-index:5;
+  border:.6pt solid rgba(240,205,119,.32);
+}
+.foil{
+  background:linear-gradient(100deg,var(--g4) 0%,var(--g2) 18%,var(--g1) 32%,var(--g3) 46%,var(--g1) 60%,var(--g2) 74%,var(--g4) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* ── 헤더 ── */
+.hd{ padding:11mm 12mm 0; position:relative; z-index:2; }
+.hd__row{ display:flex; align-items:flex-end; justify-content:space-between; gap:6mm; }
+.hd__name{ font-family:var(--f-disp); font-size:23mm; line-height:.9; letter-spacing:.02em;
+  filter:drop-shadow(0 1mm 4mm rgba(201,153,47,.45)); }
+.hd__en{ font-family:var(--f-lat); font-style:italic; font-size:3.4mm; letter-spacing:.5em;
+  color:var(--g3); margin-top:2.4mm; }
+.hd__badge{ text-align:right; }
+.hd__label{ font-family:var(--f-lat); font-size:2.7mm; letter-spacing:.28em; color:var(--g3); }
+.hd__tag{ font-family:var(--f-serif); font-weight:700; font-size:6.4mm; line-height:1.34;
+  color:var(--g1); margin-top:1.6mm; }
+.hd__rule{ height:.5mm; margin:5mm 0 0;
+  background:linear-gradient(90deg,var(--g3),var(--g1) 22%,var(--neon-m) 55%,var(--neon-c) 78%,transparent); }
+
+/* ── 본문 ── */
+.body{ flex:1; display:grid; grid-template-columns:56mm 1fr; gap:6mm;
+  padding:6mm 12mm 0; position:relative; z-index:2; min-height:0; }
+
+/* 왼쪽 열 */
+.photo{ position:relative; border:.5pt solid rgba(240,205,119,.42); }
+.photo img{ width:100%; aspect-ratio:4/5; object-fit:cover; display:block; }
+.photo::after{ content:''; position:absolute; inset:1.6mm; border:.4pt solid rgba(240,205,119,.3); }
+
+.spec{ margin-top:4mm; border-top:.5pt solid rgba(240,205,119,.28); }
+.spec div{ display:flex; gap:2.5mm; padding:1.9mm 0; border-bottom:.4pt solid rgba(255,255,255,.07); }
+.spec dt{ font-size:2.7mm; letter-spacing:.06em; color:var(--g3); min-width:13mm; padding-top:.3mm; }
+.spec dd{ font-size:3.1mm; color:#e2e5f0; font-weight:500; flex:1; line-height:1.42; }
+
+.hits{ margin-top:4.5mm; }
+.hits__t{ font-family:var(--f-serif); font-weight:700; font-size:4.2mm; color:var(--g1);
+  padding-bottom:1.6mm; border-bottom:.5pt solid rgba(240,205,119,.3); }
+.hits ol{ list-style:none; margin-top:2mm; }
+.hits li{ display:flex; align-items:baseline; gap:2mm; padding:1.5mm 0; }
+.hits .y{ font-family:var(--f-lat); font-size:2.8mm; color:var(--g3); min-width:8mm; }
+.hits .s{ font-size:3.3mm; color:#dfe3ef; font-weight:500; }
+.hits li:first-child .s{ color:var(--g1); font-weight:700; }
+.hits li:first-child .s::after{ content:'NEW'; font-family:var(--f-lat); font-size:2.1mm;
+  letter-spacing:.1em; color:var(--neon-m); margin-left:1.6mm; vertical-align:.6mm; }
+
+/* 오른쪽 열 */
+.right{ display:flex; flex-direction:column; gap:4.4mm; min-height:0; }
+.blk__t{ display:flex; align-items:center; gap:2.4mm; margin-bottom:2.4mm; }
+.blk__t b{ font-family:var(--f-serif); font-weight:700; font-size:4.4mm; color:var(--g1); white-space:nowrap; }
+.blk__t i{ flex:1; height:.4pt; background:linear-gradient(90deg,rgba(240,205,119,.5),transparent); }
+.blk__t em{ font-family:var(--f-lat); font-style:italic; font-size:2.5mm; letter-spacing:.2em; color:var(--g4); }
+
+.rows{ list-style:none; }
+.rows li{ display:flex; gap:3mm; align-items:baseline; padding:1.45mm 0;
+  border-bottom:.4pt dotted rgba(255,255,255,.12); }
+.rows li:last-child{ border-bottom:0; }
+.rows .k{ font-family:var(--f-lat); font-size:2.8mm; color:var(--g3); min-width:11mm; letter-spacing:.04em; }
+.rows .v{ font-size:3.15mm; color:#dde1ee; flex:1; line-height:1.44; }
+.rows .v b{ color:var(--g2); font-weight:700; }
+
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:4mm 6mm; }
+
+.awards{ list-style:none; }
+.awards li{ display:flex; gap:2.4mm; align-items:baseline; padding:1.35mm 0; }
+.awards li::before{ content:'✦'; color:var(--g3); font-size:2.2mm; }
+.awards .v{ font-size:3.1mm; color:#dde1ee; flex:1; line-height:1.4; }
+.awards li:first-child .v{ color:var(--g1); font-weight:700; }
+
+.chips{ display:flex; flex-wrap:wrap; gap:1.8mm; }
+.chips span{ font-size:2.85mm; padding:1.3mm 2.8mm; border:.4pt solid rgba(240,205,119,.34);
+  color:#e7e2d4; background:rgba(240,205,119,.05); }
+
+/* ── 푸터 ── */
+.ft{ margin:5mm 12mm 9mm; padding:4.6mm 5.5mm; position:relative; z-index:2;
+  display:flex; align-items:center; gap:5.5mm;
+  background:linear-gradient(100deg, rgba(201,153,47,.19), rgba(11,14,28,.5) 62%);
+  border:.5pt solid rgba(240,205,119,.42); }
+.ft__l{ flex:1; }
+.ft__k{ font-family:var(--f-lat); font-size:2.7mm; letter-spacing:.26em; color:var(--g3); }
+.ft__p{ font-family:var(--f-lat); font-weight:700; font-size:11mm; line-height:1.06;
+  color:var(--g1); letter-spacing:.01em; margin:1mm 0 1.4mm; }
+.ft__s{ font-size:2.9mm; color:#b2b8cc; }
+.ft__qr{ text-align:center; }
+.ft__qr img{ width:20mm; height:20mm; padding:1.4mm; background:#f6efe2; display:block; }
+.ft__qr span{ display:block; font-size:2.3mm; letter-spacing:.08em; color:var(--g3); margin-top:1.4mm; }
+
+/* ── 인쇄 / PDF ── */
+@page{ size:A4 portrait; margin:0; }
+@media print{
+  body{ background:#fff; }
+  .page{ margin:0; box-shadow:none; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+
+  <header class="hd">
+    <div class="hd__row">
+      <div>
+        <div class="hd__name foil">지수양</div>
+        <div class="hd__en">JI SUYANG</div>
+      </div>
+      <div class="hd__badge">
+        <div class="hd__label">TROT SINGER · PROFILE 2026</div>
+        <div class="hd__tag">카리스마 넘치는 창법의<br>트로트 여왕</div>
+      </div>
+    </div>
+    <div class="hd__rule"></div>
+  </header>
+
+  <main class="body">
+    <!-- 왼쪽 -->
+    <div>
+      <figure class="photo"><img src="assets/profile.jpg" alt="가수 지수양"></figure>
+
+      <dl class="spec">
+        <div><dt>장르</dt><dd>성인가요 · 트로트</dd></div>
+        <div><dt>데뷔</dt><dd>2018년 「달아 달아」</dd></div>
+        <div><dt>거점</dt><dd>전남 고흥 · 전국 활동</dd></div>
+        <div><dt>채널</dt><dd>유튜브 「가수 지수양」<br>무대 영상 368편</dd></div>
+      </dl>
+
+      <div class="hits">
+        <div class="hits__t">대표곡</div>
+        <ol>
+          <li><span class="y">2025</span><span class="s">사랑을 하는걸까</span></li>
+          <li><span class="y">2021</span><span class="s">우연한 만남</span></li>
+          <li><span class="y">2020</span><span class="s">깍쟁이 내사랑</span></li>
+          <li><span class="y">2018</span><span class="s">달아 달아</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- 오른쪽 -->
+    <div class="right">
+
+      <section>
+        <div class="blk__t"><b>음반</b><i></i><em>DISCOGRAPHY</em></div>
+        <ul class="rows">
+          <li><span class="k">2025.09</span><span class="v"><b>정규 1집 「사랑을 하는걸까」</b> — 전 32트랙 수록 · 기획/유통 RIAK</span></li>
+          <li><span class="k">2021.06</span><span class="v">싱글 「우연한 만남」 — 뉴트로 복고풍 댄스트롯</span></li>
+          <li><span class="k">2020.05</span><span class="v">싱글 「깍쟁이 내사랑」 — 작사 남기선 · 작곡 송광수</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <div class="blk__t"><b>방송 출연</b><i></i><em>ON AIR</em></div>
+        <ul class="rows">
+          <li><span class="k">KBS</span><span class="v">전국 TOP10 가요쇼 (2023.1) · 아침마당 「도전! 꿈의 무대」 (2026.1) · 라디오 동포노래방 (2026.5)</span></li>
+          <li><span class="k">MBC</span><span class="v">광주교통방송 · 교통방송 3시</span></li>
+          <li><span class="k">TBN</span><span class="v">차차차 (13시) · TEN 달리는 라디오 (18시)</span></li>
+          <li><span class="k">그 외</span><span class="v">가요TV 정규 출연 (현재까지) · I net 라디오수다 (2020)</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <div class="blk__t"><b>최근 무대</b><i></i><em>2026 STAGE</em></div>
+        <ul class="rows">
+          <li><span class="k">07.30</span><span class="v">제19회 정남진 장흥 물축제</span></li>
+          <li><span class="k">07.20</span><span class="v">제23회 고흥군 농업경영인 대회</span></li>
+          <li><span class="k">06.24</span><span class="v">무안 노인일자리 힐링 콘서트</span></li>
+          <li><span class="k">05.24</span><span class="v">충남 부여 미암사 산사음악회</span></li>
+          <li><span class="k">04.30</span><span class="v">제24회 고흥 녹동 바다 불꽃축제</span></li>
+        </ul>
+      </section>
+
+      <div class="two">
+        <section>
+          <div class="blk__t"><b>수상</b><i></i></div>
+          <ul class="awards">
+            <li><span class="v">2024 제30회 대한민국 연예예술상</span></li>
+            <li><span class="v">2019 제2회 가요TV 가요대상</span></li>
+            <li><span class="v">2019 가요 창작인이 선정한 신인 가요상</span></li>
+            <li><span class="v">산수유 축제 대상</span></li>
+            <li><span class="v">전국 축제 및 그 외 다수 수상</span></li>
+          </ul>
+        </section>
+        <section>
+          <div class="blk__t"><b>가능한 무대</b><i></i></div>
+          <div class="chips">
+            <span>지역 축제</span><span>불꽃축제</span><span>기념식</span>
+            <span>이·취임식</span><span>한마음대회</span><span>힐링 콘서트</span>
+            <span>산사음악회</span><span>노래교실 강사</span><span>방송 출연</span>
+          </div>
+          <ul class="awards" style="margin-top:2.6mm">
+            <li><span class="v">고흥군 노래교실 강사 (2023 · 2024)</span></li>
+            <li><span class="v">메들리 · 요청곡 무대 진행 가능</span></li>
+          </ul>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="ft">
+    <div class="ft__l">
+      <div class="ft__k">BOOKING · 공연 문의</div>
+      <div class="ft__p">010-4177-0545</div>
+      <div class="ft__s">전국 어디든 찾아갑니다 · 큰길이벤트.com/jisuyang</div>
+    </div>
+    <div class="ft__qr">
+      <img src="assets/qr.svg" alt="지수양 홈페이지 QR">
+      <span>무대 영상 보기</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

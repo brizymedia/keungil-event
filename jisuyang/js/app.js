@@ -26,6 +26,7 @@
     try {
       await navigator.clipboard.writeText(CONFIG.phone);
       btn.textContent = '복사됨 ✓';
+      toast('전화번호를 복사했습니다');
     } catch { btn.textContent = CONFIG.phone; }
     setTimeout(() => (btn.textContent = '번호 복사'), 1800);
   });
@@ -39,6 +40,67 @@
     };
     probe.src = 'assets/profile.jpg';
   })();
+
+  /* ── 토스트 ─────────────────────────────────────── */
+  const toastEl = $('#toast');
+  let toastT;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-on');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => toastEl.classList.remove('is-on'), 2600);
+  }
+
+  /* ── 원페이지 프로필 공유 (카톡 등) ──────────────── */
+  const siteUrl = location.origin + location.pathname.replace(/index\.html$/, '');
+  const shareText =
+    `[가수 지수양 프로필]\n` +
+    `카리스마 넘치는 창법의 트로트 여왕\n` +
+    `대표곡 「사랑을 하는걸까」 (2025 정규 1집)\n\n` +
+    `섭외 문의 ${CONFIG.phone}\n` +
+    `${siteUrl}`;
+
+  $('#shareSheet').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+
+    // 1순위 — 프로필 이미지를 그대로 공유 (휴대폰: 카톡·문자 선택창)
+    try {
+      const res = await fetch('assets/profile-sheet.jpg');
+      if (res.ok) {
+        const blob = await res.blob();
+        const file = new File([blob], '지수양-프로필.jpg', { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: '가수 지수양 프로필', text: shareText });
+          btn.disabled = false;
+          return;
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') { btn.disabled = false; return; }
+    }
+
+    // 2순위 — 링크만 공유
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: '가수 지수양 프로필', text: shareText, url: siteUrl });
+        btn.disabled = false;
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') { btn.disabled = false; return; }
+      }
+    }
+
+    // 3순위 — PC: 문구 복사 + 이미지 새 창
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast('카톡에 붙여넣을 문구를 복사했습니다');
+    } catch {
+      toast('아래 「이미지 저장」으로 받아서 보내주세요');
+    }
+    window.open('assets/profile-sheet.jpg', '_blank', 'noopener');
+    btn.disabled = false;
+  });
 
   /* ── 마퀴 ───────────────────────────────────────── */
   const mqWords = [

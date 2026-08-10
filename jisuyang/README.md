@@ -8,14 +8,37 @@
 ```
 jisuyang/
 ├─ index.html          # 페이지 구조
+├─ profile-card.html   # A4 한장 프로필 원본 (이미지·PDF를 여기서 뽑습니다)
 ├─ css/style.css       # 디자인 (다크 스테이지 × 골드 포일)
 ├─ js/data.js          # ★ 내용·연락처 데이터 (여기만 고치면 됩니다)
 ├─ js/app.js           # 인터랙션
 └─ assets/
    ├─ hero.jpg         # 히어로 배경 (녹동 바다 불꽃축제 무대)
    ├─ profile.jpg      # 프로필 사진 (유튜브 공식 채널 프로필 원본)
-   └─ hero-portrait.jpg# profile.jpg 가 없을 때 쓰는 대체본
+   ├─ hero-portrait.jpg# profile.jpg 가 없을 때 쓰는 대체본
+   ├─ qr.svg           # 홈페이지 QR 코드
+   ├─ profile-sheet.jpg# ★ 카톡 전송용 한장 프로필 (1240×1754)
+   ├─ profile-sheet.png# 고해상도 원본 (1747×2471)
+   └─ profile-sheet.pdf# 인쇄용 A4 PDF
 ```
+
+## 한장 프로필 (기획사 전달용)
+
+섭외 문의 섹션에 **카톡으로 보내기 / 이미지 저장 / PDF** 버튼이 있습니다.
+
+- 휴대폰 — 「카톡으로 보내기」를 누르면 공유창이 뜨고 카카오톡을 고르면 **이미지가 그대로 전송**됩니다.
+- PC — 카톡에 붙여넣을 안내 문구가 복사되고, 이미지가 새 창으로 열립니다. 그 이미지를 카톡 창에 끌어다 놓으면 됩니다.
+
+### 내용을 고친 뒤 다시 뽑는 법
+
+`profile-card.html` 을 수정하고 로컬 서버를 띄운 뒤:
+
+```bash
+chrome --headless=new --window-size=794,1123 --force-device-scale-factor=2.2 --virtual-time-budget=12000 --screenshot=assets/profile-sheet.png http://localhost:8801/profile-card.html
+```
+
+PDF는 `--print-to-pdf=assets/profile-sheet.pdf --no-pdf-header-footer` 로 뽑고,
+카톡용 JPG는 `ffmpeg -i assets/profile-sheet.png -vf scale=1240:-1 -q:v 3 assets/profile-sheet.jpg` 로 줄입니다.
 
 ## 연락처
 
@@ -47,7 +70,7 @@ phone: '010-4177-0545',
 | 02 음반 | 대표곡 4장 카드(커서 스포트라이트) + 정규 1집 31곡 검색·랜덤 선곡 |
 | 03 무대영상 | 대표 6편 · 카테고리 필터 · 라이트박스 재생 |
 | 04 활동/수상 | 연도별 타임라인 + 수상 경력 + 방송 채널 |
-| 05 섭외문의 | 전화 연결 · 번호 복사 · 유튜브 채널 |
+| 05 섭외문의 | 한장 프로필(카톡 전송·저장·PDF) · 전화 연결 · 번호 복사 · 유튜브 채널 |
 
 ## 내용 수정 방법
 

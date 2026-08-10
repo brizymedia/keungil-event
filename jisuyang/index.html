@@ -241,6 +241,31 @@
       <p class="sec__lead">축제 · 기념식 · 노래교실 · 방송 — 전국 어디든 찾아갑니다.</p>
     </div>
 
+    <!-- 원페이지 프로필 -->
+    <div class="sheet reveal">
+      <a class="sheet__thumb" href="assets/profile-sheet.jpg" target="_blank" rel="noopener" aria-label="프로필 크게 보기">
+        <img src="assets/profile-sheet.jpg" alt="지수양 원페이지 프로필 A4" loading="lazy">
+        <span class="sheet__zoom">크게 보기</span>
+      </a>
+      <div class="sheet__body">
+        <span class="sheet__k">ONE-PAGE PROFILE</span>
+        <h3 class="sheet__title">기획사 · 행사 담당자용<br>한 장짜리 프로필</h3>
+        <p class="sheet__desc">
+          프로필과 음반, 방송 출연, 수상 경력, 최근 무대, 섭외 연락처까지
+          <b>A4 한 장</b>에 담았습니다. 카톡으로 바로 보내거나 인쇄해서 쓰실 수 있습니다.
+        </p>
+        <div class="sheet__btns">
+          <button class="btn btn--gold" id="shareSheet">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M12 3v13M12 3L7 8M12 3l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>카톡으로 보내기</span>
+          </button>
+          <a class="btn btn--ghost" href="assets/profile-sheet.jpg" download="지수양-프로필.jpg">이미지 저장</a>
+          <a class="btn btn--ghost" href="assets/profile-sheet.pdf" download="지수양-프로필.pdf">PDF (인쇄용)</a>
+        </div>
+        <p class="sheet__hint" id="shareHint">휴대폰에서는 카톡·문자로 바로 전송됩니다. PC에서는 안내 문구가 복사됩니다.</p>
+      </div>
+    </div>
+
     <div class="book reveal">
       <div class="book__card">
         <span class="book__k">공연 문의</span>
@@ -285,6 +310,7 @@
 </footer>
 
 <button class="totop" id="totop" aria-label="맨 위로">↑</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- ══════════ LIGHTBOX ══════════ -->
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="영상 재생" hidden>
