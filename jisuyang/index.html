@@ -309,7 +309,17 @@
     <!-- 리워드 -->
     <div class="rewards" id="rewards"></div>
 
-    <div class="sup">
+    <!-- 후원하기 버튼 -->
+    <div class="sup__cta reveal">
+      <button class="btn btn--gold btn--big" id="openSupport" aria-expanded="false" aria-controls="supPanel">
+        <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M12 20.5l-1.5-1.35C5.4 14.5 2.5 11.9 2.5 8.7 2.5 6.1 4.5 4 7.1 4c1.5 0 2.9.7 3.9 1.8C12 4.7 13.4 4 14.9 4c2.6 0 4.6 2.1 4.6 4.7 0 3.2-2.9 5.8-8 10.45z" fill="currentColor"/></svg>
+        <span id="openSupportTxt">후원하기</span>
+        <svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="sup__cta-hint">버튼을 누르시면 후원 계좌와 신청서가 열립니다.</p>
+    </div>
+
+    <div class="sup" id="supPanel" hidden>
       <!-- 계좌 -->
       <aside class="sup__acc reveal">
         <span class="sup__k">후원 계좌</span>

@@ -629,8 +629,33 @@ button,input{ font:inherit; color:inherit; }
 .rw__meta{ margin-top:15px; padding-top:13px; border-top:1px solid rgba(255,255,255,.08);
   font-size:11.8px; letter-spacing:.06em; color:var(--gold-3); }
 
+/* 후원하기 버튼 */
+.sup__cta{ text-align:center; margin-bottom:clamp(26px,4vw,40px); }
+.btn--big{
+  padding:19px 46px; font-size:17px; letter-spacing:.02em; border-radius:100px;
+  box-shadow:0 14px 44px -12px rgba(240,205,119,.7);
+  animation:supPulse 3.4s ease-in-out infinite;
+}
+.btn--big:hover{ transform:translateY(-3px) scale(1.02); animation-play-state:paused; }
+.btn--big .chev{ transition:transform .45s var(--ease); }
+.btn--big.is-open .chev{ transform:rotate(180deg); }
+.btn--big.is-open{ animation:none; }
+@keyframes supPulse{
+  0%,100%{ box-shadow:0 14px 44px -12px rgba(240,205,119,.7); }
+  50%{ box-shadow:0 14px 56px -8px rgba(240,205,119,.95); }
+}
+.sup__cta-hint{ margin-top:14px; font-size:13px; color:#8b91a8; transition:opacity .35s; }
+.btn--big.is-open ~ .sup__cta-hint{ opacity:0; height:0; margin:0; overflow:hidden; }
+
 /* 계좌 + 신청서 */
-.sup{ display:grid; grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr); gap:20px; align-items:start; }
+.sup{ display:grid; grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr); gap:20px;
+  align-items:start; scroll-margin-top:96px; }
+.sup[hidden]{ display:none; }
+.sup.is-open{ animation:supOpen .6s var(--ease) both; }
+@keyframes supOpen{
+  from{ opacity:0; transform:translateY(-14px); }
+  to{ opacity:1; transform:none; }
+}
 
 .sup__acc{
   padding:28px 26px; border-radius:16px; position:sticky; top:104px;

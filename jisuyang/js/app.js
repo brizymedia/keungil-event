@@ -300,6 +300,37 @@
     } catch { toast(`${BANK.name} ${BANK.number}`); }
   });
 
+  /* ── 후원하기 버튼 → 계좌·신청서 펼치기 ─────────── */
+  const supBtn = $('#openSupport'), supPanel = $('#supPanel'), supTxt = $('#openSupportTxt');
+
+  function openSupport() {
+    if (!supPanel.hidden) return;
+    supPanel.hidden = false;
+    // 패널 안의 리빌 요소는 숨겨진 동안 관찰되지 않으므로 직접 켜준다
+    $$('.reveal', supPanel).forEach(el => el.classList.add('is-in'));
+    supPanel.classList.add('is-open');
+    supBtn.classList.add('is-open');
+    supBtn.setAttribute('aria-expanded', 'true');
+    supTxt.textContent = '접기';
+    requestAnimationFrame(() => {
+      supPanel.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+    });
+  }
+
+  function closeSupport() {
+    supPanel.classList.remove('is-open');
+    supPanel.hidden = true;
+    supBtn.classList.remove('is-open');
+    supBtn.setAttribute('aria-expanded', 'false');
+    supTxt.textContent = '후원하기';
+    supBtn.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
+  }
+
+  supBtn.addEventListener('click', () => (supPanel.hidden ? openSupport() : closeSupport()));
+
+  // #support-form 으로 들어오면 바로 펼쳐준다
+  if (location.hash === '#support-form') openSupport();
+
   /* ── 후원 신청서 ───────────────────────────────── */
   const F = {
     name: $('#fName'), phone: $('#fPhone'), email: $('#fEmail'),
