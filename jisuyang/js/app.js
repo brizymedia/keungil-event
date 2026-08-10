@@ -269,6 +269,125 @@
   $('#media').innerHTML = MEDIA.map(m =>
     `<div><dt>${m.k}</dt><dd>${m.v}</dd></div>`).join('');
 
+  /* ── 후원: 리워드 · 계좌 ───────────────────────── */
+  const RW_ICONS = {
+    album: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3a9 9 0 016.4 2.7"/></svg>',
+    film:  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.4"/><path d="M7 4.5v15M17 4.5v15M2.5 12h19"/></svg>',
+  };
+  $('#rewards').innerHTML = REWARDS.map((r, i) => `
+    <article class="rw reveal" style="--d:${i * 100}ms">
+      <div class="rw__top">
+        <span class="rw__ico">${RW_ICONS[r.icon] || ''}</span>
+        <div>
+          <span class="rw__tag">${r.tag}</span>
+          <h3 class="rw__title">${r.title}</h3>
+        </div>
+      </div>
+      <p class="rw__desc">${r.desc}</p>
+      <p class="rw__meta">${r.meta}</p>
+    </article>`).join('');
+
+  const BANK = CONFIG.bank;
+  $('#acc').innerHTML = `
+    <div><dt>은행</dt><dd>${BANK.name}</dd></div>
+    <div><dt>계좌번호</dt><dd class="num">${BANK.number}</dd></div>
+    <div><dt>예금주</dt><dd>${BANK.holder}</dd></div>`;
+
+  $('#copyAcc').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(`${BANK.name} ${BANK.number} (예금주 ${BANK.holder})`);
+      toast('계좌번호를 복사했습니다');
+    } catch { toast(`${BANK.name} ${BANK.number}`); }
+  });
+
+  /* ── 후원 신청서 ───────────────────────────────── */
+  const F = {
+    name: $('#fName'), phone: $('#fPhone'), email: $('#fEmail'),
+    amount: $('#fAmount'), date: $('#fDate'), msg: $('#fMsg'), agree: $('#fAgree'),
+  };
+
+  function markBad(el, bad) {
+    el.classList.toggle('is-bad', bad);
+    if (bad) { el.focus(); el.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' }); }
+  }
+
+  function collect() {
+    const v = (el) => el.value.trim();
+
+    if (!v(F.name)) { markBad(F.name, true); toast('성함을 입력해주세요'); return null; }
+    markBad(F.name, false);
+
+    if (v(F.phone).replace(/[^0-9]/g, '').length < 9) {
+      markBad(F.phone, true); toast('연락처를 정확히 입력해주세요'); return null;
+    }
+    markBad(F.phone, false);
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v(F.email))) {
+      markBad(F.email, true); toast('이메일을 정확히 입력해주세요'); return null;
+    }
+    markBad(F.email, false);
+
+    const agreeBox = F.agree.closest('.agree');
+    if (!F.agree.checked) {
+      agreeBox.classList.add('is-bad');
+      toast('개인정보 제공에 동의해주세요');
+      F.agree.focus();
+      return null;
+    }
+    agreeBox.classList.remove('is-bad');
+
+    let t = `[가수 지수양 후원 신청]\n`;
+    t += `성함: ${v(F.name)}\n`;
+    t += `연락처: ${v(F.phone)}\n`;
+    t += `이메일: ${v(F.email)}\n`;
+    if (v(F.amount)) t += `후원 금액: ${v(F.amount)}\n`;
+    if (v(F.date))   t += `입금일: ${v(F.date)}\n`;
+    if (v(F.msg))    t += `응원 한마디: ${v(F.msg)}\n`;
+    t += `\n※ 고음질 앨범과 미공개 영상을 위 이메일로 받겠습니다.`;
+    return t;
+  }
+
+  // 문자 (iOS는 &body, 그 외는 ?body)
+  $('#sendSms').addEventListener('click', () => {
+    const body = collect();
+    if (!body) return;
+    const num = CONFIG.phone.replace(/[^0-9+]/g, '');
+    const sep = /iP(hone|ad|od)|Mac/.test(navigator.userAgent) ? '&' : '?';
+    location.href = `sms:${num}${sep}body=${encodeURIComponent(body)}`;
+  });
+
+  // 카톡 등 공유
+  $('#sendKakao').addEventListener('click', async () => {
+    const body = collect();
+    if (!body) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: '가수 지수양 후원 신청', text: body });
+        return;
+      } catch (err) { if (err.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(body);
+      toast(`신청 내용을 복사했습니다 · 카톡으로 ${CONFIG.phone} 에 보내주세요`);
+    } catch { toast('신청 내용 복사에 실패했습니다'); }
+  });
+
+  // 복사
+  $('#copyForm').addEventListener('click', async () => {
+    const body = collect();
+    if (!body) return;
+    try {
+      await navigator.clipboard.writeText(body);
+      toast('신청 내용을 복사했습니다');
+    } catch { toast('복사에 실패했습니다'); }
+  });
+
+  // 입력하면 오류 표시 해제
+  [F.name, F.phone, F.email].forEach(el =>
+    el.addEventListener('input', () => el.classList.remove('is-bad')));
+  F.agree.addEventListener('change', () =>
+    F.agree.closest('.agree').classList.toggle('is-bad', !F.agree.checked));
+
   /* ── 스크롤 리빌 ───────────────────────────────── */
   const io = new IntersectionObserver((entries) => {
     entries.forEach(en => {
