@@ -75,9 +75,38 @@
   /* 설 수 있는 무대 */
   $('#kinds').innerHTML = STAGES.map(s => `<div><dt>${s.k}</dt><dd>${s.v}</dd></div>`).join('');
 
-  /* 라이트박스 */
+  /* 사진 갤러리 — 파일이 없는 항목은 조용히 숨긴다.
+     assets/ 에 사진을 넣기만 하면 자동으로 나타나므로, 나중에 혼자 추가하기 쉽다. */
+  const gal = $('#gal');
+  gal.innerHTML = GALLERY.map((g, i) => `
+    <button class="ph reveal" style="--d:${Math.min(i, 6) * 60}ms" data-img="${g.src}" data-cap="${g.cap}"
+            hidden aria-label="${g.cap} 사진 크게 보기">
+      <img src="${g.src}" alt="가수 마리 — ${g.cap}" loading="lazy"
+           style="object-position:${g.pos || '50% 22%'}">
+      <span>${g.cap}</span>
+    </button>`).join('');
+  $$('.ph', gal).forEach(b => {
+    const img = b.querySelector('img');
+    const show = () => { b.hidden = false; };
+    if (img.complete) { img.naturalWidth ? show() : b.remove(); }
+    else { img.addEventListener('load', show); img.addEventListener('error', () => b.remove()); }
+  });
+  gal.addEventListener('click', (e) => {
+    const b = e.target.closest('.ph');
+    if (b) openImg(b.dataset.img, b.dataset.cap);
+  });
+
+  /* 라이트박스 — 영상과 사진을 모두 띄운다 */
   const lb = $('#lb'), lbF = $('#lbF');
   let last = null;
+  function openImg(src, cap) {
+    last = document.activeElement;
+    lbF.innerHTML = `<img src="${src}" alt="가수 마리 — ${cap}" class="lb__img">`;
+    $('#lbC').textContent = cap;
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    $('#lbX').focus();
+  }
   function open() {
     last = document.activeElement;
     lbF.innerHTML = `<iframe src="https://www.youtube.com/embed/${CONFIG.featuredVideo}?autoplay=1&rel=0"

@@ -48,26 +48,29 @@ const ALBUMS = [
     tracks: ['남겨진 그리움'],
     meta: '싱글',
   },
-  {
-    year: '2009',
-    date: '2009.01.01',
-    title: 'Endless Love / 큰 일 / 다시 돌아와',
-    type: '초기 음반',
-    badge: '',
-    desc: '지금의 무대가 있기까지, 오래전부터 노래는 계속되고 있었다.',
-    tracks: ['Endless Love', '큰 일', '다시 돌아와'],
-    meta: '정규',
-  },
 ];
 
-/* ---------- 대표곡 ---------- */
+/* ---------- 대표곡 ----------
+   음원 사이트에 같은 이름의 다른 가수(2009년 음반) 곡이 섞여 있어 제외했다. */
 const SONGS = [
   { t: '사랑의 라켄롤', y: '2020', hot: true },
   { t: '위험한 사랑',   y: '2020', hot: false },
   { t: '남겨진 그리움', y: '2022', hot: true },
-  { t: 'Endless Love', y: '2009', hot: false },
-  { t: '큰 일',        y: '2009', hot: false },
-  { t: '다시 돌아와',   y: '2009', hot: false },
+];
+
+/* ---------- 사진 갤러리 ----------
+   assets/ 에 파일을 넣으면 자동으로 나타나고, 없는 파일은 조용히 숨겨진다.
+   새 사진을 추가하려면 아래에 한 줄만 더 쓰면 된다. */
+const GALLERY = [
+  // pos — 잘릴 때 어디를 남길지. 인물이 작게 나온 전신 사진은 아래쪽(45%)을 잡아준다.
+  { src: 'assets/mari-live.jpg',    cap: '무대',      pos: '50% 16%' },
+  { src: 'assets/gallery-1.jpg',    cap: '체크 재킷',  pos: '50% 20%' },
+  { src: 'assets/mari-stage.jpg',   cap: '스테이지',   pos: '50% 45%' },
+  { src: 'assets/gallery-2.jpg',    cap: '레드',      pos: '50% 26%' },
+  { src: 'assets/mari-profile.jpg', cap: '프로필',    pos: '50% 20%' },
+  { src: 'assets/gallery-3.jpg',    cap: '화이트',    pos: '50% 24%' },
+  { src: 'assets/gallery-4.jpg',    cap: '팬아트',    pos: '50% 16%' },
+  { src: 'assets/mari-hero.jpg',    cap: '스튜디오',   pos: '50% 18%' },
 ];
 
 /* ---------- 설 수 있는 무대 ---------- */
