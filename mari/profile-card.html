@@ -49,7 +49,7 @@ body{background:#333;font-family:var(--body);-webkit-font-smoothing:antialiased}
   grid-template-columns:1fr 1fr 1fr;gap:2.5mm}
 .strip figure{position:relative;overflow:hidden}
 /* 높이를 고정한다 — aspect-ratio 로 두면 폭에 따라 세로가 늘어나 푸터를 밀어낸다 */
-.strip img{width:100%;height:28mm;object-fit:cover;object-position:50% 22%;
+.strip img{width:100%;height:28mm;object-fit:cover;object-position:50% 20%;
   filter:contrast(1.05) grayscale(.15)}
 .strip figcaption{position:absolute;left:0;bottom:0;font-family:var(--lat);font-weight:500;
   font-size:2.3mm;letter-spacing:.16em;background:var(--red);color:#fff;padding:1mm 2.4mm}
@@ -104,6 +104,7 @@ body{background:#333;font-family:var(--body);-webkit-font-smoothing:antialiased}
 <div class="page" id="page">
 
   <header class="hd">
+    <!-- ▼ 헤더 사진 — 다른 사진으로 바꾸려면 이 src 만 고치면 됩니다 -->
     <div class="hd__photo"><img src="assets/mari-hero.jpg" alt="가수 마리"></div>
     <div class="hd__t">
       <div class="kick"><i></i>SINGER &middot; PROFILE 2026</div>
@@ -170,8 +171,8 @@ body{background:#333;font-family:var(--body);-webkit-font-smoothing:antialiased}
 
     <div class="strip">
       <figure><img src="assets/mari-live.jpg" alt="무대에서 노래하는 가수 마리"><figcaption>LIVE</figcaption></figure>
-      <figure><img src="assets/mari-stage.jpg" alt="무대 위의 가수 마리"><figcaption>STAGE</figcaption></figure>
-      <figure><img src="assets/mari-profile.jpg" alt="가수 마리"><figcaption>PROFILE</figcaption></figure>
+      <figure><img style="object-position:50% 34%" src="assets/gallery-2.jpg" alt="가수 마리"><figcaption>PROFILE</figcaption></figure>
+      <figure><img style="object-position:50% 42%" src="assets/gallery-3.jpg" alt="가수 마리"><figcaption>OUTDOOR</figcaption></figure>
     </div>
   </main>
 
