@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>가수 마리 — 사랑의 라켄롤</title>
+<meta name="description" content="가수 마리(정마리) 공식 홍보 페이지. 정규 1집 「사랑의 라켄롤」, 무대 영상, 음반, 행사 섭외 안내.">
+<meta property="og:title" content="가수 마리 — 사랑의 라켄롤">
+<meta property="og:description" content="무대를 흔드는 라켄롤 보컬 · 행사 섭외 010-2648-6717">
+<meta property="og:image" content="assets/mari-live.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ══════ NAV ══════ -->
+<header class="nav" id="nav">
+  <div class="nav__bar" id="navBar"></div>
+  <div class="nav__in">
+    <a href="#top" class="brand">
+      <span class="brand__ko">마리</span>
+      <span class="brand__en">MARI</span>
+    </a>
+    <nav class="links" id="links">
+      <a href="#about" data-sec="about">프로필</a>
+      <a href="#music" data-sec="music">음반</a>
+      <a href="#stage" data-sec="stage">무대</a>
+      <a href="#booking" data-sec="booking">섭외</a>
+    </nav>
+    <a href="#booking" class="nav__cta">섭외 문의</a>
+    <button class="burger" id="burger" aria-label="메뉴" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero" id="top">
+  <div class="hero__grid">
+    <div class="hero__text">
+      <p class="kicker reveal"><i></i>SINGER · 성인가요</p>
+      <h1 class="reveal" style="--d:90ms">
+        <span class="h1__ko">마리</span>
+        <span class="h1__en">MARI</span>
+      </h1>
+      <p class="hero__tag reveal" style="--d:180ms">무대를 흔드는<br><em>라켄롤</em> 보컬</p>
+      <p class="hero__sub reveal" style="--d:260ms">
+        2020년 1집 「사랑의 라켄롤」로 성인가요 무대에 이름을 올린 가수 <b>마리</b>.
+        작은 모임부터 큰 축제까지, 그 순간에 어울리는 노래를 부릅니다.
+      </p>
+      <div class="hero__btn reveal" style="--d:340ms">
+        <button class="btn btn--red" data-play>
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>
+          무대 영상 보기
+        </button>
+        <a href="#booking" class="btn btn--ghost">섭외 문의</a>
+      </div>
+    </div>
+    <figure class="hero__photo reveal" style="--d:120ms">
+      <img src="assets/mari-live.jpg" alt="무대에서 노래하는 가수 마리" fetchpriority="high">
+      <figcaption>LIVE</figcaption>
+    </figure>
+  </div>
+  <div class="ticker" aria-hidden="true"><div class="ticker__t" id="ticker"></div></div>
+</section>
+
+<!-- ══════ ABOUT ══════ -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <header class="head reveal">
+      <span class="num">01</span>
+      <h2>프로필</h2>
+    </header>
+    <div class="about">
+      <figure class="about__photo reveal">
+        <img src="assets/mari-hero.jpg" alt="가수 마리 프로필 사진" loading="lazy">
+      </figure>
+      <div class="about__body">
+        <p class="about__lead reveal" style="--d:80ms">
+          부산에서 나고 자란 마리는 2020년 정규 1집 「사랑의 라켄롤」로 성인가요 무대에 정식으로 이름을 올렸습니다.
+          로큰롤의 흥을 트로트에 얹은 이 곡처럼, 마리의 무대는 관객을 앉혀두지 않습니다.
+        </p>
+        <p class="about__lead reveal" style="--d:140ms">
+          행사와 축제, 초청 공연과 방송까지 — 무대의 크기를 가리지 않고
+          그 자리에 어울리는 노래로 관객 한 사람 한 사람과 눈을 맞춥니다.
+        </p>
+        <dl class="facts reveal" style="--d:200ms" id="facts"></dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ MUSIC ══════ -->
+<section class="sec sec--alt" id="music">
+  <div class="wrap">
+    <header class="head reveal">
+      <span class="num">02</span>
+      <h2>음반</h2>
+      <p class="head__lead">곡을 누르면 유튜브에서 찾아 드립니다.</p>
+    </header>
+    <div class="albums" id="albums"></div>
+    <div class="songs reveal">
+      <h3 class="songs__t">전체 수록곡</h3>
+      <ul id="songs"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ STAGE ══════ -->
+<section class="sec" id="stage">
+  <div class="wrap">
+    <header class="head reveal">
+      <span class="num">03</span>
+      <h2>무대</h2>
+    </header>
+    <div class="stage">
+      <button class="video reveal" data-play aria-label="무대 영상 재생">
+        <img src="" alt="" id="vThumb" loading="lazy">
+        <span class="video__play"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg></span>
+        <span class="video__cap"><b id="vTitle"></b><i id="vEvent"></i></span>
+      </button>
+      <div class="stage__side">
+        <h3 class="reveal">설 수 있는 무대</h3>
+        <dl class="kinds reveal" style="--d:80ms" id="kinds"></dl>
+        <figure class="stage__photo reveal" style="--d:160ms">
+          <img src="assets/mari-stage.jpg" alt="무대 위의 가수 마리" loading="lazy">
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ BOOKING ══════ -->
+<section class="sec sec--book" id="booking">
+  <div class="wrap">
+    <header class="head head--c reveal">
+      <span class="num">04</span>
+      <h2>행사 섭외</h2>
+      <p class="head__lead">전국 어디든 찾아갑니다.</p>
+    </header>
+
+    <div class="sheet reveal">
+      <a class="sheet__img" href="assets/profile-sheet.jpg" target="_blank" rel="noopener" aria-label="한장 프로필 크게 보기">
+        <img src="assets/profile-sheet.jpg" alt="가수 마리 A4 한장 프로필" loading="lazy">
+        <span>크게 보기</span>
+      </a>
+      <div class="sheet__body">
+        <span class="ov">ONE-PAGE PROFILE</span>
+        <h3>기획사 · 행사 담당자용<br>한 장짜리 프로필</h3>
+        <p>프로필과 음반, 대표곡, 설 수 있는 무대, 섭외 연락처를 <b>A4 한 장</b>에 담았습니다.</p>
+        <div class="sheet__btns">
+          <button class="btn btn--red" id="shareSheet">카톡으로 보내기</button>
+          <a class="btn btn--ghost" href="assets/profile-sheet.jpg" download="가수마리-프로필.jpg">이미지 저장</a>
+          <a class="btn btn--ghost" href="assets/profile-sheet.pdf" download="가수마리-프로필.pdf">PDF</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="call reveal">
+      <span class="ov">공연 문의</span>
+      <a class="call__no" id="phone" href="#"></a>
+      <div class="call__btns">
+        <button class="btn btn--ghost btn--sm" id="copyPhone">번호 복사</button>
+        <a class="btn btn--ghost btn--sm" id="other" href="#">보험 · 헬스케어 상담은 이쪽</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div>
+      <p class="foot__n">마리</p>
+      <p class="foot__t">MARI JUNG · 사랑의 라켄롤</p>
+    </div>
+    <div class="foot__src">
+      <span>자료</span>
+      <a href="https://music.bugs.co.kr/artist/80053461" target="_blank" rel="noopener">벅스 아티스트</a>
+      <a href="https://music.apple.com/us/album/%EC%82%AC%EB%9E%91%EC%9D%98-%EB%9D%BC%EC%BC%84%EB%A1%A4-ep/1646792517" target="_blank" rel="noopener">애플뮤직</a>
+    </div>
+  </div>
+  <p class="foot__c">© <span id="yr"></span> 가수 마리 · 홍보용 페이지</p>
+</footer>
+
+<button class="totop" id="totop" aria-label="맨 위로">↑</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="영상 재생" hidden>
+  <button class="lb__x" id="lbX" aria-label="닫기">✕</button>
+  <div class="lb__in"><div class="lb__f" id="lbF"></div><p class="lb__c" id="lbC"></p></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
