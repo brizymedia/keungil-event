@@ -189,16 +189,18 @@
     </label>
     <p class="note" style="margin-top:.35rem;">
       홈페이지에 올라가는 사진에만 들어갑니다.
-      <strong style="color:#a1a1aa;">드라이브에 보관되는 원본은 깨끗하게</strong> 남습니다.
+      원본을 백업하실 때는 <strong style="color:#a1a1aa;">원본이 깨끗하게</strong> 남습니다.
     </p>
 
     <label class="chk" style="margin-top:1rem;">
-      <input type="checkbox" id="keep-orig" checked>
+      <input type="checkbox" id="keep-orig">
       원본도 구글 드라이브에 백업
     </label>
     <p class="note" style="margin-top:.35rem;">
-      데이터가 약한 곳에서는 꺼두시면 훨씬 빨리 올라갑니다.
-      끄면 <strong style="color:#a1a1aa;">웹용 축소본만</strong> 올라가고 원본은 남지 않습니다.
+      <strong style="color:#a1a1aa;">기본은 꺼짐</strong>입니다 — 구글 드라이브에는 아무것도 남지 않고,
+      홈페이지에 쓰이는 축소본만 올라갑니다. 고객사에서 받은 사진을 올리실 때 그대로 두세요.
+      <br>
+      직접 찍으신 사진을 원본까지 보관하고 싶으실 때만 켜주세요. 데이터도 그만큼 더 씁니다.
     </p>
   </div>
 
@@ -443,9 +445,14 @@ function 정보갱신() {
   const 웹합 = 사진들.reduce((s, p) => s + p.web.size, 0);
   const 원합 = 사진들.reduce((s, p) => s + p.file.size, 0);
   el.hidden = false;
-  el.textContent = 사진들.length + '장 · 웹용 ' + 메가(웹합) +
-                   ' (원본 ' + 메가(원합) + ')';
+  // 원본을 안 보낼 때는 실제로 올라가는 양만 보여준다 (그게 데이터를 쓰는 양이다)
+  el.textContent = $('#keep-orig').checked
+    ? 사진들.length + '장 · 웹용 ' + 메가(웹합) + ' + 원본 ' + 메가(원합)
+    : 사진들.length + '장 · ' + 메가(웹합) + ' 올라갑니다 (원본 ' + 메가(원합) + '은 안 보냄)';
 }
+
+/* 백업을 켜고 끄면 실제로 올라가는 용량이 달라진다 — 바로 보여준다 */
+$('#keep-orig').addEventListener('change', 정보갱신);
 const 메가 = (n) => n < 1048576 ? Math.round(n / 1024) + 'KB'
                                 : (n / 1048576).toFixed(1) + 'MB';
 
