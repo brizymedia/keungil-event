@@ -185,6 +185,14 @@
     .beam-b{ left:38%; background:linear-gradient(to bottom,rgba(229,64,124,.6),rgba(229,64,124,0) 70%); animation-duration:1.8s,7.5s;animation-delay:.9s,.4s;animation-direction:normal,alternate-reverse; }
     .beam-c{ left:60%; background:linear-gradient(to bottom,rgba(139,92,246,.6),rgba(139,92,246,0) 70%); animation-duration:1.8s,10s;animation-delay:1.2s,1.6s; }
     .beam-d{ left:80%; background:linear-gradient(to bottom,rgba(245,158,11,.6),rgba(245,158,11,0) 72%); animation-duration:1.8s,8.5s;animation-delay:1.5s,.2s;animation-direction:normal,alternate-reverse; }
+    .beam.aim{ animation-name:beamIn;will-change:transform; }   /* 마우스 추적 모드: 스윙 애니메이션 해제 */
+    #hero-spot{
+      position:absolute;left:0;top:0;width:460px;height:460px;margin:-230px 0 0 -230px;border-radius:50%;
+      pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .6s ease;
+      background:radial-gradient(circle,rgba(255,214,140,.42) 0%,rgba(245,158,11,.22) 28%,rgba(229,64,124,.10) 50%,transparent 70%);
+      filter:blur(22px);will-change:transform;
+    }
+    #hero-spot.on{ opacity:1; }
     #hero-sparkles{ position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen; }
     #hero-warm{ position:absolute;left:-10%;bottom:-20%;width:60vw;height:60vw;border-radius:50%;pointer-events:none;
       background:radial-gradient(circle,rgba(245,158,11,.35),transparent 65%);filter:blur(80px);opacity:.5;animation:glowPulse 6s ease-in-out infinite; }
@@ -294,6 +302,7 @@
   <div class="beam beam-c"></div>
   <div class="beam beam-d"></div>
   <canvas id="hero-sparkles"></canvas>
+  <div id="hero-spot"></div>
   <div id="hero-warm"></div>
 
   <div class="hero-content-row" style="position:relative;z-index:2;max-width:80rem;margin:0 auto;padding:9rem 1.5rem 6rem;width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:3rem;">
@@ -731,6 +740,55 @@
   window.addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(check); } }, {passive:true});
   window.addEventListener('resize', check);
   setTimeout(check, 50);
+})();
+
+/* ── Hero: 조명 빔이 마우스를 따라오는 무빙헤드 ── */
+(function(){
+  const hero  = document.getElementById('hero');
+  const beams = [...document.querySelectorAll('#hero .beam')];
+  const spot  = document.getElementById('hero-spot');
+  if(!hero || !beams.length) return;
+  const fine   = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!fine || reduce) return;                       // 터치/모션 최소화 기기는 CSS 스윙 유지
+
+  const MAX = 38;                                    // 좌우 최대 회전각(deg)
+  const st = beams.map((el,i)=>({ el, cur:0, tgt:0, lag:.055 + i*.018, phase:i*1.7, amp:5 + (i%2)*2 }));
+  let mx=0, my=0, inside=false, sx=0, sy=0, raf=0, running=true;
+
+  beams.forEach(b=>b.classList.add('aim'));
+
+  function aimAll(){
+    const hr = hero.getBoundingClientRect();
+    for(const s of st){
+      const r  = s.el.getBoundingClientRect();
+      const ox = r.left + r.width/2 - hr.left;      // 빔 꼭짓점(위쪽 중앙), 히어로 기준 좌표
+      const oy = r.top - hr.top;
+      const dx = mx - ox, dy = Math.max(40, my - oy);
+      let a = -Math.atan2(dx, dy) * 180/Math.PI;    // 아래를 향한 빔을 커서 쪽으로
+      s.tgt = Math.max(-MAX, Math.min(MAX, a));
+    }
+  }
+  function tick(t){
+    if(!running) return;
+    for(const s of st){
+      const target = inside ? s.tgt : Math.sin(t/1000*.45 + s.phase) * s.amp;   // 마우스 없으면 자연 스윙
+      s.cur += (target - s.cur) * s.lag;
+      s.el.style.transform = 'rotate(' + s.cur.toFixed(3) + 'deg)';
+    }
+    sx += (mx - sx) * .12; sy += (my - sy) * .12;
+    spot.style.transform = 'translate3d(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px,0)';
+    raf = requestAnimationFrame(tick);
+  }
+  hero.addEventListener('pointermove', e=>{
+    const hr = hero.getBoundingClientRect();
+    mx = e.clientX - hr.left; my = e.clientY - hr.top;
+    if(!inside){ inside = true; sx = mx; sy = my; spot.classList.add('on'); }
+    aimAll();
+  }, {passive:true});
+  hero.addEventListener('pointerleave', ()=>{ inside=false; spot.classList.remove('on'); });
+  new IntersectionObserver(([e])=>{ running = e.isIntersecting; if(running){ cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); } }).observe(hero);
+  raf = requestAnimationFrame(tick);
 })();
 
 /* ── Hero: 브랜드 리빌 + 반짝이 파티클 ── */
