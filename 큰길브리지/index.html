@@ -120,7 +120,7 @@ h2.sec-title em{font-family:var(--f-disp);font-style:italic;font-weight:400;colo
 }
 .nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(232,184,75,.6)}
 .nav-cta svg{width:14px;height:14px}
-@media(max-width:900px){.nav-links{display:none}.nav-in{gap:14px}}
+@media(max-width:1080px){.nav-links{display:none}.nav-in{gap:14px}}
 
 /* ============================================================
    HERO
@@ -326,6 +326,156 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
 .svc-item .k{font-family:var(--f-mono);font-size:.62rem;color:var(--gold);padding-top:5px;flex-shrink:0;letter-spacing:.1em}
 .svc-item .t{font-weight:700;font-size:.95rem;letter-spacing:-.025em;margin-bottom:3px}
 .svc-item .d{font-size:.84rem;color:var(--txt-mute);line-height:1.6}
+
+/* ============================================================
+   VIDEO — 홍보영상 제작
+   ============================================================ */
+.video{background:linear-gradient(180deg,var(--ink),#0A0D14 60%,var(--ink));position:relative;overflow:hidden}
+.video::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 45% at 82% 20%,rgba(255,107,74,.13),transparent 65%);
+}
+.reels{
+  display:flex;gap:clamp(12px,2.4vw,28px);justify-content:center;align-items:center;
+  margin-bottom:clamp(44px,6vw,72px);perspective:1400px;
+}
+.reel{
+  position:relative;flex:1 1 0;max-width:250px;aspect-ratio:9/16;border-radius:24px;overflow:hidden;
+  border:1px solid var(--line-2);background:#0D1119;
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
+  transition:transform .7s var(--ease),border-color .5s,box-shadow .7s;
+}
+.reel:nth-child(1){transform:rotate(-5deg) translateY(14px) scale(.93)}
+.reel:nth-child(3){transform:rotate(5deg)  translateY(14px) scale(.93)}
+.reel:nth-child(2){z-index:2;border-color:rgba(232,184,75,.4)}
+.reels:hover .reel{transform:none;scale:1}
+.reel:hover{border-color:var(--gold);box-shadow:0 40px 90px -30px rgba(232,184,75,.45)}
+.reel-bg{position:absolute;inset:0;background-size:200% 200%;animation:reelShift 9s ease-in-out infinite}
+@keyframes reelShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,15,.5) 0%,transparent 30%,transparent 55%,rgba(7,9,15,.92) 100%)}
+.reel-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:14px}
+.reel-tag{
+  align-self:flex-start;display:flex;align-items:center;gap:6px;
+  font-family:var(--f-mono);font-size:.5rem;letter-spacing:.16em;padding:4px 8px;border-radius:99px;
+  background:rgba(7,9,15,.62);backdrop-filter:blur(6px);border:1px solid var(--line-2);color:var(--txt);
+}
+.reel-tag i{width:5px;height:5px;border-radius:50%;background:var(--coral);animation:pulse 1.8s infinite;font-style:normal}
+.reel-play{
+  margin:auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(237,234,227,.14);backdrop-filter:blur(8px);border:1px solid rgba(237,234,227,.3);
+  transition:transform .45s var(--ease-2),background .4s;
+}
+.reel:hover .reel-play{transform:scale(1.16);background:var(--gold);border-color:var(--gold)}
+.reel-play svg{width:15px;height:15px;margin-left:2px;color:var(--txt);transition:color .4s}
+.reel:hover .reel-play svg{color:var(--ink)}
+.reel-cap{margin-top:auto;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.reel-cap b{
+  font-size:.76rem;font-weight:800;letter-spacing:-.03em;line-height:1.35;
+  background:var(--gold);color:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.reel-cap span{font-size:.66rem;color:var(--txt-dim);padding-left:2px}
+.reel-bar{margin-top:10px;height:2.5px;border-radius:9px;background:rgba(237,234,227,.2);overflow:hidden}
+.reel-bar i{display:block;height:100%;background:var(--gold);width:0;animation:scrub 6s linear infinite}
+@keyframes scrub{to{width:100%}}
+@media(max-width:640px){
+  .reels{gap:8px}
+  .reel{border-radius:16px}
+  .reel-play{width:34px;height:34px}
+  .reel-cap b{font-size:.6rem}
+  .reel-cap span{display:none}
+}
+
+.vid-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,4vw,56px);align-items:start}
+@media(max-width:880px){.vid-grid{grid-template-columns:1fr}}
+.vid-types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.vid-types{grid-template-columns:1fr}}
+.vtype{
+  padding:20px;border-radius:16px;border:1px solid var(--line);background:rgba(237,234,227,.022);
+  transition:transform .45s var(--ease-2),border-color .4s,background .4s;
+}
+.vtype:hover{transform:translateY(-4px);border-color:rgba(255,107,74,.4);background:rgba(255,107,74,.05)}
+.vtype .vi{font-size:1.2rem;margin-bottom:10px;display:block}
+.vtype h4{font-size:.93rem;font-weight:800;letter-spacing:-.03em;margin-bottom:5px}
+.vtype p{font-size:.79rem;color:var(--txt-mute);line-height:1.6}
+.vid-inc{border:1px solid var(--line);border-radius:20px;padding:clamp(22px,3vw,32px);background:rgba(237,234,227,.022)}
+.vid-inc h4{font-size:1rem;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+.vid-inc > p{font-size:.79rem;color:var(--txt-mute);margin-bottom:20px}
+.vid-inc ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:11px;font-size:.83rem}
+@media(max-width:520px){.vid-inc ul{grid-template-columns:1fr}}
+.vid-inc li{display:flex;gap:8px;align-items:flex-start;color:var(--txt-dim);line-height:1.45}
+.vid-inc li svg{width:13px;height:13px;flex-shrink:0;margin-top:3px;color:var(--coral)}
+.vid-cta{
+  margin-top:24px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.vid-cta .pw{display:flex;align-items:baseline;gap:6px}
+.vid-cta .pw b{font-size:1.75rem;font-weight:900;letter-spacing:-.05em;color:var(--gold);line-height:1}
+.vid-cta .pw span{font-size:.78rem;color:var(--txt-dim)}
+.vid-cta .pk{font-size:.72rem;color:var(--txt-mute);width:100%;line-height:1.6}
+
+/* ============================================================
+   AI CLASS — 준비중
+   ============================================================ */
+.aiclass{background:var(--ink-2);border-top:1px solid var(--line);position:relative;overflow:hidden}
+.aiclass::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(65% 50% at 20% 15%,rgba(63,211,198,.13),transparent 62%);
+}
+.soon{
+  display:inline-flex;align-items:center;gap:9px;padding:7px 15px 7px 10px;border-radius:999px;
+  border:1px solid rgba(63,211,198,.42);background:rgba(63,211,198,.09);color:var(--teal);
+  font-family:var(--f-mono);font-size:.62rem;letter-spacing:.18em;margin-bottom:20px;
+}
+.soon i{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;font-style:normal}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.2vw,22px);margin-bottom:clamp(34px,4.5vw,52px)}
+@media(max-width:820px){.tracks{grid-template-columns:1fr}}
+.track{
+  position:relative;border:1px solid var(--line);border-radius:22px;padding:clamp(24px,3vw,34px);
+  background:linear-gradient(165deg,rgba(63,211,198,.06),transparent 65%);overflow:hidden;
+  transition:transform .5s var(--ease-2),border-color .45s;
+}
+.track:hover{transform:translateY(-6px);border-color:rgba(63,211,198,.45)}
+.track-n{
+  font-family:var(--f-disp);font-style:italic;font-size:2.4rem;line-height:1;color:var(--teal);opacity:.42;margin-bottom:12px;
+}
+.track h3{font-size:clamp(1.1rem,2.2vw,1.4rem);font-weight:800;letter-spacing:-.04em;margin-bottom:9px;line-height:1.25}
+.track > p{font-size:.85rem;color:var(--txt-dim);line-height:1.75;margin-bottom:22px}
+.track ol{list-style:none;counter-reset:c;display:flex;flex-direction:column;gap:0}
+.track li{
+  counter-increment:c;display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line);
+  font-size:.85rem;color:var(--txt-dim);line-height:1.5;align-items:flex-start;
+}
+.track li:last-child{border-bottom:1px solid var(--line)}
+.track li::before{
+  content:counter(c,decimal-leading-zero);font-family:var(--f-mono);font-size:.6rem;color:var(--teal);
+  padding-top:3px;flex-shrink:0;letter-spacing:.08em;
+}
+.track li b{color:var(--txt);font-weight:700;display:block;margin-bottom:2px;letter-spacing:-.02em}
+
+.prep{
+  border:1px solid var(--line);border-radius:22px;padding:clamp(24px,3.2vw,36px);
+  background:rgba(237,234,227,.022);display:grid;grid-template-columns:1fr auto;gap:clamp(24px,4vw,48px);align-items:center;
+}
+@media(max-width:820px){.prep{grid-template-columns:1fr}}
+.prep h4{font-size:1.05rem;font-weight:800;letter-spacing:-.035em;margin-bottom:22px}
+.psteps{display:flex;gap:0;flex-wrap:wrap}
+.pstep{flex:1 1 150px;position:relative;padding-right:16px}
+.pstep .pdot{
+  width:11px;height:11px;border-radius:50%;background:var(--ink-3);border:2px solid var(--line-2);
+  margin-bottom:12px;position:relative;z-index:2;
+}
+.pstep.done .pdot{background:var(--teal);border-color:var(--teal)}
+.pstep.now .pdot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 5px rgba(232,184,75,.2);animation:pulse 2.2s infinite}
+.pstep::after{content:"";position:absolute;left:11px;top:4.5px;right:0;height:2px;background:var(--line)}
+.pstep.done::after{background:var(--teal);opacity:.45}
+.pstep:last-child::after{display:none}
+.pstep .pt{font-size:.86rem;font-weight:700;letter-spacing:-.025em;margin-bottom:3px}
+.pstep .ps{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.12em;color:var(--txt-mute)}
+.pstep.done .ps{color:var(--teal)}
+.pstep.now .ps{color:var(--gold)}
+.prep-cta{display:flex;flex-direction:column;gap:10px;min-width:min(100%,230px)}
+.prep-cta .btn{justify-content:center;width:100%}
+.prep-cta small{font-size:.7rem;color:var(--txt-mute);text-align:center;line-height:1.6}
 
 /* ============================================================
    PRICING + CALCULATOR
@@ -653,9 +803,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
     </a>
     <div class="nav-links">
       <a href="#why">왜 우리인가</a>
-      <a href="#service">서비스</a>
+      <a href="#service">홈페이지</a>
+      <a href="#video">영상제작</a>
+      <a href="#aiclass">AI 클래스</a>
       <a href="#price">요금 · 견적</a>
-      <a href="#process">제작과정</a>
       <a href="#works">포트폴리오</a>
       <a href="#faq">FAQ</a>
     </div>
@@ -834,6 +985,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
         <h3>스크롤을 멈추게 하는<br><em>15초의 힘.</em></h3>
         <p>홈페이지가 있어도 아무도 모르면 소용없습니다. 인스타 릴스·유튜브 숏츠·틱톡에 바로 올릴 수 있는 세로형 홍보 영상을 만들어 드립니다. 촬영본이 없어도 괜찮습니다.</p>
         <div class="svc-price"><span class="p">10만원</span><span class="s">부터 / 1편 기준</span></div>
+        <p style="margin-top:14px"><a href="#video" style="color:var(--gold);font-size:.85rem;font-weight:700;text-decoration:underline;text-underline-offset:4px">영상 제작 자세히 보기 →</a></p>
       </div>
       <div class="svc-list">
         <div class="svc-item"><span class="k">01</span><div><div class="t">세로형 숏폼 (9:16)</div><div class="d">릴스·숏츠·틱톡 규격에 맞춘 15~60초 편집본</div></div></div>
@@ -849,6 +1001,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
         <h3>AI를 몰라도 괜찮습니다.<br><em>손잡고 알려드립니다.</em></h3>
         <p>"AI가 좋다는데 뭘 어떻게 해야 할지 모르겠다"는 분들을 위한 강의입니다. 어려운 용어 대신, 당장 내 가게와 내 무대 홍보에 쓸 수 있는 것부터 함께 만들어 봅니다.</p>
         <div class="svc-price"><span class="p">10만원</span><span class="s">부터 / 2시간 1:1 기준</span></div>
+        <p style="margin-top:14px"><a href="#aiclass" style="color:var(--teal);font-size:.85rem;font-weight:700;text-decoration:underline;text-underline-offset:4px">정규 AI 클래스 준비중 · 자세히 보기 →</a></p>
       </div>
       <div class="svc-list">
         <div class="svc-item"><span class="k">01</span><div><div class="t">1:1 맞춤 과외</div><div class="d">업종과 수준에 맞춰 커리큘럼을 그날 그날 조정</div></div></div>
@@ -861,12 +1014,161 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
   </div>
 </section>
 
+<!-- ══════════ VIDEO ══════════ -->
+<section class="sec video" id="video">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="mono sec-num">03 — VIDEO</div>
+        <h2 class="sec-title">손가락이 멈추는<br><em>15초</em>를 만듭니다.</h2>
+      </div>
+      <p class="sec-sub">
+        홈페이지를 만들어도 아무도 모르면 소용없습니다.
+        인스타 릴스·유튜브 숏츠·틱톡에 오늘 바로 올릴 수 있는 세로형 홍보 영상을,
+        <b style="color:var(--txt)">촬영본이 없어도</b> 만들어 드립니다.
+      </p>
+    </div>
+
+    <div class="reels rv">
+      <article class="reel">
+        <div class="reel-bg" style="background:linear-gradient(135deg,#3A2440,#7A3B32 45%,#241A2E)"></div>
+        <div class="reel-in">
+          <span class="reel-tag"><i></i>INSTAGRAM REELS</span>
+          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <div class="reel-cap">
+            <b>우리 가게, 이제 검색됩니다</b>
+            <span>매장 홍보 · 0:22</span>
+            <div class="reel-bar" style="width:100%"><i></i></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="reel">
+        <div class="reel-bg" style="background:linear-gradient(135deg,#1F3A4D,#B8862F 50%,#2A1F16)"></div>
+        <div class="reel-in">
+          <span class="reel-tag"><i></i>YOUTUBE SHORTS</span>
+          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <div class="reel-cap">
+            <b>무대 위 3분, 그대로 담았습니다</b>
+            <span>공연 스케치 · 0:45</span>
+            <div class="reel-bar" style="width:100%"><i></i></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="reel">
+        <div class="reel-bg" style="background:linear-gradient(135deg,#16403B,#2E6E5E 48%,#101F2A)"></div>
+        <div class="reel-in">
+          <span class="reel-tag"><i></i>TIKTOK</span>
+          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <div class="reel-cap">
+            <b>이번 축제, 놓치지 마세요</b>
+            <span>행사 티저 · 0:15</span>
+            <div class="reel-bar" style="width:100%"><i></i></div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="vid-grid">
+      <div class="vid-types rv">
+        <div class="vtype"><span class="vi">🏪</span><h4>매장 · 상품 홍보</h4><p>메뉴, 시술, 제품을 15초 안에 각인시키는 구성</p></div>
+        <div class="vtype"><span class="vi">🎤</span><h4>공연 · 행사 스케치</h4><p>현장 영상을 하이라이트로 재구성해 섭외로 연결</p></div>
+        <div class="vtype"><span class="vi">👤</span><h4>인물 · 프로필 소개</h4><p>가수·강사·대표님을 짧고 강하게 소개하는 영상</p></div>
+        <div class="vtype"><span class="vi">🎪</span><h4>이벤트 티저</h4><p>모집·공연·프로모션 기간에 집중 노출시키는 예고편</p></div>
+      </div>
+
+      <div class="vid-inc rv" style="transition-delay:.08s">
+        <h4>1편에 전부 포함됩니다</h4>
+        <p>따로 붙는 옵션비 없이, 아래가 기본 구성입니다.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>기획 · 구성안 작성</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>편집 · 컷 구성</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>가독성 높은 한글 자막</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>AI 성우 내레이션</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>배경음악 · 효과음</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>표지 썸네일 1종</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>9:16 · 1:1 · 16:9 리사이즈</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>납품 후 수정 2회</li>
+        </ul>
+        <div class="vid-cta">
+          <span class="pw"><b>100,000원</b><span>/ 1편 · VAT 별도</span></span>
+          <button class="btn btn-gold" type="button" id="addVideo">
+            영상 견적에 담기
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <span class="pk">촬영본이 없으면 AI 생성 이미지·영상으로 채워 드립니다. 3편 이상은 상담 시 패키지가로 조정해 드립니다.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ AI CLASS ══════════ -->
+<section class="sec aiclass" id="aiclass">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="mono sec-num">04 — AI CLASS</div>
+        <span class="soon"><i></i>COMING SOON · 준비중</span>
+        <h2 class="sec-title">이제는 직접<br><em>만들어 보시겠어요?</em></h2>
+      </div>
+      <p class="sec-sub">
+        맡기는 것도 좋지만, 직접 만들 수 있으면 훨씬 강해집니다.
+        <b style="color:var(--txt)">AI로 홈페이지 만들기</b>와 <b style="color:var(--txt)">AI로 홍보영상 만들기</b>를
+        묶은 실습 클래스를 준비하고 있습니다. 컴퓨터를 잘 모르셔도 됩니다.
+      </p>
+    </div>
+
+    <div class="tracks">
+      <article class="track rv">
+        <div class="track-n">01</div>
+        <h3>AI로 내 홈페이지 만들기</h3>
+        <p>업체에 맡기지 않고, 내 손으로 페이지를 만들고 고치는 법. 코딩은 한 줄도 배우지 않습니다.</p>
+        <ol>
+          <li><span><b>무엇을 보여줄지 정하기</b>손님이 궁금해하는 순서로 페이지 구조 잡기</span></li>
+          <li><span><b>AI로 문구와 이미지 뽑기</b>소개글, 메뉴 설명, 배너 이미지를 대화로 만들기</span></li>
+          <li><span><b>페이지 완성하고 띄우기</b>도메인 연결까지, 실제로 검색되는 상태로</span></li>
+          <li><span><b>혼자 수정하기</b>가격이 바뀌거나 사진을 갈아끼울 때 직접 하기</span></li>
+        </ol>
+      </article>
+
+      <article class="track rv" style="transition-delay:.08s">
+        <div class="track-n">02</div>
+        <h3>AI로 홍보영상 만들기</h3>
+        <p>휴대폰과 노트북만으로 릴스·숏츠를 뽑아내는 과정. 촬영 장비도, 편집 경력도 필요 없습니다.</p>
+        <ol>
+          <li><span><b>15초 대본 쓰기</b>스크롤을 멈추게 하는 첫 3초 만드는 법</span></li>
+          <li><span><b>AI로 장면 만들기</b>찍은 게 없어도 이미지·영상 소스를 생성해서 채우기</span></li>
+          <li><span><b>자막과 내레이션 넣기</b>AI 성우로 목소리 입히고 자막 얹기</span></li>
+          <li><span><b>올리고 반응 보기</b>업로드 시간, 해시태그, 반응 확인하고 다음 편 고치기</span></li>
+        </ol>
+      </article>
+    </div>
+
+    <div class="prep rv">
+      <div>
+        <h4>준비 진행 상황</h4>
+        <div class="psteps">
+          <div class="pstep done"><div class="pdot"></div><div class="pt">커리큘럼 설계</div><div class="ps">완료</div></div>
+          <div class="pstep now"><div class="pdot"></div><div class="pt">교재 · 실습자료 제작</div><div class="ps">진행중</div></div>
+          <div class="pstep"><div class="pdot"></div><div class="pt">1기 수강생 모집</div><div class="ps">오픈 예정</div></div>
+        </div>
+      </div>
+      <div class="prep-cta">
+        <button class="btn btn-gold" type="button" id="classAlert">1기 모집 알림 받기</button>
+        <small>사전 신청하신 분께 먼저 안내드리고,<br>1기 한정 수강료로 모십니다.<br><br>정규 클래스 오픈 전이라도 <b style="color:var(--gold)">1:1 맞춤 강의</b>는<br>지금 바로 신청하실 수 있습니다.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ PRICING + CALCULATOR ══════════ -->
 <section class="sec pricing" id="price">
   <div class="wrap">
     <div class="sec-head rv">
       <div>
-        <div class="mono sec-num">03 — PRICING</div>
+        <div class="mono sec-num">05 — PRICING</div>
         <h2 class="sec-title">필요한 만큼만,<br><em>정직하게.</em></h2>
       </div>
       <p class="sec-sub">플랜을 고르고 옵션을 켜보세요. 계산기가 실시간으로 총액을 알려드립니다. 숨은 비용은 없습니다.</p>
@@ -1057,7 +1359,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
   <div class="wrap">
     <div class="sec-head rv">
       <div>
-        <div class="mono sec-num">04 — PROCESS</div>
+        <div class="mono sec-num">06 — PROCESS</div>
         <h2 class="sec-title">전화 한 통이면<br><em>다 됩니다.</em></h2>
       </div>
       <p class="sec-sub">준비물은 없습니다. 사진이 없어도, 문구가 없어도 괜찮습니다. 통화하면서 함께 만들어 갑니다.</p>
@@ -1076,7 +1378,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
   <div class="wrap">
     <div class="sec-head rv">
       <div>
-        <div class="mono sec-num">05 — WORKS</div>
+        <div class="mono sec-num">07 — WORKS</div>
         <h2 class="sec-title">이런 분들이<br><em>함께하고 있습니다.</em></h2>
       </div>
       <p class="sec-sub">업종별로 필요한 구성은 전부 다릅니다. 아래 유형 중 가까운 것을 알려주시면 그 구조부터 잡아드립니다.</p>
@@ -1133,7 +1435,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
   <div class="wrap">
     <div class="sec-head rv">
       <div>
-        <div class="mono sec-num">06 — FAQ</div>
+        <div class="mono sec-num">08 — FAQ</div>
         <h2 class="sec-title">자주 묻는 <em>질문</em></h2>
       </div>
       <p class="sec-sub">여기에 없는 궁금증은 1533-7295로 편하게 물어보세요. 상담은 무료입니다.</p>
@@ -1176,7 +1478,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
   <div class="wrap">
     <div class="ct-grid">
       <div class="ct-l rv">
-        <div class="mono sec-num">07 — CONTACT</div>
+        <div class="mono sec-num">09 — CONTACT</div>
         <h2 class="ct-big">망설이는 동안에도<br>손님은 <em>검색하고 있습니다.</em></h2>
         <p>상담은 무료입니다. 지금 하고 계신 일과 고민만 말씀해 주세요. 필요 없는 건 필요 없다고 솔직하게 말씀드립니다.</p>
 
@@ -1215,7 +1517,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
               <option value="홈페이지 제작">홈페이지 제작</option>
               <option value="홈페이지 + 홍보영상">홈페이지 + 홍보영상</option>
               <option value="숏폼 홍보영상만">숏폼 홍보영상만</option>
-              <option value="AI 맞춤 강의">AI 맞춤 강의</option>
+              <option value="AI 맞춤 강의">AI 맞춤 강의 (1:1)</option>
+              <option value="AI 클래스 1기 사전신청">AI 클래스 1기 사전신청 (준비중)</option>
               <option value="아직 잘 모르겠어요">아직 잘 모르겠어요 (상담 원함)</option>
             </select>
           </div>
@@ -1258,8 +1561,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
         <div class="ft-col">
           <h5>SERVICE</h5>
           <a href="#service">홈페이지 제작</a>
-          <a href="#service">숏폼 홍보영상</a>
-          <a href="#service">AI 맞춤 강의</a>
+          <a href="#video">숏폼 홍보영상</a>
+          <a href="#aiclass">AI 클래스 (준비중)</a>
           <a href="#price">요금 · 견적 계산기</a>
         </div>
         <div class="ft-col">
@@ -1626,6 +1929,28 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
       note.innerHTML = '아래 내용을 복사해 카톡·문자로 보내주시거나 1533-7295로 전화 주세요.';
       showFallback(note, body);
     }
+  });
+
+  /* ---------- 영상 섹션 → 견적 계산기로 담기 ---------- */
+  function goTo(el){
+    const y = el.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top:y, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+
+  const addVideoBtn = $('#addVideo');
+  if(addVideoBtn) addVideoBtn.addEventListener('click', ()=>{
+    const plus = $('.stepper[data-qty="video"] button[data-step="1"]');
+    if(plus && +$('.stepper[data-qty="video"] [data-q]').textContent === 0) plus.click();
+    goTo($('#calc'));
+  });
+
+  /* ---------- AI 클래스 알림 신청 → 문의 폼 프리셋 ---------- */
+  const classBtn = $('#classAlert');
+  if(classBtn) classBtn.addEventListener('click', ()=>{
+    const sel = $('#f-type');
+    if(sel) sel.value = 'AI 클래스 1기 사전신청';
+    goTo($('#contact'));
+    setTimeout(()=>{ const n = $('#f-name'); if(n) n.focus({preventScroll:true}); }, 700);
   });
 
   /* ---------- smooth anchor offset ---------- */
