@@ -1,0 +1,39 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "banilla",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "http-server",
+        "바닐라헤어",
+        "-p",
+        "8145",
+        "-c-1"
+      ],
+      "port": 8145
+    },
+    {
+      "name": "keungil-bridge",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/bridge-server.js"
+      ],
+      "port": 8805
+    },
+    {
+      "name": "keungil-home",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "http-server",
+        ".",
+        "-p",
+        "8151",
+        "-c-1"
+      ],
+      "port": 8151
+    }
+  ]
+}
