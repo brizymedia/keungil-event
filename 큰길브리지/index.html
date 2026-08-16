@@ -382,18 +382,19 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
 .reel-play .ic-play{margin-left:2px}
 .reel-play .ic-pause{display:none}
 .reel:hover .reel-play svg{color:var(--ink)}
-.reel.playing .reel-play{opacity:0}
-.reel.playing:hover .reel-play{opacity:1;background:rgba(7,9,15,.6);border-color:rgba(237,234,227,.4)}
-.reel.playing:hover .reel-play svg{color:var(--txt)}
-.reel.playing .ic-play{display:none}
-.reel.playing .ic-pause{display:block}
+/* 일시정지 아이콘·소리 버튼은 "호버 미리보기"가 아니라 사용자가 실제로 재생을 누른 뒤에만 */
+.reel.armed .reel-play{opacity:0}
+.reel.armed:hover .reel-play{opacity:1;background:rgba(7,9,15,.6);border-color:rgba(237,234,227,.4)}
+.reel.armed:hover .reel-play svg{color:var(--txt)}
+.reel.armed .ic-play{display:none}
+.reel.armed .ic-pause{display:block}
 .reel-sound{
   position:absolute;top:14px;right:14px;z-index:3;width:28px;height:28px;border-radius:50%;
   display:none;place-items:center;pointer-events:auto;cursor:pointer;padding:0;
   background:rgba(7,9,15,.62);backdrop-filter:blur(6px);border:1px solid var(--line-2);
   transition:background .3s,border-color .3s;
 }
-.reel.playing .reel-sound{display:grid}
+.reel.armed .reel-sound{display:grid}
 .reel-sound:hover{background:var(--gold);border-color:var(--gold)}
 .reel-sound svg{width:13px;height:13px;color:var(--txt)}
 .reel-sound:hover svg{color:var(--ink)}
@@ -2003,7 +2004,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
         if(r === except) return;
         const v = $('.reel-vid', r);
         if(v && !v.paused) v.pause();
-        r.classList.remove('sound-on');
+        r.classList.remove('sound-on','armed');   // armed 상태도 함께 해제
         if(v) v.muted = true;
       });
     }
@@ -2016,8 +2017,29 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
       const src = reel.dataset.src;
       if(!vid || !btn || !src) return;
 
-      let armed = false;               // 사용자가 재생 버튼을 눌러 "고정 재생" 상태인지
+      // armed = 사용자가 재생 버튼을 눌러 소리 재생을 요청한 상태.
+      // 다른 릴에서도 해제할 수 있도록 클래스를 단일 기준으로 삼는다.
+      const armed = ()=> reel.classList.contains('armed');
       const load = ()=>{ if(!vid.getAttribute('src')){ vid.setAttribute('src', src); } };
+
+      /* 재생 버튼 → 항상 소리와 함께 재생.
+         호버 미리보기가 이미 돌고 있어도 음소거만 풀고 이어서 재생한다. */
+      function playWithSound(){
+        pauseOthers(reel);
+        reel.classList.add('armed','sound-on');
+        vid.muted = false;
+        vid.volume = 1;
+        const p = vid.play();
+        if(p && p.catch) p.catch(err=>{
+          // 브라우저가 소리 있는 재생을 정말로 막은 경우에만 무음으로 되돌린다.
+          // AbortError(로딩 중 재생 요청이 끊긴 경우) 등은 무시 — 곧 재생이 이어진다.
+          if(err && err.name === 'NotAllowedError'){
+            vid.muted = true;
+            reel.classList.remove('sound-on');
+            vid.play().catch(()=>{});
+          }
+        });
+      }
 
       vid.addEventListener('loadeddata', ()=> reel.classList.add('vid-ready'));
       vid.addEventListener('play',  ()=>{ reel.classList.add('playing','touched','vid-ready'); });
@@ -2034,20 +2056,20 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
       btn.addEventListener('click', e=>{
         e.preventDefault(); e.stopPropagation();
         load();
-        if(vid.paused){
-          pauseOthers(reel);
-          armed = true;
+        // 호버 미리보기 상태라면 재생 중이어도 정지가 아니라 소리를 켜고 이어재생한다
+        if(armed() && !vid.paused){
+          reel.classList.remove('armed','sound-on');
+          vid.pause();
+        }else{
+          playWithSound();
+        }
+      });
+
+      // 재생이 실제로 시작됐는데 음소거가 남아 있으면 풀어준다 (호버 미리보기 → 클릭 전환 대비)
+      vid.addEventListener('playing', ()=>{
+        if(armed() && vid.muted){
           vid.muted = false;
           reel.classList.add('sound-on');
-          vid.play().catch(()=>{
-            // 브라우저가 소리 있는 자동재생을 막으면 무음으로라도 재생
-            vid.muted = true;
-            reel.classList.remove('sound-on');
-            vid.play().catch(()=>{});
-          });
-        }else{
-          armed = false;
-          vid.pause();
         }
       });
 
@@ -2060,13 +2082,13 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
       /* 데스크톱에서만 호버 무음 미리보기 */
       if(fine && !calm){
         reel.addEventListener('mouseenter', ()=>{
-          if(armed) return;
+          if(armed()) return;
           load();
           vid.muted = true;
           vid.play().catch(()=>{});
         });
         reel.addEventListener('mouseleave', ()=>{
-          if(armed) return;
+          if(armed()) return;
           vid.pause();
           vid.currentTime = 0;
           if(bar) bar.style.width = '0%';
