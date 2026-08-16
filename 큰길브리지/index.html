@@ -517,10 +517,13 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
    ============================================================ */
 .pricing{background:var(--ink-2);border-top:1px solid var(--line)}
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,22px)}
-@media(max-width:920px){.plans{grid-template-columns:1fr}}
+/* 세로로 쌓이면 카드 위로 튀어나온 뱃지가 윗 카드에 닿으므로 간격을 넉넉히 준다 */
+@media(max-width:920px){.plans{grid-template-columns:1fr;gap:30px}}
 .plan{
   position:relative;border:1px solid var(--line);border-radius:22px;padding:clamp(24px,3vw,34px);
-  background:rgba(237,234,227,.022);cursor:pointer;overflow:hidden;
+  background:rgba(237,234,227,.022);cursor:pointer;
+  /* 뱃지가 카드 위쪽 테두리에 걸쳐 있는 디자인이라 overflow 를 잘라내면 안 된다 */
+  overflow:visible;
   transition:border-color .4s,transform .5s var(--ease-2),background .4s;
   display:flex;flex-direction:column;
 }
