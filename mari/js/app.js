@@ -159,6 +159,128 @@
     btn.disabled = false;
   });
 
+  /* ── 후원: 리워드 · 계좌 ── */
+  const RW_ICONS = {
+    disc: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3a9 9 0 016.4 2.7"/></svg>',
+    film: '<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.4"/><path d="M7 4.5v15M17 4.5v15M2.5 12h19"/></svg>',
+  };
+  $('#rewards').innerHTML = REWARDS.map((r, i) => `
+    <article class="rw reveal" style="--d:${i * 90}ms">
+      <div class="rw__top">
+        <span class="rw__ico">${RW_ICONS[r.icon] || ''}</span>
+        <div><span class="rw__tag">${r.tag}</span><h3 class="rw__title">${r.title}</h3></div>
+      </div>
+      <p class="rw__desc">${r.desc}</p>
+      <p class="rw__meta">${r.meta}</p>
+    </article>`).join('');
+
+  const BANK = CONFIG.bank;
+  $('#acc').innerHTML = `
+    <div><dt>은행</dt><dd>${BANK.name}</dd></div>
+    <div><dt>계좌번호</dt><dd class="num">${BANK.number}</dd></div>
+    <div><dt>예금주</dt><dd>${BANK.holder}</dd></div>`;
+  $('#copyAcc').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(`${BANK.name} ${BANK.number} (예금주 ${BANK.holder})`);
+      toast('계좌번호를 복사했습니다');
+    } catch { toast(`${BANK.name} ${BANK.number}`); }
+  });
+
+  /* ── 후원하기 버튼 → 펼치기 ── */
+  const supBtn = $('#openSup'), supPanel = $('#supPanel'), supTxt = $('#openSupTxt');
+  function openSup() {
+    if (!supPanel.hidden) return;
+    supPanel.hidden = false;
+    // 숨겨진 동안에는 IntersectionObserver 가 발화하지 않으므로 직접 켜준다
+    $$('.reveal', supPanel).forEach(el => el.classList.add('in'));
+    supPanel.classList.add('open');
+    supBtn.classList.add('open');
+    supBtn.setAttribute('aria-expanded', 'true');
+    supTxt.textContent = '접기';
+    requestAnimationFrame(() => supPanel.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' }));
+  }
+  function closeSup() {
+    supPanel.classList.remove('open');
+    supPanel.hidden = true;
+    supBtn.classList.remove('open');
+    supBtn.setAttribute('aria-expanded', 'false');
+    supTxt.textContent = '후원하기';
+    supBtn.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
+  }
+  supBtn.addEventListener('click', () => (supPanel.hidden ? openSup() : closeSup()));
+  if (location.hash === '#support-form') openSup();
+
+  /* ── 신청서 ── */
+  const F = { name: $('#fName'), phone: $('#fPhone'), email: $('#fEmail'),
+              amount: $('#fAmount'), date: $('#fDate'), msg: $('#fMsg'), agree: $('#fAgree') };
+  const val = (el) => el.value.trim();
+
+  function bad(el, msg) {
+    el.classList.add('bad');
+    el.focus();
+    el.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' });
+    toast(msg);
+    return null;
+  }
+
+  // 문자 본문이 너무 길면 잘리거나 안 열린다. 필수 항목은 남기고 응원글만 줄인다.
+  function collect(limit = 700) {
+    if (!val(F.name)) return bad(F.name, '성함을 입력해주세요');
+    F.name.classList.remove('bad');
+    if (val(F.phone).replace(/[^0-9]/g, '').length < 9) return bad(F.phone, '연락처를 정확히 입력해주세요');
+    F.phone.classList.remove('bad');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val(F.email))) return bad(F.email, '이메일을 정확히 입력해주세요');
+    F.email.classList.remove('bad');
+    const box = F.agree.closest('.agree');
+    if (!F.agree.checked) { box.classList.add('bad'); F.agree.focus(); toast('개인정보 제공에 동의해주세요'); return null; }
+    box.classList.remove('bad');
+
+    let core = `[가수 마리 후원 신청]\n성함: ${val(F.name)}\n연락처: ${val(F.phone)}\n이메일: ${val(F.email)}`;
+    if (val(F.amount)) core += `\n후원 금액: ${val(F.amount)}`;
+    if (val(F.date)) core += `\n입금일: ${val(F.date)}`;
+    const tail = '\n\n※ 고음질 음원과 미공개 영상을 위 이메일로 받겠습니다.';
+    if (val(F.msg)) {
+      const room = limit - core.length - tail.length - 12;
+      if (room > 20) {
+        const m = val(F.msg);
+        core += `\n응원 한마디: ${m.slice(0, room)}${m.length > room ? '…' : ''}`;
+      }
+    }
+    return core + tail;
+  }
+
+  $('#sendSms').addEventListener('click', () => {
+    const body = collect();
+    if (!body) return;
+    // iPadOS 13+ 는 UA에 iPad를 안 쓰고 Mac인 척하므로 터치 포인트로 함께 판별한다
+    const apple = /iP(hone|od|ad)/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    location.href = `sms:${CONFIG.phone.replace(/[^0-9+]/g, '')}${apple ? '&' : '?'}body=${encodeURIComponent(body)}`;
+  });
+
+  $('#sendKakao').addEventListener('click', async () => {
+    const body = collect();
+    if (!body) return;
+    if (navigator.share) {
+      try { await navigator.share({ title: '가수 마리 후원 신청', text: body }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(body); toast(`내용을 복사했습니다 · 카톡으로 ${CONFIG.phone} 에 보내주세요`); }
+    catch { toast('복사에 실패했습니다'); }
+  });
+
+  $('#copyForm').addEventListener('click', async () => {
+    const body = collect();
+    if (!body) return;
+    try { await navigator.clipboard.writeText(body); toast('신청 내용을 복사했습니다'); }
+    catch { toast('복사에 실패했습니다'); }
+  });
+
+  [F.name, F.phone, F.email].forEach(el =>
+    el.addEventListener('input', () => el.classList.remove('bad')));
+  F.agree.addEventListener('change', () =>
+    F.agree.closest('.agree').classList.toggle('bad', !F.agree.checked));
+
   /* 스크롤 리빌 */
   const io = new IntersectionObserver((en) => {
     en.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } });
