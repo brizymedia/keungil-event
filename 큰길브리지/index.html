@@ -352,8 +352,18 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
 .reel:hover{border-color:var(--gold);box-shadow:0 40px 90px -30px rgba(232,184,75,.45)}
 .reel-bg{position:absolute;inset:0;background-size:200% 200%;animation:reelShift 9s ease-in-out infinite}
 @keyframes reelShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.reel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,15,.5) 0%,transparent 30%,transparent 55%,rgba(7,9,15,.92) 100%)}
-.reel-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:14px}
+.reel-vid{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
+  opacity:0;transition:opacity .5s var(--ease);background:#0D1119;
+}
+.reel.vid-ready .reel-vid{opacity:1}
+.reel::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(7,9,15,.5) 0%,transparent 30%,transparent 55%,rgba(7,9,15,.92) 100%);
+  transition:opacity .5s var(--ease);
+}
+.reel.playing::after{opacity:.45}
+.reel-in{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:14px;pointer-events:none}
 .reel-tag{
   align-self:flex-start;display:flex;align-items:center;gap:6px;
   font-family:var(--f-mono);font-size:.5rem;letter-spacing:.16em;padding:4px 8px;border-radius:99px;
@@ -363,11 +373,33 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
 .reel-play{
   margin:auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
   background:rgba(237,234,227,.14);backdrop-filter:blur(8px);border:1px solid rgba(237,234,227,.3);
-  transition:transform .45s var(--ease-2),background .4s;
+  transition:transform .45s var(--ease-2),background .4s,opacity .4s;
+  pointer-events:auto;cursor:pointer;padding:0;
 }
 .reel:hover .reel-play{transform:scale(1.16);background:var(--gold);border-color:var(--gold)}
-.reel-play svg{width:15px;height:15px;margin-left:2px;color:var(--txt);transition:color .4s}
+.reel-play:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.reel-play svg{width:15px;height:15px;color:var(--txt);transition:color .4s}
+.reel-play .ic-play{margin-left:2px}
+.reel-play .ic-pause{display:none}
 .reel:hover .reel-play svg{color:var(--ink)}
+.reel.playing .reel-play{opacity:0}
+.reel.playing:hover .reel-play{opacity:1;background:rgba(7,9,15,.6);border-color:rgba(237,234,227,.4)}
+.reel.playing:hover .reel-play svg{color:var(--txt)}
+.reel.playing .ic-play{display:none}
+.reel.playing .ic-pause{display:block}
+.reel-sound{
+  position:absolute;top:14px;right:14px;z-index:3;width:28px;height:28px;border-radius:50%;
+  display:none;place-items:center;pointer-events:auto;cursor:pointer;padding:0;
+  background:rgba(7,9,15,.62);backdrop-filter:blur(6px);border:1px solid var(--line-2);
+  transition:background .3s,border-color .3s;
+}
+.reel.playing .reel-sound{display:grid}
+.reel-sound:hover{background:var(--gold);border-color:var(--gold)}
+.reel-sound svg{width:13px;height:13px;color:var(--txt)}
+.reel-sound:hover svg{color:var(--ink)}
+.reel-sound .ic-on{display:none}
+.reel.sound-on .reel-sound .ic-on{display:block}
+.reel.sound-on .reel-sound .ic-off{display:none}
 .reel-cap{margin-top:auto;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
 .reel-cap b{
   font-size:.76rem;font-weight:800;letter-spacing:-.03em;line-height:1.35;
@@ -377,6 +409,8 @@ h1 .thin{font-family:var(--f-disp);font-style:italic;font-weight:400;color:var(-
 .reel-bar{margin-top:10px;height:2.5px;border-radius:9px;background:rgba(237,234,227,.2);overflow:hidden}
 .reel-bar i{display:block;height:100%;background:var(--gold);width:0;animation:scrub 6s linear infinite}
 @keyframes scrub{to{width:100%}}
+/* 실제 영상이 한 번이라도 재생되면 장식용 스크럽 애니메이션을 끄고 실제 진행률을 쓴다 */
+.reel.touched .reel-bar i{animation:none}
 @media(max-width:640px){
   .reels{gap:8px}
   .reel{border-radius:16px}
@@ -1030,40 +1064,64 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
     </div>
 
     <div class="reels rv">
-      <article class="reel">
+      <article class="reel" data-src="videos/sample-1.mp4" data-label="가수 프로필 샘플 영상">
         <div class="reel-bg" style="background:linear-gradient(135deg,#3A2440,#7A3B32 45%,#241A2E)"></div>
+        <video class="reel-vid" poster="videos/sample-1.jpg" preload="none" playsinline muted loop></video>
         <div class="reel-in">
           <span class="reel-tag"><i></i>INSTAGRAM REELS</span>
-          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <button class="reel-play" type="button" aria-label="가수 프로필 샘플 영상 재생">
+            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="reel-sound" type="button" aria-label="소리 켜기/끄기">
+            <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/></svg>
+            <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
+          </button>
           <div class="reel-cap">
-            <b>우리 가게, 이제 검색됩니다</b>
-            <span>매장 홍보 · 0:22</span>
+            <b>가수 프로필, 섭외로 이어집니다</b>
+            <span>아티스트 소개 · 0:10</span>
             <div class="reel-bar" style="width:100%"><i></i></div>
           </div>
         </div>
       </article>
 
-      <article class="reel">
+      <article class="reel" data-src="videos/sample-2.mp4" data-label="제품 홍보 샘플 영상">
         <div class="reel-bg" style="background:linear-gradient(135deg,#1F3A4D,#B8862F 50%,#2A1F16)"></div>
+        <video class="reel-vid" poster="videos/sample-2.jpg" preload="none" playsinline muted loop></video>
         <div class="reel-in">
           <span class="reel-tag"><i></i>YOUTUBE SHORTS</span>
-          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <button class="reel-play" type="button" aria-label="제품 홍보 샘플 영상 재생">
+            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="reel-sound" type="button" aria-label="소리 켜기/끄기">
+            <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/></svg>
+            <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
+          </button>
           <div class="reel-cap">
-            <b>무대 위 3분, 그대로 담았습니다</b>
-            <span>공연 스케치 · 0:45</span>
+            <b>제품의 강점만 뽑아 담았습니다</b>
+            <span>제품 홍보 영상 · 1:23</span>
             <div class="reel-bar" style="width:100%"><i></i></div>
           </div>
         </div>
       </article>
 
-      <article class="reel">
+      <article class="reel" data-src="videos/sample-3.mp4" data-label="브랜드 숏폼 샘플 영상">
         <div class="reel-bg" style="background:linear-gradient(135deg,#16403B,#2E6E5E 48%,#101F2A)"></div>
+        <video class="reel-vid" poster="videos/sample-3.jpg" preload="none" playsinline muted loop></video>
         <div class="reel-in">
           <span class="reel-tag"><i></i>TIKTOK</span>
-          <span class="reel-play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+          <button class="reel-play" type="button" aria-label="브랜드 숏폼 샘플 영상 재생">
+            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="reel-sound" type="button" aria-label="소리 켜기/끄기">
+            <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"/></svg>
+            <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
+          </button>
           <div class="reel-cap">
-            <b>이번 축제, 놓치지 마세요</b>
-            <span>행사 티저 · 0:15</span>
+            <b>스크롤을 멈추게 하는 첫 3초</b>
+            <span>브랜드 숏폼 · 0:38</span>
             <div class="reel-bar" style="width:100%"><i></i></div>
           </div>
         </div>
@@ -1930,6 +1988,92 @@ footer{border-top:1px solid var(--line);padding:56px 0 120px;background:var(--in
       showFallback(note, body);
     }
   });
+
+  /* ============================================================
+     REEL 샘플 영상 — 호버 시 무음 미리보기, 재생 버튼 클릭 시 소리와 함께 재생
+     ============================================================ */
+  (function(){
+    const reels = $$('.reel');
+    if(!reels.length) return;
+    const fine   = matchMedia('(pointer:fine)').matches;
+    const calm   = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function pauseOthers(except){
+      reels.forEach(r=>{
+        if(r === except) return;
+        const v = $('.reel-vid', r);
+        if(v && !v.paused) v.pause();
+        r.classList.remove('sound-on');
+        if(v) v.muted = true;
+      });
+    }
+
+    reels.forEach(reel=>{
+      const vid = $('.reel-vid', reel);
+      const btn = $('.reel-play', reel);
+      const snd = $('.reel-sound', reel);
+      const bar = $('.reel-bar i', reel);
+      const src = reel.dataset.src;
+      if(!vid || !btn || !src) return;
+
+      let armed = false;               // 사용자가 재생 버튼을 눌러 "고정 재생" 상태인지
+      const load = ()=>{ if(!vid.getAttribute('src')){ vid.setAttribute('src', src); } };
+
+      vid.addEventListener('loadeddata', ()=> reel.classList.add('vid-ready'));
+      vid.addEventListener('play',  ()=>{ reel.classList.add('playing','touched','vid-ready'); });
+      vid.addEventListener('pause', ()=> reel.classList.remove('playing'));
+      vid.addEventListener('timeupdate', ()=>{
+        if(bar && vid.duration) bar.style.width = (vid.currentTime / vid.duration * 100) + '%';
+      });
+      // 파일이 없거나 코덱을 못 읽으면 조용히 그래디언트 배경으로 되돌린다
+      vid.addEventListener('error', ()=>{
+        reel.classList.remove('vid-ready','playing');
+        btn.style.display = 'none';
+      });
+
+      btn.addEventListener('click', e=>{
+        e.preventDefault(); e.stopPropagation();
+        load();
+        if(vid.paused){
+          pauseOthers(reel);
+          armed = true;
+          vid.muted = false;
+          reel.classList.add('sound-on');
+          vid.play().catch(()=>{
+            // 브라우저가 소리 있는 자동재생을 막으면 무음으로라도 재생
+            vid.muted = true;
+            reel.classList.remove('sound-on');
+            vid.play().catch(()=>{});
+          });
+        }else{
+          armed = false;
+          vid.pause();
+        }
+      });
+
+      if(snd) snd.addEventListener('click', e=>{
+        e.preventDefault(); e.stopPropagation();
+        vid.muted = !vid.muted;
+        reel.classList.toggle('sound-on', !vid.muted);
+      });
+
+      /* 데스크톱에서만 호버 무음 미리보기 */
+      if(fine && !calm){
+        reel.addEventListener('mouseenter', ()=>{
+          if(armed) return;
+          load();
+          vid.muted = true;
+          vid.play().catch(()=>{});
+        });
+        reel.addEventListener('mouseleave', ()=>{
+          if(armed) return;
+          vid.pause();
+          vid.currentTime = 0;
+          if(bar) bar.style.width = '0%';
+        });
+      }
+    });
+  })();
 
   /* ---------- 영상 섹션 → 견적 계산기로 담기 ---------- */
   function goTo(el){
