@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache">
-  <title>문의하기 — YM토탈이벤트</title>
+  <title>YM토탈이벤트 — 새 주소로 이동합니다</title>
   <meta name="robots" content="noindex">
-  <link rel="canonical" href="quote.html">
-  <meta http-equiv="refresh" content="0; url=quote.html">
-
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23EF4444'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='bold' fill='%230a0a0b' text-anchor='middle'%3EYM%3C/text%3E%3C/svg%3E">
+  <link rel="canonical" href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/quote.html">
   <style>
     body{margin:0;min-height:100svh;display:grid;place-items:center;
-         background:#0a0a0b;color:#a1a1aa;font-family:system-ui,sans-serif;text-align:center;padding:1.5rem;
-         line-height:1.9;}
+         background:#0a0a0b;color:#a1a1aa;font-family:system-ui,sans-serif;
+         text-align:center;padding:1.5rem;line-height:1.9;}
     a{color:#F87171;font-weight:700;}
+    strong{color:#fff;}
   </style>
 </head>
 <body>
   <div>
-    <p>문의는 <strong style="color:#fff;">견적 문의</strong> 한 곳으로 모았습니다.</p>
+    <p>YM토탈이벤트 홈페이지가 <strong>www.와이엠토탈이벤트.com</strong> 으로 옮겨졌습니다.</p>
     <p>잠시 후 자동으로 이동합니다. 이동하지 않으면
-      <a href="quote.html">여기를 눌러주세요</a>.</p>
+      <a id="go" href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/quote.html">여기를 눌러주세요</a>.</p>
   </div>
   <script>
-    /* 문의 페이지를 견적 문의로 합쳤습니다.
-       예전 주소나 즐겨찾기로 들어오신 분을 그대로 넘겨줍니다. */
-    location.replace('quote.html');
+    /* 새 주소로 넘겨줍니다.
+       meta refresh 대신 스크립트를 쓰는 이유는 주소 뒤 내용을 보존하기 위해서입니다. */
+    var 목적지 = 'https://www.xn--el3bx2ohi64bba144lgmbdzd.com/quote.html';
+    document.getElementById('go').href = 목적지;
+    location.replace(목적지);
   </script>
 </body>
 </html>

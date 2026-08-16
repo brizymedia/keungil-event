@@ -3,22 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YM토탈이벤트 — 주소가 변경되었습니다</title>
+  <title>YM토탈이벤트 — 새 주소로 이동합니다</title>
   <meta name="robots" content="noindex">
-  <link rel="canonical" href="../ym토탈이벤트/">
-  <meta http-equiv="refresh" content="0; url=../ym토탈이벤트/">
+  <link rel="canonical" href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/">
   <style>
     body{margin:0;min-height:100svh;display:grid;place-items:center;
-         background:#0a0a0b;color:#a1a1aa;font-family:system-ui,sans-serif;text-align:center;padding:1.5rem;}
+         background:#0a0a0b;color:#a1a1aa;font-family:system-ui,sans-serif;
+         text-align:center;padding:1.5rem;line-height:1.9;}
     a{color:#F87171;font-weight:700;}
+    strong{color:#fff;}
   </style>
 </head>
 <body>
   <div>
-    <p>YM토탈이벤트 홈페이지 주소가 바뀌었습니다.</p>
+    <p>YM토탈이벤트 홈페이지가 <strong>www.와이엠토탈이벤트.com</strong> 으로 옮겨졌습니다.</p>
     <p>잠시 후 자동으로 이동합니다. 이동하지 않으면
-      <a href="../ym토탈이벤트/">여기를 눌러주세요</a>.</p>
+      <a id="go" href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/">여기를 눌러주세요</a>.</p>
   </div>
-  <script>location.replace('../ym토탈이벤트/');</script>
+  <script>
+    /* 새 주소로 넘겨줍니다.
+       meta refresh 대신 스크립트를 쓰는 이유는 주소 뒤 내용을 보존하기 위해서입니다. */
+    var 목적지 = 'https://www.xn--el3bx2ohi64bba144lgmbdzd.com/' + location.search + location.hash;
+    document.getElementById('go').href = 목적지;
+    location.replace(목적지);
+  </script>
 </body>
 </html>
