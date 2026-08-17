@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B0A10">
+<title>전자계약서 — 큰길이벤트기획</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+<style>
+  :root{ --amber:#F59E0B; --amber-2:#FBBF24; --amber-ink:#B45309; --dark:#0B0A10; --ink:#16141C; }
+  *{ box-sizing:border-box;font-family:'Pretendard',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all; }
+  html,body{ margin:0;background:var(--dark);color:#fff;-webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+  [hidden]{ display:none !important; }
+
+  /* ── 상단 바 ── */
+  .topbar{ position:sticky;top:0;z-index:40;background:rgba(11,10,16,.85);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08); }
+  .topbar-in{ max-width:88rem;margin:0 auto;padding:.7rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem; }
+  .brand{ display:flex;align-items:center;gap:.5rem;text-decoration:none;font-weight:800;letter-spacing:-.02em;font-size:.95rem; }
+  .brand img{ height:1.8rem;filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(245,158,11,.5)); }
+  .pill{ display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:9999px;font-size:.75rem;font-weight:700;border:1px solid rgba(255,255,255,.14);color:#CFC9D6; }
+  .pill.admin{ border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.12);color:#FCD34D; }
+  .pill.signed{ border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.12);color:#86EFAC; }
+
+  /* ── 버튼 ── */
+  .btn{ display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.4rem;border-radius:9999px;font-weight:700;font-size:.9rem;cursor:pointer;text-decoration:none;white-space:nowrap;transition:all .3s cubic-bezier(.16,1,.3,1);border:1px solid transparent; }
+  .btn-primary{ background:var(--amber);color:#0a0a0a;box-shadow:0 6px 24px -8px rgba(245,158,11,.5); }
+  .btn-primary:hover{ background:var(--amber-2);transform:translateY(-1px); }
+  .btn-primary:disabled{ opacity:.5;cursor:not-allowed;transform:none; }
+  .btn-ghost{ background:transparent;color:#fff;border-color:rgba(255,255,255,.2); }
+  .btn-ghost:hover{ border-color:var(--amber);background:rgba(245,158,11,.06); }
+  .btn-sm{ padding:.55rem 1rem;font-size:.82rem; }
+
+  /* ── 레이아웃 ── */
+  .wrap{ max-width:88rem;margin:0 auto;padding:1.25rem 1.1rem 6rem;display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem; }
+  body.admin .wrap{ grid-template-columns:400px minmax(0,1fr);align-items:start; }
+  @media (max-width:1023px){ body.admin .wrap{ grid-template-columns:1fr; } }
+
+  /* ── 관리자 패널 ── */
+  #admin{ position:sticky;top:4.2rem;max-height:calc(100dvh - 5rem);overflow:auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:1.25rem;padding:1.1rem;scrollbar-width:thin; }
+  @media (max-width:1023px){ #admin{ position:static;max-height:none; } }
+  details.sec{ border:1px solid rgba(255,255,255,.08);border-radius:.9rem;background:rgba(255,255,255,.02);margin-bottom:.6rem; }
+  details.sec > summary{ list-style:none;cursor:pointer;padding:.8rem .95rem;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;color:#F4F0FA; }
+  details.sec > summary::-webkit-details-marker{ display:none; }
+  details.sec > summary .chev{ transition:transform .25s;color:#8A8494; }
+  details.sec[open] > summary .chev{ transform:rotate(180deg); }
+  details.sec > .body{ padding:0 .95rem .95rem;display:flex;flex-direction:column;gap:.6rem; }
+  label.f{ display:block;font-size:.72rem;color:#A9A3B3;font-weight:600;letter-spacing:.03em;margin-bottom:.28rem; }
+  .in{ width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;padding:.6rem .75rem;color:#fff;font-size:.88rem;outline:none;transition:border-color .2s; }
+  .in:focus{ border-color:rgba(245,158,11,.6); }
+  .in::placeholder{ color:#6B6675; }
+  textarea.in{ resize:vertical;min-height:70px;line-height:1.55; }
+  .row2{ display:grid;grid-template-columns:1fr 1fr;gap:.5rem; }
+  .row3{ display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem; }
+  .hint{ font-size:.74rem;color:#8A8494;line-height:1.6; }
+  .items-t{ width:100%;border-collapse:collapse;font-size:.8rem; }
+  .items-t th{ text-align:left;font-weight:700;color:#8A8494;font-size:.68rem;padding:.2rem .25rem;letter-spacing:.03em; }
+  .items-t td{ padding:.15rem .2rem;vertical-align:middle; }
+  .items-t .in{ padding:.42rem .5rem;font-size:.8rem;border-radius:.45rem; }
+  .items-t .del{ background:none;border:none;color:#8A8494;cursor:pointer;font-size:1rem;padding:.2rem; }
+  .items-t .del:hover{ color:#F87171; }
+  .actions{ display:flex;flex-direction:column;gap:.55rem;margin-top:.8rem; }
+  .actions .btn{ width:100%; }
+  .kv{ display:flex;justify-content:space-between;font-size:.82rem;color:#CFC9D6;padding:.15rem 0; }
+  .kv b{ color:#fff; }
+  .toast{ position:fixed;left:50%;bottom:1.5rem;transform:translate(-50%,1rem);background:#1E1B27;color:#fff;padding:.8rem 1.2rem;border-radius:.8rem;font-size:.9rem;font-weight:600;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:all .3s;z-index:100;max-width:92vw;text-align:center; }
+  .toast.on{ opacity:1;transform:translate(-50%,0); }
+
+  /* ── 문서(종이) ── */
+  .paper-wrap{ min-width:0; }
+  #paper{
+    background:#fff;color:#111;border-radius:.6rem;box-shadow:0 30px 80px -30px rgba(0,0,0,.8);
+    padding:14mm 14mm 12mm;max-width:210mm;margin:0 auto;font-size:10.5pt;line-height:1.65;
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;
+  }
+  @media (max-width:640px){ #paper{ padding:7mm 5mm 8mm;font-size:10pt;border-radius:.4rem; } }
+  #paper h1{ text-align:center;font-size:20pt;letter-spacing:.35em;font-weight:800;margin:0 0 4mm;color:#111; }
+  #paper .doc-no{ display:flex;justify-content:space-between;font-size:8.5pt;color:#555;border-bottom:2px solid #111;padding-bottom:2mm;margin-bottom:5mm; }
+  #paper .preamble{ margin:0 0 4mm; }
+  #paper h2{ font-size:11pt;font-weight:800;margin:5mm 0 1.5mm;color:#111; }
+  #paper p{ margin:0 0 1.2mm; }
+  #paper ol{ margin:0 0 1.5mm;padding-left:1.4em; }
+  #paper ol li{ margin-bottom:.6mm; }
+  #paper table.info{ width:100%;border-collapse:collapse;margin:1.5mm 0 3mm;font-size:9.5pt; }
+  #paper table.info th{ width:24%;text-align:left;background:#F5F3EE;border:1px solid #D9D5CC;padding:1.6mm 2.2mm;font-weight:700;color:#333; }
+  #paper table.info td{ border:1px solid #D9D5CC;padding:1.6mm 2.2mm; }
+  #paper table.items{ width:100%;border-collapse:collapse;margin:1.5mm 0 2mm;font-size:9pt; }
+  #paper table.items th{ background:#111;color:#fff;padding:1.6mm 1.8mm;font-weight:700;text-align:left;font-size:8.5pt; }
+  #paper table.items td{ border-bottom:1px solid #E5E1D8;padding:1.5mm 1.8mm;vertical-align:top; }
+  #paper .r{ text-align:right;white-space:nowrap; } #paper .c{ text-align:center; }
+  #paper .sum td{ border-bottom:none;padding:.9mm 1.8mm;font-size:9pt; }
+  #paper .sum .tot td{ font-weight:800;font-size:10.5pt;border-top:2px solid #111;padding-top:1.6mm; }
+  #paper .amount-box{ border:1.5px solid #111;padding:2.5mm 3mm;margin:2mm 0 3mm;font-weight:800;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;background:#FFFBF2; }
+  #paper .amount-box small{ font-weight:600;color:#555;font-size:8.5pt; }
+  #paper table.cancel{ width:100%;border-collapse:collapse;font-size:9pt;margin:1.5mm 0; }
+  #paper table.cancel th,#paper table.cancel td{ border:1px solid #D9D5CC;padding:1.4mm 2mm;text-align:left; }
+  #paper table.cancel th{ background:#F5F3EE;font-weight:700; }
+  #paper .special{ white-space:pre-wrap;border:1px dashed #BDB8AE;padding:2.5mm 3mm;min-height:14mm;background:#FCFBF8;font-size:9.5pt; }
+  #paper .closing{ margin:5mm 0 3mm; }
+  #paper .sign-date{ text-align:center;font-weight:700;margin:4mm 0 5mm;font-size:11pt; }
+  #paper .parties{ display:grid;grid-template-columns:1fr 1fr;gap:6mm; }
+  @media (max-width:640px){ #paper .parties{ grid-template-columns:1fr; } }
+  #paper .party{ border:1px solid #D9D5CC;padding:3mm 3.5mm;position:relative;min-height:46mm; }
+  #paper .party .role{ display:inline-block;font-size:8pt;font-weight:800;letter-spacing:.2em;padding:.4mm 2mm;background:#111;color:#fff;margin-bottom:2mm; }
+  #paper .party .line{ display:grid;grid-template-columns:20mm 1fr;font-size:9pt;padding:.7mm 0;border-bottom:1px dotted #E0DCD3; }
+  #paper .party .line span:first-child{ color:#666; }
+  #paper .party .sig-slot{ margin-top:2.5mm;display:flex;align-items:center;justify-content:space-between;gap:2mm;min-height:22mm; }
+  #paper .party .sig-slot .lab{ font-size:8.5pt;color:#666; }
+  #paper .party .sig-slot .box{ flex:1;height:22mm;border:1px dashed #C9C4BA;display:flex;align-items:center;justify-content:center;color:#B0AAA0;font-size:8.5pt;position:relative;overflow:visible;background:#FCFBF8; }
+  #paper .party .sig-slot .box img{ max-height:20mm;max-width:100%;object-fit:contain; }
+  #paper .party .sig-slot .box img.seal{ position:absolute;right:4mm;top:50%;transform:translateY(-50%) rotate(-6deg);height:19mm;width:19mm;opacity:.92;mix-blend-mode:multiply; }
+  #paper .party .sig-slot .box .seal-css{ position:absolute;right:4mm;top:50%;transform:translateY(-50%) rotate(-8deg);width:19mm;height:19mm;border-radius:50%;border:2.2px solid #C8102E;color:#C8102E;display:flex;align-items:center;justify-content:center;font-size:6.5pt;font-weight:800;letter-spacing:.05em;text-align:center;line-height:1.15;padding:1.5mm;opacity:.9;mix-blend-mode:multiply;box-shadow:inset 0 0 0 1px #C8102E; }
+  #paper .party .sig-slot .box .sig-img{ position:relative;z-index:1;max-height:20mm; }
+  #paper .party .sig-slot .box .signed-name{ position:absolute;left:3mm;bottom:1.5mm;font-size:8pt;color:#333;font-weight:700; }
+  #paper .verify{ margin-top:5mm;padding-top:2.5mm;border-top:1px solid #D9D5CC;font-size:7.8pt;color:#666;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1mm 3mm; }
+  #paper .verify code{ font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.6pt;color:#333; }
+  #paper .stamp-flag{ position:absolute;top:2.5mm;right:3mm;font-size:7.5pt;font-weight:800;color:#C8102E;border:1px solid #C8102E;padding:.3mm 1.5mm;border-radius:2px;letter-spacing:.05em; }
+  #paper .stamp-flag.ok{ color:#0F7A3B;border-color:#0F7A3B; }
+
+  /* ── 서명 패널(고객) ── */
+  #sign{ max-width:210mm;margin:1.5rem auto 0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:1.25rem;padding:1.4rem 1.2rem; }
+  #sign h3{ margin:0 0 .3rem;font-size:1.15rem;font-weight:800;letter-spacing:-.01em; }
+  #sign .sub{ color:#B9B3C2;font-size:.88rem;margin:0 0 1rem;line-height:1.6; }
+  .pad-wrap{ background:#fff;border-radius:.9rem;border:2px solid rgba(245,158,11,.5);position:relative;overflow:hidden;touch-action:none;box-shadow:0 12px 40px -20px rgba(245,158,11,.4); }
+  #pad{ width:100%;height:220px;display:block;cursor:crosshair; }
+  .pad-hint{ position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#B0AAA0;font-size:.95rem;font-weight:600;pointer-events:none;letter-spacing:.05em; }
+  .pad-hint.hide{ display:none; }
+  .pad-line{ position:absolute;left:8%;right:8%;bottom:26%;border-bottom:1px dashed #D9D5CC;pointer-events:none; }
+  .pad-tools{ display:flex;justify-content:space-between;align-items:center;margin:.6rem 0 1rem;font-size:.8rem;color:#8A8494; }
+  .chk{ display:flex;gap:.6rem;align-items:flex-start;font-size:.86rem;line-height:1.55;color:#E4DFEA;padding:.55rem .1rem;cursor:pointer; }
+  .chk input{ width:1.1rem;height:1.1rem;accent-color:var(--amber);flex-shrink:0;margin-top:.15rem; }
+  .sticky-cta{ position:fixed;left:0;right:0;bottom:0;z-index:30;padding:.75rem 1rem calc(.75rem + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(11,10,16,.98),rgba(11,10,16,.85));backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);display:flex;gap:.6rem;justify-content:center; }
+  .sticky-cta .btn{ flex:1;max-width:420px; }
+  .done{ max-width:210mm;margin:1.5rem auto 0;text-align:center;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.35);border-radius:1.25rem;padding:2rem 1.2rem; }
+  .done .ic{ font-size:3rem;color:#4ADE80; }
+  .done h3{ margin:.4rem 0 .4rem;font-size:1.3rem;font-weight:800; }
+  .done p{ color:#B9B3C2;font-size:.9rem;line-height:1.7;margin:0 0 1rem; }
+  .spin{ width:1rem;height:1rem;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:sp .8s linear infinite;display:inline-block; }
+  @keyframes sp{ to{ transform:rotate(360deg); } }
+  .modal{ position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1rem; }
+  .modal .box{ background:#17151E;border:1px solid rgba(245,158,11,.3);border-radius:1.25rem;padding:1.5rem;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.6); }
+  .modal h3{ margin:0 0 .5rem;font-size:1.1rem;font-weight:800; }
+  .modal .link{ background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;padding:.6rem .75rem;font-size:.75rem;word-break:break-all;color:#CFC9D6;max-height:6rem;overflow:auto;font-family:ui-monospace,Menlo,monospace; }
+  .modal .grid{ display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.9rem; }
+  @media (max-width:480px){ .modal .grid{ grid-template-columns:1fr; } }
+
+  /* ── 인쇄 ── */
+  @media print{
+    @page{ size:A4;margin:12mm; }
+    body{ background:#fff !important;color:#000; }
+    .topbar,#admin,#sign,.sticky-cta,.toast,.done,.modal,.no-print{ display:none !important; }
+    .wrap{ display:block !important;padding:0 !important;max-width:none !important; }
+    #paper{ box-shadow:none !important;border-radius:0 !important;padding:0 !important;max-width:none !important;font-size:10pt; }
+    #paper h2{ break-after:avoid; }
+    #paper .parties,#paper .party,#paper table{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── 상단 바 ── -->
+<div class="topbar no-print">
+  <div class="topbar-in">
+    <a class="brand" href="index.html"><img src="logo-kgm-transparent.png" alt=""><span>큰길이벤트기획</span></a>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      <span class="pill" id="mode-pill"><iconify-icon icon="solar:document-text-bold"></iconify-icon> 전자계약서</span>
+      <button class="btn btn-ghost btn-sm" onclick="window.print()"><iconify-icon icon="solar:printer-bold" style="color:var(--amber-2);"></iconify-icon> 인쇄·PDF</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════ 관리자 패널 ══════════════ -->
+<aside id="admin" class="no-print" hidden>
+  <div style="display:flex;align-items:center;gap:.5rem;font-weight:800;color:#FCD34D;margin-bottom:.8rem;">
+    <iconify-icon icon="solar:shield-user-bold" style="font-size:19px;"></iconify-icon> 계약서 작성 (관리자)
+  </div>
+
+  <details class="sec">
+    <summary>견적서에서 가져오기 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <p class="hint">quote.html 관리자 모드의 <b>「이 견적으로 계약서 작성」</b>을 누르면 자동으로 채워집니다. 견적서 링크를 여기 붙여넣어도 됩니다.</p>
+      <textarea class="in" id="paste-quote" placeholder="견적서 링크(…quote.html#q=…) 붙여넣기"></textarea>
+      <button class="btn btn-ghost btn-sm" id="btn-import"><iconify-icon icon="solar:import-bold"></iconify-icon> 견적 내용 불러오기</button>
+    </div>
+  </details>
+
+  <details class="sec" open>
+    <summary>계약 상대방 (갑) <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <div><label class="f">단체 · 회사명</label><input class="in" data-k="cl.org" placeholder="예) 고흥군청 문화관광과"></div>
+      <div class="row2">
+        <div><label class="f">담당자 (서명자)</label><input class="in" data-k="cl.name" placeholder="홍길동"></div>
+        <div><label class="f">연락처</label><input class="in" data-k="cl.tel" placeholder="010-0000-0000" inputmode="tel"></div>
+      </div>
+      <div><label class="f">이메일 (서명본 PDF 수신)</label><input class="in" data-k="cl.email" placeholder="name@example.com" inputmode="email"></div>
+      <div><label class="f">주소</label><input class="in" data-k="cl.addr" placeholder="선택"></div>
+    </div>
+  </details>
+
+  <details class="sec" open>
+    <summary>행사 내용 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <div><label class="f">행사명</label><input class="in" data-k="ev.title" placeholder="예) 2026 녹동바다불꽃축제 무대·음향 운영"></div>
+      <div class="row2">
+        <div><label class="f">행사 일시</label><input class="in" data-k="ev.date" placeholder="2026-05-01 ~ 05-04"></div>
+        <div><label class="f">예상 인원</label><input class="in" data-k="ev.people" placeholder="500명"></div>
+      </div>
+      <div><label class="f">행사 장소</label><input class="in" data-k="ev.place" placeholder="고흥군 녹동항 일원"></div>
+      <div><label class="f">용역 범위 (자유 기술)</label><textarea class="in" data-k="ev.scope" placeholder="무대·트러스 설치, 음향·조명·LED 운영, 현장 인력 배치, 리허설 및 철거 등"></textarea></div>
+    </div>
+  </details>
+
+  <details class="sec" open>
+    <summary>계약 항목 · 금액 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <table class="items-t">
+        <thead><tr><th style="width:38%">항목</th><th>수량</th><th>일수</th><th>단가</th><th></th></tr></thead>
+        <tbody id="items-body"></tbody>
+      </table>
+      <button class="btn btn-ghost btn-sm" id="btn-add-item"><iconify-icon icon="solar:add-circle-bold"></iconify-icon> 항목 추가</button>
+      <div class="row2">
+        <div><label class="f">할인 (원)</label><input class="in" data-k="m.disc" inputmode="numeric" placeholder="0"></div>
+        <div><label class="f">계약금 비율 (%)</label><input class="in" data-k="m.depPct" inputmode="numeric" placeholder="30"></div>
+      </div>
+      <div><label class="f">계약금 지급 시기</label><input class="in" data-k="m.depDue"></div>
+      <div><label class="f">잔금 지급 시기</label><input class="in" data-k="m.balDue"></div>
+      <div id="sum-box" style="border-top:1px solid rgba(255,255,255,.08);padding-top:.5rem;"></div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>취소 · 위약 규정 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body" id="cancel-body"></div>
+  </details>
+
+  <details class="sec">
+    <summary>특약 · 계약일 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <div><label class="f">특약 사항</label><textarea class="in" data-k="sp" placeholder="예) 우천 시 실내 대체 장소 협의, 전력·주차 공간은 갑이 제공 등"></textarea></div>
+      <label class="chk" style="padding:.2rem 0;"><input type="checkbox" data-k="photo"> 행사 사진·영상을 을의 포트폴리오·홍보에 사용하는 것에 동의 (제10조)</label>
+      <div class="row2">
+        <div><label class="f">계약 체결일</label><input class="in" type="date" data-k="date"></div>
+        <div><label class="f">계약 번호</label><input class="in" data-k="no" placeholder="자동"></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>우리 회사 정보 · 서버 설정 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <p class="hint">한 번 저장하면 이 브라우저에 기억됩니다.</p>
+      <div class="row2">
+        <div><label class="f">상호</label><input class="in" data-k="co.name"></div>
+        <div><label class="f">대표자</label><input class="in" data-k="co.rep" placeholder="대표자 성명"></div>
+      </div>
+      <div class="row2">
+        <div><label class="f">사업자등록번호</label><input class="in" data-k="co.biz" placeholder="000-00-00000"></div>
+        <div><label class="f">전화</label><input class="in" data-k="co.tel"></div>
+      </div>
+      <div><label class="f">주소</label><input class="in" data-k="co.addr"></div>
+      <div><label class="f">이메일 (서명본 수신)</label><input class="in" data-k="co.email"></div>
+      <div><label class="f">입금 계좌</label><input class="in" data-k="co.bank" placeholder="○○은행 000-000-000000 (예금주)"></div>
+      <div><label class="f">계약 서버 주소 (Apps Script 웹앱 URL)</label><input class="in" data-k="api" placeholder="https://script.google.com/macros/s/…/exec"></div>
+      <p class="hint">서버가 있으면 <b>짧은 링크</b> 발급 · 서명본 <b>PDF 자동 생성</b> · 양측 <b>이메일 발송</b> · <b>대장 기록</b>이 됩니다. 없으면 긴 링크로 동작하고 서명본은 메일로만 옵니다. (설치법: apps-script/contract/README.md)</p>
+      <button class="btn btn-ghost btn-sm" id="btn-save-co"><iconify-icon icon="solar:diskette-bold"></iconify-icon> 회사 정보 저장</button>
+    </div>
+  </details>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-share"><iconify-icon icon="solar:link-round-bold"></iconify-icon> 고객 서명 링크 만들기</button>
+    <button class="btn btn-ghost" id="btn-preview"><iconify-icon icon="solar:smartphone-bold"></iconify-icon> 고객 화면 미리보기</button>
+  </div>
+</aside>
+
+<!-- ══════════════ 문서 ══════════════ -->
+<div class="paper-wrap">
+  <article id="paper" aria-label="행사 대행 계약서"></article>
+
+  <!-- 고객 서명 패널 -->
+  <section id="sign" class="no-print" hidden>
+    <h3>전자서명</h3>
+    <p class="sub">위 계약서 내용을 확인하신 후, 아래 칸에 손가락이나 마우스로 서명해 주세요. 서명이 완료되면 도장이 찍힌 계약서와 함께 PDF가 양측 이메일로 발송됩니다.</p>
+    <div class="row2" style="margin-bottom:.8rem;">
+      <div><label class="f">서명자 성명</label><input class="in" id="s-name" placeholder="성명"></div>
+      <div><label class="f">연락처</label><input class="in" id="s-tel" placeholder="010-0000-0000" inputmode="tel"></div>
+    </div>
+    <div><label class="f">이메일 (서명본 PDF를 받을 주소)</label><input class="in" id="s-email" placeholder="선택 · name@example.com" inputmode="email" style="margin-bottom:.8rem;"></div>
+    <div class="pad-wrap">
+      <canvas id="pad"></canvas>
+      <div class="pad-line"></div>
+      <div class="pad-hint" id="pad-hint">여기에 서명해 주세요</div>
+    </div>
+    <div class="pad-tools">
+      <span>서명은 이미지로 저장되어 계약서 갑 서명란에 들어갑니다.</span>
+      <button class="btn btn-ghost btn-sm" id="pad-clear" type="button"><iconify-icon icon="solar:eraser-bold"></iconify-icon> 지우기</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="agree1"> 계약서의 모든 조항(계약금액, 지급조건, 취소·위약 규정, 특약)을 읽고 이해했으며 이에 동의합니다.</label>
+    <label class="chk"><input type="checkbox" id="agree2"> 본 계약이 전자문서 및 전자서명으로 체결되며, 서면 계약과 동일한 효력을 갖는 것에 동의합니다. (전자서명법 제3조)</label>
+    <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btn-sign" style="flex:1;min-width:220px;padding:1rem 1.5rem;font-size:1rem;"><iconify-icon icon="solar:pen-new-square-bold" style="font-size:19px;"></iconify-icon> 서명하고 계약서 보내기</button>
+    </div>
+    <p class="hint" style="margin-top:.8rem;">서명 시각·문서 확인 코드(SHA-256)가 계약서에 함께 기록됩니다.</p>
+  </section>
+
+  <!-- 완료 -->
+  <section id="done" class="done no-print" hidden>
+    <div class="ic"><iconify-icon icon="solar:check-circle-bold"></iconify-icon></div>
+    <h3>계약이 체결되었습니다</h3>
+    <p id="done-msg">서명이 반영된 계약서 PDF를 이메일로 보내드렸습니다.</p>
+    <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;">
+      <a class="btn btn-primary" id="done-pdf" href="#" target="_blank" rel="noopener" hidden><iconify-icon icon="solar:file-download-bold"></iconify-icon> 계약서 PDF 열기</a>
+      <button class="btn btn-ghost" onclick="window.print()"><iconify-icon icon="solar:printer-bold" style="color:var(--amber-2);"></iconify-icon> 이 화면 인쇄·PDF 저장</button>
+    </div>
+  </section>
+</div>
+</div>
+
+<!-- 모바일 고정 CTA -->
+<div class="sticky-cta no-print" id="cta" hidden>
+  <button class="btn btn-primary" onclick="document.getElementById('sign').scrollIntoView({behavior:'smooth'})"><iconify-icon icon="solar:pen-new-square-bold"></iconify-icon> 내용 확인 후 서명하기</button>
+</div>
+
+<!-- 공유 모달 -->
+<div class="modal no-print" id="share-modal" hidden>
+  <div class="box">
+    <h3>고객 서명 링크</h3>
+    <p class="hint" id="share-note" style="margin:0 0 .6rem;"></p>
+    <div class="link" id="share-url"></div>
+    <div class="grid">
+      <button class="btn btn-primary btn-sm" id="share-copy"><iconify-icon icon="solar:copy-bold"></iconify-icon> 링크 복사</button>
+      <button class="btn btn-ghost btn-sm" id="share-native"><iconify-icon icon="solar:share-bold"></iconify-icon> 카톡·문자로 보내기</button>
+      <a class="btn btn-ghost btn-sm" id="share-sms" href="#"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon> 문자 앱 열기</a>
+      <a class="btn btn-ghost btn-sm" id="share-mail" href="#"><iconify-icon icon="solar:letter-bold"></iconify-icon> 이메일로 보내기</a>
+    </div>
+    <div style="text-align:right;margin-top:.9rem;"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('share-modal').hidden=true">닫기</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   설정
+═══════════════════════════════════════════════════════ */
+const 서버주소_기본 = '';                          // Apps Script 웹앱 URL을 여기 고정해도 됨
+const 회사_수신_이메일 = 'gilauto325@gmail.com';   // 서버 없을 때 서명본 메일 폴백(FormSubmit)
+const STAMP_SRC = 'stamp-keungil.png';             // 도장 이미지 (투명 PNG). 없으면 CSS 도장으로 대체
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const LS = window.localStorage;
+
+const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const genNo = () => { const d=new Date(); return 'KG-'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).slice(2,5).toUpperCase(); };
+
+const DEF = () => ({
+  v:1, no:'', date: today(), api:'',
+  co:{ name:'큰길이벤트기획', rep:'', biz:'', addr:'광주전남특별시 광양 강변동길 1', tel:'1533-7295', email:'gilcaro@naver.com', bank:'' },
+  cl:{ org:'', name:'', tel:'', email:'', addr:'' },
+  ev:{ title:'', date:'', place:'', people:'', scope:'' },
+  items:[],
+  m:{ disc:0, depPct:30, depDue:'계약 체결일로부터 3일 이내', balDue:'행사 종료일로부터 7일 이내' },
+  cancel:[
+    ['행사일 30일 전까지', '위약금 없음 (기지급 계약금 전액 환불)'],
+    ['행사일 29일 ~ 15일 전', '계약금액의 10%'],
+    ['행사일 14일 ~ 7일 전',  '계약금액의 30%'],
+    ['행사일 6일 전 ~ 당일',   '계약금액의 50% (기투입 실비 별도)'],
+  ],
+  sp:'', photo:true,
+});
+let C = DEF();
+let MODE = 'customer';       // admin | customer | signed | preview
+let SIGNED = null;           // { sig, name, tel, ts, hash, pdfUrl }
+let DOC_ID = '';             // 서버 발급 ID (짧은 링크)
+
+/* ── 회사 기본값(localStorage) ── */
+function loadCo(){ try{ const s=JSON.parse(LS.getItem('kg_contract_co')||'null'); if(s){ Object.assign(C.co, s.co||{}); if(s.api) C.api=s.api; } }catch(e){} }
+function saveCo(){ LS.setItem('kg_contract_co', JSON.stringify({co:C.co, api:C.api})); }
+function apiURL(){ return 서버주소_기본 || C.api || ''; }
+
+/* ── 상태 인코딩 ── */
+const b64u = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u = (s) => { let t=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(t.length%4) t+='='; return decodeURIComponent(escape(atob(t))); };
+function packState(){ const s=JSON.parse(JSON.stringify(C)); delete s.api; return b64u(JSON.stringify(s)); }
+function unpackState(str){ try{ const s=JSON.parse(unb64u(str)); C=Object.assign(DEF(), s); C.co=Object.assign(DEF().co, s.co||{}); C.cl=Object.assign(DEF().cl, s.cl||{}); C.ev=Object.assign(DEF().ev, s.ev||{}); C.m=Object.assign(DEF().m, s.m||{}); if(!s.co) loadCo(); /* 견적서에서 넘어온 상태엔 회사정보가 없으므로 저장값 적용 */ return true; }catch(e){ return false; } }
+
+/* ── 금액 ── */
+const num = (v) => +String(v==null?'':v).replace(/[^0-9.-]/g,'') || 0;
+const won = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
+function calc(){
+  let supply=0, tbd=0;
+  for(const it of C.items){ if(it.price==null||it.price==='') { tbd++; continue; } supply += num(it.qty)*num(it.days||1)*num(it.price); }
+  const disc = Math.min(supply, num(C.m.disc));
+  const base = supply - disc;
+  const vat = Math.round(base*0.1);
+  const total = base + vat;
+  const dep = Math.round(total * (num(C.m.depPct)/100));
+  return { supply, disc, base, vat, total, dep, bal: total-dep, tbd };
+}
+function 한글금액(n){
+  n = Math.round(n); if(!n) return '영';
+  const D=['','일','이','삼','사','오','육','칠','팔','구'], U=['','십','백','천'], B=['','만','억','조'];
+  let out='', i=0;
+  while(n>0){ let part=n%10000, s='';
+    for(let j=0;part>0;j++){ const d=part%10; if(d) s = D[d] + U[j] + s; part=Math.floor(part/10); }   /* 계약서 관례: 일십·일백·일천 명시(위변조 방지) */
+    if(s) out = s + B[i] + out; n=Math.floor(n/10000); i++; }
+  return out;
+}
+
+/* ── 문서 해시 ── */
+function canonical(){ const s=JSON.parse(JSON.stringify(C)); delete s.api; return JSON.stringify(s); }
+async function docHash(){
+  try{ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical()));
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }catch(e){ return ''; }
+}
+let HASH = '';
+
+/* ═══════════════════════════════════════════════════════
+   문서 렌더링
+═══════════════════════════════════════════════════════ */
+const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const or = (v, d='-') => (v==null || String(v).trim()==='') ? d : esc(v);
+const fmtDate = (s) => { if(!s) return '-'; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? `${m[1]}년 ${+m[2]}월 ${+m[3]}일` : esc(s); };
+const fmtTs = (iso, sec) => { const d=new Date(iso); if(isNaN(d)) return esc(iso);   /* 항상 한국 시간으로 표기 */
+  try{ const s=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(d); return sec ? s : s.slice(0,16); }
+  catch(e){ return esc(iso).replace('T',' ').slice(0, sec?19:16); } };
+let stampOK = null;   // null=미확인, true=이미지 있음, false=없음
+
+function sealHTML(){
+  if(stampOK===false) return `<div class="seal-css">${esc(C.co.name)}<br>대표<br>인</div>`;
+  return `<img class="seal" src="${STAMP_SRC}" alt="직인" onerror="stampOK=false;this.outerHTML='<div class=&quot;seal-css&quot;>'+${JSON.stringify(esc(C.co.name))}+'<br>대표<br>인</div>'">`;
+}
+
+function render(){
+  const t = calc();
+  const rows = C.items.map((it,i)=>{
+    const amt = (it.price==null||it.price==='') ? '협의' : won(num(it.qty)*num(it.days||1)*num(it.price));
+    const q = esc(it.qty)+esc(it.unit||'')+((num(it.days)||1)>1?' × '+esc(it.days)+'일':'');
+    return `<tr><td class="c" style="color:#888;">${i+1}</td><td><b>${or(it.name,'(항목명 없음)')}</b>${it.spec?`<br><span style="font-size:8.5pt;color:#666;">${esc(it.spec)}</span>`:''}</td><td class="c">${q}</td><td class="r">${(it.price==null||it.price==='')?'협의':won(num(it.price))}</td><td class="r">${amt}</td></tr>`;
+  }).join('') || `<tr><td colspan="5" class="c" style="color:#999;padding:4mm;">계약 항목이 없습니다</td></tr>`;
+
+  const cancelRows = (C.cancel||[]).filter(r=>r[0]||r[1]).map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join('');
+  const signedBlock = SIGNED
+    ? `<img class="sig-img" src="${SIGNED.sig}" alt="갑 서명"><span class="signed-name">${esc(SIGNED.name)} (전자서명 · ${fmtTs(SIGNED.ts)})</span>`
+    : `<span>${MODE==='admin'||MODE==='preview' ? '고객 전자서명 (서명 후 자동 표시)' : '아래에서 서명해 주세요'}</span>`;
+
+  $('#paper').innerHTML = `
+    <h1>행사 대행 계약서</h1>
+    <div class="doc-no"><span>계약번호 <b>${or(C.no)}</b></span><span>${esc(C.co.name)} 표준계약서 v1</span></div>
+
+    <p class="preamble"><b>${or(C.cl.org, '(갑)')}</b>(이하 "갑"이라 한다)과(와) <b>${esc(C.co.name)}</b>(이하 "을"이라 한다)은 아래 행사의 기획·운영 용역에 관하여 다음과 같이 계약을 체결한다.</p>
+
+    <h2>제1조 (계약의 목적)</h2>
+    <p>본 계약은 갑이 주최·주관하는 행사의 기획, 무대·장비 설치, 운영 및 철거 등 용역(이하 "본 용역")을 을에게 위탁하고, 을이 이를 성실히 수행함에 있어 필요한 사항을 정함을 목적으로 한다.</p>
+
+    <h2>제2조 (행사 및 용역의 내용)</h2>
+    <table class="info">
+      <tr><th>행사명</th><td>${or(C.ev.title)}</td></tr>
+      <tr><th>행사 일시</th><td>${or(C.ev.date)}</td></tr>
+      <tr><th>행사 장소</th><td>${or(C.ev.place)}</td></tr>
+      <tr><th>예상 인원</th><td>${or(C.ev.people)}</td></tr>
+      <tr><th>용역 범위</th><td style="white-space:pre-wrap;">${or(C.ev.scope, '아래 제3조 계약 항목에 따름')}</td></tr>
+    </table>
+
+    <h2>제3조 (계약 항목 및 계약금액)</h2>
+    <table class="items">
+      <thead><tr><th class="c" style="width:7%">No</th><th>항목 · 규격</th><th class="c" style="width:16%">수량</th><th class="r" style="width:16%">단가</th><th class="r" style="width:18%">금액</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot class="sum">
+        <tr><td colspan="4" class="r">공급가액</td><td class="r">${won(t.supply)}</td></tr>
+        ${t.disc?`<tr><td colspan="4" class="r">할인</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
+        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${won(t.vat)}</td></tr>
+        <tr class="tot"><td colspan="4" class="r">계약금액 (부가세 포함)</td><td class="r">${won(t.total)}</td></tr>
+      </tfoot>
+    </table>
+    <div class="amount-box"><span>계약금액 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>부가세 포함${t.tbd?` · 협의 항목 ${t.tbd}건은 별도 정산`:''}</small></div>
+    <ol>
+      <li>계약금액은 제3조의 항목을 기준으로 하며, 갑의 요청에 의한 항목·수량·일정 변경으로 비용이 증감하는 경우 양 당사자가 협의하여 서면(전자문서 포함)으로 조정한다.</li>
+      <li>단가는 현장 여건(전원·진입로·설치 시간)에 따른 추가 인력·장비가 필요한 경우 사전 협의 후 조정할 수 있다.</li>
+    </ol>
+
+    <h2>제4조 (대금의 지급)</h2>
+    <ol>
+      <li>계약금 : 계약금액의 ${num(C.m.depPct)}% (${won(t.dep)})를 ${esc(C.m.depDue)}에 지급한다.</li>
+      <li>잔금 : 나머지 ${won(t.bal)}을 ${esc(C.m.balDue)}에 지급한다.</li>
+      <li>지급은 을이 지정한 계좌${C.co.bank?` (${esc(C.co.bank)})`:''}로 입금하며, 을은 갑의 요청에 따라 세금계산서를 발행한다.</li>
+      <li>갑이 지급기일을 경과한 경우 연 6%의 지연이자를 가산할 수 있다.</li>
+    </ol>
+
+    <h2>제5조 (을의 의무)</h2>
+    <ol>
+      <li>을은 본 용역을 관련 법령과 안전 기준에 따라 성실히 수행하고, 사전 리허설·장비 점검을 통해 행사가 차질 없이 진행되도록 한다.</li>
+      <li>을은 행사 현장에 전담 책임자를 두어 갑과 원활히 소통하고, 갑의 합리적인 요청에 협조한다.</li>
+      <li>을은 을의 귀책사유로 갑 또는 제3자에게 발생한 손해에 대하여 책임을 진다.</li>
+    </ol>
+
+    <h2>제6조 (갑의 의무)</h2>
+    <ol>
+      <li>갑은 행사 장소의 사용 권한, 필요한 인·허가, 전력·급수 등 기반 시설과 설치·철거를 위한 시간을 확보하여 을에게 제공한다.</li>
+      <li>갑은 행사 진행에 필요한 자료(식순, 출연자, 영상물 등)를 행사일 7일 전까지 을에게 제공한다.</li>
+      <li>갑은 행사 참가자·출연자의 안전 관리에 협조하며, 갑의 귀책사유로 을의 장비가 손상된 경우 이를 배상한다.</li>
+    </ol>
+
+    <h2>제7조 (계약의 변경 및 해제 · 취소)</h2>
+    <ol>
+      <li>행사 일정·장소·내용의 변경은 양 당사자의 합의로 하며, 이로 인한 추가 비용은 원인 제공자가 부담한다.</li>
+      <li>갑이 계약을 해제·취소하는 경우 아래 기준에 따른 위약금을 을에게 지급하며, 이미 지급한 계약금은 위약금에 충당한다.</li>
+    </ol>
+    <table class="cancel"><thead><tr><th style="width:38%">취소 통보 시점</th><th>위약금</th></tr></thead><tbody>${cancelRows||'<tr><td colspan="2" style="color:#999;">-</td></tr>'}</tbody></table>
+    <ol start="3">
+      <li>을의 귀책사유로 용역이 이행되지 못한 경우 을은 기수령 금액을 전액 반환하고, 계약금액의 10%를 갑에게 배상한다.</li>
+    </ol>
+
+    <h2>제8조 (불가항력)</h2>
+    <p>천재지변, 감염병 확산에 따른 행정명령, 전쟁·폭동 등 당사자가 통제할 수 없는 사유로 행사를 진행할 수 없는 경우, 양 당사자는 상대방에게 책임을 묻지 아니하며 일정 변경 또는 계약 종료를 협의한다. 이 경우 을은 이미 투입된 실비를 정산한 후 잔액을 반환한다.</p>
+
+    <h2>제9조 (손해배상 및 안전)</h2>
+    <p>각 당사자는 본 계약의 위반으로 상대방에게 손해를 입힌 경우 이를 배상한다. 다만 을의 배상 책임은 고의·중과실이 없는 한 계약금액을 한도로 한다.</p>
+
+    <h2>제10조 (사진 · 영상의 사용)</h2>
+    <p>${C.photo ? '갑은 을이 행사 현장에서 촬영한 사진·영상을 을의 포트폴리오, 홈페이지 및 홍보물에 사용하는 것에 동의한다. 다만 개인의 초상권 침해 우려가 있는 자료는 제외한다.' : '을은 행사 현장에서 촬영한 사진·영상을 갑의 사전 서면 동의 없이 외부에 공개하지 아니한다.'}</p>
+
+    <h2>제11조 (비밀유지)</h2>
+    <p>양 당사자는 본 계약과 관련하여 알게 된 상대방의 영업상 비밀을 계약 기간 및 종료 후 2년간 제3자에게 누설하지 아니한다.</p>
+
+    <h2>제12조 (특약 사항)</h2>
+    <div class="special">${C.sp ? esc(C.sp) : '해당 없음'}</div>
+
+    <h2>제13조 (분쟁의 해결)</h2>
+    <p>본 계약에 명시되지 않은 사항은 관련 법령과 상관례에 따라 상호 협의하여 정하며, 분쟁이 발생한 경우 을의 소재지를 관할하는 법원을 제1심 관할 법원으로 한다.</p>
+
+    <h2>제14조 (전자계약)</h2>
+    <p>본 계약은 전자문서 및 전자거래 기본법과 전자서명법에 따라 전자문서로 작성되고 전자서명으로 체결되며, 양 당사자는 이것이 서면 계약과 동일한 효력을 가짐에 동의한다. 서명 시각과 문서 확인 코드는 아래에 기록되며, 계약서 사본은 양 당사자에게 전자적으로 교부된다.</p>
+
+    <p class="closing">위 계약을 증명하기 위하여 본 계약서를 작성하고 갑과 을이 각각 서명 또는 날인한다.</p>
+    <p class="sign-date">${fmtDate(C.date)}</p>
+
+    <div class="parties">
+      <div class="party">
+        <span class="role">갑 (발주자)</span>
+        <span class="stamp-flag ${SIGNED?'ok':''}">${SIGNED?'서명 완료':'서명 대기'}</span>
+        <div class="line"><span>단체·회사명</span><b>${or(C.cl.org)}</b></div>
+        <div class="line"><span>담당자</span><span>${or(C.cl.name)}</span></div>
+        <div class="line"><span>연락처</span><span>${or(C.cl.tel)}</span></div>
+        <div class="line"><span>주소</span><span>${or(C.cl.addr)}</span></div>
+        <div class="sig-slot"><span class="lab">서명</span><div class="box">${signedBlock}</div></div>
+      </div>
+      <div class="party">
+        <span class="role">을 (수급자)</span>
+        <span class="stamp-flag ok">날인 완료</span>
+        <div class="line"><span>상호</span><b>${esc(C.co.name)}</b></div>
+        <div class="line"><span>대표자</span><span>${or(C.co.rep)}</span></div>
+        <div class="line"><span>사업자번호</span><span>${or(C.co.biz)}</span></div>
+        <div class="line"><span>주소</span><span>${or(C.co.addr)}</span></div>
+        <div class="line"><span>연락처</span><span>${esc(C.co.tel)} · ${esc(C.co.email)}</span></div>
+        <div class="sig-slot"><span class="lab">날인</span><div class="box"><span style="color:#333;font-weight:700;letter-spacing:.1em;">${esc(C.co.name)} 대표 ${or(C.co.rep,'')}</span>${sealHTML()}</div></div>
+      </div>
+    </div>
+
+    <div class="verify">
+      <span>문서 확인 코드 <code id="v-hash">${HASH ? HASH.slice(0,32)+'…' : '계산 중'}</code></span>
+      <span>${SIGNED ? '전자서명 '+fmtTs(SIGNED.ts,true)+' (KST) · 서명자 '+esc(SIGNED.name) : '서명 전'}${DOC_ID?' · 문서 ID '+esc(DOC_ID):''}</span>
+    </div>`;
+
+  docHash().then(h => { HASH=h; const el=$('#v-hash'); if(el) el.textContent = h.slice(0,32)+'…'; });
+  renderSum(t);
+}
+function renderSum(t){
+  const b=$('#sum-box'); if(!b) return;
+  b.innerHTML = `<div class="kv"><span>공급가액</span><b>${won(t.supply)}</b></div>${t.disc?`<div class="kv"><span>할인</span><b>- ${won(t.disc)}</b></div>`:''}<div class="kv"><span>부가세</span><b>${won(t.vat)}</b></div><div class="kv" style="font-size:.95rem;"><span>계약금액</span><b style="color:#FCD34D;">${won(t.total)}</b></div><div class="kv"><span>계약금 ${num(C.m.depPct)}% / 잔금</span><b>${won(t.dep)} / ${won(t.bal)}</b></div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   관리자 폼 바인딩
+═══════════════════════════════════════════════════════ */
+function getPath(o,p){ return p.split('.').reduce((a,k)=>a==null?a:a[k], o); }
+function setPath(o,p,v){ const ks=p.split('.'); let a=o; for(let i=0;i<ks.length-1;i++){ a=a[ks[i]]; } a[ks[ks.length-1]]=v; }
+function bindForm(){
+  $$('#admin [data-k]').forEach(el=>{
+    const k=el.dataset.k; const v=getPath(C,k);
+    if(el.type==='checkbox') el.checked=!!v; else el.value = (v==null?'':v);
+    el.addEventListener('input', ()=>{
+      let val = el.type==='checkbox' ? el.checked : el.value;
+      if(k==='m.disc'||k==='m.depPct') val = num(val);
+      setPath(C,k,val); render(); saveHashDebounced();
+    });
+  });
+  renderItems(); renderCancel();
+}
+function refreshForm(){ $$('#admin [data-k]').forEach(el=>{ const v=getPath(C,el.dataset.k); if(el.type==='checkbox') el.checked=!!v; else el.value=(v==null?'':v); }); renderItems(); renderCancel(); }
+function renderItems(){
+  const tb=$('#items-body'); if(!tb) return;
+  tb.innerHTML = C.items.map((it,i)=>`<tr>
+    <td><input class="in" value="${esc(it.name)}" placeholder="항목명" data-i="${i}" data-f="name"><input class="in" value="${esc(it.spec||'')}" placeholder="규격(선택)" data-i="${i}" data-f="spec" style="margin-top:.2rem;font-size:.72rem;"></td>
+    <td><input class="in" value="${esc(it.qty)}" data-i="${i}" data-f="qty" inputmode="numeric" style="width:3.2rem;"><input class="in" value="${esc(it.unit||'')}" data-i="${i}" data-f="unit" placeholder="단위" style="width:3.2rem;margin-top:.2rem;font-size:.72rem;"></td>
+    <td><input class="in" value="${esc(it.days||1)}" data-i="${i}" data-f="days" inputmode="numeric" style="width:2.8rem;"></td>
+    <td><input class="in" value="${it.price==null?'':esc(it.price)}" data-i="${i}" data-f="price" inputmode="numeric" placeholder="협의" style="width:5.5rem;"></td>
+    <td><button class="del" title="삭제" data-del="${i}">✕</button></td></tr>`).join('');
+  $$('#items-body input').forEach(inp=>inp.addEventListener('input',()=>{ const it=C.items[+inp.dataset.i]; const f=inp.dataset.f; it[f] = (f==='price') ? (inp.value.trim()===''?null:num(inp.value)) : (f==='qty'||f==='days'?num(inp.value):inp.value); render(); saveHashDebounced(); }));
+  $$('#items-body [data-del]').forEach(b=>b.addEventListener('click',()=>{ C.items.splice(+b.dataset.del,1); renderItems(); render(); saveHashDebounced(); }));
+}
+function renderCancel(){
+  const b=$('#cancel-body'); if(!b) return;
+  b.innerHTML = `<p class="hint">행사일 기준 취소 통보 시점별 위약금. 비워두면 표에서 빠집니다.</p>` + C.cancel.map((r,i)=>`<div class="row2"><input class="in" value="${esc(r[0])}" data-ci="${i}" data-cf="0" placeholder="시점"><input class="in" value="${esc(r[1])}" data-ci="${i}" data-cf="1" placeholder="위약금"></div>`).join('');
+  $$('#cancel-body input').forEach(inp=>inp.addEventListener('input',()=>{ C.cancel[+inp.dataset.ci][+inp.dataset.cf]=inp.value; render(); saveHashDebounced(); }));
+}
+$('#btn-add-item')?.addEventListener('click',()=>{ C.items.push({name:'',spec:'',qty:1,unit:'식',days:1,price:null}); renderItems(); render(); });
+$('#btn-save-co')?.addEventListener('click',()=>{ saveCo(); toast('회사 정보를 저장했습니다'); });
+
+let saveTimer;
+function saveHashDebounced(){ if(MODE!=='admin') return; clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ history.replaceState(null,'', location.pathname+'?admin=1#c='+packState()); },400); }
+
+/* ── 견적서 가져오기 (quote.html 상태 → 계약) ── */
+function importQuoteCode(code){
+  try{
+    const s = JSON.parse(unb64u(code));
+    const i = s.i||[];
+    const pick = (idx,key) => Array.isArray(i) ? (i[idx]||'') : (i[key]||'');
+    C.cl.org=pick(0,'o'); C.cl.name=pick(1,'n'); C.cl.tel=pick(2,'t'); C.cl.email=pick(3,'e');
+    C.ev.title=pick(4,'m'); C.ev.date=pick(5,'d'); C.ev.place=pick(6,'p'); C.ev.people=pick(7,'c');
+    // 항목: 카탈로그 없이 온 축약형(id만)은 이름을 알 수 없으므로 quote.html의 「계약서 작성」 버튼(완전형)을 권장
+    C.items = (s.r||[]).map(a=>{
+      if(typeof a==='string') return {name:'(견적 항목 '+a+')',spec:'',qty:1,unit:'식',days:1,price:null};
+      if(a.length<=4) return {name:'(견적 항목 '+a[0]+')',spec:'',qty:a[1]??1,unit:'식',days:a[2]??1,price:a[3]??null};
+      return {name:a[1],spec:a[2],qty:a[3],unit:a[4],days:a[5],price:a[6]};
+    });
+    C.m.disc = s.d||0;
+    return true;
+  }catch(e){ return false; }
+}
+$('#btn-import')?.addEventListener('click',()=>{
+  const txt=$('#paste-quote').value.trim(); const m=txt.match(/[#?&]q=([A-Za-z0-9\-_]+)/);
+  const code = m ? m[1] : txt;
+  if(importQuoteCode(code)){ refreshForm(); render(); saveHashDebounced(); toast('견적 내용을 불러왔습니다'); $('#paste-quote').value=''; }
+  else toast('견적서 링크를 인식하지 못했습니다');
+});
+
+/* ═══════════════════════════════════════════════════════
+   공유 (관리자 → 고객)
+═══════════════════════════════════════════════════════ */
+function customerBase(){ return location.href.replace(/[?#].*$/,''); }
+/* Apps Script 웹앱 URL ↔ 배포 ID (링크에 짧게 싣기 위함) */
+function deployId(u){ const m=String(u||'').match(/\/macros\/s\/([A-Za-z0-9_-]+)\/exec/); return m?m[1]:''; }
+function apiFromDeploy(id){ return id ? 'https://script.google.com/macros/s/'+id+'/exec' : ''; }
+async function apiPost(body){
+  const r = await fetch(apiURL(), { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body) });
+  const t = await r.text(); let j; try{ j=JSON.parse(t); }catch(e){ throw new Error('서버 응답을 읽을 수 없습니다: '+t.slice(0,120)); }
+  if(!j.ok) throw new Error(j.error||'서버 오류'); return j;
+}
+$('#btn-share')?.addEventListener('click', async ()=>{
+  if(!C.cl.name || !C.ev.title){ toast('갑 담당자와 행사명을 먼저 입력해 주세요'); return; }
+  if(!C.no){ C.no=genNo(); refreshForm(); render(); }
+  const btn=$('#btn-share'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 링크 만드는 중…';
+  let url='', note='';
+  try{
+    const dep = deployId(apiURL());
+    if(apiURL()){
+      const j = await apiPost({ action:'store', contract: JSON.parse(canonical()), hash: await docHash() });
+      DOC_ID=j.id; url = customerBase()+'?c='+encodeURIComponent(j.id)+(dep?'&s='+dep:'');
+      note='짧은 링크입니다. 고객이 서명하면 PDF가 자동 생성되어 양측 이메일로 발송되고 대장에 기록됩니다.';
+    } else {
+      url = customerBase()+'#c='+packState();
+      note='서버가 설정되지 않아 긴 링크입니다(문자로는 잘릴 수 있으니 카톡·이메일 권장). 서명본은 이메일로 전달됩니다.';
+    }
+  }catch(e){ toast('서버 오류: '+e.message+' · 긴 링크로 대체합니다'); const dep=deployId(apiURL()); url=customerBase()+(dep?'?s='+dep:'')+'#c='+packState(); note='서버 오류로 긴 링크를 만들었습니다.'; }
+  btn.disabled=false; btn.innerHTML='<iconify-icon icon="solar:link-round-bold"></iconify-icon> 고객 서명 링크 만들기';
+  const msg = `[${C.co.name}] ${C.ev.title} 계약서입니다.\n아래 링크를 열어 내용을 확인하시고 서명해 주세요.\n${url}`;
+  $('#share-url').textContent=url; $('#share-note').textContent=note;
+  $('#share-sms').href = 'sms:'+(C.cl.tel||'').replace(/[^0-9+]/g,'')+(/iPhone|iPad|Mac/.test(navigator.userAgent)?'&':'?')+'body='+encodeURIComponent(msg);
+  $('#share-mail').href = 'mailto:'+encodeURIComponent(C.cl.email||'')+'?subject='+encodeURIComponent(`[${C.co.name}] ${C.ev.title} 계약서 서명 요청`)+'&body='+encodeURIComponent(msg);
+  $('#share-copy').onclick = async ()=>{ try{ await navigator.clipboard.writeText(url); toast('링크를 복사했습니다'); }catch(e){ prompt('링크를 복사하세요', url); } };
+  $('#share-native').onclick = async ()=>{ if(navigator.share){ try{ await navigator.share({title:C.ev.title+' 계약서', text:msg}); }catch(e){} } else { try{ await navigator.clipboard.writeText(msg); toast('메시지를 복사했습니다 · 카톡에 붙여넣으세요'); }catch(e){ prompt('아래 내용을 복사하세요', msg); } } };
+  $('#share-modal').hidden=false;
+  saveHashDebounced();
+});
+$('#btn-preview')?.addEventListener('click',()=>{ window.open(customerBase()+'?preview=1#c='+packState(), '_blank'); });
+
+/* ═══════════════════════════════════════════════════════
+   서명 패드
+═══════════════════════════════════════════════════════ */
+const pad=$('#pad'); const pctx=pad.getContext('2d'); let drawing=false, last=null, hasInk=false;
+function padResize(){ const r=pad.getBoundingClientRect(); const dpr=Math.min(window.devicePixelRatio||1,3); const img = hasInk ? pad.toDataURL() : null;
+  pad.width=Math.round(r.width*dpr); pad.height=Math.round(r.height*dpr); pctx.setTransform(dpr,0,0,dpr,0,0); pctx.lineCap='round'; pctx.lineJoin='round'; pctx.strokeStyle='#111'; pctx.lineWidth=2.6;
+  if(img){ const im=new Image(); im.onload=()=>pctx.drawImage(im,0,0,r.width,r.height); im.src=img; } }
+function pos(e){ const r=pad.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top, p:e.pressure||.5}; }
+pad.addEventListener('pointerdown', e=>{ e.preventDefault(); pad.setPointerCapture(e.pointerId); drawing=true; last=pos(e); pctx.beginPath(); pctx.arc(last.x,last.y,1.2,0,Math.PI*2); pctx.fillStyle='#111'; pctx.fill(); hasInk=true; $('#pad-hint').classList.add('hide'); });
+pad.addEventListener('pointermove', e=>{ if(!drawing) return; e.preventDefault(); const p=pos(e); const mid={x:(last.x+p.x)/2,y:(last.y+p.y)/2};
+  pctx.lineWidth = 1.8 + (e.pointerType==='pen' ? p.p*2.4 : 1.0); pctx.beginPath(); pctx.moveTo(last.x,last.y); pctx.quadraticCurveTo(last.x,last.y,mid.x,mid.y); pctx.lineTo(p.x,p.y); pctx.stroke(); last=p; });
+['pointerup','pointercancel','pointerleave'].forEach(ev=>pad.addEventListener(ev, ()=>{ drawing=false; last=null; }));
+$('#pad-clear').addEventListener('click', ()=>{ pctx.clearRect(0,0,pad.width,pad.height); hasInk=false; $('#pad-hint').classList.remove('hide'); });
+window.addEventListener('resize', ()=>{ if(!$('#sign').hidden) padResize(); });
+
+function sigDataURL(){
+  // 잉크 영역만 잘라내고 폭 600px로 축소
+  const w=pad.width, h=pad.height; const d=pctx.getImageData(0,0,w,h).data;
+  let minx=w,miny=h,maxx=0,maxy=0;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ if(d[(y*w+x)*4+3]>10){ if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; } }
+  if(maxx<minx) return null;
+  const pad2=Math.round(w*.02); minx=Math.max(0,minx-pad2); miny=Math.max(0,miny-pad2); maxx=Math.min(w-1,maxx+pad2); maxy=Math.min(h-1,maxy+pad2);
+  const cw=maxx-minx+1, ch=maxy-miny+1; const scale=Math.min(1, 600/cw);
+  const out=document.createElement('canvas'); out.width=Math.round(cw*scale); out.height=Math.round(ch*scale);
+  out.getContext('2d').drawImage(pad, minx,miny,cw,ch, 0,0,out.width,out.height);
+  return out.toDataURL('image/png');
+}
+
+/* ── 도장 이미지를 data URI로 (PDF 생성 시 서버가 원격 이미지를 못 가져올 수 있어 인라인) ── */
+async function stampDataURL(){
+  return new Promise(res=>{ const im=new Image(); im.crossOrigin='anonymous'; im.onload=()=>{ try{ const c=document.createElement('canvas'); c.width=im.naturalWidth; c.height=im.naturalHeight; c.getContext('2d').drawImage(im,0,0); res(c.toDataURL('image/png')); }catch(e){ res(null); } }; im.onerror=()=>res(null); im.src=STAMP_SRC+'?v=1'; });
+}
+function paperHTMLForPDF(stampURI){
+  const css = [...document.styleSheets].map(ss=>{ try{ return [...ss.cssRules].map(r=>r.cssText).join('\n'); }catch(e){ return ''; } }).join('\n');
+  let html = $('#paper').outerHTML;
+  if(stampURI) html = html.replace(/src="stamp-keungil\.png[^"]*"/g, 'src="'+stampURI+'"');
+  return `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><style>${css}\nbody{background:#fff;margin:0;} #paper{box-shadow:none;border-radius:0;max-width:none;padding:0;}</style></head><body>${html}</body></html>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   서명 제출
+═══════════════════════════════════════════════════════ */
+$('#btn-sign').addEventListener('click', async ()=>{
+  const name=$('#s-name').value.trim(), tel=$('#s-tel').value.trim(), email=$('#s-email').value.trim();
+  if(!name){ toast('서명자 성명을 입력해 주세요'); $('#s-name').focus(); return; }
+  if(!tel){ toast('연락처를 입력해 주세요'); $('#s-tel').focus(); return; }
+  if(!hasInk){ toast('서명란에 서명해 주세요'); return; }
+  if(!$('#agree1').checked || !$('#agree2').checked){ toast('두 가지 동의 항목에 체크해 주세요'); return; }
+  const sig=sigDataURL(); if(!sig){ toast('서명을 인식하지 못했습니다. 다시 서명해 주세요'); return; }
+
+  const btn=$('#btn-sign'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 계약서 보내는 중…';
+  C.cl.name = C.cl.name || name; C.cl.tel = C.cl.tel || tel; if(email) C.cl.email = email;
+  const ts = new Date().toISOString();
+  const hash = await docHash();
+  SIGNED = { sig, name, tel, ts, hash };
+  render();
+  await new Promise(r=>setTimeout(r,50));
+
+  const stampURI = await stampDataURL();
+  const payload = {
+    action:'sign', id: DOC_ID || '', contract: JSON.parse(canonical()), hash,
+    signer:{ name, tel, email }, sig, ts, ua: navigator.userAgent, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    html: paperHTMLForPDF(stampURI),
+    to:{ company: C.co.email || 회사_수신_이메일, customer: email || C.cl.email || '' },
+    subject: `[${C.co.name}] 전자계약 체결 완료 — ${C.ev.title}`,
+  };
+  try{
+    if(apiURL()){
+      const j = await apiPost(payload);
+      SIGNED.pdfUrl = j.pdfUrl||''; DOC_ID = j.id||DOC_ID;
+      $('#done-msg').textContent = '서명이 반영된 계약서 PDF를 ' + [payload.to.company, payload.to.customer].filter(Boolean).join(', ') + ' 로 보내드렸습니다.';
+      if(j.pdfUrl){ $('#done-pdf').href=j.pdfUrl; $('#done-pdf').hidden=false; }
+    } else {
+      // 폴백: FormSubmit 으로 회사에 서명 정보 전달 (PDF는 고객이 화면 인쇄로 저장)
+      const t=calc();
+      const r = await fetch('https://formsubmit.co/ajax/'+회사_수신_이메일, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify({ _subject: payload.subject, _template:'box', _replyto: email||'',
+          '계약': `${C.ev.title} / ${C.cl.org} / 계약금액 ${won(t.total)} / 계약번호 ${C.no}`,
+          '서명자': `${name} / ${tel} / ${email||'-'}`, '서명 시각': ts, '문서 확인 코드': hash,
+          '계약서 열기 (서명 전 원문)': customerBase()+'?admin=1#c='+packState(),
+          '서명 이미지(data URI · 브라우저 주소창에 붙여넣으면 보임)': sig }) });
+      if(!r.ok) throw new Error('메일 전송 실패 '+r.status);
+      $('#done-msg').textContent = '서명 내용을 큰길이벤트기획에 전달했습니다. 아래 버튼으로 서명된 계약서를 PDF로 저장해 보관해 주세요.';
+    }
+    $('#sign').hidden=true; $('#cta').hidden=true; $('#done').hidden=false; $('#mode-pill').className='pill signed'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:check-circle-bold"></iconify-icon> 서명 완료';
+    $('#done').scrollIntoView({behavior:'smooth'});
+    render();
+  }catch(e){
+    SIGNED=null; render();
+    btn.disabled=false; btn.innerHTML='<iconify-icon icon="solar:pen-new-square-bold" style="font-size:19px;"></iconify-icon> 서명하고 계약서 보내기';
+    toast('전송에 실패했습니다: '+e.message+' · 잠시 후 다시 시도해 주세요');
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   토스트 · 초기화
+═══════════════════════════════════════════════════════ */
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),2800); }
+
+async function init(){
+  const q = new URLSearchParams(location.search);
+  loadCo();
+  const isAdmin = q.get('admin')==='1';
+  const isPreview = q.get('preview')==='1';
+  const shortId = q.get('c');
+  const hashCode = location.hash.startsWith('#c=') ? location.hash.slice(3) : '';
+
+  // 도장 존재 확인
+  await new Promise(res=>{ const im=new Image(); im.onload=()=>{stampOK=true;res();}; im.onerror=()=>{stampOK=false;res();}; im.src=STAMP_SRC; });
+
+  // 링크에 실린 배포 ID(&s=)로 서버 주소 복원 — 고객 기기에는 설정이 없으므로
+  if(q.get('s') && !isAdmin) C.api = apiFromDeploy(q.get('s'));
+  if(hashCode){ const savedApi=C.api; unpackState(hashCode); if(!C.api) C.api=savedApi; }
+  if(shortId && !isAdmin){
+    $('#paper').innerHTML='<p style="text-align:center;color:#666;padding:20mm 0;">계약서를 불러오는 중입니다…</p>';
+    try{
+      const base = apiURL();
+      if(!base) throw new Error('서버 주소를 알 수 없습니다 (링크가 잘렸을 수 있습니다)');
+      const r = await fetch(base+'?id='+encodeURIComponent(shortId)+'&t='+Date.now(), {cache:'no-store'});
+      const j = await r.json(); if(!j.ok) throw new Error(j.error||'불러오기 실패');
+      const savedApi=C.api; C=Object.assign(DEF(), j.contract); C.co=Object.assign(DEF().co, j.contract.co||{}); C.api=savedApi; DOC_ID=shortId;
+      if(j.status==='signed'){ SIGNED = { sig:j.sig||'', name:j.signer&&j.signer.name||'', tel:'', ts:j.signedAt||'', hash:j.hash||'', pdfUrl:j.pdfUrl||'' }; }
+    }catch(e){ $('#paper').innerHTML='<p style="text-align:center;color:#B91C1C;padding:20mm 0;">계약서를 불러오지 못했습니다.<br><small>'+esc(e.message)+'</small><br><br>보내주신 분께 다시 요청해 주세요.</p>'; return; }
+  }
+
+  if(isAdmin){
+    MODE='admin'; document.body.classList.add('admin'); $('#admin').hidden=false;
+    $('#mode-pill').className='pill admin'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:shield-user-bold"></iconify-icon> 관리자 · 작성 모드';
+    if(!C.no) C.no=genNo();
+    bindForm(); render(); saveHashDebounced();
+  } else if(SIGNED && SIGNED.sig){
+    MODE='signed'; render();
+    $('#mode-pill').className='pill signed'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:check-circle-bold"></iconify-icon> 서명 완료';
+    $('#done').hidden=false; $('#done-msg').textContent='이미 서명이 완료된 계약서입니다.'; if(SIGNED.pdfUrl){ $('#done-pdf').href=SIGNED.pdfUrl; $('#done-pdf').hidden=false; }
+  } else {
+    MODE = isPreview ? 'preview' : 'customer'; render();
+    if(!isPreview){ $('#sign').hidden=false; $('#cta').hidden=false; padResize();
+      $('#s-name').value=C.cl.name||''; $('#s-tel').value=C.cl.tel||''; $('#s-email').value=C.cl.email||''; }
+    else { $('#mode-pill').innerHTML='<iconify-icon icon="solar:eye-bold"></iconify-icon> 고객 화면 미리보기'; $('#sign').hidden=false; padResize(); }
+    // 고객 화면: 하단 CTA는 서명 패널이 보이면 숨김
+    if(!isPreview){ new IntersectionObserver(([e])=>{ $('#cta').hidden = e.isIntersecting; }).observe($('#sign')); }
+  }
+}
+init();
+</script>
+</body>
+</html>
