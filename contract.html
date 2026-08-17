@@ -255,12 +255,16 @@
     <div class="body">
       <p class="hint">한 번 저장하면 이 브라우저에 기억됩니다.</p>
       <div class="row2">
-        <div><label class="f">상호</label><input class="in" data-k="co.name"></div>
+        <div><label class="f">법인명 (계약 주체)</label><input class="in" data-k="co.name"></div>
+        <div><label class="f">브랜드명 (병기)</label><input class="in" data-k="co.brand"></div>
+      </div>
+      <div class="row2">
         <div><label class="f">대표자</label><input class="in" data-k="co.rep" placeholder="대표자 성명"></div>
+        <div><label class="f">전화</label><input class="in" data-k="co.tel"></div>
       </div>
       <div class="row2">
         <div><label class="f">사업자등록번호</label><input class="in" data-k="co.biz" placeholder="000-00-00000"></div>
-        <div><label class="f">전화</label><input class="in" data-k="co.tel"></div>
+        <div><label class="f">법인등록번호</label><input class="in" data-k="co.corp" placeholder="000000-0000000"></div>
       </div>
       <div><label class="f">주소</label><input class="in" data-k="co.addr"></div>
       <div><label class="f">이메일 (서명본 수신)</label><input class="in" data-k="co.email"></div>
@@ -359,7 +363,9 @@ const genNo = () => { const d=new Date(); return 'KG-'+d.getFullYear()+String(d.
 
 const DEF = () => ({
   v:1, no:'', date: today(), api:'',
-  co:{ name:'큰길이벤트기획', rep:'', biz:'', addr:'광주전남특별시 광양 강변동길 1', tel:'1533-7295', email:'gilcaro@naver.com', bank:'' },
+  co:{ name:'주식회사 브리지미디어', brand:'큰길이벤트기획', rep:'김동길', biz:'813-81-02252', corp:'204611-0065269',
+       addr:'전라남도 광양시 광양읍 강변동길 1, 2층', tel:'1533-7295', email:'gilcaro@naver.com',
+       bank:'KB국민은행 788101-01-397776 (예금주: 주식회사 브리지미디어)' },
   cl:{ org:'', name:'', tel:'', email:'', addr:'' },
   ev:{ title:'', date:'', place:'', people:'', scope:'' },
   items:[],
@@ -431,10 +437,11 @@ const fmtTs = (iso, sec) => { const d=new Date(iso); if(isNaN(d)) return esc(iso
 let stampOK = null;   // null=미확인, true=이미지 있음, false=없음
 
 function sealHTML(){
-  if(stampOK===false) return `<div class="seal-css">${esc(C.co.name)}<br>대표<br>인</div>`;
-  return `<img class="seal" src="${STAMP_SRC}" alt="직인" onerror="stampOK=false;this.outerHTML='<div class=&quot;seal-css&quot;>'+${JSON.stringify(esc(C.co.name))}+'<br>대표<br>인</div>'">`;
+  if(stampOK===false) return `<div class="seal-css">${esc(C.co.brand||C.co.name)}<br>대표<br>인</div>`;
+  return `<img class="seal" src="${STAMP_SRC}" alt="직인">`;
 }
 
+const coFull = () => esc(C.co.name) + (C.co.brand && C.co.brand!==C.co.name ? ' (' + esc(C.co.brand) + ')' : '');
 function render(){
   const t = calc();
   const rows = C.items.map((it,i)=>{
@@ -450,9 +457,9 @@ function render(){
 
   $('#paper').innerHTML = `
     <h1>행사 대행 계약서</h1>
-    <div class="doc-no"><span>계약번호 <b>${or(C.no)}</b></span><span>${esc(C.co.name)} 표준계약서 v1</span></div>
+    <div class="doc-no"><span>계약번호 <b>${or(C.no)}</b></span><span>${esc(C.co.brand||C.co.name)} 표준계약서 v1</span></div>
 
-    <p class="preamble"><b>${or(C.cl.org, '(갑)')}</b>(이하 "갑"이라 한다)과(와) <b>${esc(C.co.name)}</b>(이하 "을"이라 한다)은 아래 행사의 기획·운영 용역에 관하여 다음과 같이 계약을 체결한다.</p>
+    <p class="preamble"><b>${or(C.cl.org, '(갑)')}</b>(이하 "갑"이라 한다)과(와) <b>${coFull()}</b>(이하 "을"이라 한다)은 아래 행사의 기획·운영 용역에 관하여 다음과 같이 계약을 체결한다.</p>
 
     <h2>제1조 (계약의 목적)</h2>
     <p>본 계약은 갑이 주최·주관하는 행사의 기획, 무대·장비 설치, 운영 및 철거 등 용역(이하 "본 용역")을 을에게 위탁하고, 을이 이를 성실히 수행함에 있어 필요한 사항을 정함을 목적으로 한다.</p>
@@ -552,12 +559,12 @@ function render(){
       <div class="party">
         <span class="role">을 (수급자)</span>
         <span class="stamp-flag ok">날인 완료</span>
-        <div class="line"><span>상호</span><b>${esc(C.co.name)}</b></div>
+        <div class="line"><span>상호</span><b>${coFull()}</b></div>
         <div class="line"><span>대표자</span><span>${or(C.co.rep)}</span></div>
-        <div class="line"><span>사업자번호</span><span>${or(C.co.biz)}</span></div>
+        <div class="line"><span>사업자번호</span><span>${or(C.co.biz)}${C.co.corp?` <span style="color:#777;">· 법인 ${esc(C.co.corp)}</span>`:''}</span></div>
         <div class="line"><span>주소</span><span>${or(C.co.addr)}</span></div>
         <div class="line"><span>연락처</span><span>${esc(C.co.tel)} · ${esc(C.co.email)}</span></div>
-        <div class="sig-slot"><span class="lab">날인</span><div class="box"><span style="color:#333;font-weight:700;letter-spacing:.1em;">${esc(C.co.name)} 대표 ${or(C.co.rep,'')}</span>${sealHTML()}</div></div>
+        <div class="sig-slot"><span class="lab">날인</span><div class="box"><span style="color:#333;font-weight:700;letter-spacing:.06em;font-size:9pt;line-height:1.5;text-align:center;margin-right:14mm;position:relative;">${esc(C.co.name)}<br>대표이사 ${or(C.co.rep,'')} <span style="color:#999;font-weight:400;">(인)</span></span>${sealHTML()}</div></div>
       </div>
     </div>
 
