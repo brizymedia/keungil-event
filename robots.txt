@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Disallow: /contract.html
+Disallow: /upload.html
+Disallow: /apps-script/
+Disallow: /scripts/
+
+# AI 검색 크롤러도 허용 (홈페이지 · 지역안내 · 갤러리 · 견적)
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Yeti
+Allow: /
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://xn--wk0bn7yi8h24iszc.com/sitemap.xml
