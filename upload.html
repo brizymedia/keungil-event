@@ -166,6 +166,10 @@
       갤러리 페이지(gallery.html)에 이 글이 그대로 실려 <b>네이버·구글·AI 검색</b>에 노출됩니다.
       <b>지역명 + 행사 종류 + 준비한 장비(무대·음향·LED·조명·MC·가수)</b>를 한 문장씩 넣어주시면 검색에 잘 잡힙니다. 비워두면 기본 문구가 들어갑니다.
     </p>
+    <button class="btn btn-sub" id="promo-preview" type="button" style="margin-top:.6rem;">
+      <iconify-icon icon="solar:pen-new-round-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
+      블로그 · 인스타 글 미리 만들기
+    </button>
   </div>
 
   <!-- ── 02 사진 ── -->
@@ -218,30 +222,43 @@
     <p class="note" id="status"></p>
   </div>
 
-  <!-- ── 04 홍보 문구 ── -->
+  <!-- ── 04 홍보 문구 (블로그 · 인스타 자동 작성) ── -->
   <div class="card" id="promo" hidden>
-    <div class="card-title"><span class="n">04</span>홍보 문구</div>
+    <div class="card-title"><span class="n">04</span>블로그 · 인스타 글 자동 작성</div>
     <p class="note" style="margin-top:0;">
-      아래 문구를 그대로 쓰셔도 되고 고치셔도 됩니다. 복사한 뒤 앱에 붙여넣으세요.
+      행사명 · 장소 · 행사 설명에서 <b>지역과 장비(무대·음향·LED·조명·MC·가수·드론쇼)</b>를 읽어 검색에 잘 잡히는 글을 만듭니다.
+      그대로 쓰셔도 되고 고치셔도 됩니다. 홈페이지 · 갤러리 · 견적 링크는 글 끝에 자동으로 들어갑니다.
     </p>
+    <div id="promo-detect" class="note" style="margin:.4rem 0 1rem;padding:.6rem .8rem;border-radius:.6rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#FCD34D;"></div>
 
-    <label class="f">인스타그램용</label>
-    <textarea class="cap" id="cap-insta"></textarea>
+    <label class="f">네이버 블로그 제목 후보 <span style="color:#52525b;font-weight:400;">(하나 골라 복사)</span></label>
+    <div id="cap-titles" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem;"></div>
+
+    <label class="f">네이버 블로그 본문 <span style="color:#52525b;font-weight:400;">(사진은 「― 사진 ―」 자리에 넣으세요)</span></label>
+    <textarea class="cap" id="cap-blog" style="min-height:16rem;"></textarea>
+    <div class="row2" style="margin-top:.6rem;">
+      <button class="btn btn-sub" data-copy="cap-blog">본문 복사</button>
+      <button class="btn btn-sub" id="share-blog">사진과 함께 공유</button>
+    </div>
+
+    <label class="f" style="margin-top:1.4rem;">인스타그램 문구</label>
+    <textarea class="cap" id="cap-insta" style="min-height:11rem;"></textarea>
     <div class="row2" style="margin-top:.6rem;">
       <button class="btn btn-sub" data-copy="cap-insta">문구 복사</button>
       <button class="btn btn-sub" id="share-insta">사진과 함께 공유</button>
     </div>
 
-    <label class="f" style="margin-top:1.4rem;">블로그용</label>
-    <textarea class="cap" id="cap-blog" style="min-height:13rem;"></textarea>
+    <label class="f" style="margin-top:1.4rem;">글 끝 서명 블록 <span style="color:#52525b;font-weight:400;">(다른 글에도 붙여 쓰세요)</span></label>
+    <textarea class="cap" id="cap-sign" style="min-height:6.5rem;"></textarea>
     <div class="row2" style="margin-top:.6rem;">
-      <button class="btn btn-sub" data-copy="cap-blog">문구 복사</button>
-      <button class="btn btn-sub" id="share-blog">사진과 함께 공유</button>
+      <button class="btn btn-sub" data-copy="cap-sign">서명 복사</button>
+      <button class="btn btn-sub" id="promo-regen">다시 만들기</button>
     </div>
 
     <p class="note">
       「사진과 함께 공유」를 누르면 휴대폰 공유창이 열립니다. 거기서 네이버 블로그나 인스타그램을 고르면
-      사진이 딸려갑니다. 문구는 복사도 같이 되니 붙여넣기만 하시면 됩니다.
+      사진이 딸려갑니다. 문구는 복사도 같이 되니 붙여넣기만 하시면 됩니다.<br>
+      <b>팁</b> · 블로그 글에는 링크를 글 끝에 1~3개만, 제목에는 지역+행사+장비를. 매번 같은 문장이면 저품질로 볼 수 있으니 한두 문장은 그날 이야기로 바꿔주세요.
     </p>
   </div>
 
@@ -270,6 +287,7 @@
 const 서버주소_기본 = '';
 
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
 const 저장 = window.localStorage;
 
 let 서버주소 = 서버주소_기본 || 저장.getItem('kg_srv') || '';
@@ -711,60 +729,178 @@ function 관리폼(몸, 행사, 줄) {
   });
 }
 
+/* ═══════════════════════════════════════════════════════
+   블로그 · 인스타 글 자동 작성
+   행사명 · 장소 · 설명에서 지역과 장비를 감지해 검색 키워드가 자연스럽게 들어간 글을 만든다.
+═══════════════════════════════════════════════════════ */
+const 홈주소 = 'https://큰길이벤트.com';
+const 지역표 = [
+  ['광양', ['광양', '중마', '광양항', '광양읍']], ['순천', ['순천', '순천만', '신대']], ['여수', ['여수', '엑스포', '웅천', '돌산']],
+  ['고흥', ['고흥', '녹동', '소록도', '나로']],   ['하동', ['하동', '화개', '섬진강']],   ['남원', ['남원', '춘향']],
+  ['광주', ['광주', '김대중컨벤션', '상무']],     ['진주', ['진주', '남강', '유등']],     ['통영', ['통영', '강구안', '도남']],
+  ['보성', ['보성', '벌교']], ['구례', ['구례']], ['곡성', ['곡성']], ['담양', ['담양']], ['나주', ['나주']], ['목포', ['목포']], ['사천', ['사천', '삼천포']], ['거제', ['거제']],
+];
+const 장비표 = [
+  ['무대',   ['무대', '트러스', '레이허', '스테이지']],
+  ['음향',   ['음향', '스피커', '마이크', '믹서', '라인어레이', '사운드']],
+  ['LED',    ['led', 'LED', '전광판', '영상', '스크린', '프로젝터']],
+  ['조명',   ['조명', '무빙', '라이트', '핀조명']],
+  ['MC',     ['mc', 'MC', '사회', '진행자', '아나운서']],
+  ['가수',   ['가수', '초청', '공연팀', '연예인', '축하공연', '밴드', '트로트']],
+  ['드론쇼', ['드론']],
+  ['중계',   ['중계', '송출', '유튜브', '라이브', '스트리밍', '촬영']],
+  ['특수효과', ['불꽃', '특수효과', '폭죽', '포그', '스파클']],
+  ['천막',   ['천막', '몽골텐트', '부스']],
+];
+const 행사종류표 = [
+  ['축제', ['축제', '페스티벌', '페스타']], ['기공식', ['기공식', '착공']], ['준공식', ['준공', '개관', '개원']], ['오픈식', ['오픈', '개업', '론칭', '출범']],
+  ['시상식', ['시상', '표창']], ['이취임식', ['취임', '이임']], ['기념식', ['기념', '주년', '창립']], ['체육대회', ['체육대회', '운동회', '한마음']],
+  ['컨퍼런스', ['컨퍼런스', '포럼', '세미나', '설명회', '토론회']], ['공연', ['공연', '콘서트', '버스킹', '음악회']], ['송년회', ['송년', '신년', '시무식', '종무식']], ['워크숍', ['워크숍', '워크샵', '연수']],
+];
+function 찾기(표, 글) { const g = String(글 || ''); return 표.filter(([, 키들]) => 키들.some((k) => g.toLowerCase().includes(k.toLowerCase()))).map(([이름]) => 이름); }
+function 갤러리슬러그(s) { return String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'event'; }
+function 골라(배열) { return 배열[Math.floor(Math.random() * 배열.length)]; }
+
 function 문구만들기(행사) {
+  const 이름 = 행사.name || '행사';
   const 날 = (행사.date || '').replace(/-/g, '.');
   const 곳 = 행사.place || '';
-  const 태그 = 해시태그(행사.name);
+  const 설명 = (행사.desc || '').trim();
+  const 전체 = [이름, 곳, 설명].join(' ');
 
-  const 엮기 = (줄들) => 줄들.filter((s) => s !== false)
-                            .join('\n')
-                            .replace(/\n{3,}/g, '\n\n')
-                            .trim();
+  const 지역들 = 찾기(지역표, 전체);
+  const 지역 = 지역들[0] || '';
+  const 장비들 = 찾기(장비표, 전체);
+  const 장비 = 장비들.length ? 장비들 : ['무대', '음향', '조명', 'LED'];
+  const 종류 = 찾기(행사종류표, 전체)[0] || '행사';
+  const 장비줄 = 장비.slice(0, 4).join('·') + (장비.length > 4 ? ' 외' : '');   // 제목·훅용 (길어지지 않게 4개까지)
+  const 지역접두 = 지역 ? 지역 + ' ' : '';
+  const 다른지역 = ['순천', '여수', '광양', '고흥', '하동', '남원', '광주', '진주', '통영'].filter((r) => r !== 지역).join('·');
+  const 갤러리링크 = 홈주소 + '/gallery.html#' + 갤러리슬러그(이름);
 
+  $('#promo-detect').innerHTML =
+    '감지 → 지역 <b>' + (지역들.length ? 지역들.join(', ') : '(없음 · 장소나 설명에 지역명을 넣어주세요)') + '</b>' +
+    ' · 종류 <b>' + 종류 + '</b>' +
+    ' · 장비 <b>' + (장비들.length ? 장비들.join(', ') : '(없음 · 기본값 사용)') + '</b>';
+
+  const 엮기 = (줄들) => 줄들.filter((s) => s !== false && s != null).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+  /* ── 블로그 제목 후보 ── */
+  const 제목들 = [
+    지역접두 + 이름 + ' ' + 장비줄 + ' 세팅 후기 | 큰길이벤트기획',
+    지역접두 + 종류 + ' 무대·음향·조명 준비, ' + 이름 + ' 현장 스케치',
+    (지역 ? 지역 + ' 이벤트회사 큰길이벤트기획 — ' : '큰길이벤트기획 — ') + 이름 + ' ' + 장비줄 + ' 대여·운영',
+    (지역 ? 지역 + ' ' + 종류 + ' 행사대행 사례 | ' : 종류 + ' 행사대행 사례 | ') + 이름 + (날 ? ' (' + 날 + ')' : ''),
+    이름 + ' 이렇게 준비했습니다 — ' + 장비줄 + (장비들.includes('가수') || 장비들.includes('MC') ? ' · 섭외까지' : ''),
+  ];
+  $('#cap-titles').innerHTML = 제목들.map((t, i) =>
+    '<div style="display:flex;gap:.5rem;align-items:center;">' +
+      '<input class="cap" readonly value="' + t.replace(/"/g, '&quot;') + '" style="flex:1;min-height:0;padding:.55rem .7rem;font-size:.85rem;">' +
+      '<button class="btn btn-sub" data-copytext="' + t.replace(/"/g, '&quot;') + '" style="padding:.5rem .8rem;font-size:.8rem;white-space:nowrap;">복사</button>' +
+    '</div>').join('');
+  $$('#cap-titles [data-copytext]').forEach((b) => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.copytext); toast('제목을 복사했습니다'); } catch (e) { prompt('제목을 복사하세요', b.dataset.copytext); }
+  }));
+
+  /* ── 서명 블록 ── */
+  const 서명 = 엮기([
+    '큰길이벤트기획 (주식회사 브리지미디어) · 전남 광양',
+    '행사기획 · 무대 · 음향 · LED · 조명 · MC/가수 섭외 · 드론쇼 — 전남·경남 전역',
+    '홈페이지 ' + 홈주소,
+    '이 행사 사진 더 보기 ' + 갤러리링크,
+    '견적 문의 ' + 홈주소 + '/quote.html · 1533-7295',
+  ]);
+  $('#cap-sign').value = 서명;
+
+  /* ── 블로그 본문 ── */
+  const 준비목록 = {
+    '무대':   '무대와 트러스를 행사장 규모에 맞춰 설치',
+    '음향':   '라인어레이 스피커·무선 마이크·믹서로 음향 세팅',
+    'LED':    'LED 전광판·영상 장비로 무대 영상과 자막 운영',
+    '조명':   '무빙헤드·파라이트 조명으로 무대 연출',
+    'MC':     '행사 성격에 맞는 전문 MC 섭외와 식순 진행',
+    '가수':   '초청가수·공연팀 섭외와 출연 진행',
+    '드론쇼': '드론 라이트쇼 연출',
+    '중계':   '카메라 중계와 실시간 송출',
+    '특수효과': '불꽃·특수효과 연출',
+    '천막':   '천막·부스 설치',
+  };
+  const 인트로후보 = [
+    (지역 ? 지역 + '에서 열린 ' : '') + 이름 + ' 현장에 큰길이벤트기획이 다녀왔습니다.',
+    (날 ? 날 + ', ' : '') + (지역 ? 지역 + ' ' : '') + 이름 + '의 ' + 장비줄 + '을(를) 큰길이벤트기획이 준비했습니다.',
+    (지역 ? 지역 + ' ' : '') + 종류 + ' 현장, ' + 이름 + '. 이번에도 큰길이벤트기획이 함께했습니다.',
+  ];
+  $('#cap-blog').value = 엮기([
+    골라(인트로후보),
+    '',
+    (날 ? '📅 일시 : ' + 날 : false),
+    (곳 ? '📍 장소 : ' + 곳 : false),
+    '',
+    (설명 ? 설명 : (지역 ? 지역 : '전남') + ' 일원에서 진행된 ' + 종류 + '입니다. 현장 여건에 맞춰 장비를 구성하고, 행사 시작 전 리허설로 소리와 조명을 먼저 잡았습니다.'),
+    '',
+    '― 사진 ―',
+    '',
+    '■ 이번 행사에서 준비한 것',
+    ...장비.map((z) => '· ' + (준비목록[z] || z)),
+    '',
+    '― 사진 ―',
+    '',
+    (지역 ? 지역 + '을 비롯해 ' : '') + 다른지역 + ' 등 전남·경남 어디든 광양에서 출발해 당일 세팅합니다. ' + 종류 + ' 준비 중이시라면 일정·장소·인원만 알려주세요. 당일 안에 개략 견적을 드립니다.',
+    '',
+    서명,
+    '',
+    해시태그(이름, 지역들, 장비, 종류),
+  ]);
+
+  /* ── 인스타 ── */
+  const 훅후보 = [
+    (지역 ? 지역 + ', ' : '') + 이름 + ' 🎪',
+    (지역 ? '#' + 지역 + ' ' : '') + 이름 + ' 현장 ✨',
+    이름 + (지역 ? ' @' + 지역 : '') + ' 🔊',
+  ];
   $('#cap-insta').value = 엮기([
-    행사.name + ' 현장 🎪',
-    '음향 · 조명 · LED · 무대 — 큰길이벤트기획이 함께했습니다.',
+    골라(훅후보),
+    장비줄 + ' — 큰길이벤트기획이 준비했습니다.',
+    (설명 ? '' : false),
+    (설명 ? 설명.split(/(?<=[.!?。])\s+/)[0] : false),
     '',
     (곳 ? '📍 ' + 곳 : false),
     (날 ? '📅 ' + 날 : false),
     '',
-    '행사 준비 문의 gilcaro@naver.com',
+    '행사 문의 1533-7295 · 프로필 링크 → 자동 견적서',
     '',
-    태그,
-  ]);
-
-  $('#cap-blog').value = 엮기([
-    '[' + 행사.name + '] 현장 스케치',
-    '',
-    (날 ? '일시 : ' + 날 : false),
-    (곳 ? '장소 : ' + 곳 : false),
-    '',
-    '큰길이벤트기획이 함께한 ' + 행사.name + ' 현장입니다.',
-    '음향, 조명, LED 전광판, 무대 설치까지 한 번에 준비했습니다.',
-    '',
-    '현장 여건에 맞춰 장비를 구성하고, 행사 시작 전 리허설로 소리와 조명을 잡았습니다.',
-    '덕분에 순서가 밀리지 않고 매끄럽게 진행됐습니다.',
-    '',
-    '― 아래에 현장 사진을 넣어주세요 ―',
-    '',
-    '행사 준비는 큰길이벤트기획',
-    'gilcaro@naver.com · 전남 광양',
-    '음향 · 조명 · LED · 무대 · 특수효과 · 섭외',
-    '',
-    태그,
+    해시태그(이름, 지역들, 장비, 종류, true),
   ]);
 
   $('#promo').hidden = false;
   $('#promo').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function 해시태그(행사명) {
-  const 기본 = ['행사음향', '무대조명', 'LED전광판', '행사대행', '이벤트업체',
-                '광양이벤트', '전남행사', '큰길이벤트기획'];
+function 해시태그(행사명, 지역들, 장비들, 종류, 인스타) {
+  const 세트 = [];
   const 이름표 = String(행사명 || '').replace(/[^가-힣A-Za-z0-9]/g, '');
-  if (이름표) 기본.unshift(이름표);
-  return 기본.map((t) => '#' + t).join(' ');
+  if (이름표) 세트.push(이름표);
+  (지역들 || []).forEach((r) => { 세트.push(r + '이벤트', r + '행사', r + '이벤트회사'); });
+  if (종류 && 종류 !== '행사') 세트.push(종류.replace(/\s/g, ''), (지역들 && 지역들[0] ? 지역들[0] + 종류 : ''));
+  const 장비태그 = { '무대': ['무대설치', '트러스'], '음향': ['음향장비대여', '행사음향'], 'LED': ['LED전광판', 'LED영상장비대여'], '조명': ['조명대여', '무대조명'],
+                    'MC': ['MC섭외', '행사사회자'], '가수': ['가수섭외', '초청가수'], '드론쇼': ['드론쇼', '드론라이트쇼'], '중계': ['라이브중계', '행사촬영'], '특수효과': ['특수효과', '불꽃연출'], '천막': ['천막대여'] };
+  (장비들 || []).forEach((z) => (장비태그[z] || []).forEach((t) => 세트.push(t)));
+  세트.push('행사기획', '행사대행', '이벤트회사추천', '전남이벤트', '경남이벤트', '광양이벤트', '큰길이벤트기획');
+  if (인스타) 세트.push('이벤트', '행사', '축제', '공연', '무대', 'event', 'stage', 'sound', 'lighting');
+  const 고유 = [...new Set(세트.filter(Boolean))].slice(0, 인스타 ? 30 : 15);
+  return 고유.map((t) => '#' + t).join(' ');
 }
+
+/* 업로드 전에도 미리 만들어보기 · 다시 만들기 */
+function 현재행사() {
+  return { name: $('#ev-name').value.trim(), date: $('#ev-date').value, place: $('#ev-place').value.trim(), desc: $('#ev-desc').value.trim() };
+}
+$('#promo-preview')?.addEventListener('click', () => {
+  const 행사 = 현재행사();
+  if (!행사.name) { toast('행사명을 먼저 입력해 주세요'); $('#ev-name').focus(); return; }
+  문구만들기(행사);
+});
+$('#promo-regen')?.addEventListener('click', () => 문구만들기(현재행사()));
 
 document.querySelectorAll('[data-copy]').forEach((b) => {
   b.addEventListener('click', async () => {
