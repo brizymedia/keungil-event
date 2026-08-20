@@ -56,7 +56,7 @@ const totalPhotos = photos.length;
 const REGIONS = ['광양', '순천', '여수', '고흥', '녹동', '하동', '남원', '광주', '진주', '통영', '보성', '구례', '곡성', '담양', '나주', '목포', '사천', '거제'];
 const regionOf = (g) => REGIONS.find((r) => (g.event + ' ' + g.place).includes(r)) || '';
 const defaultDesc = (g) => {
-  const r = regionOf(g); const where = g.place || (r ? r + ' 일원' : '전남·경남');
+  const r = regionOf(g); const where = g.place || (r ? r + ' 일원' : '광주·전남·경남');
   return `${where}에서 진행한 ${g.event} 현장입니다. ${BRAND}이 무대·트러스 설치, 음향·조명·LED 영상장비 세팅과 현장 운영을 맡았습니다.`;
 };
 
@@ -88,7 +88,7 @@ const jsonld = {
       { '@type': 'ListItem', position: 1, name: '홈', item: SITE + '/' },
       { '@type': 'ListItem', position: 2, name: '행사 갤러리', item: SITE + '/gallery.html' } ] },
     { '@type': 'CollectionPage', '@id': SITE + '/gallery.html', url: SITE + '/gallery.html', name: `${BRAND} 행사 갤러리`, inLanguage: 'ko',
-      description: `광양·순천·여수·고흥 등 전남·경남에서 ${BRAND}이 진행한 행사 현장 사진 ${totalPhotos}장. 행사별 무대·음향·조명·LED 세팅 기록.`,
+      description: `광양·순천·여수·고흥 등 광주·전남·경남에서 ${BRAND}이 진행한 행사 현장 사진 ${totalPhotos}장. 행사별 무대·음향·조명·LED 세팅 기록.`,
       publisher: { '@id': SITE + '/#business' },
       hasPart: events.map((g) => ({ '@type': 'ImageGallery', name: g.event, url: SITE + '/gallery.html#' + g.id, datePublished: g.date || undefined,
         contentLocation: g.place ? { '@type': 'Place', name: g.place } : undefined,
@@ -104,14 +104,14 @@ const html = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0B0A10">
 <title>행사 갤러리 — 광양·순천·여수·고흥 행사 현장 사진 ${totalPhotos}장 | ${BRAND}</title>
-<meta name="description" content="${esc(`${BRAND}이 전남·경남(광양·순천·여수·고흥·하동·남원·광주·진주·통영)에서 진행한 지역축제·기업행사·기관행사 현장. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼 세팅 기록 ${events.length}건, 사진 ${totalPhotos}장.`)}">
+<meta name="description" content="${esc(`${BRAND}이 광주·전남·경남(광양·순천·여수·고흥·하동·남원·광주·진주·통영)에서 진행한 지역축제·기업행사·기관행사 현장. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼 세팅 기록 ${events.length}건, 사진 ${totalPhotos}장.`)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="${SITE}/gallery.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="${BRAND}">
 <meta property="og:title" content="행사 갤러리 — ${BRAND} 현장 사진">
-<meta property="og:description" content="전남·경남 행사 현장 ${events.length}건 · 사진 ${totalPhotos}장. 무대·음향·조명·LED·드론쇼.">
+<meta property="og:description" content="광주·전남·경남 행사 현장 ${events.length}건 · 사진 ${totalPhotos}장. 무대·음향·조명·LED·드론쇼.">
 <meta property="og:url" content="${SITE}/gallery.html">
 <meta property="og:image" content="${events[0] && events[0].photos[0] ? imgUrl(events[0].photos[0]) : SITE + '/hero-stage-1280.jpg'}">
 <meta name="twitter:card" content="summary_large_image">
@@ -168,7 +168,7 @@ const html = `<!DOCTYPE html>
 <header class="hero"><div class="hero-in">
   <div class="eyebrow">Gallery</div>
   <h1>행사 갤러리 — 현장 ${events.length}건 · 사진 ${totalPhotos}장</h1>
-  <p class="lead">광양·순천·여수·고흥 등 전남·경남 곳곳에서 ${BRAND}이 직접 세팅하고 운영한 행사 현장입니다. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼까지 — 행사별로 무엇을 준비했는지 사진과 함께 기록합니다.</p>
+  <p class="lead">광양·순천·여수·고흥 등 광주·전남·경남 곳곳에서 ${BRAND}이 직접 세팅하고 운영한 행사 현장입니다. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼까지 — 행사별로 무엇을 준비했는지 사진과 함께 기록합니다.</p>
   <nav class="toc" aria-label="행사 목록">${events.map((g) => `<a href="#${esc(g.id)}">${esc(g.event)}</a>`).join('')}</nav>
 </div></header>
 
