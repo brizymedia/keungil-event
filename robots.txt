@@ -24,3 +24,4 @@ User-agent: Bingbot
 Allow: /
 
 Sitemap: https://xn--wk0bn7yi8h24iszc.com/sitemap.xml
+Sitemap: https://xn--wk0bn7yi8h24iszc.com/rss.xml

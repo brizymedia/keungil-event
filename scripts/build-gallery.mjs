@@ -175,6 +175,8 @@ const html = `<!DOCTYPE html>
 <meta name="keywords" content="${esc(PAGE_KEYWORDS)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="${SITE}/gallery.html">
+<link rel="alternate" type="application/rss+xml" title="큰길이벤트기획 소식" href="/rss.xml">
+<!-- 네이버 서치어드바이저 소유확인: 발급받은 meta 태그를 이 줄 아래에 붙여넣으세요 -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="${BRAND}">
@@ -334,5 +336,44 @@ ${pages.map((p) => `  <url>
 </urlset>
 `;
 writeFileSync(resolve(ROOT, 'sitemap.xml'), sitemap, 'utf8');
+
+// ── rss.xml (네이버 서치어드바이저 RSS 제출용) ────────────
+const rssDate = (d) => new Date(d).toUTCString();
+const rssItems = [
+  { title: `${BRAND} — 광주·전남·경남 행사기획 · 무대 · 음향 · LED · 조명`,
+    link: SITE + '/',
+    desc: '광양 본사, 순천·여수·고흥·하동·남원·광주·진주·통영 출장. 지역축제·기업행사·기공식·시상식 기획부터 음향장비·LED 영상장비·조명 대여, 무대 설치, MC·가수 섭외까지 원스톱.' },
+  { title: `회사소개 — ${BRAND} (주식회사 브리지미디어)`,
+    link: SITE + '/company.html',
+    desc: '2015년 설립, 음향·조명·LED영상·무대·발전기를 직접 보유하고 자체 인력으로 운영하는 토탈 이벤트 솔루션 기업. 연혁·경영이념·보유장비·사옥 안내.' },
+  { title: '서비스 지역 안내 — 광양·순천·여수·고흥·하동·남원·광주·진주·통영',
+    link: SITE + '/areas.html',
+    desc: '광양에서 출발해 차량 1~2시간권 전역 당일 세팅. 지역별 행사 사례와 자주 받는 문의를 안내합니다.' },
+  ...events.map((g) => ({
+    title: `${(g.regions && g.regions[0]) ? g.regions[0] + ' ' : ''}${g.name} 현장 사진 ${g.photos.length}장`,
+    link: SITE + '/gallery.html#' + g.id,
+    desc: g.desc || '',
+  })),
+];
+const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>${esc(BRAND)} — 광주·전남·경남 행사기획 · 장비 대여</title>
+  <link>${SITE}/</link>
+  <description>${esc('광양 본사 큰길이벤트기획(주식회사 브리지미디어). 지역축제·컨퍼런스·시상식·기공식·체육대회 기획과 무대·음향·조명·LED 영상장비 대여, MC·가수 섭외.')}</description>
+  <language>ko</language>
+  <lastBuildDate>${rssDate(Date.now())}</lastBuildDate>
+  <atom:link href="${SITE}/rss.xml" rel="self" type="application/rss+xml"/>
+${rssItems.map((it) => `  <item>
+    <title>${esc(it.title)}</title>
+    <link>${esc(it.link)}</link>
+    <guid isPermaLink="true">${esc(it.link)}</guid>
+    <description>${esc(it.desc)}</description>
+    <pubDate>${rssDate(latest)}</pubDate>
+  </item>`).join('\n')}
+</channel>
+</rss>
+`;
+writeFileSync(resolve(ROOT, 'rss.xml'), rss, 'utf8');
 
 console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · sitemap.xml 갱신 완료`);
