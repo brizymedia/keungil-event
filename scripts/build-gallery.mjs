@@ -35,9 +35,68 @@ try {
   process.exit(1);
 }
 
+
+/* ── 카테고리별 SEO 메타 (현장 사진의 현수막·LED에서 확인한 실제 행사·지역) ── */
+const CAT_SEO = {
+  festival: {
+    name: '지역축제 & 공연행사',
+    regions: ['고흥', '순천', '광양', '여수'],
+    events: ['제24회 녹동바다불꽃축제 (고흥 녹동항)', '고흥 남열해돋이해수욕장 해맞이 행사', '순천조례호수공원 제7회 물총축제', '제2회 남도마을 한가위 축제 및 노래자랑'],
+    desc: '고흥 녹동항 제24회 녹동바다불꽃축제, 순천조례호수공원 물총축제, 고흥 남열해돋이 해맞이 행사 등 지역축제 현장입니다. 무대·트러스 설치부터 라인어레이 음향, 무빙헤드 조명, LED 전광판 영상까지 큰길이벤트기획이 종합 대행했습니다.',
+  },
+  conference: {
+    name: '컨퍼런스 · 포럼 · 기념식',
+    regions: ['광양', '고흥', '여수', '순천', '전남'],
+    events: ['2025 광양시 정책비전 투어', '2026 옥룡면 시민과의 대화', '국립소록도병원 개원 110주년 기념식 및 제23회 한센인의 날', '가야문화권 지역발전 시장·군수 협의회', '여순10·19 여순추모공원 참배'],
+    desc: '광양시 정책비전 투어와 시민과의 대화, 국립소록도병원 개원 110주년 기념식 및 제23회 한센인의 날, 가야문화권 시장·군수 협의회 등 기관·지자체 행사 현장입니다. 회의 음향과 LED 영상, 다중 카메라 중계와 의전 세팅을 한 팀이 맡아 운영했습니다.',
+  },
+  ceremony: {
+    name: '시상식 & 이취임식',
+    regions: ['여수', '광양', '순천', '전남'],
+    events: ['여수라이온스클럽 창립 제59주년 및 회장 이·취임식', 'JCI 광양청년회의소 2026 회장단·감사 이·취임식', '제10·11대 재광양고흥군향우회 회장단 이·취임식', '태인동청년회 제39대 회장단 이·취임식 및 전역식', '제53차 전남지구JC 회원대회', '(사)한국권투협회 전남지회 발대식 및 취임식'],
+    desc: '여수라이온스클럽 창립 59주년, JCI 광양청년회의소 이·취임식, 재광양고흥군향우회 회장단 이·취임식, 전남지구JC 회원대회 등 단체 시상식과 이·취임식 현장입니다. 식순 기획과 무대 연출, 현수막·LED 영상, 음향·조명 세팅을 준비했습니다.',
+  },
+  groundbreaking: {
+    name: '기공식 · 오픈식 · 브랜드 론칭',
+    regions: ['무안', '광주', '전남'],
+    events: ['광주호남모델협회 워크숍 비치웨어 패션쇼 (무안 오배캠핑 풀빌라)'],
+    desc: '기공식과 준공식, 오픈식과 브랜드 론칭, 패션쇼 등 브랜드 행사 현장입니다. 시삽·제막 의전 세팅부터 야외 무대와 음향·조명까지 현장 조건에 맞춰 준비했습니다.',
+  },
+  sports: {
+    name: '체육대회 & 명랑운동회',
+    regions: ['순천', '여수', '광양'],
+    events: ['2025 제5회 순천시 읍면동 체육대회 (팔마실내체육관)', '제10회 여수진남초등학교 총동문 한마음체육대회', '제38차 순천도사초등학교 총동문 체육대회'],
+    desc: '순천시 읍면동 체육대회, 여수진남초·순천도사초 총동문 한마음체육대회 등 체육대회와 명랑운동회 현장입니다. 실내체육관과 운동장 여건에 맞춘 무대·음향·LED 영상, 경품과 진행 MC를 함께 준비했습니다.',
+  },
+  school: {
+    name: '학교 행사 & 축제',
+    regions: ['여수', '광양', '순천'],
+    events: ['여수아리울중학교 제60회 아리울제', '한올고등학교 한꿈축제', 'HOSEONG FESTA 2025', '광양 유치원 꿈·끼 사랑 발표회'],
+    desc: '여수아리울중학교 아리울제, 한올고 한꿈축제, 호성 페스타 등 중·고교 축제와 유치원·초등 발표회 현장입니다. 강당과 체육관 여건에 맞춰 무대·음향·조명·영상을 구성하고 리허설까지 진행했습니다.',
+  },
+  busking: {
+    name: '버스킹 & 음악회',
+    regions: ['광양', '하동'],
+    events: ['광양 배알도 별빛버스킹 (광양시 문화예술과)', '제23회 광양매화축제 공연 무대'],
+    desc: '광양 배알도 별빛버스킹과 광양매화축제 공연 무대 등 거리 버스킹과 야외 음악회 현장입니다. 소규모 공연에 맞는 음향과 조명, 이동식 무대를 준비하고 공연팀 섭외와 진행까지 맡았습니다.',
+  },
+  film: {
+    name: '공연 영상 촬영 & 중계',
+    regions: ['전남', '광양', '여수'],
+    events: ['National Youth Dance Festival 전국 청소년 댄스 페스티벌 공연 촬영·중계'],
+    desc: '전국 청소년 댄스 페스티벌 등 공연장 영상 촬영과 다중 카메라 중계 현장입니다. 지미집과 슬라이더 카메라, 4K 스위칭과 조명 콘솔을 자체 인력이 운용하며 무대 조명·헤이즈 연출까지 함께 진행했습니다.',
+  },
+};
+
+/* 지역명 → areas.html 앵커 */
+const REGION_ANCHOR = { 광양:'gwangyang', 순천:'suncheon', 여수:'yeosu', 고흥:'goheung', 하동:'hadong', 남원:'namwon', 광주:'gwangju', 진주:'jinju', 통영:'tongyeong' };
+
 // 카테고리(폴더)별 묶기 — photos.json 의 categories 순서를 따른다
 const cats = (data.categories || []).filter((c) => c.count > 0);
-const byCat = new Map(cats.map((c) => [c.slug, { ...c, id: c.slug, photos: [] }]));
+const byCat = new Map(cats.map((c) => {
+  const seo = CAT_SEO[c.slug] || {};
+  return [c.slug, { ...c, ...seo, id: c.slug, photos: [] }];
+}));
 for (const p of photos) {
   const g = byCat.get(p.cat);
   if (g) g.photos.push(p);
@@ -49,21 +108,31 @@ const totalPhotos = photos.length;
 
 // ── HTML ────────────────────────────────────────────────
 const sections = events.map((g) => {
+  const regions = g.regions || [];
+  const evs = g.events || [];
+  // 사진 alt: 분야 + 지역 + 서비스 키워드를 돌아가며 넣어 지역 검색에 걸리게 한다
   const imgs = g.photos.map((p, i) => {
-    const alt = `${g.name} 현장 사진 ${i + 1} · ${BRAND}`;
+    const region = regions.length ? regions[i % regions.length] : '광주·전남·경남';
+    const alt = `${region} ${g.name} 현장 — 무대·음향·조명·LED 세팅 · ${BRAND} (${i + 1})`;
     return `<a class="ph" href="${imgUrl(p)}" data-i="${i}" target="_blank" rel="noopener"><img src="${imgUrl(p)}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600"></a>`;
   }).join('\n        ');
+  const regionTags = regions.length
+    ? `<div class="ev-regions">${regions.map((r) => `<a href="areas.html#${esc(REGION_ANCHOR[r] || '')}">${esc(r)}</a>`).join('')}</div>` : '';
+  const evList = evs.length
+    ? `<div class="ev-list"><h3>이 분야에서 진행한 주요 행사</h3><ul>${evs.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
   return `
   <article class="ev" id="${esc(g.id)}" itemscope itemtype="https://schema.org/ImageGallery">
     <header>
-      <div class="ev-meta">사진 ${g.photos.length}장</div>
-      <h2 itemprop="name">${esc(g.name)}</h2>
+      <div class="ev-meta">사진 ${g.photos.length}장${regions.length ? ' · ' + esc(regions.join(' · ')) : ''}</div>
+      <h2 itemprop="name">${esc(regions[0] ? regions[0] + ' · ' : '')}${esc(g.name)}</h2>
       <p class="ev-desc" itemprop="description">${esc(g.desc || '')}</p>
+      ${regionTags}
     </header>
     <div class="grid">
         ${imgs}
     </div>
-    <div class="ev-cta"><a href="quote.html">이런 행사 견적 받기</a><a href="index.html#services">서비스 자세히</a></div>
+    ${evList}
+    <div class="ev-cta"><a href="quote.html">${esc(g.name)} 견적 받기</a><a href="areas.html">지역별 안내</a><a href="index.html#services">서비스 자세히</a></div>
   </article>`;
 }).join('\n');
 
@@ -76,11 +145,24 @@ const jsonld = {
     { '@type': 'CollectionPage', '@id': SITE + '/gallery.html', url: SITE + '/gallery.html', name: `${BRAND} 행사 갤러리`, inLanguage: 'ko',
       description: `광양·순천·여수·고흥 등 광주·전남·경남에서 ${BRAND}이 진행한 행사 현장 사진 ${totalPhotos}장. 행사 종류별 무대·음향·조명·LED 세팅 기록.`,
       publisher: { '@id': SITE + '/#business' },
-      hasPart: events.map((g) => ({ '@type': 'ImageGallery', name: g.name, url: SITE + '/gallery.html#' + g.id,
+      hasPart: events.map((g) => ({ '@type': 'ImageGallery', name: (g.regions && g.regions[0] ? g.regions[0] + ' · ' : '') + g.name,
+        url: SITE + '/gallery.html#' + g.id,
         description: g.desc || '',
+        keywords: [...(g.regions || []).flatMap((r) => [`${r} ${g.name}`, `${r} 이벤트회사`, `${r} 행사대행`]), ...(g.events || [])].join(', '),
+        contentLocation: (g.regions || []).map((r) => ({ '@type': 'Place', name: r, address: { '@type': 'PostalAddress', addressLocality: r, addressCountry: 'KR' } })),
+        about: (g.events || []).map((e) => ({ '@type': 'Event', name: e })),
         image: g.photos.slice(0, 12).map((p) => imgUrl(p)) })) }
   ]
 };
+
+/* 페이지 전체 키워드 — 지역 × 분야 조합 */
+const ALL_REGIONS = [...new Set(events.flatMap((g) => g.regions || []))];
+const PAGE_KEYWORDS = [
+  ...ALL_REGIONS.flatMap((r) => [`${r} 이벤트회사`, `${r} 행사대행`, `${r} 무대 설치`, `${r} 음향장비 대여`, `${r} 조명 대여`, `${r} LED 전광판 대여`]),
+  ...events.flatMap((g) => (g.regions || []).slice(0, 2).map((r) => `${r} ${g.name.replace(/\s*[&·]\s*/g, ' ')}`)),
+  ...events.flatMap((g) => (g.events || []).map((e) => e.replace(/\s*\(.*?\)\s*/g, ''))),
+  '행사 사진', '행사 현장 사진', '이벤트회사 추천', BRAND,
+].join(', ');
 
 const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -90,6 +172,7 @@ const html = `<!DOCTYPE html>
 <meta name="theme-color" content="#0B0A10">
 <title>행사 갤러리 — 지역축제·컨퍼런스·시상식·체육대회 현장 사진 ${totalPhotos}장 | ${BRAND}</title>
 <meta name="description" content="${esc(`${BRAND}이 광주·전남·경남(광양·순천·여수·고흥·하동·남원·광주·진주·통영)에서 진행한 지역축제·컨퍼런스·시상식·기공식·체육대회·학교행사·버스킹·영상촬영 현장. 무대·트러스, 음향·조명·LED 영상장비 세팅 기록 ${events.length}개 분야, 사진 ${totalPhotos}장.`)}">
+<meta name="keywords" content="${esc(PAGE_KEYWORDS)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="${SITE}/gallery.html">
 <meta property="og:type" content="website">
@@ -129,6 +212,14 @@ const html = `<!DOCTYPE html>
   .ev h2{ font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;line-height:1.3; }
   .ev-desc{ color:var(--ink-2);line-height:1.8;margin:0 0 1.2rem;font-size:.95rem;white-space:pre-wrap;max-width:80ch; }
   .grid{ display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.7rem; }
+  .ev-regions{ display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1.2rem; }
+  .ev-regions a{ font-size:.78rem;font-weight:700;text-decoration:none;padding:.28rem .75rem;border-radius:9999px;background:rgba(245,158,11,.12);color:var(--amber-ink);transition:all .25s; }
+  .ev-regions a:hover{ background:rgba(245,158,11,.24); }
+  .ev-list{ margin-top:1.2rem;padding:1rem 1.2rem;border-radius:.9rem;background:rgba(22,20,28,.035);border:1px solid var(--line); }
+  .ev-list h3{ margin:0 0 .5rem;font-size:.76rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3); }
+  .ev-list ul{ margin:0;padding:0;list-style:none;display:grid;gap:.35rem; }
+  .ev-list li{ font-size:.88rem;color:var(--ink-2);line-height:1.6;padding-left:1.1rem;position:relative; }
+  .ev-list li::before{ content:'';position:absolute;left:0;top:.55rem;width:.35rem;height:.35rem;border-radius:50%;background:var(--amber); }
   .ev-cta{ margin-top:1.1rem;display:flex;gap:.5rem;flex-wrap:wrap; }
   .ev-cta a{ font-size:.82rem;font-weight:700;text-decoration:none;padding:.5rem 1rem;border-radius:9999px;border:1px solid var(--line);color:var(--ink-2);transition:all .25s; }
   .ev-cta a:hover{ border-color:var(--amber);color:var(--ink);background:rgba(245,158,11,.07); }
@@ -192,6 +283,20 @@ ${sections}
 writeFileSync(resolve(ROOT, 'gallery.html'), html, 'utf8');
 
 // ── sitemap.xml ─────────────────────────────────────────
+/* 사진 사이트맵 제목·설명에도 지역 키워드를 넣는다 */
+const catOf = new Map(events.map((g) => [g.slug, g]));
+const photoIdx = new Map();
+function imgTitle(ph) {
+  const g = catOf.get(ph.cat); if (!g) return ph.event || '';
+  const i = (photoIdx.get(ph.cat) || 0); photoIdx.set(ph.cat, i + 1);
+  const r = (g.regions && g.regions.length) ? g.regions[i % g.regions.length] : '광주·전남·경남';
+  return `${r} ${g.name} 현장 — ${BRAND}`;
+}
+function imgCaption(ph) {
+  const g = catOf.get(ph.cat); if (!g) return '';
+  return `${g.name} 무대·트러스 설치, 음향·조명·LED 영상장비 세팅. ${(g.regions || []).join(' · ')} 지역 행사 대행 ${BRAND}.`;
+}
+
 const today = new Date().toISOString().slice(0, 10);
 const pages = [
   { loc: '/', lastmod: today, priority: '1.0', changefreq: 'weekly' },
@@ -207,7 +312,7 @@ ${pages.map((p) => `  <url>
     <lastmod>${p.lastmod}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>${(p.images || []).map((ph) => `
-    <image:image><image:loc>${esc(imgUrl(ph))}</image:loc><image:title>${esc(ph.event || '')}</image:title></image:image>`).join('')}
+    <image:image><image:loc>${esc(imgUrl(ph))}</image:loc><image:title>${esc(imgTitle(ph))}</image:title><image:caption>${esc(imgCaption(ph))}</image:caption></image:image>`).join('')}
   </url>`).join('\n')}
 </urlset>
 `;
