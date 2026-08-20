@@ -81,7 +81,7 @@ const CAT_SEO = {
     desc: '광양 배알도 별빛버스킹과 광양매화축제 공연 무대 등 거리 버스킹과 야외 음악회 현장입니다. 소규모 공연에 맞는 음향과 조명, 이동식 무대를 준비하고 공연팀 섭외와 진행까지 맡았습니다.',
   },
   film: {
-    name: '공연 영상 촬영 & 중계',
+    name: '카메라 중계 & 공연 영상 촬영',
     regions: ['전남', '광양', '여수'],
     events: ['National Youth Dance Festival 전국 청소년 댄스 페스티벌 공연 촬영·중계'],
     desc: '전국 청소년 댄스 페스티벌 등 공연장 영상 촬영과 다중 카메라 중계 현장입니다. 지미집과 슬라이더 카메라, 4K 스위칭과 조명 콘솔을 자체 인력이 운용하며 무대 조명·헤이즈 연출까지 함께 진행했습니다.',
@@ -265,6 +265,23 @@ ${sections}
   <a href="index.html">홈</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
 </footer>
 <script>
+/* 해시(#festival 등)로 들어왔을 때 해당 분야로 확실히 이동
+   — 사진이 많고 지연 로딩이라 브라우저 기본 점프가 빗나가는 것을 보정한다 */
+(function(){
+  function jump(smooth){
+    var id=decodeURIComponent(location.hash.slice(1)); if(!id) return;
+    var el=document.getElementById(id); if(!el) return;
+    // behavior:'auto' 는 CSS 의 scroll-behavior:smooth 를 따라가 첫 진입 때 밀린다 → instant 로 강제
+    el.scrollIntoView({behavior: smooth ? 'smooth' : 'instant', block:'start'});
+  }
+  if(location.hash){
+    jump(false);
+    addEventListener('load', function(){ jump(false); setTimeout(function(){ jump(false); },250); });
+    document.addEventListener('DOMContentLoaded', function(){ jump(false); });
+  }
+  addEventListener('hashchange', function(){ jump(true); });
+})();
+
 (function(){
   var lb=document.getElementById('lb'),im=document.getElementById('lb-img'),c=document.getElementById('lb-c'),list=[],idx=0;
   document.querySelectorAll('.ev').forEach(function(ev){
