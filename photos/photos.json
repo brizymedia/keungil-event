@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-20T09:52:16.207Z",
+ "updated": "2026-08-20T17:02:44.195Z",
  "categories": [
   {
    "slug": "festival",
@@ -23,7 +23,7 @@
    "slug": "groundbreaking",
    "name": "기공식 · 오픈식 · 브랜드 론칭",
    "desc": "기공식과 준공식, 오픈식과 브랜드 론칭 현장입니다. 시삽·제막 의전 세팅부터 무대와 음향까지 준비했습니다.",
-   "count": 5
+   "count": 14
   },
   {
    "slug": "sports",
@@ -35,7 +35,7 @@
    "slug": "school",
    "name": "학교 행사 & 축제",
    "desc": "초·중·고교와 대학의 축제, 발표회, 기념행사 현장입니다. 무대·음향·조명·영상을 학교 여건에 맞춰 구성했습니다.",
-   "count": 26
+   "count": 31
   },
   {
    "slug": "busking",
@@ -617,6 +617,51 @@
    "event": "기공식 · 오픈식 · 브랜드 론칭"
   },
   {
+   "path": "photos/groundbreaking/006.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/007.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/008.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/009.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/010.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/011.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/012.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/013.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/014.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
    "path": "photos/sports/001.jpg",
    "cat": "sports",
    "event": "체육대회 & 명랑운동회"
@@ -913,6 +958,31 @@
   },
   {
    "path": "photos/school/026.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/027.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/028.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/029.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/030.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/031.jpg",
    "cat": "school",
    "event": "학교 행사 & 축제"
   },
