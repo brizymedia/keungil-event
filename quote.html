@@ -169,12 +169,16 @@
     .party b{ color:#fff;font-weight:700; }
     .party .lbl{ display:inline-block;min-width:4.6rem;color:#71717a; }
 
+    /* ── 대표 직인 ── */
     .stamp{
-      position:absolute;right:-1mm;top:8mm;width:21mm;height:auto;
-      pointer-events:none;
-      mix-blend-mode:multiply;
+      position:absolute;right:.25rem;top:2.4rem;
+      width:5.4rem;height:auto;
+      pointer-events:none;user-select:none;
+      opacity:.95;
+      filter:drop-shadow(0 0 6px rgba(200,16,46,.35));
       -webkit-print-color-adjust:exact;print-color-adjust:exact;
     }
+    @media (max-width:520px){ .stamp{ width:4.4rem;top:2rem; } }
 
     .tbl-wrap{ overflow-x:auto; }
     table.q{ width:100%;border-collapse:collapse;min-width:46rem; }
@@ -259,6 +263,9 @@
       .sum-total .v{ background:none!important;-webkit-text-fill-color:#111!important;color:#111!important; }
       .tbd-note{ color:#a05c00!important; }
       .glass{ background:#fff!important;border-color:#999!important;backdrop-filter:none!important;box-shadow:none!important; }
+
+      /* 직인: 흰 종이에서는 곱하기 합성으로 자연스럽게 */
+      .stamp{ mix-blend-mode:multiply!important;filter:none!important;opacity:1!important;width:22mm!important;top:9mm!important;right:0!important; }
     }
     .print-only{ display:none; }
   </style>
@@ -400,12 +407,16 @@
             견적일 <span id="doc-date">-</span> · 견적 유효기간 발행일로부터 30일
           </div>
         </div>
-        <div class="party" style="position:relative;">
+        <div class="party" style="position:relative;padding-right:5.8rem;">
           <div style="font-size:.7rem;letter-spacing:.16em;color:#FBBF24;font-weight:700;margin-bottom:.35rem;">공급자</div>
-          <div><span class="lbl">상호</span><b>큰길이벤트기획</b></div>
-          <div><span class="lbl">연락처</span><b>gilcaro@naver.com</b></div>
+          <div><span class="lbl">상호</span><b>주식회사 브리지미디어</b></div>
+          <div><span class="lbl">대표자</span><b>김동길</b></div>
+          <div><span class="lbl">사업자번호</span><b>813-81-02252</b></div>
+          <div><span class="lbl">연락처</span><b>1533-7295</b></div>
           <div><span class="lbl">이메일</span><b>gilcaro@naver.com</b></div>
-          <div><span class="lbl">소재지</span><b>전남 광양</b></div>
+          <div><span class="lbl">소재지</span><b>전남 광양시 광양읍 강변동길 1, 2층</b></div>
+          <img class="stamp" src="stamp-keungil.png" alt="주식회사 브리지미디어 대표 직인"
+               onerror="this.style.display='none'">
         </div>
         <div class="party">
           <div style="font-size:.7rem;letter-spacing:.16em;color:#FBBF24;font-weight:700;margin-bottom:.35rem;">수요자</div>
@@ -490,10 +501,10 @@
       </button>
     </div>
 
-    <p class="no-print" id="stamp-note" hidden
+    <p class="no-print" id="stamp-note"
        style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;">
       <iconify-icon icon="solar:stamp-bold" style="font-size:15px;color:#71717a;vertical-align:-2px;"></iconify-icon>
-      인쇄 · PDF 저장 시 <strong style="color:#71717a;">대표 직인</strong>이 함께 찍힙니다.
+      공급자 칸에 <strong style="color:#71717a;">대표 직인</strong>이 찍혀 있습니다. 인쇄 · PDF 저장 · 메일 발송본에도 그대로 들어갑니다.
     </p>
 
     <p class="no-print" id="send-note" style="text-align:center;font-size:.78rem;color:#52525b;margin-top:1rem;line-height:1.8;">
@@ -997,6 +1008,10 @@ function 견적HTML() {
   const F  = "'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
   const TD = 'padding:11px 10px;border-bottom:1px solid #e5e7eb;font-size:13px;color:#111827;';
   const TH = 'padding:10px;background:#111827;color:#ffffff;font-size:12px;font-weight:700;letter-spacing:.02em;';
+  // 메일 본문은 다른 PC에서 열리므로 직인은 절대 주소로 (상대경로는 안 보임)
+  const 직인 = location.origin.startsWith('http')
+    ? location.origin + location.pathname.replace(/[^/]*$/, '') + 'stamp-keungil.png'
+    : 'https://xn--wk0bn7yi8h24iszc.com/stamp-keungil.png';
 
   const 항목행 = rows.map((r, i) => {
     const 금액 = r.price === null ? null : (+r.qty || 0) * (+r.days || 0) * (+r.price || 0);
@@ -1065,9 +1080,20 @@ function 견적HTML() {
     <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
       <td width="50%" valign="top" style="padding:12px 14px;background:#f9fafb;border:1px solid #e5e7eb;">
         <div style="font-size:10.5px;letter-spacing:.14em;color:#D97706;font-weight:800;padding-bottom:6px;">공급자</div>
-        ${정보칸('상호', '큰길이벤트기획')}
-        ${정보칸('이메일', 'gilcaro@naver.com')}
-        ${정보칸('소재지', '전남 광양')}
+        <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+          <td valign="top">
+            ${정보칸('상호', '주식회사 브리지미디어')}
+            ${정보칸('대표자', '김동길')}
+            ${정보칸('사업자', '813-81-02252')}
+            ${정보칸('연락처', '1533-7295')}
+            ${정보칸('이메일', 'gilcaro@naver.com')}
+            ${정보칸('소재지', '전남 광양시 광양읍 강변동길 1, 2층')}
+          </td>
+          <td valign="middle" align="right" width="66" style="padding-left:6px;">
+            <img src="${직인}" width="62" height="62" alt="주식회사 브리지미디어 대표 직인"
+                 style="display:block;width:62px;height:62px;border:0;outline:none;">
+          </td>
+        </tr></table>
       </td>
       <td width="8"></td>
       <td width="50%" valign="top" style="padding:12px 14px;background:#f9fafb;border:1px solid #e5e7eb;">
@@ -1122,8 +1148,9 @@ function 견적HTML() {
 
   <tr><td style="padding:20px 24px 26px;">
     <div style="border-top:1px solid #e5e7eb;padding-top:16px;font-size:12px;color:#6b7280;line-height:1.8;">
-      <b style="color:#111827;font-size:13px;">큰길이벤트기획</b><br>
-      gilcaro@naver.com · 전남 광양<br>
+      <b style="color:#111827;font-size:13px;">큰길이벤트기획</b> <span style="color:#9ca3af;">(주식회사 브리지미디어)</span><br>
+      대표 김동길 · 사업자등록번호 813-81-02252<br>
+      전남 광양시 광양읍 강변동길 1, 2층 · 1533-7295 · gilcaro@naver.com<br>
       음향 · 조명 · LED · 무대 · 특수효과 · 섭외 — 행사 전 과정을 한 곳에서
     </div>
   </td></tr>
@@ -1282,8 +1309,9 @@ function 고객메일텍스트() {
     '',
     '궁금하신 점은 편하게 회신 주시거나 아래 이메일로 연락 주세요.',
     '',
-    '큰길이벤트기획',
-    'gilcaro@naver.com · 전남 광양',
+    '큰길이벤트기획 (주식회사 브리지미디어)',
+    '대표 김동길 · 사업자등록번호 813-81-02252',
+    '전남 광양시 광양읍 강변동길 1, 2층 · 1533-7295 · gilcaro@naver.com',
   ].join('\n');
 }
 
