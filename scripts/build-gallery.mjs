@@ -24,60 +24,46 @@ const slug = (s) => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-
 const fmtDate = (d) => { const m = String(d || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? `${m[1]}년 ${+m[2]}월 ${+m[3]}일` : (d || ''); };
 
 // ── 데이터 ──────────────────────────────────────────────
-let photos = [];
+let photos = [], data = {};
 try {
   const r = await fetch(PHOTOS_URL + '?t=' + Date.now(), { cache: 'no-store' });
   if (!r.ok) throw new Error('HTTP ' + r.status);
-  photos = (await r.json()).photos || [];
+  data = await r.json();
+  photos = data.photos || [];
 } catch (e) {
   console.error('photos.json 을 불러오지 못했습니다:', e.message);
   process.exit(1);
 }
 
-// 행사별 묶기 (event|date), 최신순
-const groups = new Map();
+// 카테고리(폴더)별 묶기 — photos.json 의 categories 순서를 따른다
+const cats = (data.categories || []).filter((c) => c.count > 0);
+const byCat = new Map(cats.map((c) => [c.slug, { ...c, id: c.slug, photos: [] }]));
 for (const p of photos) {
-  const key = (p.event || '') + '|' + (p.date || '');
-  if (!groups.has(key)) groups.set(key, { event: p.event || '(행사명 없음)', date: p.date || '', place: p.place || '', desc: p.desc || '', photos: [] });
-  const g = groups.get(key);
-  if (p.desc && !g.desc) g.desc = p.desc;
-  if (p.place && !g.place) g.place = p.place;
-  g.photos.push(p);
+  const g = byCat.get(p.cat);
+  if (g) g.photos.push(p);
 }
-const events = [...groups.values()].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-// 같은 이름 행사가 여러 날짜면 slug 에 날짜 붙이기
-const seen = new Map();
-for (const g of events) { const base = slug(g.event); const n = (seen.get(base) || 0) + 1; seen.set(base, n); g.id = n === 1 ? base : base + '-' + (g.date || n).replace(/-/g, ''); }
+const events = [...byCat.values()].filter((g) => g.photos.length);
 
-const latest = events[0]?.date || new Date().toISOString().slice(0, 10);
+const latest = (data.updated || new Date().toISOString()).slice(0, 10);
 const totalPhotos = photos.length;
-
-// 지역 힌트: 행사명/장소에서 지역명 추출 (SEO 문장용)
-const REGIONS = ['광양', '순천', '여수', '고흥', '녹동', '하동', '남원', '광주', '진주', '통영', '보성', '구례', '곡성', '담양', '나주', '목포', '사천', '거제'];
-const regionOf = (g) => REGIONS.find((r) => (g.event + ' ' + g.place).includes(r)) || '';
-const defaultDesc = (g) => {
-  const r = regionOf(g); const where = g.place || (r ? r + ' 일원' : '광주·전남·경남');
-  return `${where}에서 진행한 ${g.event} 현장입니다. ${BRAND}이 무대·트러스 설치, 음향·조명·LED 영상장비 세팅과 현장 운영을 맡았습니다.`;
-};
 
 // ── HTML ────────────────────────────────────────────────
 const sections = events.map((g) => {
-  const r = regionOf(g);
-  const desc = g.desc || defaultDesc(g);
   const imgs = g.photos.map((p, i) => {
-    const alt = `${g.event} 현장 사진 ${i + 1}${g.place ? ' — ' + g.place : ''} · ${BRAND}`;
+    const alt = `${g.name} 현장 사진 ${i + 1} · ${BRAND}`;
     return `<a class="ph" href="${imgUrl(p)}" data-i="${i}" target="_blank" rel="noopener"><img src="${imgUrl(p)}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600"></a>`;
   }).join('\n        ');
   return `
   <article class="ev" id="${esc(g.id)}" itemscope itemtype="https://schema.org/ImageGallery">
     <header>
-      <div class="ev-meta">${esc(fmtDate(g.date))}${g.place ? ' · ' + esc(g.place) : ''}${r ? ' · <span class="tag">' + esc(r) + '</span>' : ''} · 사진 ${g.photos.length}장</div>
-      <h2 itemprop="name">${esc(g.event)}</h2>
-      <p class="ev-desc" itemprop="description">${esc(desc)}</p>
+      <div class="ev-meta">사진 ${g.photos.length}장</div>
+      <h2 itemprop="name">${esc(g.name)}</h2>
+      <p class="ev-desc" itemprop="description">${esc(g.desc || '')}</p>
     </header>
     <div class="grid">
         ${imgs}
     </div>
+    <div class="ev-cta"><a href="quote.html">이런 행사 견적 받기</a><a href="index.html#services">서비스 자세히</a></div>
   </article>`;
 }).join('\n');
 
@@ -88,11 +74,10 @@ const jsonld = {
       { '@type': 'ListItem', position: 1, name: '홈', item: SITE + '/' },
       { '@type': 'ListItem', position: 2, name: '행사 갤러리', item: SITE + '/gallery.html' } ] },
     { '@type': 'CollectionPage', '@id': SITE + '/gallery.html', url: SITE + '/gallery.html', name: `${BRAND} 행사 갤러리`, inLanguage: 'ko',
-      description: `광양·순천·여수·고흥 등 광주·전남·경남에서 ${BRAND}이 진행한 행사 현장 사진 ${totalPhotos}장. 행사별 무대·음향·조명·LED 세팅 기록.`,
+      description: `광양·순천·여수·고흥 등 광주·전남·경남에서 ${BRAND}이 진행한 행사 현장 사진 ${totalPhotos}장. 행사 종류별 무대·음향·조명·LED 세팅 기록.`,
       publisher: { '@id': SITE + '/#business' },
-      hasPart: events.map((g) => ({ '@type': 'ImageGallery', name: g.event, url: SITE + '/gallery.html#' + g.id, datePublished: g.date || undefined,
-        contentLocation: g.place ? { '@type': 'Place', name: g.place } : undefined,
-        description: g.desc || defaultDesc(g),
+      hasPart: events.map((g) => ({ '@type': 'ImageGallery', name: g.name, url: SITE + '/gallery.html#' + g.id,
+        description: g.desc || '',
         image: g.photos.slice(0, 12).map((p) => imgUrl(p)) })) }
   ]
 };
@@ -103,15 +88,15 @@ const html = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0B0A10">
-<title>행사 갤러리 — 광양·순천·여수·고흥 행사 현장 사진 ${totalPhotos}장 | ${BRAND}</title>
-<meta name="description" content="${esc(`${BRAND}이 광주·전남·경남(광양·순천·여수·고흥·하동·남원·광주·진주·통영)에서 진행한 지역축제·기업행사·기관행사 현장. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼 세팅 기록 ${events.length}건, 사진 ${totalPhotos}장.`)}">
+<title>행사 갤러리 — 지역축제·컨퍼런스·시상식·체육대회 현장 사진 ${totalPhotos}장 | ${BRAND}</title>
+<meta name="description" content="${esc(`${BRAND}이 광주·전남·경남(광양·순천·여수·고흥·하동·남원·광주·진주·통영)에서 진행한 지역축제·컨퍼런스·시상식·기공식·체육대회·학교행사·버스킹·영상촬영 현장. 무대·트러스, 음향·조명·LED 영상장비 세팅 기록 ${events.length}개 분야, 사진 ${totalPhotos}장.`)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="${SITE}/gallery.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="${BRAND}">
 <meta property="og:title" content="행사 갤러리 — ${BRAND} 현장 사진">
-<meta property="og:description" content="광주·전남·경남 행사 현장 ${events.length}건 · 사진 ${totalPhotos}장. 무대·음향·조명·LED·드론쇼.">
+<meta property="og:description" content="광주·전남·경남 행사 현장 ${events.length}개 분야 · 사진 ${totalPhotos}장. 무대·음향·조명·LED.">
 <meta property="og:url" content="${SITE}/gallery.html">
 <meta property="og:image" content="${events[0] && events[0].photos[0] ? imgUrl(events[0].photos[0]) : SITE + '/hero-stage-1280.jpg'}">
 <meta name="twitter:card" content="summary_large_image">
@@ -144,6 +129,9 @@ const html = `<!DOCTYPE html>
   .ev h2{ font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;line-height:1.3; }
   .ev-desc{ color:var(--ink-2);line-height:1.8;margin:0 0 1.2rem;font-size:.95rem;white-space:pre-wrap;max-width:80ch; }
   .grid{ display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.7rem; }
+  .ev-cta{ margin-top:1.1rem;display:flex;gap:.5rem;flex-wrap:wrap; }
+  .ev-cta a{ font-size:.82rem;font-weight:700;text-decoration:none;padding:.5rem 1rem;border-radius:9999px;border:1px solid var(--line);color:var(--ink-2);transition:all .25s; }
+  .ev-cta a:hover{ border-color:var(--amber);color:var(--ink);background:rgba(245,158,11,.07); }
   .ph{ display:block;aspect-ratio:4/3;border-radius:.8rem;overflow:hidden;background:#16141C;box-shadow:0 1px 2px rgba(22,20,28,.05),0 14px 34px -18px rgba(22,20,28,.25); }
   .ph img{ width:100%;height:100%;object-fit:cover;transition:transform .5s ease;filter:saturate(1.15) contrast(1.04);display:block; }
   .ph:hover img{ transform:scale(1.05); }
@@ -167,9 +155,9 @@ const html = `<!DOCTYPE html>
 
 <header class="hero"><div class="hero-in">
   <div class="eyebrow">Gallery</div>
-  <h1>행사 갤러리 — 현장 ${events.length}건 · 사진 ${totalPhotos}장</h1>
-  <p class="lead">광양·순천·여수·고흥 등 광주·전남·경남 곳곳에서 ${BRAND}이 직접 세팅하고 운영한 행사 현장입니다. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼까지 — 행사별로 무엇을 준비했는지 사진과 함께 기록합니다.</p>
-  <nav class="toc" aria-label="행사 목록">${events.map((g) => `<a href="#${esc(g.id)}">${esc(g.event)}</a>`).join('')}</nav>
+  <h1>행사 갤러리 — ${events.length}개 분야 · 사진 ${totalPhotos}장</h1>
+  <p class="lead">광양·순천·여수·고흥 등 광주·전남·경남 곳곳에서 ${BRAND}이 직접 세팅하고 운영한 현장입니다. 무대·트러스, 음향·조명·LED 영상장비, 드론쇼까지 — 행사 종류별로 모아 보실 수 있습니다.</p>
+  <nav class="toc" aria-label="행사 분야">${events.map((g) => `<a href="#${esc(g.id)}">${esc(g.name)} <span style="opacity:.6;font-weight:600;">${g.photos.length}</span></a>`).join('')}</nav>
 </div></header>
 
 <main>
@@ -219,10 +207,10 @@ ${pages.map((p) => `  <url>
     <lastmod>${p.lastmod}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>${(p.images || []).map((ph) => `
-    <image:image><image:loc>${esc(imgUrl(ph))}</image:loc><image:title>${esc((ph.event || '') + (ph.place ? ' — ' + ph.place : ''))}</image:title></image:image>`).join('')}
+    <image:image><image:loc>${esc(imgUrl(ph))}</image:loc><image:title>${esc(ph.event || '')}</image:title></image:image>`).join('')}
   </url>`).join('\n')}
 </urlset>
 `;
 writeFileSync(resolve(ROOT, 'sitemap.xml'), sitemap, 'utf8');
 
-console.log(`gallery.html: 행사 ${events.length}건, 사진 ${totalPhotos}장 · sitemap.xml 갱신 완료`);
+console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · sitemap.xml 갱신 완료`);
