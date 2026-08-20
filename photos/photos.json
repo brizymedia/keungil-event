@@ -1,316 +1,1020 @@
 {
+ "updated": "2026-08-20T09:52:16.207Z",
+ "categories": [
+  {
+   "slug": "festival",
+   "name": "지역축제 & 공연행사",
+   "desc": "수만 명이 함께 숨 쉬는 축제 현장입니다. 무대·트러스 설치부터 라인어레이 음향, 무빙헤드 조명, LED 영상까지 큰길이벤트기획이 종합 대행했습니다.",
+   "count": 26
+  },
+  {
+   "slug": "conference",
+   "name": "컨퍼런스 · 포럼 · 기념식",
+   "desc": "기관·기업 컨퍼런스와 포럼, 기념식 현장입니다. 회의 음향과 LED 영상, 의전 세팅과 진행까지 한 팀이 맡아 운영했습니다.",
+   "count": 54
+  },
+  {
+   "slug": "ceremony",
+   "name": "시상식 & 이취임식",
+   "desc": "시상식과 이·취임식 현장입니다. 식순 기획, 무대 연출, 현수막과 LED 영상, 음향·조명 세팅을 큰길이벤트기획이 준비했습니다.",
+   "count": 28
+  },
+  {
+   "slug": "groundbreaking",
+   "name": "기공식 · 오픈식 · 브랜드 론칭",
+   "desc": "기공식과 준공식, 오픈식과 브랜드 론칭 현장입니다. 시삽·제막 의전 세팅부터 무대와 음향까지 준비했습니다.",
+   "count": 5
+  },
+  {
+   "slug": "sports",
+   "name": "체육대회 & 명랑운동회",
+   "desc": "총동문 체육대회부터 마을 명랑운동회까지. 무대와 음향, 경품과 진행 MC를 함께 준비한 현장입니다.",
+   "count": 34
+  },
+  {
+   "slug": "school",
+   "name": "학교 행사 & 축제",
+   "desc": "초·중·고교와 대학의 축제, 발표회, 기념행사 현장입니다. 무대·음향·조명·영상을 학교 여건에 맞춰 구성했습니다.",
+   "count": 26
+  },
+  {
+   "slug": "busking",
+   "name": "버스킹 & 음악회",
+   "desc": "거리 버스킹과 야외 음악회 현장입니다. 소규모 공연에 맞는 음향과 조명, 무대를 준비하고 공연팀 섭외까지 진행했습니다.",
+   "count": 12
+  },
+  {
+   "slug": "film",
+   "name": "영화 · 영상 촬영 지원",
+   "desc": "영화·영상 촬영 현장 지원입니다. 촬영용 조명과 발전 차량, 인력과 장비를 현장 조건에 맞춰 지원했습니다.",
+   "count": 8
+  }
+ ],
  "photos": [
   {
-   "path": "photos/20260816-eqv8/011.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/001.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/010.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/002.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/009.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/003.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/008.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/004.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/007.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/005.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/006.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/006.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/005.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/007.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/004.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/008.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/003.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/009.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/002.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/010.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-eqv8/001.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "녹동항 일원",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": "녹동바다축제 셋팅하는 사진입니다. 무대, 음향, 조명, LED, 레이허까지 토탈로 들어간 행사였습니다. 명실상부한 토탈 이벤트의 최고봉~! 와이엠 토탈이벤트!!"
+   "path": "photos/festival/011.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-1dik/003.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": ""
+   "path": "photos/festival/012.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-1dik/002.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": ""
+   "path": "photos/festival/013.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260816-1dik/001.jpg",
-   "event": "녹동바다축제 셋팅하기",
-   "date": "2026-08-16",
-   "place": "",
-   "caption": "녹동바다축제 셋팅하기",
-   "desc": ""
+   "path": "photos/festival/014.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/006.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/015.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/005.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/016.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/004.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/017.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/003.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/018.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/002.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/019.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260502-d9rv/001.jpg",
-   "event": "고흥행사 녹동바다축제",
-   "date": "2026-05-02",
-   "place": "녹동항 일원",
-   "caption": "고흥행사 녹동바다축제",
-   "desc": "오늘 행사는 고흥군에서 열린 드론 행사였습니다. 많은 분들이 오셔서 함께 즐기면서 실력파 가수들도 많이 왔어요. 다음 행사도 포스팅 많이 할께요"
+   "path": "photos/festival/020.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260801-9dh8/005.jpg",
-   "event": "녹동항 드론 버스킹",
-   "date": "2026-08-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "녹동항 드론 버스킹",
-   "desc": "실력파 가수들의 버스킹 공연과 밤하늘을 수놓은 드론 공연. YM토탈이벤트가 함께합니다 ^^"
+   "path": "photos/festival/021.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260801-9dh8/004.jpg",
-   "event": "녹동항 드론 버스킹",
-   "date": "2026-08-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "녹동항 드론 버스킹",
-   "desc": "실력파 가수들의 버스킹 공연과 밤하늘을 수놓은 드론 공연. YM토탈이벤트가 함께합니다 ^^"
+   "path": "photos/festival/022.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260801-9dh8/003.jpg",
-   "event": "녹동항 드론 버스킹",
-   "date": "2026-08-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "녹동항 드론 버스킹",
-   "desc": "실력파 가수들의 버스킹 공연과 밤하늘을 수놓은 드론 공연. YM토탈이벤트가 함께합니다 ^^"
+   "path": "photos/festival/023.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260801-9dh8/002.jpg",
-   "event": "녹동항 드론 버스킹",
-   "date": "2026-08-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "녹동항 드론 버스킹",
-   "desc": "실력파 가수들의 버스킹 공연과 밤하늘을 수놓은 드론 공연. YM토탈이벤트가 함께합니다 ^^"
+   "path": "photos/festival/024.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260801-9dh8/001.jpg",
-   "event": "녹동항 드론 버스킹",
-   "date": "2026-08-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "녹동항 드론 버스킹",
-   "desc": "실력파 가수들의 버스킹 공연과 밤하늘을 수놓은 드론 공연. YM토탈이벤트가 함께합니다 ^^"
+   "path": "photos/festival/025.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260501-hwsf/029.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/festival/026.jpg",
+   "cat": "festival",
+   "event": "지역축제 & 공연행사"
   },
   {
-   "path": "photos/20260501-hwsf/028.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/001.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/027.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/002.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/026.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/003.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/025.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/004.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/024.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/005.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/023.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/006.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/022.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/007.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/021.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/008.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/020.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/009.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/019.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/010.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/018.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/011.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/017.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/012.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/016.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/013.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/015.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/014.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
   },
   {
-   "path": "photos/20260501-hwsf/014.jpg",
-   "event": "제25회 녹동바다불꽃축제",
-   "date": "2026-05-01",
-   "place": "고흥군 녹동항 일원",
-   "caption": "제25회 녹동바다불꽃축제"
+   "path": "photos/conference/015.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/016.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/017.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/018.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/019.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/020.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/021.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/022.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/023.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/024.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/025.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/026.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/027.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/028.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/029.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/030.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/031.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/032.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/033.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/034.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/035.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/036.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/037.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/038.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/039.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/040.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/041.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/042.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/043.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/044.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/045.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/046.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/047.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/048.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/049.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/050.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/051.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/052.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/053.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/conference/054.jpg",
+   "cat": "conference",
+   "event": "컨퍼런스 · 포럼 · 기념식"
+  },
+  {
+   "path": "photos/ceremony/001.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/002.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/003.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/004.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/005.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/006.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/007.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/008.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/009.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/010.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/011.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/012.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/013.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/014.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/015.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/016.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/017.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/018.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/019.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/020.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/021.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/022.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/023.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/024.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/025.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/026.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/027.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/ceremony/028.jpg",
+   "cat": "ceremony",
+   "event": "시상식 & 이취임식"
+  },
+  {
+   "path": "photos/groundbreaking/001.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/002.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/003.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/004.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/groundbreaking/005.jpg",
+   "cat": "groundbreaking",
+   "event": "기공식 · 오픈식 · 브랜드 론칭"
+  },
+  {
+   "path": "photos/sports/001.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/002.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/003.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/004.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/005.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/006.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/007.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/008.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/009.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/010.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/011.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/012.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/013.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/014.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/015.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/016.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/017.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/018.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/019.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/020.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/021.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/022.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/023.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/024.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/025.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/026.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/027.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/028.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/029.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/030.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/031.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/032.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/033.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/sports/034.jpg",
+   "cat": "sports",
+   "event": "체육대회 & 명랑운동회"
+  },
+  {
+   "path": "photos/school/001.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/002.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/003.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/004.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/005.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/006.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/007.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/008.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/009.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/010.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/011.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/012.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/013.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/014.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/015.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/016.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/017.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/018.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/019.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/020.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/021.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/022.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/023.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/024.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/025.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/school/026.jpg",
+   "cat": "school",
+   "event": "학교 행사 & 축제"
+  },
+  {
+   "path": "photos/busking/001.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/002.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/003.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/004.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/005.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/006.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/007.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/008.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/009.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/010.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/011.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/busking/012.jpg",
+   "cat": "busking",
+   "event": "버스킹 & 음악회"
+  },
+  {
+   "path": "photos/film/001.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/002.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/003.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/004.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/005.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/006.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/007.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
+  },
+  {
+   "path": "photos/film/008.jpg",
+   "cat": "film",
+   "event": "영화 · 영상 촬영 지원"
   }
  ]
 }
