@@ -207,6 +207,7 @@ writeFileSync(resolve(ROOT, 'gallery.html'), html, 'utf8');
 const today = new Date().toISOString().slice(0, 10);
 const pages = [
   { loc: '/', lastmod: today, priority: '1.0', changefreq: 'weekly' },
+  { loc: '/company.html', lastmod: today, priority: '0.9', changefreq: 'monthly' },
   { loc: '/areas.html', lastmod: today, priority: '0.9', changefreq: 'monthly' },
   { loc: '/gallery.html', lastmod: latest, priority: '0.8', changefreq: 'weekly', images: photos.slice(0, 500) },
   { loc: '/quote.html', lastmod: today, priority: '0.7', changefreq: 'monthly' },

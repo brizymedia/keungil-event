@@ -294,6 +294,40 @@
     .faq .a{ padding:0 1.25rem 1.1rem;color:var(--fg-2);font-size:.92rem;line-height:1.75; }
     .kw-line{ font-size:.78rem;color:#5B5664;line-height:1.8;max-width:80rem;margin:1rem auto 0; }
     .kw-line a{ color:#7E7889;text-decoration:none; } .kw-line a:hover{ color:#fff; }
+
+    /* ── 행사 약력 (track record) ── */
+    .rec-list{ display:grid;gap:.6rem; }
+    .rec{ display:grid;grid-template-columns:6.2rem minmax(0,1fr) auto;gap:1.25rem;align-items:center;
+          background:var(--card);border:1px solid var(--card-line);border-radius:.9rem;padding:1rem 1.25rem;
+          box-shadow:var(--shadow);transition:all .3s cubic-bezier(.16,1,.3,1); }
+    .rec:hover{ border-color:rgba(245,158,11,.35);transform:translateX(3px); }
+    .rec .d{ font-size:.82rem;font-weight:800;color:var(--amber-ink);font-variant-numeric:tabular-nums;letter-spacing:.01em; }
+    .sec-dark .rec .d{ color:var(--amber-2); }
+    .rec .n{ font-size:1rem;font-weight:800;letter-spacing:-.015em;line-height:1.45; }
+    .rec .n span{ display:block;font-size:.82rem;font-weight:500;color:var(--fg-2);margin-top:.15rem; }
+    .rec .r{ font-size:.72rem;font-weight:700;padding:.32rem .8rem;border-radius:9999px;white-space:nowrap;
+             background:var(--chip);border:1px solid var(--card-line);color:var(--fg-2); }
+    @media (max-width:700px){
+      .rec{ grid-template-columns:1fr;gap:.4rem;padding:1rem 1.1rem; }
+      .rec .r{ justify-self:start; }
+    }
+
+    /* ── 보유 장비 ── */
+    .gear-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:1rem; }
+    @media (max-width:900px){ .gear-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:560px){ .gear-grid{ grid-template-columns:1fr; } }
+    .gear{ background:var(--card);border:1px solid var(--card-line);border-radius:1.1rem;overflow:hidden;
+           box-shadow:var(--shadow);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column; }
+    .gear:hover{ border-color:rgba(245,158,11,.35);transform:translateY(-3px); }
+    .gear .ph{ aspect-ratio:16/12;overflow:hidden;background:#16141C;position:relative; }
+    .gear .ph img{ width:100%;height:100%;object-fit:cover;filter:saturate(1.12) contrast(1.04);transition:transform .5s ease; }
+    .gear:hover .ph img{ transform:scale(1.05); }
+    .gear .ph .no{ position:absolute;top:.7rem;left:.7rem;width:1.7rem;height:1.7rem;border-radius:50%;
+                   background:rgba(11,10,16,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);
+                   color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center; }
+    .gear .bd{ padding:1.1rem 1.25rem 1.3rem;flex:1; }
+    .gear h3{ font-size:1.02rem;font-weight:800;letter-spacing:-.015em;margin:0 0 .35rem;line-height:1.4; }
+    .gear p{ margin:0;font-size:.86rem;line-height:1.7;color:var(--fg-2); }
   </style>
 
   <!-- ── 구조화 데이터: 사업체 · FAQ · 웹사이트 ── -->
@@ -376,10 +410,11 @@
       <span class="nav-brand">큰길이벤트기획</span>
     </a>
     <div class="hidden md:flex items-center gap-7">
+      <a href="company.html" class="nav-link">회사소개</a>
       <a href="#services"  class="nav-link">서비스</a>
-      <a href="#portfolio" class="nav-link">포트폴리오</a>
+      <a href="#gear"      class="nav-link">보유장비</a>
+      <a href="#record"    class="nav-link">행사약력</a>
       <a href="#gallery"   class="nav-link">갤러리</a>
-      <a href="areas.html" class="nav-link">지역안내</a>
       <a href="quote.html" class="nav-link">견적 · 문의</a>
     </div>
     <div style="display:flex;align-items:center;gap:.5rem;">
@@ -604,6 +639,93 @@
     <div class="reveal" style="margin-top:3.5rem;text-align:center;">
       <a href="#gallery" class="btn-ghost">전체 갤러리 보기 <iconify-icon icon="solar:gallery-bold" style="font-size:18px;"></iconify-icon></a>
     </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     RECORD — 행사 약력
+══════════════════════════════════════════════════ -->
+<section id="record" class="sec-light" style="padding:6rem 1.5rem;border-top:1px solid var(--line);">
+  <div style="max-width:80rem;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:2.5rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+      <div>
+        <div class="section-eyebrow">Track Record</div>
+        <h2 class="sec-title" style="margin-bottom:.75rem;">행사 약력</h2>
+        <p class="t2" style="font-size:1rem;max-width:54ch;line-height:1.75;">기획부터 무대·음향·조명·LED영상까지 <strong style="color:var(--fg);">종합시스템을 통째로 대행</strong>한 최근 행사입니다. 지자체 축제, 기관 기념식, 기업·문화 행사를 두루 진행합니다.</p>
+      </div>
+      <a href="company.html#history" class="btn-ghost" style="padding:.8rem 1.5rem;font-size:.9rem;">
+        회사 연혁 보기 <iconify-icon icon="solar:arrow-right-linear" style="font-size:16px;"></iconify-icon>
+      </a>
+    </div>
+
+    <div class="rec-list reveal">
+      <div class="rec"><div class="d">2026. 5</div><div class="n">국립 소록도병원 110주년 · 제23회 한센인의 날<span>보건복지부 · 참석 1,200명 · 기획 및 종합 운영</span></div><div class="r">정부기관</div></div>
+      <div class="rec"><div class="d">2025 — 2026</div><div class="n">녹동바다불꽃축제<span>고흥군 · 2년 연속 대행사 선정 · 4일간 53,000명</span></div><div class="r">지역축제</div></div>
+      <div class="rec"><div class="d">2025. 9</div><div class="n">제23회 녹동바다불꽃축제<span>고흥 녹동항 · 종합시스템 대행</span></div><div class="r">지역축제</div></div>
+      <div class="rec"><div class="d">2025. 9</div><div class="n">광산구 청소년 축제<span>광주 광산구 · 종합시스템 대행</span></div><div class="r">지자체</div></div>
+      <div class="rec"><div class="d">2025. 9</div><div class="n">제2회 고흥 청년의 날 축제<span>고흥군 · 종합시스템 대행</span></div><div class="r">지자체</div></div>
+      <div class="rec"><div class="d">2025. 8</div><div class="n">여순사건 유해발굴 봉안식<span>여수 · 의전 행사 · 종합시스템 대행</span></div><div class="r">기관행사</div></div>
+      <div class="rec"><div class="d">2025. 8</div><div class="n">제3회 여수문화도시 예술제<span>여수 · 야외 공연 · 종합시스템 대행</span></div><div class="r">문화행사</div></div>
+      <div class="rec"><div class="d">2025. 6</div><div class="n">광양시 정책비전 투어<span>광양시 · 회의 음향 · LED영상 · 종합시스템 대행</span></div><div class="r">지자체</div></div>
+    </div>
+
+    <p class="t3 reveal" style="font-size:.82rem;line-height:1.8;margin-top:1.5rem;">
+      위 목록은 최근 주요 실적이며, 이 외 기업 창립기념식 · 기공식 · 준공식 · 시상식 · 체육대회 등 다수 행사를 진행했습니다.
+      상세 현장 기록은 <a href="gallery.html" style="color:var(--amber-ink);font-weight:700;">행사 갤러리</a>에서 보실 수 있습니다.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     GEAR — 보유 장비 현황
+══════════════════════════════════════════════════ -->
+<section id="gear" class="sec-dark" style="padding:6rem 1.5rem;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:-15%;left:-8%;width:45vw;height:45vw;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(245,158,11,.2),transparent 65%);filter:blur(90px);"></div>
+  <div style="position:absolute;bottom:-20%;right:-8%;width:42vw;height:42vw;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(139,92,246,.16),transparent 65%);filter:blur(90px);"></div>
+
+  <div style="max-width:80rem;margin:0 auto;position:relative;">
+    <div class="reveal" style="margin-bottom:2.75rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+      <div>
+        <div class="section-eyebrow">Equipment</div>
+        <h2 class="sec-title" style="margin-bottom:.75rem;">보유 장비 현황</h2>
+        <p class="t2" style="font-size:1rem;max-width:56ch;line-height:1.75;">빌려 쓰지 않습니다. 음향·조명·LED영상·무대·발전기까지 <strong style="color:#fff;">직접 보유하고 자체 인력이 운영</strong>합니다. 협력업체를 거치지 않으니 현장에서 바로 대응됩니다.</p>
+      </div>
+      <a href="quote.html" class="btn-primary" style="padding:.8rem 1.6rem;font-size:.9rem;">
+        장비 대여 견적 <iconify-icon icon="solar:arrow-right-linear" style="font-size:16px;"></iconify-icon>
+      </a>
+    </div>
+
+    <div class="gear-grid reveal">
+      <div class="gear">
+        <div class="ph"><span class="no">1</span><img src="gear-sound.jpg" alt="FBT 이태리 라인어레이 스피커 25K — 큰길이벤트기획 보유 음향장비" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>FBT 이태리 명품 라인어레이 25K</h3><p>수만 명 규모 야외 축제까지 커버하는 이태리 FBT 라인어레이. 2018년부터 DB TECHNOLOGY 시스템과 함께 운영합니다.</p></div>
+      </div>
+      <div class="gear">
+        <div class="ph"><span class="no">2</span><img src="gear-mic.jpg" alt="슈어·젠하이저 무선 마이크 20채널 — 큰길이벤트기획 보유" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>무선 마이크 20채널</h3><p>슈어(SHURE), 젠하이저(SENNHEISER) 등 무선 20채널 보유. 다자 토론, 시상식, 대형 축제에서 동시 운용이 가능합니다.</p></div>
+      </div>
+      <div class="gear">
+        <div class="ph"><span class="no">3</span><img src="gear-light.jpg" alt="행사용 특수조명 빔·아우라·스트로브 — 큰길이벤트기획 보유 조명장비" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>행사용 특수조명</h3><p>빔, 아우라, 스트로브 등 무대 연출용 특수조명. 2023년 조명 사업 시작 이후 직접 구축했습니다.</p></div>
+      </div>
+      <div class="gear">
+        <div class="ph"><span class="no">4</span><img src="gear-led.jpg" alt="DICOLOR 3.9mm 고화질 LED 전광판 400인치 — 큰길이벤트기획 보유" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>DICOLOR 3.9mm 고화질 LED 400"</h3><p>픽셀피치 3.9mm 고화질 LED 전광판 400인치. 2025년 LED영상 사업 시작과 함께 도입해 실내외 모두 운용합니다.</p></div>
+      </div>
+      <div class="gear">
+        <div class="ph"><span class="no">5</span><img src="gear-camera.jpg" alt="영상 카메라 3대 및 4K 스위쳐 — 큰길이벤트기획 중계 장비" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>영상 카메라 3대 · 4K 스위쳐</h3><p>다중 카메라 현장 중계와 4K 스위칭. 행사 스케치 영상, 드론 촬영, 유튜브·줌 실시간 송출까지 직접 진행합니다.</p></div>
+      </div>
+      <div class="gear">
+        <div class="ph"><span class="no">6</span><img src="gear-stage.jpg" alt="무대·발전기 100K·캠핑의자·캠핑조명 — 큰길이벤트기획 보유 행사장비" loading="lazy" decoding="async"></div>
+        <div class="bd"><h3>무대 · 발전기 100K · 캠핑 장비</h3><p>조립식 무대와 트러스, 100K 발전기, 대형 천막과 캠핑의자·캠핑조명까지. 전원이 없는 야외 현장도 문제없습니다.</p></div>
+      </div>
+    </div>
+
+    <p class="t3 reveal" style="font-size:.82rem;line-height:1.8;margin-top:1.75rem;">
+      장비만 단독 대여도 가능합니다. 오퍼레이터 포함 여부와 행사 규모에 따라 구성을 조정해 드립니다 ·
+      <a href="company.html" style="color:var(--amber-2);font-weight:700;">회사소개 자세히 보기</a>
+    </p>
   </div>
 </section>
 
@@ -861,8 +983,9 @@
       <span style="font-size:.9rem;font-weight:700;letter-spacing:-.02em;white-space:nowrap;">큰길이벤트기획</span>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:1.75rem;font-size:.875rem;">
-      <a href="#services" class="nav-link">서비스</a>
-      <a href="#portfolio" class="nav-link">포트폴리오</a>
+      <a href="company.html" class="nav-link">회사소개</a>
+      <a href="#gear" class="nav-link">보유장비</a>
+      <a href="#record" class="nav-link">행사약력</a>
       <a href="#gallery" class="nav-link">갤러리</a>
       <a href="areas.html" class="nav-link">지역안내</a>
       <a href="quote.html" class="nav-link">견적 · 문의</a>
