@@ -182,7 +182,7 @@ ${sections}
 
 <div id="lb" onclick="if(event.target===this)lbClose()"><button class="p" onclick="lbMove(-1)">‹</button><img id="lb-img" alt=""><button class="n" onclick="lbMove(1)">›</button><button class="x" onclick="lbClose()">✕</button><div class="c" id="lb-c"></div></div>
 <footer class="foot">
-  주식회사 브리지미디어 (${BRAND}) · 대표 김동길 · 사업자등록번호 813-81-02252 · 전라남도 광양시 광양읍 강변동길 1, 2층 · <a href="tel:15337295">1533-7295</a> · <a href="mailto:gilcaro@naver.com">gilcaro@naver.com</a><br>
+  주식회사 브리지미디어 (${BRAND}) · 대표 김동길 · 사업자등록번호 813-81-02252 · 전남광주통합특별시 광양시 광양읍 강변동길 1, 2층 · <a href="tel:15337295">1533-7295</a> · <a href="mailto:gilcaro@naver.com">gilcaro@naver.com</a><br>
   <a href="index.html">홈</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
 </footer>
 <script>
