@@ -172,16 +172,19 @@
     .party b{ color:#fff;font-weight:700; }
     .party .lbl{ display:inline-block;min-width:4.6rem;color:#71717a; }
 
-    /* ── 대표 직인 ── */
+    /* ── 대표 직인: 상호명 바로 뒤에 찍힌다 ── */
+    .co-name{ position:relative;display:inline-block; }
     .stamp{
-      position:absolute;right:.25rem;top:2.4rem;
-      width:5.4rem;height:auto;
+      position:absolute;left:100%;top:50%;
+      transform:translateY(-45%);
+      margin-left:.5rem;
+      width:4.4rem;height:auto;
       pointer-events:none;user-select:none;
       opacity:.95;
       filter:drop-shadow(0 0 6px rgba(200,16,46,.35));
       -webkit-print-color-adjust:exact;print-color-adjust:exact;
     }
-    @media (max-width:520px){ .stamp{ width:4.4rem;top:2rem; } }
+    @media (max-width:520px){ .stamp{ width:3.4rem;margin-left:.35rem; } }
 
     .tbl-wrap{ overflow-x:auto; }
     table.q{ width:100%;border-collapse:collapse;min-width:46rem; }
@@ -294,11 +297,11 @@
       .tbd-note{ color:#a05c00!important;font-size:7.2pt!important; }
       .glass{ background:#fff!important;border-color:#999!important;backdrop-filter:none!important;box-shadow:none!important; }
 
-      /* 직인: 상호·대표자 줄에 걸치도록 바짝 붙인다 */
-      .doc-head > div:nth-child(2){ padding-right:15mm!important;flex:1 1 auto!important; }
+      /* 직인: 상호명(…브리지미디어) 바로 뒤에 바짝 붙여 찍는다 */
+      .doc-head > div:nth-child(2){ flex:1 1 auto!important; }
       .doc-head > div:nth-child(3){ flex:0 0 auto!important; }
       .stamp{ mix-blend-mode:multiply!important;filter:none!important;opacity:1!important;
-              width:16mm!important;top:1.5mm!important;right:-1mm!important; }
+              width:15mm!important;margin-left:1.5mm!important;transform:translateY(-42%)!important; }
     }
     .print-only{ display:none; }
   </style>
@@ -440,16 +443,14 @@
             견적일 <span id="doc-date">-</span> · 견적 유효기간 발행일로부터 30일
           </div>
         </div>
-        <div class="party" style="position:relative;padding-right:5.8rem;">
+        <div class="party" style="position:relative;">
           <div style="font-size:.7rem;letter-spacing:.16em;color:#FBBF24;font-weight:700;margin-bottom:.35rem;">공급자</div>
-          <div><span class="lbl">상호</span><b>주식회사 브리지미디어</b></div>
+          <div><span class="lbl">상호</span><b class="co-name">주식회사 브리지미디어<img class="stamp" src="stamp-keungil.png" alt="주식회사 브리지미디어 대표 직인" onerror="this.style.display='none'"></b></div>
           <div><span class="lbl">대표자</span><b>김동길</b></div>
           <div><span class="lbl">사업자번호</span><b>813-81-02252</b></div>
           <div><span class="lbl">연락처</span><b>1533-7295</b></div>
           <div><span class="lbl">이메일</span><b>gilcaro@naver.com</b></div>
-          <div><span class="lbl">소재지</span><b>전남광주통합특별시 광양시 광양읍 강변동길 1, 2층</b></div>
-          <img class="stamp" src="stamp-keungil.png" alt="주식회사 브리지미디어 대표 직인"
-               onerror="this.style.display='none'">
+          <div><span class="lbl">홈페이지</span><b>큰길이벤트.com</b></div>
         </div>
         <div class="party">
           <div style="font-size:.7rem;letter-spacing:.16em;color:#FBBF24;font-weight:700;margin-bottom:.35rem;">수요자</div>
@@ -1120,7 +1121,7 @@ function 견적HTML() {
             ${정보칸('사업자', '813-81-02252')}
             ${정보칸('연락처', '1533-7295')}
             ${정보칸('이메일', 'gilcaro@naver.com')}
-            ${정보칸('소재지', '전남광주통합특별시 광양시 광양읍 강변동길 1, 2층')}
+            ${정보칸('홈페이지', '큰길이벤트.com')}
           </td>
           <td valign="middle" align="right" width="66" style="padding-left:6px;">
             <img src="${직인}" width="62" height="62" alt="주식회사 브리지미디어 대표 직인"
