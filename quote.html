@@ -241,34 +241,64 @@
     .toast.on{ opacity:1;transform:translate(-50%,0); }
 
     @media print{
-      @page { size:A4; margin:14mm 12mm; }
-      body{ background:#fff!important;color:#111!important;overflow:visible; }
+      /* A4 한 장에 담기도록 전체를 압축한다 */
+      @page { size:A4; margin:10mm 9mm; }
+      html,body{ background:#fff!important;color:#111!important;overflow:visible; }
       .noise-overlay,header,.no-print,.toolbar,footer{ display:none!important; }
-      main{ padding:0!important; }
+      main{ padding:0!important;max-width:none!important; }
       .print-only{ display:block!important; }
 
-      .doc{ border:1px solid #999!important;border-radius:0!important;background:#fff!important;box-shadow:none!important; }
-      .doc-head{ border-bottom:2px solid #111!important;padding:0 0 10mm!important; }
-      .doc-title{ color:#111!important; }
-      .party{ color:#333!important; } .party b{ color:#111!important; } .party .lbl{ color:#666!important; }
+      /* 문서 테두리 안쪽 좌우 여백 */
+      .doc{ border:1px solid #999!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
+            padding:0 7mm 5mm!important;break-inside:avoid; }
+      /* 공급자·수요자가 제목과 한 줄에 나란히 오도록 (줄바꿈 금지) */
+      .doc-head{ border-bottom:1.6pt solid #111!important;padding:6mm 0 4mm!important;
+                 gap:5mm!important;flex-wrap:nowrap!important;align-items:flex-start!important; }
+      .doc-head > div{ min-width:0!important; }
+      .doc-head > div:first-child{ flex:0 0 auto!important; }
+      .doc-title{ color:#111!important;font-size:15pt!important;letter-spacing:.24em!important; }
+      .doc-head > div:first-child > div:last-child{ font-size:7.6pt!important;margin-top:1.5mm!important; }
 
-      table.q{ min-width:0!important; }
-      table.q th{ background:#f1f1f1!important;color:#111!important;border-bottom:1px solid #111!important; -webkit-print-color-adjust:exact;print-color-adjust:exact; }
-      table.q td{ border-bottom:1px solid #ccc!important; }
-      table.q input{ color:#111!important;border-color:transparent!important;background:transparent!important; }
-      .cell-amt{ color:#111!important; } .cell-amt.tbd{ color:#a05c00!important; }
+      .party{ color:#333!important;font-size:7.8pt!important;line-height:1.5!important; }
+      .party b{ color:#111!important; } .party .lbl{ color:#666!important;min-width:13mm!important; }
+      .party > div:first-child{ font-size:7pt!important;margin-bottom:1mm!important; }
+
+      .tbl-wrap{ overflow:visible!important; }
+      /* 열 너비를 고정해 규격·비고가 잘리지 않게 한다 */
+      table.q{ min-width:0!important;width:100%!important;table-layout:fixed!important; }
+      table.q th:nth-child(1),table.q td:nth-child(1){ width:6%!important; }
+      table.q th:nth-child(2),table.q td:nth-child(2){ width:21%!important; }
+      table.q th:nth-child(3),table.q td:nth-child(3){ width:29%!important; }
+      table.q th:nth-child(4),table.q td:nth-child(4){ width:8%!important; }
+      table.q th:nth-child(5),table.q td:nth-child(5){ width:7%!important; }
+      table.q th:nth-child(6),table.q td:nth-child(6){ width:7%!important; }
+      table.q th:nth-child(7),table.q td:nth-child(7){ width:11%!important; }
+      table.q th:nth-child(8),table.q td:nth-child(8){ width:11%!important; }
+      table.q th{ background:#f1f1f1!important;color:#111!important;border-bottom:1px solid #111!important;
+                  font-size:7.4pt!important;padding:2mm 1.2mm!important; -webkit-print-color-adjust:exact;print-color-adjust:exact; }
+      table.q td{ border-bottom:.5pt solid #ccc!important;padding:.6mm .8mm!important; }
+      table.q input{ color:#111!important;border-color:transparent!important;background:transparent!important;
+                     font-size:8pt!important;padding:1mm .6mm!important; }
+      table.q tr{ break-inside:avoid; }
+      .cell-amt{ color:#111!important;font-size:8pt!important;padding-right:1.5mm!important; } .cell-amt.tbd{ color:#a05c00!important;font-size:7.6pt!important; }
       .row-del{ display:none!important; }
-      .sum{ border-top:1px solid #111!important; }
-      .sum-row{ color:#333!important; } .sum-row .v{ color:#111!important; }
-      .sum-row input{ color:#111!important;background:transparent!important;border-color:transparent!important; }
-      .sum-total{ border-top:1px solid #111!important; }
-      .sum-total .k{ color:#111!important; }
-      .sum-total .v{ background:none!important;-webkit-text-fill-color:#111!important;color:#111!important; }
-      .tbd-note{ color:#a05c00!important; }
+
+      .sum{ border-top:1pt solid #111!important;padding:3.5mm 0 0!important;break-inside:avoid; }
+      .sum-row{ color:#333!important;font-size:8.4pt!important;padding:.6mm 0!important; }
+      .sum-row .v{ color:#111!important;min-width:32mm!important; }
+      .sum-row input{ color:#111!important;background:transparent!important;border-color:transparent!important;font-size:8.4pt!important;padding:.4mm .6mm!important; }
+      .sum-total{ border-top:1pt solid #111!important;padding-top:2.5mm!important;margin-top:2mm!important; }
+      .sum-total .k{ color:#111!important;font-size:9.5pt!important; }
+      .sum-total .v{ background:none!important;-webkit-text-fill-color:#111!important;color:#111!important;font-size:14pt!important;min-width:32mm!important; }
+      .sum > div:last-child{ font-size:7pt!important;margin-top:2mm!important; }
+      .tbd-note{ color:#a05c00!important;font-size:7.2pt!important; }
       .glass{ background:#fff!important;border-color:#999!important;backdrop-filter:none!important;box-shadow:none!important; }
 
-      /* 직인: 흰 종이에서는 곱하기 합성으로 자연스럽게 */
-      .stamp{ mix-blend-mode:multiply!important;filter:none!important;opacity:1!important;width:22mm!important;top:9mm!important;right:0!important; }
+      /* 직인: 상호·대표자 줄에 걸치도록 바짝 붙인다 */
+      .doc-head > div:nth-child(2){ padding-right:15mm!important;flex:1 1 auto!important; }
+      .doc-head > div:nth-child(3){ flex:0 0 auto!important; }
+      .stamp{ mix-blend-mode:multiply!important;filter:none!important;opacity:1!important;
+              width:16mm!important;top:1.5mm!important;right:-1mm!important; }
     }
     .print-only{ display:none; }
   </style>
