@@ -34,6 +34,38 @@
         "-c-1"
       ],
       "port": 8151
+    },
+    {
+      "name": "ai-make",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/aimake-server.js"
+      ],
+      "port": 8811
+    },
+    {
+      "name": "zinzino",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/static-server.js"
+      ],
+      "port": 8799
+    },
+    {
+      "name": "iao6i",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/iao6i-server.js"
+      ],
+      "port": 8815
+    },
+    {
+      "name": "keungil-areas",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/keungil-server.js"
+      ],
+      "port": 8822
     }
   ]
 }
