@@ -344,6 +344,9 @@ function 만들기(c) {
   H.push('<head>');
   H.push('<meta charset="UTF-8">');
   H.push('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+  H.push('<link rel="icon" href="/favicon.ico" sizes="32x32">');
+  H.push('<link rel="icon" href="/favicon.svg" type="image/svg+xml">');
+  H.push('<link rel="apple-touch-icon" href="/apple-touch-icon.png">');
   H.push('<title>' + esc(제목) + '</title>');
   H.push('<meta name="description" content="' + esc(설명) + '">');
   H.push('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">');
