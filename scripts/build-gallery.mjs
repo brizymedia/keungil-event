@@ -90,6 +90,8 @@ const CAT_SEO = {
 
 /* 지역명 → areas.html 앵커 */
 const REGION_ANCHOR = { 광양:'gwangyang', 순천:'suncheon', 여수:'yeosu', 고흥:'goheung', 하동:'hadong', 남원:'namwon', 광주:'gwangju', 진주:'jinju', 통영:'tongyeong' };
+/* 지역명 → 지역 페이지 주소 (예전에는 areas.html 앵커로 보냈다) */
+const REGION_URL = (r) => REGION_ANCHOR[r] ? '/' + REGION_ANCHOR[r] + '/' : 'areas.html';
 
 // 카테고리(폴더)별 묶기 — photos.json 의 categories 순서를 따른다
 const cats = (data.categories || []).filter((c) => c.count > 0);
@@ -117,7 +119,7 @@ const sections = events.map((g) => {
     return `<a class="ph" href="${imgUrl(p)}" data-i="${i}" target="_blank" rel="noopener"><img src="${imgUrl(p)}" alt="${esc(alt)}" loading="lazy" decoding="async" width="800" height="600"></a>`;
   }).join('\n        ');
   const regionTags = regions.length
-    ? `<div class="ev-regions">${regions.map((r) => `<a href="areas.html#${esc(REGION_ANCHOR[r] || '')}">${esc(r)}</a>`).join('')}</div>` : '';
+    ? `<div class="ev-regions">${regions.map((r) => `<a href="${esc(REGION_URL(r))}">${esc(r)}</a>`).join('')}</div>` : '';
   const evList = evs.length
     ? `<div class="ev-list"><h3>이 분야에서 진행한 주요 행사</h3><ul>${evs.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
   return `
@@ -321,7 +323,17 @@ const today = new Date().toISOString().slice(0, 10);
 const pages = [
   { loc: '/', lastmod: today, priority: '1.0', changefreq: 'weekly' },
   { loc: '/company.html', lastmod: today, priority: '0.9', changefreq: 'monthly' },
-  { loc: '/areas.html', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/areas.html', lastmod: today, priority: '0.8', changefreq: 'monthly' },
+  /* 지역 페이지 — build-areas.js 가 만든다. 지역을 늘리면 여기도 같이 늘릴 것 */
+  { loc: '/gwangyang/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/suncheon/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/yeosu/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/goheung/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/hadong/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/namwon/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/gwangju/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/jinju/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
+  { loc: '/tongyeong/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
   { loc: '/gallery.html', lastmod: latest, priority: '0.8', changefreq: 'weekly', images: photos.slice(0, 500) },
   { loc: '/quote.html', lastmod: today, priority: '0.7', changefreq: 'monthly' },
 ];
