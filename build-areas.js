@@ -307,8 +307,8 @@ function 만들기(c) {
   const 이름 = c.이름;
   const url = SITE + '/' + c.slug + '/';
   const 제목 = 이름 + ' 행사기획 · 이벤트업체 | 음향장비 대여 · 무대설치 · ' + BRAND;
-  const 설명 = 이름 + ' 행사기획 이벤트업체 ' + BRAND + '. ' + c.요약 +
-               ' ' + 이름 + ' 음향장비 대여 · 조명 · LED · 무대설치, MC · 가수 섭외. ' + TEL;
+  const 설명 = 이름 + ' 이벤트업체 ' + BRAND + '. ' + c.요약 +
+               ' ' + 이름 + ' 음향장비 대여 · 조명 · LED, ' + 이름 + ' 무대설치, MC · 가수 섭외. ' + TEL;
   const faq전체 = c.faq.concat(공통FAQ);
   const 이웃 = c.인접.map(s => 지역들.find(x => x.slug === s)).filter(Boolean);
   const 나머지 = 지역들.filter(x => x.slug !== c.slug && !c.인접.includes(x.slug));
@@ -356,6 +356,7 @@ function 만들기(c) {
   H.push('<meta property="og:site_name" content="' + BRAND + '">');
   H.push('<meta property="og:locale" content="ko_KR">');
   H.push('<meta name="twitter:card" content="summary_large_image">');
+  H.push('<meta name="naver-site-verification" content="ac711b26937bffbfe38e3394c5c9d2540a13b95c" />');
   H.push('<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">');
   H.push('<link rel="stylesheet" href="/area.css">');
   H.push('<script type="application/ld+json">');
@@ -499,6 +500,10 @@ const 검색어 = ['행사기획', '이벤트업체', '음향장비 대여', '�
   검색어.forEach(k => {
     const 구 = r.이름 + ' ' + k;
     if (본문.indexOf(구) < 0) { ok = false; console.error(r.slug + ' 검색어 누락: ' + 구); }
+    /* 제목이나 설명 중 한 곳에는 통째로 들어가 있어야 한다 */
+    if (r.제목.indexOf(구) < 0 && r.설명.indexOf(구) < 0) {
+      console.warn('  제목·설명에 통째로는 없음 (h2·본문에만): ' + 구);
+    }
   });
   if (r.제목.length > 48) console.warn('  제목 김 (' + r.제목.length + '자) ' + r.slug);
   if (r.설명.length > 158) console.warn('  설명 김 (' + r.설명.length + '자) ' + r.slug);
