@@ -1246,7 +1246,9 @@
   fetch(PHOTOS_URL + '?t=' + Date.now(), {cache:'no-store'})
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(data => {
-      allPhotos = (data.photos || []).slice().reverse();
+      // photos.json 은 이미 새 사진이 앞에 온다(업로드 때 맨 앞에 넣는다).
+      // 예전엔 뒤에 붙이던 방식이라 reverse 를 했는데, 그대로 두면 제일 오래된 사진만 보인다.
+      allPhotos = (data.photos || []).slice();
       if(!allPhotos.length){ emptyEl.textContent = '아직 올린 사진이 없습니다.'; return; }
       emptyEl.style.display = 'none';
       renderGrid(allPhotos.slice(0, showing));
