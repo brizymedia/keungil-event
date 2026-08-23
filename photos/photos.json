@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-23T15:29:48.253Z",
+ "updated": "2026-08-23T15:30:09.142Z",
  "categories": [
   {
    "slug": "festival",
@@ -47,7 +47,7 @@
    "slug": "film",
    "name": "영화 · 영상 촬영 지원",
    "desc": "영화·영상 촬영 현장 지원입니다. 촬영용 조명과 발전 차량, 인력과 장비를 현장 조건에 맞춰 지원했습니다.",
-   "count": 8
+   "count": 7
   }
  ],
  "photos": [
@@ -1202,11 +1202,6 @@
   },
   {
    "path": "photos/film/007.jpg",
-   "cat": "film",
-   "event": "영화 · 영상 촬영 지원"
-  },
-  {
-   "path": "photos/film/008.jpg",
    "cat": "film",
    "event": "영화 · 영상 촬영 지원"
   }
