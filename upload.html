@@ -39,13 +39,20 @@
 
     label.f { display:block;font-size:.8rem;color:#a1a1aa;margin:.85rem 0 .35rem; }
     label.f:first-of-type { margin-top:0; }
-    input[type=text],input[type=date],input[type=password],textarea{
+    input[type=text],input[type=date],input[type=password],textarea,select{
       width:100%;padding:.75rem .85rem;border-radius:.65rem;
       background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);
       color:#fff;font-size:.95rem;
     }
-    input:focus,textarea:focus{ outline:none;border-color:rgba(245,158,11,.65);background:rgba(245,158,11,.07); }
+    input:focus,textarea:focus,select:focus{ outline:none;border-color:rgba(245,158,11,.65);background:rgba(245,158,11,.07); }
     input::placeholder,textarea::placeholder{ color:#52525b; }
+    /* 휴대폰 기본 화살표가 어두운 배경에서 안 보여 직접 그린다 */
+    select{
+      appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:2.4rem;
+      background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right .8rem center;background-size:1.15rem;
+    }
+    select option{ background:#18181b;color:#fff; }
     .row2 { display:grid;grid-template-columns:1fr 1fr;gap:.75rem; }
     @media (max-width:460px){ .row2{ grid-template-columns:1fr; } }
 
@@ -128,7 +135,7 @@
     <span style="display:grid;place-items:center;width:2.2rem;height:2.2rem;border-radius:.6rem;background:linear-gradient(135deg,#F59E0B,#D97706);font-weight:900;font-size:.72rem;color:#09090b;">KG</span>
     <div>
       <div style="font-size:1.05rem;font-weight:800;letter-spacing:-.02em;">행사 사진 올리기</div>
-      <div style="font-size:.76rem;color:#71717a;">올리면 갤러리에 바로 쌓입니다 · 원본은 드라이브에 보관됩니다</div>
+      <div style="font-size:.76rem;color:#71717a;">올리면 갤러리에 바로 쌓입니다 · 워터마크 자동</div>
     </div>
   </div>
 
@@ -147,7 +154,16 @@
   <!-- ── 01 행사 정보 ── -->
   <div class="card">
     <div class="card-title"><span class="n">01</span>행사 정보</div>
-    <label class="f" for="ev-name">행사명</label>
+
+    <label class="f" for="ev-cat">갤러리 항목</label>
+    <select id="ev-cat"></select>
+    <p class="note" style="margin-top:.4rem;">
+      고르신 항목의 갤러리 칸에 사진이 쌓입니다.
+      홈페이지 <b>서비스 카드</b>를 누르면 대부분 이 칸으로 넘어옵니다.
+      사진이 한 장도 없는 항목은 갤러리에 칸 자체가 없다가, 처음 올리시면 그때 생깁니다.
+    </p>
+
+    <label class="f" for="ev-name" style="margin-top:1rem;">행사명</label>
     <input type="text" id="ev-name" placeholder="예) 제25회 광양 매화축제">
     <div class="row2">
       <div>
@@ -165,8 +181,9 @@
               placeholder="예) 순천만 일원에서 열린 ○○축제 개막식. 12m 레이허 무대와 트러스, 라인어레이 음향, 무빙헤드 조명, LED 전광판을 세팅하고 초청가수 공연과 MC 진행을 맡았습니다."
               style="line-height:1.75;resize:vertical;"></textarea>
     <p class="note" style="margin-top:.4rem;">
-      갤러리 페이지(gallery.html)에 이 글이 그대로 실려 <b>네이버·구글·AI 검색</b>에 노출됩니다.
-      <b>지역명 + 행사 종류 + 준비한 장비(무대·음향·LED·조명·MC·가수)</b>를 한 문장씩 넣어주시면 검색에 잘 잡힙니다. 비워두면 기본 문구가 들어갑니다.
+      아래 <b>블로그 · 인스타 글</b>을 자동으로 만들 때 쓰이고, 행사 기록으로 남습니다.
+      <b>지역명 + 행사 종류 + 준비한 장비(무대·음향·LED·조명·MC·가수)</b>를 한 문장씩 넣어주시면 그만큼 좋은 글이 나옵니다.
+      갤러리 페이지에 실리는 설명은 항목별로 이미 정해져 있어 이 글이 그대로 나오지는 않습니다.
     </p>
     <button class="btn btn-sub" id="promo-preview" type="button" style="margin-top:.6rem;">
       <iconify-icon icon="solar:pen-new-round-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
@@ -192,17 +209,12 @@
       사진 오른쪽 위에 <strong style="color:#fff;">큰길이벤트기획</strong> 워터마크 넣기
     </label>
     <p class="note" style="margin-top:.35rem;">
-      홈페이지에 올라가는 사진에만 들어갑니다.
-      <strong style="color:#a1a1aa;">드라이브에 보관되는 원본은 깨끗하게</strong> 남습니다.
+      홈페이지에 올라가는 <strong style="color:#a1a1aa;">웹용 사본에만</strong> 들어갑니다.
+      휴대폰에 있는 원본 사진은 건드리지 않습니다.
     </p>
-
-    <label class="chk" style="margin-top:1rem;">
-      <input type="checkbox" id="keep-orig" checked>
-      원본도 구글 드라이브에 백업
-    </label>
-    <p class="note" style="margin-top:.35rem;">
-      데이터가 약한 곳에서는 꺼두시면 훨씬 빨리 올라갑니다.
-      끄면 <strong style="color:#a1a1aa;">웹용 축소본만</strong> 올라가고 원본은 남지 않습니다.
+    <p class="note" style="margin-top:.7rem;">
+      올라가는 것은 <strong style="color:#a1a1aa;">긴 변 1600px 로 줄인 사본</strong> 한 장뿐입니다.
+      원본은 휴대폰에만 있으니, 남겨두실 사진은 지우지 마세요.
     </p>
   </div>
 
@@ -304,8 +316,46 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('on'), 3200);
 }
 
+/* ══ 갤러리 항목 ══
+   slug 는 photos.json 의 카테고리 및 gallery.html 의 앵커와 같아야 한다.
+   여기 없는 항목으로 올리면 갤러리에 칸이 생기지 않는다.
+   항목을 늘릴 때는 scripts/prepare-gallery-photos.mjs 의 CATEGORIES 와 맞춰둘 것. */
+const 갤러리항목 = [
+  { slug: 'festival',       name: '지역축제 & 공연행사',
+    desc: '수만 명이 함께 숨 쉬는 축제 현장입니다. 무대·트러스 설치부터 라인어레이 음향, 무빙헤드 조명, LED 영상까지 큰길이벤트기획이 종합 대행했습니다.' },
+  { slug: 'conference',     name: '컨퍼런스 · 포럼 · 기념식',
+    desc: '기관·기업 컨퍼런스와 포럼, 기념식 현장입니다. 회의 음향과 LED 영상, 의전 세팅과 진행까지 한 팀이 맡아 운영했습니다.' },
+  { slug: 'ceremony',       name: '시상식 & 이취임식',
+    desc: '시상식과 이·취임식 현장입니다. 식순 기획, 무대 연출, 현수막과 LED 영상, 음향·조명 세팅을 큰길이벤트기획이 준비했습니다.' },
+  { slug: 'groundbreaking', name: '기공식 · 오픈식 · 브랜드 론칭',
+    desc: '기공식과 준공식, 오픈식과 브랜드 론칭 현장입니다. 시삽·제막 의전 세팅부터 무대와 음향까지 준비했습니다.' },
+  { slug: 'sports',         name: '체육대회 & 명랑운동회',
+    desc: '총동문 체육대회부터 마을 명랑운동회까지. 무대와 음향, 경품과 진행 MC를 함께 준비한 현장입니다.' },
+  { slug: 'school',         name: '학교 행사 & 축제',
+    desc: '초·중·고교와 대학의 축제, 발표회, 기념행사 현장입니다. 무대·음향·조명·영상을 학교 여건에 맞춰 구성했습니다.' },
+  { slug: 'busking',        name: '버스킹 & 음악회',
+    desc: '거리 버스킹과 야외 음악회 현장입니다. 소규모 공연에 맞는 음향과 조명, 무대를 준비하고 공연팀 섭외까지 진행했습니다.' },
+  { slug: 'film',           name: '영화 · 영상 촬영 지원',
+    desc: '영화·영상 촬영 현장 지원입니다. 촬영용 조명과 발전 차량, 인력과 장비를 현장 조건에 맞춰 지원했습니다.' },
+  { slug: 'broadcast',      name: '카메라 중계 & 라이브 스트리밍',
+    desc: '다중 카메라 현장 중계와 유튜브·줌 실시간 송출 현장입니다.' },
+  { slug: 'rental',         name: '장비 대여 & MC·가수 섭외',
+    desc: '음향·LED 영상·조명·무대 장비 대여와 MC·가수 섭외 현장입니다.' },
+];
+function 항목찾기(slug) { return 갤러리항목.find((c) => c.slug === slug) || null; }
+
 (function 시작() {
   if (!서버주소) $('#setup').hidden = false;
+
+  const 칸 = $('#ev-cat');
+  갤러리항목.forEach((c) => {
+    const o = document.createElement('option');
+    o.value = c.slug; o.textContent = c.name;
+    칸.appendChild(o);
+  });
+  칸.value = 저장.getItem('kg_cat') || 갤러리항목[0].slug;
+  칸.addEventListener('change', () => 저장.setItem('kg_cat', 칸.value));
+
   const 오늘 = new Date();
   $('#ev-date').value = [오늘.getFullYear(),
                          ('0' + (오늘.getMonth() + 1)).slice(-2),
@@ -441,10 +491,8 @@ function 정보갱신() {
   const el = $('#pick-info');
   if (!사진들.length) { el.hidden = true; return; }
   const 웹합 = 사진들.reduce((s, p) => s + p.web.size, 0);
-  const 원합 = 사진들.reduce((s, p) => s + p.file.size, 0);
   el.hidden = false;
-  el.textContent = 사진들.length + '장 · 웹용 ' + 메가(웹합) +
-                   ' (원본 ' + 메가(원합) + ')';
+  el.textContent = 사진들.length + '장 · 올라갈 용량 ' + 메가(웹합);
 }
 const 메가 = (n) => n < 1048576 ? Math.round(n / 1024) + 'KB'
                                 : (n / 1048576).toFixed(1) + 'MB';
@@ -454,6 +502,8 @@ $('#go').addEventListener('click', async () => {
   if (!사진들.length)     { toast('사진을 먼저 골라주세요'); return; }
   const 이름 = $('#ev-name').value.trim();
   if (!이름)              { toast('행사명을 넣어주세요'); $('#ev-name').focus(); return; }
+  const 항목 = 항목찾기($('#ev-cat').value);
+  if (!항목)              { toast('갤러리 항목을 골라주세요'); $('#ev-cat').focus(); return; }
   const pw = $('#pw').value.trim();
   if (!pw)                { toast('업로드 비밀번호를 넣어주세요'); $('#pw').focus(); return; }
 
@@ -463,7 +513,6 @@ $('#go').addEventListener('click', async () => {
 
   const 행사 = { name: 이름, date: $('#ev-date').value, place: $('#ev-place').value.trim(),
                  desc: $('#ev-desc').value.trim() };
-  const 원본포함 = $('#keep-orig').checked;
   const eventId = (행사.date || '').replace(/-/g, '') + '-' +
                   Math.random().toString(36).slice(2, 6);
 
@@ -472,7 +521,7 @@ $('#go').addEventListener('click', async () => {
   $('#bar').hidden = false;
   const 게이지 = $('#bar > i');
   const 남길것 = [];
-  let 성공 = 0, 실패 = 0, 경고 = '', 실패사유 = '';
+  let 성공 = 0, 실패 = 0, 실패사유 = '';
 
   const 대기목록 = 사진들.filter((p) => p.state !== '완료');
 
@@ -485,19 +534,17 @@ $('#go').addEventListener('click', async () => {
     try {
       const 몸통 = {
         pw: pw, action: 'photo', eventId: eventId, event: 행사,
+        cat: 항목.slug,
         index: 사진들.indexOf(p),
         web: await base64(p.web),
-        origName: p.file.name,
       };
-      if (원본포함) 몸통.orig = await base64(p.file);
 
       const 결과 = await 보내기(몸통);
       if (!결과.ok) throw new Error(결과.error || '알 수 없는 오류');
 
       p.state = '완료'; 성공++;
-      if (결과.원본경고) 경고 = 결과.원본경고;
       남길것.push({
-        path: 결과.path, event: 행사.name, date: 행사.date,
+        path: 결과.path, cat: 항목.slug, event: 행사.name, date: 행사.date,
         place: 행사.place, caption: 행사.name, desc: 행사.desc,
       });
     } catch (err) {
@@ -512,7 +559,7 @@ $('#go').addEventListener('click', async () => {
 
   if (남길것.length) {
     try {
-      const 마무리 = await 보내기({ pw: pw, action: 'finish', photos: 남길것 });
+      const 마무리 = await 보내기({ pw: pw, action: 'finish', photos: 남길것, cat: 항목 });
       if (!마무리.ok) throw new Error(마무리.error || '알 수 없는 오류');
     } catch (err) {
       $('#status').className = 'note warn';
@@ -528,7 +575,6 @@ $('#go').addEventListener('click', async () => {
   const 말 = [];
   if (성공) 말.push(성공 + '장 올렸습니다.');
   if (실패) 말.push(실패 + '장 실패 — ' + (실패사유 || '사유 알 수 없음'));
-  if (경고) 말.push('(' + 경고 + ')');
   if (성공 && !실패) 말.push('갤러리에서 바로 확인하실 수 있습니다.');
   $('#status').className = 'note ' + (실패 ? 'warn' : 'ok');
   $('#status').textContent = 말.join(' ');
