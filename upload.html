@@ -633,10 +633,12 @@ async function 관리목록불러오기(앞말, 종류) {
     const 열쇠 = (p.event || '') + '|' + (p.date || '');
     if (!묶음.has(열쇠)) {
       묶음.set(열쇠, { event: p.event || '', date: p.date || '',
-                       place: p.place || '', desc: p.desc || '', 사진: [] });
+                       place: p.place || '', desc: p.desc || '',
+                       cat: p.cat || '', 사진: [] });
     }
     const g = 묶음.get(열쇠);
     if (p.desc && !g.desc) g.desc = p.desc;
+    if (p.cat && !g.cat) g.cat = p.cat;
     g.사진.push(p);
   });
 
@@ -687,6 +689,24 @@ function 관리폼(몸, 행사, 줄) {
     몸.append(l, i);
     return i;
   };
+
+  // 갤러리 항목 — 바꾸면 이 행사 사진 전부가 다른 칸으로 옮겨간다
+  const 항목라벨 = document.createElement('label');
+  항목라벨.className = 'f'; 항목라벨.textContent = '갤러리 항목';
+  const 항목칸 = document.createElement('select');
+  갤러리항목.forEach((c) => {
+    const o = document.createElement('option');
+    o.value = c.slug; o.textContent = c.name;
+    항목칸.appendChild(o);
+  });
+  // 목록에 없는 옛 항목이면 그 값도 골라둘 수 있게 하나 만들어 준다
+  if (행사.cat && !항목찾기(행사.cat)) {
+    const o = document.createElement('option');
+    o.value = 행사.cat; o.textContent = 행사.cat + ' (등록되지 않은 항목)';
+    항목칸.appendChild(o);
+  }
+  항목칸.value = 행사.cat || 갤러리항목[0].slug;
+  몸.append(항목라벨, 항목칸);
 
   const 이름칸 = 만들기('행사명', 0, 행사.event);
   const 날짜칸 = 만들기('행사일', 0, 행사.date, 'input', 'date');
@@ -739,14 +759,19 @@ function 관리폼(몸, 행사, 줄) {
     저장버튼.disabled = true;
     관리안내('저장하는 중…');
     try {
+      const 옮긴항목 = 항목칸.value !== (행사.cat || '') ? 항목찾기(항목칸.value) : null;
       const 답 = await 보내기({
         pw: pw, action: 'edit',
         old: { event: 행사.event, date: 행사.date },
         new: { event: 이름칸.value.trim(), date: 날짜칸.value,
-               place: 장소칸.value.trim(), desc: 설명칸.value.trim() },
+               place: 장소칸.value.trim(), desc: 설명칸.value.trim(),
+               cat: 항목칸.value },
+        cat: 옮긴항목 || undefined,   // 처음 쓰는 항목이면 갤러리 칸을 새로 만들어야 한다
       });
       if (!답.ok) throw new Error(답.error || '알 수 없는 오류');
-      await 관리목록불러오기('고쳤습니다 (사진 ' + 답.changed + '장 반영)', 'ok');
+      await 관리목록불러오기(
+        '고쳤습니다 (사진 ' + 답.changed + '장 반영' +
+        (옮긴항목 ? ' · ' + 옮긴항목.name + ' 으로 옮김' : '') + ')', 'ok');
     } catch (err) {
       관리안내('저장 실패: ' + (err.message || err), 'warn');
     }

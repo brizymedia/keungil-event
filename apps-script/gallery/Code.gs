@@ -162,14 +162,22 @@ function 목록갱신(요청) {
   return { ok: true, added: 추가, total: 지금.photos.length, 갤러리갱신: 신호 };
 }
 
-/* ── 행사 정보 고치기 ── */
+/* ── 행사 정보 고치기 (갤러리 항목 옮기기 포함) ──
+
+   항목을 옮길 때 사진 파일까지 다른 폴더로 옮기지는 않는다.
+   갤러리는 photos.json 의 cat 값으로 칸을 나누고, 사진 주소는 path 를 그대로 쓴다.
+   즉 파일이 photos/sports/ 에 남아 있어도 cat 이 broadcast 면 중계 칸에 나온다.
+   19장을 옮기자고 파일마다 읽기·쓰기·지우기를 돌리면 앱스 스크립트 실행 시간(6분)을
+   넘겨 중간에 끊길 수 있어서, 값만 바꾸는 쪽을 택했다.                        */
 function 정보수정(요청) {
   const 옛 = 요청.old || {};
   const 새 = 요청['new'] || {};
   if (!새.event) return { ok: false, error: '행사명은 비울 수 없습니다' };
 
+  const 새항목 = 슬러그(새.cat);
+
   const 지금 = 목록읽기();
-  let 바뀜 = 0;
+  let 바뀜 = 0, 옮김 = 0;
   지금.photos.forEach((p) => {
     if ((p.event || '') !== (옛.event || '') || (p.date || '') !== (옛.date || '')) return;
     p.event   = 새.event;
@@ -177,16 +185,24 @@ function 정보수정(요청) {
     p.place   = 새.place || '';
     p.desc    = 새.desc || '';
     p.caption = 새.event;
+    if (새항목 && p.cat !== 새항목) { p.cat = 새항목; 옮김++; }
     바뀜++;
   });
 
   if (!바뀜) return { ok: false, error: '고칠 사진을 찾지 못했습니다. 목록을 다시 불러와 주세요.' };
 
-  const 결과 = 목록쓰기(지금, '행사 정보 수정: ' + 새.event + ' (' + 바뀜 + '장)');
+  if (옮김) {
+    항목확인(지금, 요청.cat);   // 처음 쓰는 항목이면 갤러리 칸을 만든다
+    개수맞추기(지금);           // 옮긴 만큼 양쪽 칸의 숫자를 다시 센다
+  }
+
+  const 메모 = '행사 정보 수정: ' + 새.event + ' (' + 바뀜 + '장' +
+               (옮김 ? ', ' + 새항목 + ' 으로 옮김' : '') + ')';
+  const 결과 = 목록쓰기(지금, 메모);
   if (!결과.ok) return 결과;
 
   갤러리다시만들기();
-  return { ok: true, changed: 바뀜 };
+  return { ok: true, changed: 바뀜, moved: 옮김 };
 }
 
 /* ── 사진 지우기 ── */
