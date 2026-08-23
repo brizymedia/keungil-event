@@ -111,19 +111,6 @@
     }
     .btn-ghost:hover{ transform:scale(1.02);border-color:var(--amber);background:rgba(245,158,11,.06); }
 
-    /* ── YM토탈이벤트 칩 ── */
-    .ym-chip{
-      display:inline-flex;align-items:center;gap:.35rem;
-      padding:.42rem .75rem;border-radius:9999px;
-      border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);
-      color:#FCA5A5;font-size:.8rem;font-weight:700;letter-spacing:-.01em;
-      text-decoration:none;white-space:nowrap;transition:all .25s;
-    }
-    .ym-chip:hover{ background:rgba(239,68,68,.22);color:#fff;border-color:rgba(239,68,68,.7); }
-    .ym-chip-short{ display:none; }
-    @media (max-width:639px){ .ym-chip{ padding:.42rem .6rem; } .ym-chip-label{ display:none; } .ym-chip-short{ display:inline; } }
-    @media (max-width:400px){ .ym-chip{ padding:.42rem .5rem; } .ym-chip-short{ display:none; } }
-
     /* ── NAV (스크롤 위치에 따라 밝기 전환) ── */
     #site-nav{ pointer-events:none; }
     #nav-pill{ pointer-events:auto;transition:background .35s ease,border-color .35s ease,color .35s ease,box-shadow .35s ease; }
@@ -437,11 +424,6 @@
       <a href="quote.html" class="nav-link">견적 · 문의</a>
     </div>
     <div style="display:flex;align-items:center;gap:.5rem;">
-      <a href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/" target="_blank" rel="noopener" class="ym-chip" title="YM토탈이벤트 — 음향·조명·LED·특수효과">
-        <iconify-icon icon="solar:volume-loud-bold" style="font-size:14px;"></iconify-icon>
-        <span class="ym-chip-label">YM토탈이벤트</span>
-        <span class="ym-chip-short">YM</span>
-      </a>
       <a href="#contact" class="btn-primary" style="padding:.55rem 1.25rem;font-size:.875rem;">무료 상담</a>
     </div>
   </div>
@@ -1073,7 +1055,6 @@
       <a href="#gallery" class="nav-link">갤러리</a>
       <a href="areas.html" class="nav-link">지역안내</a>
       <a href="quote.html" class="nav-link">견적 · 문의</a>
-      <a href="https://www.xn--el3bx2ohi64bba144lgmbdzd.com/" target="_blank" rel="noopener" style="color:#FCA5A5;text-decoration:none;font-weight:600;white-space:nowrap;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#FCA5A5'">YM토탈이벤트</a>
     </div>
     <div style="display:flex;gap:.75rem;">
       <a href="https://blog.naver.com/ty-health" target="_blank" rel="noopener" class="glass" style="width:2.25rem;height:2.25rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#B9B3C2;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#03C75A'" onmouseout="this.style.color='#B9B3C2'" title="네이버 블로그"><iconify-icon icon="simple-icons:naver" style="font-size:15px;"></iconify-icon></a>
