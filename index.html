@@ -7,8 +7,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#0B0A10">
-  <title>큰길이벤트기획 — 광양·순천·여수·광주 행사기획 | 음향·LED·조명 대여, 무대 설치, MC·가수 섭외</title>
-  <meta name="description" content="광양 본사 행사 전문 큰길이벤트기획(주식회사 브리지미디어). 순천·여수·광양·고흥·광주·진주 등 광주·전남·경남은 당일 세팅, 강화도·당진 문화재 야행 등 대형 행사는 전국 출장. 지역축제·기업행사·기공식·시상식 기획부터 음향장비·LED 영상장비·조명 대여, 무대·트러스 설치, MC·가수 섭외, 드론쇼까지 원스톱.">
+  <title>큰길이벤트기획 | 광양 순천 여수 행사기획 이벤트업체 · 음향 조명 LED 대여</title>
+  <meta name="description" content="광양 본사 행사 전문 큰길이벤트기획. 광주·전남·경남 당일 세팅, 대형 행사는 전국 출장. 지역축제·기업행사·기공식·시상식 기획과 음향·LED·조명 대여, 무대 설치, MC·가수 섭외까지 한 팀이 맡습니다. 1533-7295">
   <meta name="keywords" content="이벤트회사, 이벤트회사 추천, 행사기획, 행사대행, 음향장비 대여, 음향 렌탈, LED 영상장비 대여, LED 전광판 대여, 조명 대여, 무대 설치, 트러스, MC 섭외, 가수 섭외, 연예인 섭외, 지역축제, 기업행사, 기공식, 시상식, 드론쇼, 광양 이벤트, 순천 이벤트, 여수 이벤트, 고흥 이벤트, 하동 이벤트, 남원 이벤트, 광주 이벤트, 진주 이벤트, 통영 이벤트, 큰길이벤트기획">
   <meta name="author" content="큰길이벤트기획 (주식회사 브리지미디어)">
   <meta name="robots" content="index,follow,max-image-preview:large">
@@ -1237,9 +1237,10 @@
       grid.appendChild(wrap);
     });
   }
-  function openLb(i){ lbIdx=i; lbImg.src=imgUrl(allPhotos[i]); lbCount.textContent=(i+1)+' / '+allPhotos.length; lb.style.display='flex'; document.body.style.overflow='hidden'; }
+  function lbAlt(p){ return [p.event||'행사 현장', p.place, '큰길이벤트기획 현장 사진'].filter(Boolean).join(' — '); }
+  function openLb(i){ lbIdx=i; lbImg.src=imgUrl(allPhotos[i]); lbImg.alt=lbAlt(allPhotos[i]); lbCount.textContent=(i+1)+' / '+allPhotos.length; lb.style.display='flex'; document.body.style.overflow='hidden'; }
   window.closeLb = function(){ lb.style.display='none'; document.body.style.overflow=''; };
-  window.moveLb  = function(d){ lbIdx=(lbIdx+d+allPhotos.length)%allPhotos.length; lbImg.src=imgUrl(allPhotos[lbIdx]); lbCount.textContent=(lbIdx+1)+' / '+allPhotos.length; };
+  window.moveLb  = function(d){ lbIdx=(lbIdx+d+allPhotos.length)%allPhotos.length; lbImg.src=imgUrl(allPhotos[lbIdx]); lbImg.alt=lbAlt(allPhotos[lbIdx]); lbCount.textContent=(lbIdx+1)+' / '+allPhotos.length; };
   document.addEventListener('keydown', e => {
     if (lb.style.display==='flex'){
       if(e.key==='ArrowLeft') moveLb(-1); else if(e.key==='ArrowRight') moveLb(1); else if(e.key==='Escape') closeLb();
