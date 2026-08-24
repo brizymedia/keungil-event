@@ -9,6 +9,7 @@
  * 로컬 실행:  node scripts/build-gallery.mjs
  */
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { buildStories } from './build-stories.mjs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -249,7 +250,7 @@ const html = `<!DOCTYPE html>
 <body>
 <div class="topbar"><div class="topbar-in">
   <a class="brand" href="index.html"><img src="logo-kgm-transparent.png" alt="${BRAND}"><span>${BRAND}</span></a>
-  <nav class="topnav"><a href="index.html#services">서비스</a><a href="areas.html">지역안내</a><a href="quote.html">견적 · 문의</a><a href="tel:15337295" style="color:var(--amber-2);font-weight:700;">1533-7295</a></nav>
+  <nav class="topnav"><a href="index.html#services">서비스</a><a href="/stories/">행사 이야기</a><a href="areas.html">지역안내</a><a href="quote.html">견적 · 문의</a><a href="tel:15337295" style="color:var(--amber-2);font-weight:700;">1533-7295</a></nav>
 </div></div>
 
 <header class="hero"><div class="hero-in">
@@ -270,7 +271,7 @@ ${sections}
 <div id="lb" onclick="if(event.target===this)lbClose()"><button class="p" onclick="lbMove(-1)">‹</button><img id="lb-img" alt=""><button class="n" onclick="lbMove(1)">›</button><button class="x" onclick="lbClose()">✕</button><div class="c" id="lb-c"></div></div>
 <footer class="foot">
   주식회사 브리지미디어 (${BRAND}) · 대표 김동길 · 사업자등록번호 813-81-02252 · 전남광주통합특별시 광양시 광양읍 강변동길 1, 2층 · <a href="tel:15337295">1533-7295</a> · <a href="mailto:gilcaro@naver.com">gilcaro@naver.com</a><br>
-  <a href="index.html">홈</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
+  <a href="index.html">홈</a> · <a href="/stories/">행사 이야기</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
 </footer>
 <script>
 /* 해시(#festival 등)로 들어왔을 때 해당 분야로 확실히 이동
@@ -307,6 +308,12 @@ ${sections}
 `;
 writeFileSync(resolve(ROOT, 'gallery.html'), html, 'utf8');
 
+// ── 행사 이야기 (stories) ───────────────────────────────
+/* 업로드로 올린 행사를 홈페이지의 글로 만든다. 목록은 sitemap·RSS 에도 넣는다. */
+const { stories, pages: storyPages, rssItems: storyRss } = buildStories({
+  photos, ROOT, SITE, BRAND, esc, imgUrl, slug, categories: data.categories || [],
+});
+
 // ── sitemap.xml ─────────────────────────────────────────
 /* 사진 사이트맵 제목·설명에도 지역 키워드를 넣는다 */
 const catOf = new Map(events.map((g) => [g.slug, g]));
@@ -339,6 +346,7 @@ const pages = [
   { loc: '/tongyeong/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
   { loc: '/gallery.html', lastmod: latest, priority: '0.8', changefreq: 'weekly', images: photos.slice(0, 500) },
   { loc: '/quote.html', lastmod: today, priority: '0.7', changefreq: 'monthly' },
+  ...storyPages,
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -365,6 +373,7 @@ const rssItems = [
   { title: '서비스 지역 안내 — 광양·순천·여수·고흥·하동·남원·광주·진주·통영',
     link: SITE + '/areas.html',
     desc: '광양에서 출발해 차량 1~2시간권 전역 당일 세팅. 지역별 행사 사례와 자주 받는 문의를 안내합니다.' },
+  ...storyRss,
   ...events.map((g) => ({
     title: `${(g.regions && g.regions[0]) ? g.regions[0] + ' ' : ''}${g.name} 현장 사진 ${g.photos.length}장`,
     link: SITE + '/gallery.html#' + g.id,
@@ -385,11 +394,11 @@ ${rssItems.map((it) => `  <item>
     <link>${esc(it.link)}</link>
     <guid isPermaLink="true">${esc(it.link)}</guid>
     <description>${esc(it.desc)}</description>
-    <pubDate>${rssDate(latest)}</pubDate>
+    <pubDate>${rssDate(it.date || latest)}</pubDate>
   </item>`).join('\n')}
 </channel>
 </rss>
 `;
 writeFileSync(resolve(ROOT, 'rss.xml'), rss, 'utf8');
 
-console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · sitemap.xml 갱신 완료`);
+console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · 행사 이야기 ${stories.length}건 · sitemap.xml 갱신 완료`);
