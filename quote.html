@@ -246,18 +246,20 @@
     .toast.on{ opacity:1;transform:translate(-50%,0); }
 
     @media print{
-      /* A4 한 장에 담기도록 전체를 압축한다 */
-      @page { size:A4; margin:10mm 9mm; }
+      /* A4 한 장에 담기도록 전체를 압축한다.
+         위 여백은 넉넉히 — 브라우저가 인쇄할 때 종이 맨 위에 주소·날짜 줄을 얹는데,
+         여백이 좁으면 그 줄과 문서가 붙어 답답해 보인다. */
+      @page { size:A4; margin:17mm 9mm 12mm; }
       html,body{ background:#fff!important;color:#111!important;overflow:visible; }
       .noise-overlay,header,.no-print,.toolbar,footer{ display:none!important; }
       main{ padding:0!important;max-width:none!important; }
       .print-only{ display:block!important; }
 
-      /* 문서 테두리 안쪽 좌우 여백 */
+      /* 문서 테두리 안쪽 여백 — 위쪽도 띄워 제목이 테두리에 붙지 않게 */
       .doc{ border:1px solid #999!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;
-            padding:0 7mm 5mm!important;break-inside:avoid; }
+            padding:6mm 7mm 5mm!important;break-inside:avoid; }
       /* 공급자·수요자가 제목과 한 줄에 나란히 오도록 (줄바꿈 금지) */
-      .doc-head{ border-bottom:1.6pt solid #111!important;padding:6mm 0 4mm!important;
+      .doc-head{ border-bottom:1.6pt solid #111!important;padding:5mm 0 4.5mm!important;
                  gap:5mm!important;flex-wrap:nowrap!important;align-items:flex-start!important; }
       .doc-head > div{ min-width:0!important; }
       .doc-head > div:first-child{ flex:0 0 auto!important; }
