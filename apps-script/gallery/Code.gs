@@ -87,6 +87,7 @@ function doPost(e) {
     }
 
     if (요청.action === 'photo')  return 응답(사진저장(요청));
+    if (요청.action === 'cover')  return 응답(표지저장(요청));
     if (요청.action === 'finish') return 응답(잠그고(function () { return 목록갱신(요청); }));
     if (요청.action === 'edit')   return 응답(잠그고(function () { return 정보수정(요청); }));
     if (요청.action === 'delete') return 응답(잠그고(function () { return 사진삭제(요청); }));
@@ -129,9 +130,37 @@ function 사진저장(요청) {
   return { ok: true, path: 경로 };
 }
 
+/* ══════════════════════════════════════════════════════════════
+   3-2. 대표 썸네일 저장
+
+   행사명을 얹은 카드 두 장(정사각·가로형)을 받아 저장한다.
+   정사각은 블로그 대표 이미지와 갤러리 칸 표지에,
+   가로형은 행사 이야기 글의 표지와 카톡·검색 공유 이미지에 쓴다.
+══════════════════════════════════════════════════════════════ */
+function 표지저장(요청) {
+  const id = 슬러그파일(요청.eventId);
+  if (!id) return { ok: false, error: '행사 번호(eventId)가 없습니다' };
+  if (!요청.square || !요청.wide) return { ok: false, error: '썸네일 이미지가 없습니다' };
+
+  const 정사각 = 저장경로 + '/_cover/' + id + '-sq.jpg';
+  const 가로   = 저장경로 + '/_cover/' + id + '-wide.jpg';
+
+  let 답 = 깃허브에올리기(정사각, 요청.square, '대표 썸네일(정사각): ' + id);
+  if (!답.ok) return 답;
+  답 = 깃허브에올리기(가로, 요청.wide, '대표 썸네일(가로): ' + id);
+  if (!답.ok) return 답;
+
+  return { ok: true, square: 정사각, wide: 가로 };
+}
+
 /* 갤러리 폴더 이름으로 쓸 수 있는 글자만 남긴다 */
 function 슬러그(값) {
   return String(값 || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+}
+
+/* 파일명용 — eventId 는 20260824-4ll6 꼴이라 숫자와 영문, 하이픈만 남기면 된다 */
+function 슬러그파일(값) {
+  return String(값 || '').replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
 }
 
 /* ══════════════════════════════════════════════════════════════

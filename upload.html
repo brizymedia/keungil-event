@@ -83,6 +83,30 @@
     }
     .shot.done .st{ background:rgba(34,197,94,.85);color:#052e16; }
     .shot.fail .st{ background:rgba(239,68,68,.9); }
+    /* 대표 사진으로 고른 것 */
+    .shot.rep{ outline:2.5px solid #F59E0B;outline-offset:-2.5px; }
+    .shot .rep-mark{
+      position:absolute;top:.2rem;left:.2rem;padding:.1rem .4rem;border-radius:.35rem;
+      background:#F59E0B;color:#09090b;font-size:.6rem;font-weight:900;letter-spacing:-.02em;
+    }
+    .shot .pick-rep{
+      position:absolute;inset:auto 0 0 0;padding:.2rem;border:none;cursor:pointer;
+      background:rgba(0,0,0,.55);color:#d4d4d8;font-size:.6rem;font-weight:700;
+    }
+    .shot .pick-rep:hover{ background:rgba(245,158,11,.75);color:#09090b; }
+
+    /* 대표 썸네일 미리보기 */
+    .thumb-box{ display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.9rem; }
+    @media (max-width:420px){ .thumb-box{ grid-template-columns:1fr; } }
+    .thumb-box figure{ margin:0; }
+    .thumb-box img{ width:100%;border-radius:.6rem;border:1px solid rgba(255,255,255,.1);background:#18181b; }
+    .thumb-box figcaption{ font-size:.7rem;color:#71717a;margin-top:.3rem;text-align:center; }
+    .thumb-save{
+      display:block;width:100%;margin-top:.4rem;padding:.5rem;border-radius:.5rem;cursor:pointer;
+      border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:.75rem;font-weight:700;
+      text-align:center;text-decoration:none;
+    }
+    .thumb-save:hover{ border-color:#F59E0B;color:#FBBF24; }
 
     .bar{ height:.4rem;border-radius:9999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:.9rem; }
     .bar > i{ display:block;height:100%;width:0;background:linear-gradient(90deg,#F59E0B,#D97706);transition:width .3s; }
@@ -213,9 +237,30 @@
       휴대폰에 있는 원본 사진은 건드리지 않습니다.
     </p>
     <p class="note" style="margin-top:.7rem;">
-      올라가는 것은 <strong style="color:#a1a1aa;">긴 변 1600px 로 줄인 사본</strong> 한 장뿐입니다.
+      올라가는 것은 <strong style="color:#a1a1aa;">긴 변 1600px 로 줄인 사본</strong>입니다.
       원본은 휴대폰에만 있으니, 남겨두실 사진은 지우지 마세요.
     </p>
+
+    <div id="thumb-wrap" hidden style="margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.08);">
+      <div style="font-size:.85rem;font-weight:800;margin-bottom:.3rem;">대표 썸네일</div>
+      <p class="note" style="margin-top:0;">
+        사진 아래 <b style="color:#a1a1aa;">대표로</b> 를 눌러 표지로 쓸 사진을 고르세요.
+        행사명과 날짜·장소를 얹어 만들고, <b style="color:#a1a1aa;">행사 이야기 글의 대표 이미지</b>와
+        갤러리 칸 표지로 쓰입니다. 아래에서 휴대폰에 저장해 블로그에 올리셔도 됩니다.
+      </p>
+      <div class="thumb-box">
+        <figure>
+          <img id="thumb-sq" alt="정사각 대표 썸네일 미리보기">
+          <figcaption>정사각 · 블로그 대표 이미지</figcaption>
+          <a class="thumb-save" id="save-sq" download>휴대폰에 저장</a>
+        </figure>
+        <figure>
+          <img id="thumb-wide" alt="가로형 대표 썸네일 미리보기">
+          <figcaption>가로형 · 카톡 공유 · 글 표지</figcaption>
+          <a class="thumb-save" id="save-wide" download>휴대폰에 저장</a>
+        </figure>
+      </div>
+    </div>
   </div>
 
   <!-- ── 03 올리기 ── -->
@@ -407,6 +452,7 @@ $('#pick').addEventListener('change', async (e) => {
     }
   }
   정보갱신();
+  썸네일만들기();
 });
 
 function 줄이기(file, 최대변, 품질, 워터마크) {
@@ -467,25 +513,200 @@ $('#watermark').addEventListener('change', async () => {
   }
   그리기();
   정보갱신();
+  썸네일만들기();     // 워터마크를 켜고 끄면 대표 썸네일도 다시 만든다
 });
 
 function 그리기() {
   const box = $('#shots');
   box.innerHTML = '';
+  if (대표번호 >= 사진들.length) 대표번호 = 0;   // 대표로 고른 사진을 뺐을 때
   사진들.forEach((p, i) => {
+    const 대표 = i === 대표번호;
     const d = document.createElement('div');
-    d.className = 'shot' + (p.state === '완료' ? ' done' : p.state === '실패' ? ' fail' : '');
+    d.className = 'shot' + (p.state === '완료' ? ' done' : p.state === '실패' ? ' fail' : '') +
+                  (대표 ? ' rep' : '');
     d.innerHTML =
       '<img src="' + p.thumb + '" alt="">' +
+      (대표 ? '<span class="rep-mark">대표</span>' : '') +
       (p.state === '대기'
-        ? '<button class="x" title="빼기">×</button>'
+        ? '<button class="x" title="빼기">×</button>' +
+          (대표 ? '' : '<button class="pick-rep" type="button">대표로</button>')
         : '<span class="st">' + p.state + '</span>');
     const x = d.querySelector('.x');
-    if (x) x.addEventListener('click', () => { 사진들.splice(i, 1); 그리기(); 정보갱신(); });
+    if (x) x.addEventListener('click', () => {
+      사진들.splice(i, 1);
+      if (대표번호 > i) 대표번호--;
+      그리기(); 정보갱신(); 썸네일만들기();
+    });
+    const r = d.querySelector('.pick-rep');
+    if (r) r.addEventListener('click', () => { 대표번호 = i; 그리기(); 썸네일만들기(); });
     box.appendChild(d);
     p.el = d;
   });
 }
+
+/* ═══════════════════════════════════════════════════════
+   대표 썸네일 — 고른 사진 위에 행사명·날짜·장소를 얹은 카드
+
+   블로그 목록과 갤러리 칸 표지에서 한눈에 무슨 행사인지 보이게 하는 것이
+   목적이라, 글자는 사진에 묻히지 않을 만큼 크게 넣고 아래쪽에
+   어두운 그라데이션을 깔아 대비를 확보한다.
+═══════════════════════════════════════════════════════ */
+let 대표번호 = 0;
+let 썸네일 = { sq: null, wide: null };
+let 썸네일타이머;
+
+const 글꼴 = "system-ui,-apple-system,'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
+
+/** 폭에 맞춰 줄바꿈 — 한글은 어절 단위로 끊고, 한 어절이 너무 길면 글자로 끊는다 */
+function 줄나누기(ctx, 글, 최대폭, 최대줄) {
+  const 어절 = String(글 || '').trim().split(/\s+/);
+  const 줄 = [];
+  let 현재 = '';
+  for (const w of 어절) {
+    const 후보 = 현재 ? 현재 + ' ' + w : w;
+    if (ctx.measureText(후보).width <= 최대폭) { 현재 = 후보; continue; }
+    if (현재) 줄.push(현재);
+    if (ctx.measureText(w).width <= 최대폭) { 현재 = w; continue; }
+    let 조각 = '';                                  // 한 어절이 한 줄보다 길 때
+    for (const ch of w) {
+      if (ctx.measureText(조각 + ch).width > 최대폭) { 줄.push(조각); 조각 = ch; }
+      else 조각 += ch;
+    }
+    현재 = 조각;
+  }
+  if (현재) 줄.push(현재);
+  if (줄.length <= 최대줄) return 줄;
+  const 자른것 = 줄.slice(0, 최대줄);
+  let 끝 = 자른것[최대줄 - 1];
+  while (끝.length > 1 && ctx.measureText(끝 + '…').width > 최대폭) 끝 = 끝.slice(0, -1);
+  자른것[최대줄 - 1] = 끝 + '…';
+  return 자른것;
+}
+
+/** 사진 한 장을 지정한 비율로 가운데 잘라 카드로 그린다 */
+function 카드그리기(img, 폭, 높이, 정보) {
+  const c = document.createElement('canvas');
+  c.width = 폭; c.height = 높이;
+  const ctx = c.getContext('2d');
+
+  // 사진을 비율에 맞춰 가운데 채우기 (object-fit: cover 와 같은 계산)
+  const 배율 = Math.max(폭 / img.width, 높이 / img.height);
+  const w = img.width * 배율, h = img.height * 배율;
+  ctx.drawImage(img, (폭 - w) / 2, (높이 - h) / 2, w, h);
+
+  // 아래쪽 어둡게 — 글자가 어떤 사진 위에서도 읽히도록
+  const 띠 = Math.round(높이 * 0.52);
+  const g = ctx.createLinearGradient(0, 높이 - 띠, 0, 높이);
+  g.addColorStop(0, 'rgba(11,10,16,0)');
+  g.addColorStop(0.45, 'rgba(11,10,16,.72)');
+  g.addColorStop(1, 'rgba(11,10,16,.94)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 높이 - 띠, 폭, 띠);
+
+  const 여백 = Math.round(폭 * 0.062);
+  const 글폭 = 폭 - 여백 * 2;
+
+  // 행사명
+  const 제목크기 = Math.round(높이 * (폭 === 높이 ? 0.077 : 0.105));
+  ctx.font = '800 ' + 제목크기 + 'px ' + 글꼴;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  const 줄 = 줄나누기(ctx, 정보.name, 글폭, 정보.짧게 ? 2 : 3);
+  const 줄간격 = Math.round(제목크기 * 1.28);
+
+  // 아래에서부터 쌓아 올린다: 브랜드 → 날짜·장소 → 제목
+  const 브랜드크기 = Math.round(제목크기 * 0.46);
+  const 메타크기   = Math.round(제목크기 * 0.52);
+  let y = 높이 - 여백;
+
+  ctx.font = '800 ' + 브랜드크기 + 'px ' + 글꼴;
+  ctx.fillStyle = '#F59E0B';
+  ctx.fillText('큰길이벤트기획', 여백, y);
+  y -= Math.round(브랜드크기 * 1.9);
+
+  const 메타 = [정보.date, 정보.place].filter(Boolean).join('  ·  ');
+  if (메타) {
+    ctx.font = '600 ' + 메타크기 + 'px ' + 글꼴;
+    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.fillText(메타, 여백, y);
+    y -= Math.round(메타크기 * 1.75);
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 ' + 제목크기 + 'px ' + 글꼴;
+  for (let i = 줄.length - 1; i >= 0; i--) {
+    ctx.fillText(줄[i], 여백, y);
+    y -= 줄간격;
+  }
+
+  if (정보.워터마크) 워터마크그리기(ctx, 폭, 높이);   // 사진들과 같은 자리에 같은 워터마크
+  return c;
+}
+
+const 날짜예쁘게 = (d) => {
+  const m = String(d || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? m[1] + '.' + m[2] + '.' + m[3] : (d || '');
+};
+
+/* 그리는 도중에 또 요청이 오면 먼저 시작한 쪽이 늦게 끝나 옛 그림이 덮어쓸 수 있다.
+   번호표를 뽑아 두고, 끝났을 때 내 번호가 아직 최신일 때만 반영한다. */
+let 썸네일번호 = 0;
+
+async function 썸네일만들기() {
+  clearTimeout(썸네일타이머);
+  const 내번호 = ++썸네일번호;
+  썸네일타이머 = setTimeout(async () => {
+    const 원본 = 사진들[대표번호];
+    const 칸 = $('#thumb-wrap');
+    if (!원본) { 칸.hidden = true; 썸네일 = { sq: null, wide: null }; return; }
+
+    const 정보 = {
+      name: $('#ev-name').value.trim() || '큰길이벤트기획 행사 현장',
+      date: 날짜예쁘게($('#ev-date').value),
+      place: $('#ev-place').value.trim(),
+    };
+
+    // 워터마크가 이미 찍힌 web 사본을 쓰면 잘라내기·확대 뒤에 워터마크가 두 번 겹친다.
+    // 원본에서 잘라 카드로 만들고 워터마크는 카드에 한 번만 찍는다.
+    const img = new Image();
+    const url = URL.createObjectURL(원본.file);
+    try {
+      await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = url; });
+      const 표시 = $('#watermark').checked;
+      const sq   = 카드그리기(img, 1080, 1080, { ...정보, 짧게: false, 워터마크: 표시 });
+      const wide = 카드그리기(img, 1200, 630,  { ...정보, 짧게: true,  워터마크: 표시 });
+      const sqBlob   = await new Promise((r) => sq.toBlob(r, 'image/jpeg', 0.88));
+      const wideBlob = await new Promise((r) => wide.toBlob(r, 'image/jpeg', 0.88));
+      if (내번호 !== 썸네일번호) return;          // 그 사이 새 요청이 들어왔으면 버린다
+      썸네일 = { sq: sqBlob, wide: wideBlob };
+      const 파일이름 = (정보.name.replace(/[\\/:*?"<>|]/g, '') || '대표이미지').slice(0, 40);
+      붙이기('#thumb-sq',   '#save-sq',   썸네일.sq,   파일이름 + '_정사각.jpg');
+      붙이기('#thumb-wide', '#save-wide', 썸네일.wide, 파일이름 + '_가로.jpg');
+      칸.hidden = false;
+    } catch (e) {
+      if (내번호 === 썸네일번호) 칸.hidden = true;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }, 250);   // 글자를 치는 중에는 계속 다시 그리지 않게 잠깐 기다린다
+}
+
+function 붙이기(그림, 버튼, blob, 이름) {
+  const 이전 = $(그림).dataset.url;
+  if (이전) URL.revokeObjectURL(이전);
+  const u = URL.createObjectURL(blob);
+  $(그림).src = u;
+  $(그림).dataset.url = u;
+  $(버튼).href = u;
+  $(버튼).setAttribute('download', 이름);
+  $(버튼).textContent = '휴대폰에 저장 (' + 메가(blob.size) + ')';
+}
+
+// 행사 정보를 고치면 썸네일 글자도 따라 바뀐다
+['#ev-name', '#ev-date', '#ev-place'].forEach((s) => {
+  $(s).addEventListener('input', () => { if (사진들.length) 썸네일만들기(); });
+  $(s).addEventListener('change', () => { if (사진들.length) 썸네일만들기(); });
+});
 
 function 정보갱신() {
   const el = $('#pick-info');
@@ -521,7 +742,7 @@ $('#go').addEventListener('click', async () => {
   $('#bar').hidden = false;
   const 게이지 = $('#bar > i');
   const 남길것 = [];
-  let 성공 = 0, 실패 = 0, 실패사유 = '';
+  let 성공 = 0, 실패 = 0, 실패사유 = '', 경고 = '';
 
   const 대기목록 = 사진들.filter((p) => p.state !== '완료');
 
@@ -557,6 +778,25 @@ $('#go').addEventListener('click', async () => {
     게이지.style.width = Math.round(((i + 1) / 대기목록.length) * 100) + '%';
   }
 
+  // 대표 썸네일 — 실패해도 사진은 이미 올라갔으므로 업로드를 되돌리지 않는다
+  let 표지 = null;
+  if (남길것.length && 썸네일.sq && 썸네일.wide) {
+    $('#status').className = 'note';
+    $('#status').textContent = '대표 썸네일 올리는 중…';
+    try {
+      const 답 = await 보내기({
+        pw: pw, action: 'cover', eventId: eventId, cat: 항목.slug,
+        square: await base64(썸네일.sq),
+        wide:   await base64(썸네일.wide),
+      });
+      if (답.ok) 표지 = { sq: 답.square, wide: 답.wide };
+      else 경고 = '대표 썸네일 실패: ' + (답.error || '알 수 없는 오류');
+    } catch (err) {
+      경고 = '대표 썸네일 실패: ' + (err.message || err);
+    }
+    if (표지) 남길것.forEach((p) => { p.thumb = 표지.sq; p.cover = 표지.wide; });
+  }
+
   if (남길것.length) {
     try {
       const 마무리 = await 보내기({ pw: pw, action: 'finish', photos: 남길것, cat: 항목 });
@@ -575,6 +815,7 @@ $('#go').addEventListener('click', async () => {
   const 말 = [];
   if (성공) 말.push(성공 + '장 올렸습니다.');
   if (실패) 말.push(실패 + '장 실패 — ' + (실패사유 || '사유 알 수 없음'));
+  if (경고) 말.push('(' + 경고 + ')');
   if (성공 && !실패) 말.push('갤러리에서 바로 확인하실 수 있습니다.');
   $('#status').className = 'note ' + (실패 ? 'warn' : 'ok');
   $('#status').textContent = 말.join(' ');
