@@ -101,6 +101,17 @@ class MainActivity : AppCompatActivity() {
             "이 둘을 안 하면 며칠 뒤 조용히 멈춥니다. 안드로이드가 백그라운드 앱을 정리하기 때문입니다.",
             12f, ink3, top = 8
         ))
+
+        val sound = Button(this).apply {
+            text = "알림 소리 바꾸기"
+            setOnClickListener { openChannelSettings() }
+        }
+        card.addView(sound)
+        card.addView(text(
+            "일감이 걸리면 알람 소리로 울리고 잠금화면에도 내용이 보입니다. " +
+                "소리가 부담스러우면 위에서 바꾸세요.",
+            12f, ink3, top = 8
+        ))
         root.addView(card)
     }
 
@@ -216,6 +227,23 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(action))
         } catch (e: Exception) {
             startActivity(Intent(Settings.ACTION_SETTINGS))
+        }
+    }
+
+    /** 알림 소리·진동은 안드로이드 설정에서만 바꿀 수 있다. 그 화면으로 바로 보내준다. */
+    private fun openChannelSettings() {
+        try {
+            val i = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                .putExtra(Settings.EXTRA_CHANNEL_ID, AlertListenerService.CHANNEL)
+            startActivity(i)
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName))
+            } catch (e2: Exception) {
+                startActivity(Intent(Settings.ACTION_SETTINGS))
+            }
         }
     }
 
