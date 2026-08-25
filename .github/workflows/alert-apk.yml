@@ -1,0 +1,45 @@
+name: 큰길행사알림 APK 만들기
+
+# 안드로이드 스튜디오를 깔지 않고 여기서 APK 를 만든다.
+# 다 만들어지면 Actions 탭의 실행 기록 맨 아래 Artifacts 에서 내려받으면 된다.
+
+on:
+  workflow_dispatch:            # Actions 탭에서 손으로 실행
+  push:
+    branches: [main]
+    paths:
+      - 'keungil-alert/**'
+      - '.github/workflows/alert-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 자바 준비
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 안드로이드 SDK 준비
+        uses: android-actions/setup-android@v3
+
+      - name: 그레이들 준비
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: APK 만들기
+        working-directory: keungil-alert
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: APK 올리기
+        uses: actions/upload-artifact@v4
+        with:
+          name: 큰길행사알림-apk
+          path: keungil-alert/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.KeungilAlert" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:colorBackground">#12100C</item>
+        <item name="android:textColorPrimary">#F6F1E7</item>
+        <item name="android:windowBackground">#12100C</item>
+    </style>
+</resources>
