@@ -1,7 +1,9 @@
 package com.brizymedia.keungilalert
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var root: LinearLayout
     private lateinit var statusText: TextView
     private lateinit var statusBtn: Button
+    private lateinit var notifyBtn: Button
     private lateinit var hitBox: LinearLayout
     private lateinit var countText: TextView
 
@@ -52,11 +55,32 @@ class MainActivity : AppCompatActivity() {
         scroll.addView(root)
         setContentView(scroll)
 
+        // 서비스가 아직 안 켜졌어도 채널이 있어야 설정 화면이 제대로 열린다
+        AlertListenerService.ensureChannel(this)
+
         header()
         statusCard()
         jobSection()
         regionSection()
         hitSection()
+
+        askNotificationPermission()
+    }
+
+    /**
+     * 안드로이드 13부터는 앱이 알림을 띄우는 데도 허락이 필요하다.
+     * 이걸 안 받으면 카톡 알림은 잘 읽으면서 정작 우리 알림만 안 뜬다.
+     */
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT < 33) return
+        val granted = ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") ==
+            PackageManager.PERMISSION_GRANTED
+        if (!granted) requestPermissions(arrayOf("android.permission.POST_NOTIFICATIONS"), 100)
+    }
+
+    override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, results: IntArray) {
+        super.onRequestPermissionsResult(code, perms, results)
+        refreshStatus()
     }
 
     override fun onResume() {
@@ -102,15 +126,24 @@ class MainActivity : AppCompatActivity() {
             12f, ink3, top = 8
         ))
 
-        val sound = Button(this).apply {
-            text = "알림 소리 바꾸기"
+        notifyBtn = Button(this).apply {
+            text = "알림 띄우기 켜기"
             setOnClickListener { openChannelSettings() }
         }
-        card.addView(sound)
+        card.addView(notifyBtn)
         card.addView(text(
             "일감이 걸리면 알람 소리로 울리고 잠금화면에도 내용이 보입니다. " +
                 "소리가 부담스러우면 위에서 바꾸세요.",
             12f, ink3, top = 8
+        ))
+
+        card.addView(Button(this).apply {
+            text = "시험 알림 보내기"
+            setOnClickListener { testNotify() }
+        })
+        card.addView(text(
+            "눌러서 알림이 뜨면 띄우기 쪽은 정상입니다. 안 뜨면 위 ②를 켜주세요.",
+            12f, ink3, top = 6
         ))
         root.addView(card)
     }
@@ -179,11 +212,43 @@ class MainActivity : AppCompatActivity() {
 
     // ── 갱신 ───────────────────────────────────────
 
+    /**
+     * 막히는 곳이 둘이라 따로 보여준다.
+     *   읽기 — 알림 접근 권한. 없으면 카톡 알림을 아예 못 본다.
+     *   띄우기 — 알림 표시 허용 + 채널이 꺼졌는지. 없으면 읽어도 못 울린다.
+     */
     private fun refreshStatus() {
-        val on = isListenerEnabled()
-        statusText.text = if (on) "● 지켜보는 중입니다" else "● 아직 안 켜졌습니다"
-        statusText.setTextColor(if (on) good else bad)
-        statusBtn.text = if (on) "알림 접근 설정 열기" else "알림 접근 권한 켜기"
+        val 읽기 = isListenerEnabled()
+        val 띄우기 = canPostNotifications()
+        val 채널 = channelOn()
+
+        val 줄 = StringBuilder()
+        줄.append(if (읽기) "● 카톡 알림 읽기 — 켜짐\n" else "● 카톡 알림 읽기 — 꺼짐\n")
+        줄.append(if (띄우기) "● 알림 띄우기 — 켜짐\n" else "● 알림 띄우기 — 꺼짐\n")
+        줄.append(if (채널) "● 일감 알림 채널 — 켜짐" else "● 일감 알림 채널 — 차단됨")
+
+        val 다됨 = 읽기 && 띄우기 && 채널
+        statusText.text = 줄.toString()
+        statusText.setTextColor(if (다됨) good else bad)
+
+        statusBtn.text = if (읽기) "알림 접근 설정 열기" else "① 카톡 알림 읽기 켜기"
+        notifyBtn.text = if (띄우기 && 채널) "알림 소리 바꾸기" else "② 알림 띄우기 켜기"
+    }
+
+    private fun canPostNotifications(): Boolean {
+        if (Build.VERSION.SDK_INT < 33) {
+            val nm = getSystemService(NotificationManager::class.java)
+            return nm?.areNotificationsEnabled() ?: true
+        }
+        return ContextCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS") ==
+            PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun channelOn(): Boolean {
+        val nm = getSystemService(NotificationManager::class.java) ?: return true
+        if (!nm.areNotificationsEnabled()) return false
+        val ch = nm.getNotificationChannel(AlertListenerService.CHANNEL) ?: return true
+        return ch.importance != NotificationManager.IMPORTANCE_NONE
     }
 
     private fun refreshCount() {
@@ -211,6 +276,24 @@ class MainActivity : AppCompatActivity() {
             row.addView(text(h.text, 13f, ink2, top = 2))
             hitBox.addView(row)
         }
+    }
+
+    /** 카톡과 상관없이 알림이 뜨는지만 확인한다. 어디서 막혔는지 가리는 데 쓴다. */
+    private fun testNotify() {
+        AlertListenerService.ensureChannel(this)
+        val nm = getSystemService(NotificationManager::class.java) ?: return
+        val n = androidx.core.app.NotificationCompat.Builder(this, AlertListenerService.CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("일감 — 순천 · 음향")
+            .setContentText("10월 21일 순천 축제 음향 오퍼레이터 급구합니다 (시험)")
+            .setStyle(androidx.core.app.NotificationCompat.BigTextStyle()
+                .bigText("10월 21일 순천 축제 음향 오퍼레이터 급구합니다 — 이건 시험 알림입니다. 이게 보이면 알림 띄우기는 정상입니다."))
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
+            .build()
+        nm.notify(999, n)
+        refreshStatus()
     }
 
     // ── 설정 화면으로 보내기 ────────────────────────
