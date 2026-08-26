@@ -33,8 +33,33 @@ object Rules {
         "어느정도", "해보신", "잡으시", "구매", "제외하고", "아닐까요", "잘부탁", "잘 부탁",
         "자기소개", "입장하신", "반갑습니다",
         "필요하시면", "필요 하시면", "필요하신", "필요하시는", "문의주세요", "문의 주세요",
-        "관심부탁", "많은관심", "많은 관심", "준비되어있", "준비된"
+        "관심부탁", "많은관심", "많은 관심", "준비되어있", "준비된",
+        // 부업 · 재택 프로그램 광고. 2026-08-26 실제로 한 건 울렸다.
+        "부업", "재택", "투잡", "부수입", "수익창출", "월수익", "평생이용권",
+        "상위노출", "제휴 마케팅", "제휴마케팅", "리딩방", "원금",
+        "체험단", "강력 추천", "강력추천"
     )
+
+    /**
+     * 짧은 직군어가 엉뚱한 긴 단어 속에 박혀서 울린 적이 있다.
+     * 부'가수'익 · '마이크'로소프트 처럼.
+     * 대조하기 전에 이 말들을 지워서 그런 일을 막는다.
+     */
+    val STUCK = listOf(
+        "부가수익", "추가수당", "추가수수료", "참가수수료", "물가수준", "가수요",
+        "모델하우스", "모델링", "모델명", "수익모델", "비즈니스모델",
+        "부스터", "부스트", "부스러", "부스럭",
+        "손목밴드", "헤어밴드", "고무밴드", "밴드에이드",
+        "마이크로", "중계기", "중계무역", "부동산중계",
+        "스텝바이스텝", "게임콘솔"
+    )
+
+    /** 붙어버린 말을 공백으로 바꿔 없앤다 */
+    private fun deStuck(text: String): String {
+        var t = text
+        for (w in STUCK) if (t.contains(w, ignoreCase = true)) t = t.replace(w, " ", ignoreCase = true)
+        return t
+    }
 
     data class Job(val id: String, val group: String, val label: String, val words: List<String>)
 
@@ -53,7 +78,7 @@ object Rules {
                 "댄스팀", "치어", "난타", "공연팀", "퓨전")),
         Job("helper", "공연 · 진행", "도우미 · 모델",
             listOf("도우미", "행사도우미", "부스도우미", "내레이터모델", "나레이터모델", "모델",
-                "안내요원", "진행요원", "리셉션", "스탭", "스태프", "서포터")),
+                "안내요원", "진행요원", "리셉션", "스탭", "스텝", "스태프", "서포터")),
 
         Job("sound", "장비 · 기술", "음향 · 무대",
             listOf("음향", "스피커", "마이크", "무선마이크", "믹서", "콘솔", "라인어레이", "앰프", "모니터스피커",
@@ -143,10 +168,12 @@ object Rules {
         val bad = found(text, EXCLUDE)
         if (bad.isNotEmpty()) return Verdict(false, "제외어: " + bad.first())
 
-        val sig = found(text, SIGNAL)
+        val clean = deStuck(text)
+
+        val sig = found(clean, SIGNAL)
         if (sig.isEmpty()) return Verdict(false, "구인 신호어 없음")
 
-        val job = found(text, jobWords)
+        val job = found(clean, jobWords)
         if (job.isEmpty()) return Verdict(false, "직군어 없음")
 
         if (myCities.isNotEmpty()) {
