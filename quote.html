@@ -120,6 +120,11 @@
     }
     .fld-grid input::placeholder{ color:#52525b; }
     .fld-grid input:focus{ outline:none;border-color:rgba(245,158,11,.65);background:rgba(245,158,11,.07); }
+    /* 날짜 칸 — 브라우저가 그리는 달력 아이콘이 기본 검정이라 어두운 바탕에서 안 보였다.
+       color-scheme 을 어둡게 주면 아이콘이 흰색이 되고 달력 창까지 같이 어두워진다. */
+    .fld-grid input[type="date"]{ color-scheme:dark; }
+    .fld-grid input[type="date"]::-webkit-calendar-picker-indicator{ opacity:.85;cursor:pointer; }
+    .fld-grid input[type="date"]::-webkit-calendar-picker-indicator:hover{ opacity:1; }
 
     .cat-group + .cat-group{ margin-top:1.6rem; }
     .cat-title{ font-size:.72rem;font-weight:700;letter-spacing:.16em;color:#FBBF24;margin-bottom:.7rem; }
@@ -523,6 +528,10 @@
         <iconify-icon icon="solar:link-round-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
         견적서 링크 복사
       </button>
+      <button type="button" class="btn-ghost" id="btn-box" style="padding:.85rem 1.5rem;font-size:.9rem;">
+        <iconify-icon icon="solar:folder-with-files-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
+        견적서 저장함<span id="box-count" style="color:#71717a;font-weight:600;"></span>
+      </button>
       <button type="button" class="btn-primary" id="btn-send" style="padding:.85rem 2rem;font-size:.95rem;">
         <iconify-icon icon="solar:plain-bold" style="font-size:18px;"></iconify-icon>
         이 견적으로 문의 보내기
@@ -576,6 +585,40 @@
     큰길이벤트기획 · gilcaro@naver.com · 전남광주통합특별시 광양시 광양읍 강변동길 1
   </div>
 </footer>
+
+<div id="box-modal" class="no-print" hidden
+     style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
+            display:flex;align-items:center;justify-content:center;padding:1.25rem;">
+  <div class="glass" style="max-width:34rem;width:100%;border-radius:1.15rem;padding:1.6rem 1.5rem;
+                            max-height:88vh;overflow:auto;border:1px solid rgba(245,158,11,.28);">
+    <div style="display:flex;align-items:center;gap:.5rem;font-size:1.05rem;font-weight:800;">
+      <iconify-icon icon="solar:folder-with-files-bold" style="font-size:21px;color:#FCD34D;"></iconify-icon>
+      견적서 저장함
+    </div>
+    <p style="margin-top:.7rem;font-size:.84rem;color:#a1a1aa;line-height:1.8;">
+      만든 견적서를 이 기기에 담아둡니다. 나중에 불러와서 고쳐 쓰시면 됩니다.
+    </p>
+
+    <button type="button" class="btn-primary" id="box-save"
+            style="width:100%;margin-top:1rem;padding:.9rem 1rem;font-size:.95rem;justify-content:center;">
+      <iconify-icon icon="solar:diskette-bold" style="font-size:18px;"></iconify-icon>
+      지금 이 견적서 담기
+    </button>
+
+    <div id="box-list" style="margin-top:1.2rem;display:flex;flex-direction:column;gap:.6rem;"></div>
+
+    <div style="margin-top:1.3rem;display:flex;gap:.6rem;">
+      <button type="button" class="btn-ghost" id="box-close"
+              style="flex:1;padding:.8rem 1rem;font-size:.9rem;justify-content:center;">닫기</button>
+    </div>
+
+    <p style="margin-top:1rem;font-size:.76rem;color:#52525b;line-height:1.75;">
+      <iconify-icon icon="solar:info-circle-bold" style="font-size:14px;vertical-align:-2px;"></iconify-icon>
+      이 브라우저에만 담깁니다. 다른 기기에서는 보이지 않고, 사용 기록을 지우면 함께 지워집니다.
+      오래 두실 견적서는 <strong style="color:#71717a;">인쇄 · PDF 저장</strong>을 함께 해두세요.
+    </p>
+  </div>
+</div>
 
 <div id="send-modal" class="no-print" hidden
      style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
@@ -1477,6 +1520,137 @@ $('#admin-clip').addEventListener('click', async () => {
   if (!내용 || !내용.trim()) { toast('복사해 둔 내용이 없습니다'); return; }
   견적서불러오기(내용.trim());
 });
+
+/* ── 견적서 저장함 ────────────────────────────────────────────────
+   만든 견적서를 이 기기에만 담아둔다. 서버로는 아무것도 나가지 않는다.
+   담는 것은 encodeState() 가 만드는 짧은 코드 하나뿐이라, 불러오면 그대로 되살아난다. */
+const 저장키 = 'keungil-quote-box-v1';
+const 저장한도 = 50;
+
+function 저장목록() {
+  try {
+    const v = JSON.parse(localStorage.getItem(저장키) || '[]');
+    return Array.isArray(v) ? v : [];
+  } catch (e) { return []; }
+}
+
+function 저장목록쓰기(목록) {
+  try { localStorage.setItem(저장키, JSON.stringify(목록.slice(0, 저장한도))); return true; }
+  catch (e) { return false; }
+}
+
+function 저장개수표시() {
+  const n = 저장목록().length;
+  $('#box-count').textContent = n ? ' ' + n : '';
+}
+
+function 담은때(t) {
+  const d = new Date(t);
+  if (isNaN(d)) return '';
+  const 두자리 = (x) => String(x).padStart(2, '0');
+  return d.getFullYear() + '.' + 두자리(d.getMonth() + 1) + '.' + 두자리(d.getDate()) +
+         ' ' + 두자리(d.getHours()) + ':' + 두자리(d.getMinutes());
+}
+
+function 견적서담기() {
+  const 코드 = encodeState();
+  const 목록 = 저장목록();
+  const 이미 = 목록.findIndex((q) => q.코드 === 코드);
+  목록.unshift({
+    코드,
+    제목:   $('#q-title').value.trim(),
+    고객:   [$('#q-org').value.trim(), $('#q-name').value.trim()].filter(Boolean).join(' · '),
+    행사일: $('#q-date').value,
+    금액:   $('#s-total').textContent.trim(),
+    항목:   rows.length,
+    때:     Date.now(),
+  });
+  if (이미 >= 0) 목록.splice(이미 + 1, 1);   // 같은 견적서는 하나만 — 새로 담은 것을 남긴다
+
+  if (!저장목록쓰기(목록)) { toast('이 브라우저에서 저장이 막혀 있습니다'); return; }
+  저장개수표시();
+  저장함그리기();
+  toast(이미 >= 0 ? '이미 담아둔 견적서입니다 · 맨 위로 올렸습니다' : '견적서를 담았습니다');
+}
+
+function 저장함그리기() {
+  const 목록 = 저장목록();
+  const box = $('#box-list');
+
+  if (!목록.length) {
+    box.innerHTML =
+      '<div style="padding:1.5rem 1rem;text-align:center;font-size:.86rem;color:#52525b;' +
+      'border:1px dashed rgba(255,255,255,.12);border-radius:.8rem;line-height:1.8;">' +
+      '담아둔 견적서가 없습니다.<br>위 <strong style="color:#71717a;">담기</strong> 를 누르면 여기 쌓입니다.</div>';
+    return;
+  }
+
+  box.innerHTML = 목록.map((q, i) =>
+    '<div style="display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem;border-radius:.8rem;' +
+        'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:.9rem;font-weight:700;color:#e4e4e7;white-space:nowrap;' +
+            'overflow:hidden;text-overflow:ellipsis;">' + esc(q.제목 || '이름 없는 견적서') + '</div>' +
+        '<div style="margin-top:.25rem;font-size:.77rem;color:#a1a1aa;white-space:nowrap;' +
+            'overflow:hidden;text-overflow:ellipsis;">' +
+            [esc(q.고객), esc(q.행사일),
+             q.항목 ? '항목 ' + q.항목 + '건' : '',
+             /* 단가가 전부 「협의」면 합계가 0원으로 나온다. 그럴 땐 금액을 아예 빼는 게 낫다 */
+             (+String(q.금액 || '').replace(/[^0-9]/g, '') > 0) ? esc(q.금액) : ''
+            ].filter(Boolean).join(' · ') + '</div>' +
+        '<div style="margin-top:.2rem;font-size:.72rem;color:#52525b;">' + 담은때(q.때) + ' 담음</div>' +
+      '</div>' +
+      '<button type="button" class="btn-ghost box-open" data-i="' + i + '" ' +
+          'style="padding:.5rem .85rem;font-size:.8rem;flex:none;">불러오기</button>' +
+      '<button type="button" class="btn-ghost box-del" data-i="' + i + '" title="지우기" ' +
+          'style="padding:.5rem .6rem;font-size:.8rem;flex:none;color:#a1a1aa;">' +
+        '<iconify-icon icon="solar:trash-bin-trash-bold" style="font-size:16px;"></iconify-icon></button>' +
+    '</div>').join('');
+}
+
+$('#btn-box').addEventListener('click', () => { 저장함그리기(); $('#box-modal').hidden = false; });
+$('#box-close').addEventListener('click', () => { $('#box-modal').hidden = true; });
+$('#box-modal').addEventListener('click', (e) => { if (e.target.id === 'box-modal') $('#box-modal').hidden = true; });
+$('#box-save').addEventListener('click', 견적서담기);
+
+$('#box-list').addEventListener('click', (e) => {
+  const 열기   = e.target.closest('.box-open');
+  const 지우기 = e.target.closest('.box-del');
+  const 목록   = 저장목록();
+
+  if (열기) {
+    const q = 목록[+열기.dataset.i];
+    if (q && decodeState(q.코드)) {
+      render();
+      관리자표시();
+      $('#box-modal').hidden = true;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toast('견적서를 불러왔습니다');
+    } else {
+      toast('이 견적서를 불러오지 못했습니다');
+    }
+    return;
+  }
+
+  if (지우기) {
+    /* 잘못 눌러 날리는 일이 없게 두 번 눌러야 지워진다 */
+    if (지우기.dataset.sure !== '1') {
+      지우기.dataset.sure = '1';
+      지우기.innerHTML = '지울까요?';
+      지우기.style.color = '#FCA5A5';
+      clearTimeout(지우기._t);
+      지우기._t = setTimeout(() => { 저장함그리기(); }, 3000);
+      return;
+    }
+    목록.splice(+지우기.dataset.i, 1);
+    저장목록쓰기(목록);
+    저장개수표시();
+    저장함그리기();
+    toast('지웠습니다');
+  }
+});
+
+저장개수표시();
 
 function 관리자표시() {
   if (IS_ADMIN || IS_SENT) {

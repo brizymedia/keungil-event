@@ -56,6 +56,11 @@
   .in:focus{ border-color:rgba(245,158,11,.6); }
   .in::placeholder{ color:#6B6675; }
   textarea.in{ resize:vertical;min-height:70px;line-height:1.55; }
+  /* 날짜 칸 — 브라우저가 그리는 달력 아이콘이 기본 검정이라 어두운 바탕에서 안 보였다.
+     color-scheme 을 어둡게 주면 아이콘이 흰색이 되고 달력 창까지 같이 어두워진다. */
+  .in[type="date"]{ color-scheme:dark; }
+  .in[type="date"]::-webkit-calendar-picker-indicator{ opacity:.85;cursor:pointer; }
+  .in[type="date"]::-webkit-calendar-picker-indicator:hover{ opacity:1; }
   .row2{ display:grid;grid-template-columns:1fr 1fr;gap:.5rem; }
   .row3{ display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem; }
   .hint{ font-size:.74rem;color:#8A8494;line-height:1.6; }
