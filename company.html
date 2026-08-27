@@ -66,7 +66,33 @@
   .brand{ display:flex;align-items:center;gap:.5rem;text-decoration:none;font-weight:800;letter-spacing:-.02em;font-size:.95rem; }
   .brand img{ height:1.8rem;filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(245,158,11,.5)); }
   .topnav a{ color:#B9B3C2;text-decoration:none;font-size:.875rem;margin-left:1.4rem; } .topnav a:hover{ color:#fff; }
-  @media (max-width:700px){ .topnav a{ margin-left:.9rem;font-size:.8rem; } .topnav a.hide-sm{ display:none; } }
+
+  /* 세줄 메뉴 — 폰에서 다섯 개를 다 늘어놓으면 회사 이름이 눌려 깨진다.
+     그래서 폰에서는 메뉴를 접고 세줄 단추 안으로 넣는다. */
+  .burger{
+    display:none;flex-direction:column;justify-content:center;gap:5px;
+    width:2.4rem;height:2.4rem;padding:0 .5rem;border:0;background:transparent;cursor:pointer;flex:none;
+  }
+  .burger span{
+    display:block;height:2px;width:100%;border-radius:2px;background:#E7E4EC;
+    transition:transform .28s ease,opacity .2s ease;
+  }
+  .burger[aria-expanded="true"] span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .burger[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+  .burger[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+  .burger:focus-visible{ outline:2px solid var(--amber);outline-offset:3px;border-radius:.5rem; }
+
+  #nav-menu{ border-top:1px solid rgba(255,255,255,.08);padding:.4rem .9rem .9rem; }
+  #nav-menu a{ display:block;padding:.85rem .8rem;border-radius:.7rem;color:#E7E4EC;text-decoration:none;font-size:1rem;font-weight:600; }
+  #nav-menu a:hover,#nav-menu a:focus-visible{ background:rgba(245,158,11,.14);color:#fff;outline:none; }
+
+  @media (max-width:700px){
+    .topnav{ display:none; }
+    .burger{ display:flex; }
+  }
+  /* 열어둔 채 화면이 넓어져도 남지 않게 */
+  @media (min-width:701px){ #nav-menu{ display:none!important; } }
+  @media (prefers-reduced-motion:reduce){ .burger span{ transition:none; } }
 
   .btn{ display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.5rem;border-radius:9999px;font-weight:700;font-size:.9rem;text-decoration:none;transition:all .3s;border:1px solid transparent;cursor:pointer;white-space:nowrap; }
   .btn-primary{ background:var(--amber);color:#0a0a0a;box-shadow:0 6px 24px -8px rgba(245,158,11,.5); } .btn-primary:hover{ background:var(--amber-2);transform:translateY(-1px); }
@@ -159,12 +185,25 @@
   <div class="topbar-in">
     <a class="brand" href="index.html"><img src="logo-kgm-transparent.png" alt="큰길이벤트기획"><span>큰길이벤트기획</span></a>
     <nav class="topnav">
-      <a href="index.html#services" class="hide-sm">서비스</a>
-      <a href="index.html#gear" class="hide-sm">보유장비</a>
+      <a href="index.html#services">서비스</a>
+      <a href="index.html#gear">보유장비</a>
       <a href="gallery.html">갤러리</a>
       <a href="quote.html">견적</a>
       <a href="tel:15337295" style="color:var(--amber-2);font-weight:700;">1533-7295</a>
     </nav>
+    <button type="button" id="nav-burger" class="burger"
+            aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div id="nav-menu" hidden>
+    <a href="index.html">홈</a>
+    <a href="index.html#services">서비스</a>
+    <a href="index.html#gear">보유장비</a>
+    <a href="gallery.html">갤러리</a>
+    <a href="/stories/">행사 이야기</a>
+    <a href="quote.html">견적 · 문의</a>
+    <a href="tel:15337295" style="color:var(--amber-2);font-weight:800;">1533-7295 전화하기</a>
   </div>
 </div>
 
@@ -301,5 +340,33 @@
   주식회사 브리지미디어 (큰길이벤트기획) · 대표 김동길 · 사업자등록번호 813-81-02252 · 전남광주통합특별시 광양시 광양읍 강변동길 1, 2층 · <a href="tel:15337295">1533-7295</a> · <a href="mailto:gilcaro@naver.com">gilcaro@naver.com</a><br>
   <a href="index.html">홈</a> · <a href="index.html#gear">보유 장비</a> · <a href="index.html#record">행사 약력</a> · <a href="areas.html">서비스 지역</a> · <a href="gallery.html">갤러리</a> · <a href="quote.html">자동 견적서</a>
 </footer>
+
+<script>
+/* ── 세줄 메뉴 ── */
+(function () {
+  var 단추 = document.getElementById('nav-burger');
+  var 판   = document.getElementById('nav-menu');
+  if (!단추 || !판) return;
+
+  function 열기(펼침) {
+    판.hidden = !펼침;
+    단추.setAttribute('aria-expanded', String(펼침));
+    단추.setAttribute('aria-label', 펼침 ? '메뉴 닫기' : '메뉴 열기');
+  }
+
+  단추.addEventListener('click', function (e) { e.stopPropagation(); 열기(판.hidden); });
+  판.addEventListener('click', function (e) { if (e.target.closest('a')) 열기(false); });
+  document.addEventListener('click', function (e) {
+    if (!판.hidden && !판.contains(e.target) && e.target !== 단추) 열기(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !판.hidden) { 열기(false); 단추.focus(); }
+  });
+
+  var 넓은화면 = window.matchMedia('(min-width:701px)');
+  var 정리 = function () { if (넓은화면.matches) 열기(false); };
+  넓은화면.addEventListener ? 넓은화면.addEventListener('change', 정리) : 넓은화면.addListener(정리);
+})();
+</script>
 </body>
 </html>

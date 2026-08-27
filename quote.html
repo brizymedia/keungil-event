@@ -84,6 +84,34 @@
     .nav-links{ display:none; }
     @media (min-width:768px){ .nav-links{ display:flex; } }
 
+    /* 세줄 메뉴 — 폰에서는 메뉴가 가로로 들어가지 않아 아예 숨겨져 있었다. */
+    .burger{
+      display:flex;flex-direction:column;justify-content:center;gap:5px;
+      width:2.5rem;height:2.5rem;padding:0 .55rem;border:0;background:transparent;cursor:pointer;flex:none;
+    }
+    .burger span{
+      display:block;height:2px;width:100%;border-radius:2px;background:#e4e4e7;
+      transition:transform .28s ease,opacity .2s ease;
+    }
+    .burger[aria-expanded="true"] span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+    .burger[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+    .burger[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+    .burger:focus-visible{ outline:2px solid #F59E0B;outline-offset:3px;border-radius:.5rem; }
+    @media (min-width:768px){ .burger{ display:none; } }
+
+    #nav-menu{
+      border-top:1px solid rgba(255,255,255,.07);
+      padding:.5rem .9rem 1rem;
+    }
+    #nav-menu a{
+      display:block;padding:.85rem .8rem;border-radius:.7rem;
+      text-decoration:none;color:#e4e4e7;font-size:1rem;font-weight:600;
+    }
+    #nav-menu a:hover,#nav-menu a:focus-visible{ background:rgba(245,158,11,.14);color:#fff;outline:none; }
+    #nav-menu a.on{ color:#FBBF24; }
+    @media (min-width:768px){ #nav-menu{ display:none!important; } }
+    @media (prefers-reduced-motion:reduce){ .burger span{ transition:none; } }
+
     .block-title{
       font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:1rem;
       display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
@@ -334,10 +362,25 @@
       <a href="index.html#gallery" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1aa'">갤러리</a>
       <a href="quote.html" style="color:#FBBF24;font-weight:700;text-decoration:none;">견적</a>
     </nav>
-    <a href="index.html#contact" class="btn-primary" style="padding:.6rem 1.15rem;font-size:.85rem;">
-      <iconify-icon icon="solar:phone-calling-bold" style="font-size:16px;"></iconify-icon>
-      문의하기
-    </a>
+    <div style="display:flex;align-items:center;gap:.4rem;">
+      <a href="index.html#contact" class="btn-primary" style="padding:.6rem 1.15rem;font-size:.85rem;">
+        <iconify-icon icon="solar:phone-calling-bold" style="font-size:16px;"></iconify-icon>
+        문의하기
+      </a>
+      <button type="button" id="nav-burger" class="burger no-print"
+              aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div id="nav-menu" class="no-print" hidden>
+    <a href="index.html">홈</a>
+    <a href="index.html#services">서비스</a>
+    <a href="index.html#portfolio">행사이력</a>
+    <a href="index.html#gallery">갤러리</a>
+    <a href="/stories/">행사 이야기</a>
+    <a href="quote.html" class="on">견적</a>
   </div>
 </header>
 
@@ -1681,6 +1724,33 @@ if (물음표코드) {
 }
 관리자표시();
 render();
+
+/* ── 세줄 메뉴 ── */
+(function () {
+  const 단추 = $('#nav-burger');
+  const 판   = $('#nav-menu');
+  if (!단추 || !판) return;
+
+  function 열기(펼침) {
+    판.hidden = !펼침;
+    단추.setAttribute('aria-expanded', String(펼침));
+    단추.setAttribute('aria-label', 펼침 ? '메뉴 닫기' : '메뉴 열기');
+  }
+
+  단추.addEventListener('click', (e) => { e.stopPropagation(); 열기(판.hidden); });
+  판.addEventListener('click', (e) => { if (e.target.closest('a')) 열기(false); });
+  document.addEventListener('click', (e) => {
+    if (!판.hidden && !판.contains(e.target) && e.target !== 단추) 열기(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !판.hidden) { 열기(false); 단추.focus(); }
+  });
+
+  /* 폰에서 열어둔 채 화면을 넓히면 남아 있으면 안 된다 */
+  const 넓은화면 = window.matchMedia('(min-width:768px)');
+  const 정리 = () => { if (넓은화면.matches) 열기(false); };
+  넓은화면.addEventListener ? 넓은화면.addEventListener('change', 정리) : 넓은화면.addListener(정리);
+})();
 </script>
 
 </body>

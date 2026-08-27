@@ -123,6 +123,38 @@
     nav.on-light .nav-brand{ color:#16141C; }
     nav.on-light .nav-logo{ filter:none; }
 
+    /* 세줄 메뉴 — 폰에서는 메뉴 일곱 개가 가로로 들어가지 않는다.
+       768px 아래에서만 나오고, 눌러야 펼쳐진다. */
+    .burger{
+      pointer-events:auto;display:none;flex-direction:column;justify-content:center;gap:5px;
+      width:2.5rem;height:2.5rem;padding:0 .55rem;border:0;background:transparent;cursor:pointer;
+    }
+    .burger span{
+      display:block;height:2px;width:100%;border-radius:2px;background:#E7E4EC;
+      transition:transform .28s ease,opacity .2s ease,background .35s ease;
+    }
+    nav.on-light .burger span{ background:#16141C; }
+    .burger[aria-expanded="true"] span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+    .burger[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+    .burger[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+    .burger:focus-visible{ outline:2px solid #F59E0B;outline-offset:3px;border-radius:.5rem; }
+
+    #nav-menu{
+      pointer-events:auto;width:100%;max-width:56rem;margin-top:.55rem;
+      border-radius:1.1rem;padding:.5rem;overflow:hidden;
+    }
+    #nav-menu a{
+      display:block;padding:.85rem 1rem;border-radius:.7rem;
+      text-decoration:none;color:#E7E4EC;font-size:1rem;font-weight:600;
+    }
+    #nav-menu a:hover,#nav-menu a:focus-visible{ background:rgba(245,158,11,.14);color:#fff;outline:none; }
+    nav.on-light #nav-menu a{ color:#16141C; }
+    nav.on-light #nav-menu a:hover,nav.on-light #nav-menu a:focus-visible{ background:rgba(245,158,11,.18); }
+    @media (max-width:767.98px){ .burger{ display:flex; } }
+    /* 열어둔 채로 화면이 넓어져도 남지 않게 — 자바스크립트에만 기대지 않는다 */
+    @media (min-width:768px){ #nav-menu{ display:none!important; } }
+    @media (prefers-reduced-motion:reduce){ .burger span{ transition:none; } }
+
     /* ── Icon badge (중립) ── */
     .icon-badge{
       width:2.75rem;height:2.75rem;border-radius:.875rem;
@@ -409,7 +441,7 @@
 <!-- ══════════════════════════════════════════════════
      NAV
 ══════════════════════════════════════════════════ -->
-<nav id="site-nav" class="fixed top-4 left-0 right-0 z-40 flex justify-center px-4">
+<nav id="site-nav" class="fixed top-4 left-0 right-0 z-40 flex flex-col items-center px-4">
   <div id="nav-pill" class="glass rounded-full px-5 py-3 flex items-center justify-between w-full max-w-4xl">
     <a href="#hero" style="display:flex;align-items:center;gap:.5rem;text-decoration:none;">
       <img src="logo-kgm-transparent.png" alt="큰길이벤트기획" class="nav-logo">
@@ -426,7 +458,21 @@
     </div>
     <div style="display:flex;align-items:center;gap:.5rem;">
       <a href="#contact" class="btn-primary" style="padding:.55rem 1.25rem;font-size:.875rem;">무료 상담</a>
+      <button type="button" id="nav-burger" class="burger"
+              aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </div>
+
+  <div id="nav-menu" class="glass" hidden>
+    <a href="company.html">회사소개</a>
+    <a href="#services">서비스</a>
+    <a href="#gear">보유장비</a>
+    <a href="#record">행사약력</a>
+    <a href="#gallery">갤러리</a>
+    <a href="/stories/">행사 이야기</a>
+    <a href="quote.html">견적 · 문의</a>
   </div>
 </nav>
 
@@ -1086,6 +1132,39 @@
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
   },{ threshold:.1, rootMargin:'0px 0px -40px 0px' });
   els.forEach(el=>obs.observe(el));
+})();
+
+/* ── 세줄 메뉴 ── */
+(function(){
+  const 단추 = document.getElementById('nav-burger');
+  const 판  = document.getElementById('nav-menu');
+  if(!단추 || !판) return;
+
+  function 열기(펼침){
+    판.hidden = !펼침;
+    단추.setAttribute('aria-expanded', String(펼침));
+    단추.setAttribute('aria-label', 펼침 ? '메뉴 닫기' : '메뉴 열기');
+  }
+
+  단추.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    열기(판.hidden);
+  });
+
+  /* 메뉴를 고르면 닫는다 — 같은 페이지 안 앵커라 안 닫으면 계속 덮고 있다 */
+  판.addEventListener('click', (e)=>{ if(e.target.closest('a')) 열기(false); });
+
+  document.addEventListener('click', (e)=>{
+    if(!판.hidden && !판.contains(e.target) && e.target !== 단추) 열기(false);
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && !판.hidden){ 열기(false); 단추.focus(); }
+  });
+
+  /* 폰에서 열어둔 채 화면을 넓히면 남아 있으면 안 된다 */
+  const 넓은화면 = window.matchMedia('(min-width:768px)');
+  const 정리 = () => { if(넓은화면.matches) 열기(false); };
+  넓은화면.addEventListener ? 넓은화면.addEventListener('change', 정리) : 넓은화면.addListener(정리);
 })();
 
 /* ── Nav: 밝은 섹션 위에서는 밝은 네비로 ── */
