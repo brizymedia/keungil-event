@@ -150,7 +150,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun jobSection() {
         root.addView(sectionTitle("내 직군"))
-        root.addView(text("여러 개 고를 수 있습니다.", 13f, ink2, top = 2))
+        root.addView(text("여러 개 고를 수 있습니다. 길게 누르면 그 직군의 단어가 보입니다.", 13f, ink2, top = 2))
 
         val card = card()
         var lastGroup = ""
@@ -163,16 +163,32 @@ class MainActivity : AppCompatActivity() {
                 grid = GridLayout(this).apply { columnCount = 2 }
                 card.addView(grid)
             }
-            grid?.addView(toggle(job.label, job.id in store.jobIds) { on ->
+            val btn = toggle(job.label, job.id in store.jobIds) { on ->
                 store.jobIds = store.jobIds.toMutableSet().apply { if (on) add(job.id) else remove(job.id) }
                 refreshCount()
-            })
+            }
+            btn.setOnLongClickListener { 단어보기(job); true }
+            grid?.addView(btn)
         }
 
         countText = text("", 12f, ink3, top = 12).apply { gravity = Gravity.CENTER }
         card.addView(countText)
         root.addView(card)
         refreshCount()
+    }
+
+    /** 직군을 길게 누르면 그 안에 무슨 단어가 들어있는지 보여준다.
+     *  「우리 장비 이름이 없네」 를 사장님이 직접 확인할 수 있어야 한다. */
+    private fun 단어보기(job: Rules.Job) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(job.label + " — 단어 " + job.words.size + "개")
+            .setMessage(
+                job.words.joinToString("   ") +
+                    "\n\n이 중 하나라도 글에 있고 구인 신호어(구합니다 · 섭외 · 가능하신…)가 " +
+                    "함께 있어야 울립니다.\n\n빠진 단어가 있으면 알려주세요."
+            )
+            .setPositiveButton("닫기", null)
+            .show()
     }
 
     private fun regionSection() {
