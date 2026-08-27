@@ -37,7 +37,15 @@ object Rules {
         // 부업 · 재택 프로그램 광고. 2026-08-26 실제로 한 건 울렸다.
         "부업", "재택", "투잡", "부수입", "수익창출", "월수익", "평생이용권",
         "상위노출", "제휴 마케팅", "제휴마케팅", "리딩방", "원금",
-        "체험단", "강력 추천", "강력추천"
+        "체험단", "강력 추천", "강력추천",
+        // 온라인 마케팅 대행 광고. 이 방들에 매일 올라온다.
+        "리워드", "실명배포", "비실배포", "유입작업", "플레이스", "총판",
+        "건바이", "월보장", "랜딩페이지", "슬롯", "트래픽", "대행사 모집",
+        // 보험 영업 조직이 방을 잘못 찾아 쓰는 글
+        "보험",
+        // 이미 끝난 건. 「마감」 단독은 안 된다 — "지원 마감 9월 5일" 같은 진짜 글이 있다.
+        "마감하겠습니다", "마감했습니다", "마감되었습니다", "마감됐습니다",
+        "마감합니다", "마감완료", "구했습니다", "구인완료", "모집완료"
     )
 
     /**
@@ -159,9 +167,30 @@ object Rules {
         val places: List<String> = emptyList()
     )
 
+    private fun Char.영문숫자() = this in 'a'..'z' || this in 'A'..'Z' || this in '0'..'9'
+
+    /**
+     * 「MC」가 s**mc**ompany0 · ki**mc**1226 같은 카톡 아이디 속에 박혀 광고가 울린 적이 있다.
+     * 영문·숫자로만 된 말(MC · LED · PTZ · CO2)은 앞뒤가 영문·숫자면 남의 낱말 조각으로 본다.
+     * 한글이 섞인 말은 조사가 붙으므로 이 검사를 하지 않는다 — 「무대에」, 「가수를」.
+     */
+    private fun 낱말로있나(글: String, 말: String): Boolean {
+        var i = 글.indexOf(말)
+        while (i >= 0) {
+            val 앞 = if (i == 0) ' ' else 글[i - 1]
+            val 뒤 = if (i + 말.length >= 글.length) ' ' else 글[i + 말.length]
+            if (!앞.영문숫자() && !뒤.영문숫자()) return true
+            i = 글.indexOf(말, i + 1)
+        }
+        return false
+    }
+
     private fun found(text: String, words: List<String>): List<String> {
         val lower = text.lowercase()
-        return words.filter { lower.contains(it.lowercase()) }
+        return words.filter { w ->
+            val lw = w.lowercase()
+            if (w.all { it.영문숫자() }) 낱말로있나(lower, lw) else lower.contains(lw)
+        }
     }
 
     /**
