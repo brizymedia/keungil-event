@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>큰길행사알림 받기 — 큰길이벤트기획</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12100C; --surface:#1C1913; --line:rgba(246,241,231,.13);
+    --ink:#F6F1E7; --ink2:#B8AF9E; --ink3:#8A8171;
+    --amber:#F5A524; --amber-deep:#C77700;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans KR',system-ui,'Malgun Gothic',sans-serif;
+    word-break:keep-all; line-height:1.75;
+    padding:2.5rem 1.25rem 4rem;
+  }
+  .wrap{ max-width:34rem; margin:0 auto; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:.7rem;
+    font-size:.78rem; font-weight:900; letter-spacing:.18em; color:var(--amber);
+  }
+  .eyebrow::before{ content:''; width:2rem; height:2px; background:var(--amber); }
+
+  h1{ font-size:2rem; font-weight:900; letter-spacing:-.035em; line-height:1.25; margin-top:1rem; }
+  .sub{ color:var(--ink2); font-size:1rem; margin-top:.8rem; }
+
+  .get{
+    display:flex; align-items:center; justify-content:center; gap:.6rem;
+    margin-top:2rem; padding:1.15rem 1.5rem; border-radius:.9rem;
+    background:var(--amber); color:#12100C;
+    font-size:1.1rem; font-weight:900; text-decoration:none;
+    box-shadow:0 10px 30px -12px rgba(245,165,36,.6);
+  }
+  .get:active{ transform:translateY(1px); }
+  .meta{ text-align:center; font-size:.8rem; color:var(--ink3); margin-top:.7rem; }
+
+  h2{
+    font-size:1.05rem; font-weight:900; letter-spacing:-.02em;
+    margin-top:2.6rem; padding-bottom:.6rem; border-bottom:1px solid var(--line);
+  }
+
+  ol{ list-style:none; counter-reset:step; margin-top:1.1rem; display:flex; flex-direction:column; gap:.7rem; }
+  ol li{
+    counter-increment:step; position:relative;
+    background:var(--surface); border:1px solid var(--line); border-radius:.8rem;
+    padding:.95rem 1.1rem .95rem 3.2rem; font-size:.95rem;
+  }
+  ol li::before{
+    content:counter(step); position:absolute; left:.95rem; top:.95rem;
+    width:1.6rem; height:1.6rem; border-radius:.5rem;
+    background:var(--amber); color:#12100C;
+    display:grid; place-items:center; font-size:.85rem; font-weight:900;
+  }
+  ol li b{ color:var(--ink); font-weight:700; }
+  ol li small{ display:block; margin-top:.3rem; font-size:.82rem; color:var(--ink3); }
+
+  .why{
+    margin-top:1.1rem; padding:1.1rem 1.2rem; border-radius:.8rem;
+    background:rgba(245,165,36,.08); border-left:3px solid var(--amber);
+    font-size:.9rem; color:var(--ink2);
+  }
+  .why b{ color:var(--ink); font-weight:700; }
+
+  .foot{
+    margin-top:3rem; padding-top:1.4rem; border-top:1px solid var(--line);
+    font-size:.82rem; color:var(--ink3);
+  }
+  .foot a{ color:var(--amber); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">행사팀 전용</div>
+  <h1>큰길행사알림</h1>
+  <p class="sub">
+    카톡방에 올라오는 글 중에 <b style="color:#F6F1E7;font-weight:700;">내 직군 구인 글만</b> 골라서 울립니다.
+    알림을 누르면 그 카톡방이 바로 열립니다.
+  </p>
+
+  <a class="get" href="keungil-alert.apk" download>
+    앱 내려받기
+  </a>
+  <p class="meta">안드로이드 전용 · 약 3MB</p>
+
+  <h2>깔기 전에 알아두실 것</h2>
+  <div class="why">
+    설치할 때 <b>「기기와 데이터에 위험을 줄 수 있다」</b>는 경고가 뜹니다.
+    이 앱이 <b>카톡 알림을 읽어야</b> 하기 때문이고, 구글이 이런 권한을 쓰는 앱에는 다 띄웁니다.
+    읽은 내용은 <b>폰 밖으로 절대 나가지 않습니다</b> — 서버로 보내는 코드가 아예 없습니다.
+  </div>
+
+  <h2>설치하고 켜기</h2>
+  <ol>
+    <li><b>위 단추로 내려받고, 파일을 눌러 설치합니다.</b>
+      <small>「출처를 알 수 없는 앱」을 허용하겠냐고 물으면 허용해 주세요.</small></li>
+    <li><b>경고가 뜨면 「무시하고 설치」를 누릅니다.</b>
+      <small>그래도 막히면 — 플레이스토어 → 프로필 → Play 프로텍트 → 설정(톱니) → 「유해한 앱 검색」 끄기 → 설치 → 다시 켜기</small></li>
+    <li><b>앱을 열고 ① 알림 읽기 권한을 켭니다.</b>
+      <small>목록에서 「큰길행사알림」을 찾아 켜주세요. 이게 있어야 카톡 알림을 볼 수 있습니다.</small></li>
+    <li><b>② 알림 띄우기 권한을 켭니다.</b>
+      <small>「시험 알림 보내기」를 눌러 알림이 뜨면 제대로 된 것입니다.</small></li>
+    <li><b>내 직군을 고릅니다.</b>
+      <small>직군을 <b>길게 누르면</b> 그 안에 무슨 단어가 들어있는지 보입니다. 빠진 장비 이름이 있으면 알려주세요.</small></li>
+    <li><b>다니는 지역을 고릅니다. 안 고르면 전국이 다 울립니다.</b>
+      <small>처음엔 안 고르고 써보시다가, 너무 자주 울리면 그때 좁히세요.</small></li>
+  </ol>
+
+  <h2>잘 안 될 때</h2>
+  <ol>
+    <li><b>카톡은 오는데 알림이 안 뜬다</b>
+      <small>앱에서 ②가 꺼져 있는 경우가 대부분입니다. 「시험 알림 보내기」로 먼저 확인해 보세요.</small></li>
+    <li><b>며칠 쓰다 보니 조용해졌다</b>
+      <small>배터리 최적화가 앱을 재웠을 수 있습니다. 설정 → 배터리 → 큰길행사알림 → 「제한 없음」으로 바꿔주세요.</small></li>
+    <li><b>엉뚱한 글이 울린다 · 진짜 일감을 놓쳤다</b>
+      <small>그 글을 그대로 보내주시면 기준을 고칩니다. 이렇게 다듬어 온 앱입니다.</small></li>
+  </ol>
+
+  <div class="foot">
+    큰길이벤트기획 · 주식회사 브리지미디어<br>
+    <a href="tel:15337295">1533-7295</a> · <a href="/">큰길이벤트.com</a>
+  </div>
+
+</div>
+</body>
+</html>

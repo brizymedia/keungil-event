@@ -12,7 +12,7 @@ on:
       - '.github/workflows/alert-apk.yml'
 
 permissions:
-  contents: read
+  contents: write        # 홈페이지 /app/ 에 APK 를 커밋해야 한다
 
 jobs:
   build:
@@ -43,3 +43,20 @@ jobs:
           path: keungil-alert/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 90
+
+      # Actions 아티팩트는 깃허브에 로그인해야 받아진다. 폰에서는 그게 안 되므로
+      # 홈페이지 /app/ 에도 같이 올려둔다. robots.txt 로 검색에서는 빼놨다.
+      - name: 홈페이지 /app/ 에 올리기
+        run: |
+          cp keungil-alert/app/build/outputs/apk/debug/app-debug.apk app/keungil-alert.apk
+          if git diff --quiet -- app/keungil-alert.apk; then
+            echo "APK 가 그대로다 — 올릴 것 없음"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/keungil-alert.apk
+          git commit -m "큰길행사알림 APK 새로 올림 ($GITHUB_SHA)"
+          # checkout 은 브랜치가 아니라 SHA 를 받아오므로(detached HEAD)
+          # 그냥 git push 하면 "현재 브랜치가 없다" 며 실패한다.
+          git push origin HEAD:${{ github.ref_name }}

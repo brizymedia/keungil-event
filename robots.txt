@@ -5,6 +5,7 @@ Disallow: /upload.html
 Disallow: /apps-script/
 Disallow: /scripts/
 Disallow: /keungil-alert/
+Disallow: /app/
 
 # AI 검색 크롤러도 허용 (홈페이지 · 지역안내 · 갤러리 · 견적)
 User-agent: GPTBot
