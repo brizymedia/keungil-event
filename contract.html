@@ -277,7 +277,8 @@
       <div><label class="f">주소</label><input class="in" data-k="co.addr"></div>
       <div><label class="f">이메일 (서명본 수신)</label><input class="in" data-k="co.email"></div>
       <div><label class="f">입금 계좌</label><input class="in" data-k="co.bank" placeholder="○○은행 000-000-000000 (예금주)"></div>
-      <div><label class="f">계약 서버 주소 (Apps Script 웹앱 URL)</label><input class="in" data-k="api" placeholder="https://script.google.com/macros/s/…/exec"></div>
+      <div><label class="f">계약 서버 주소 (한 번만 넣으면 기억합니다)</label><input class="in" data-k="api" placeholder="https://script.google.com/macros/s/…/exec">
+        <p id="api-note" style="font-size:.78rem;line-height:1.6;margin-top:7px"></p></div>
       <p class="hint">서버가 있으면 <b>짧은 링크</b> 발급 · 서명본 <b>PDF 자동 생성</b> · 양측 <b>이메일 발송</b> · <b>대장 기록</b>이 됩니다. 없으면 긴 링크로 동작하고 서명본은 메일로만 옵니다. (설치법: apps-script/contract/README.md)</p>
       <button class="btn btn-ghost btn-sm" id="btn-save-co"><iconify-icon icon="solar:diskette-bold"></iconify-icon> 회사 정보 저장</button>
     </div>
@@ -395,6 +396,14 @@ let DOC_ID = '';             // 서버 발급 ID (짧은 링크)
 function loadCo(){ try{ const s=JSON.parse(LS.getItem('kg_contract_co')||'null'); if(s){ Object.assign(C.co, s.co||{}); if(s.api) C.api=s.api; } }catch(e){} }
 function saveCo(){ LS.setItem('kg_contract_co', JSON.stringify({co:C.co, api:C.api})); }
 function apiURL(){ return 서버주소_기본 || C.api || ''; }
+
+/* 서버가 연결됐는지 눈에 보이게. 빠뜨리면 링크가 길어지고 서명 통보가 안 온다. */
+function 서버안내(){
+  const el = $('#api-note'); if(!el) return;
+  el.innerHTML = apiURL()
+    ? '<b style="color:#16a34a">연결됨</b> — 짧은 링크로 발급되고, 고객이 서명하면 PDF가 양쪽 메일로 자동 발송됩니다.'
+    : '<b style="color:#dc2626">비어 있음</b> — 링크가 1,000자 넘게 길어지고, <b>고객이 서명해도 자동으로 알려오지 않습니다.</b>';
+}
 
 /* ── 상태 인코딩 ── */
 const b64u = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -602,6 +611,10 @@ function bindForm(){
       let val = el.type==='checkbox' ? el.checked : el.value;
       if(k==='m.disc'||k==='m.depPct') val = num(val);
       setPath(C,k,val); render(); saveHashDebounced();
+      /* 계약 서버 주소만은 「회사 정보 저장」을 누르지 않아도 바로 기억한다.
+         저장을 깜빡하면 다음 계약서에서 칸이 비고, 그러면 링크가 1,400자로
+         길어지는 데다 고객이 서명해도 자동으로 통보가 오지 않는다. */
+      if(k==='api'){ saveCo(); 서버안내(); }
     });
   });
   renderItems(); renderCancel();
@@ -823,7 +836,7 @@ async function init(){
     MODE='admin'; document.body.classList.add('admin'); $('#admin').hidden=false;
     $('#mode-pill').className='pill admin'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:shield-user-bold"></iconify-icon> 관리자 · 작성 모드';
     if(!C.no) C.no=genNo();
-    bindForm(); render(); saveHashDebounced();
+    bindForm(); render(); saveHashDebounced(); 서버안내();
   } else if(SIGNED && SIGNED.sig){
     MODE='signed'; render();
     $('#mode-pill').className='pill signed'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:check-circle-bold"></iconify-icon> 서명 완료';
