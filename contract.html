@@ -56,6 +56,21 @@
   .in:focus{ border-color:rgba(245,158,11,.6); }
   .in::placeholder{ color:#6B6675; }
   textarea.in{ resize:vertical;min-height:70px;line-height:1.55; }
+
+  /* 계약 종류 · 출연자 구분 고르기 */
+  .kind-pick{ display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.3rem; }
+  .kind-pick button{
+    display:block;text-align:left;padding:.7rem .8rem;border-radius:.65rem;cursor:pointer;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:#B9B3C2;
+    font-family:inherit;transition:border-color .18s,background .18s,color .18s;
+  }
+  .kind-pick button b{ display:block;font-size:.9rem;font-weight:700;color:#E7E4EC; }
+  .kind-pick button small{ display:block;margin-top:.25rem;font-size:.74rem;line-height:1.5;color:#8A8171; }
+  .kind-pick button[aria-pressed="true"]{
+    background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.6);
+  }
+  .kind-pick button[aria-pressed="true"] b{ color:#FBBF24; }
+  .kind-pick button:focus-visible{ outline:2px solid #F59E0B;outline-offset:2px; }
   /* 날짜 칸 — 브라우저가 그리는 달력 아이콘이 기본 검정이라 어두운 바탕에서 안 보였다.
      color-scheme 을 어둡게 주면 아이콘이 흰색이 되고 달력 창까지 같이 어두워진다. */
   .in[type="date"]{ color-scheme:dark; }
@@ -123,6 +138,16 @@
   #paper .party .sig-slot .box .seal-css{ position:absolute;right:4mm;top:50%;transform:translateY(-50%) rotate(-8deg);width:19mm;height:19mm;border-radius:50%;border:2.2px solid #C8102E;color:#C8102E;display:flex;align-items:center;justify-content:center;font-size:6.5pt;font-weight:800;letter-spacing:.05em;text-align:center;line-height:1.15;padding:1.5mm;opacity:.9;mix-blend-mode:multiply;box-shadow:inset 0 0 0 1px #C8102E; }
   #paper .party .sig-slot .box .sig-img{ position:relative;z-index:1;max-height:20mm; }
   #paper .party .sig-slot .box .signed-name{ position:absolute;left:3mm;bottom:1.5mm;font-size:8pt;color:#333;font-weight:700; }
+  /* 미성년 출연자 — 법정대리인 동의란. 종이로 받아야 하므로 손서명 칸을 비워둔다. */
+  #paper .guardian{ margin-top:5mm;border:1px solid #D9D5CC;padding:3.5mm 4mm;break-inside:avoid; }
+  #paper .guardian h2{ font-size:10pt;border:none;padding:0; }
+  #paper .guardian p{ font-size:9pt;margin:1.5mm 0 3mm; }
+  #paper .guardian .gline{ display:flex;align-items:flex-end;gap:4mm;flex-wrap:wrap;font-size:9.5pt;border-bottom:1px solid #C9C4B9;padding-bottom:1.5mm; }
+  #paper .guardian .gline > span:first-child{ color:#666;font-size:8.5pt; }
+  #paper .guardian .gline b{ min-width:30mm; }
+  #paper .guardian .rel{ color:#666;font-size:8.5pt; }
+  #paper .guardian .seal{ margin-left:auto;color:#999;font-size:8.5pt; }
+
   #paper .verify{ margin-top:5mm;padding-top:2.5mm;border-top:1px solid #D9D5CC;font-size:7.8pt;color:#666;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1mm 3mm; }
   #paper .verify code{ font-family:ui-monospace,Menlo,Consolas,monospace;font-size:7.6pt;color:#333; }
   #paper .stamp-flag{ position:absolute;top:2.5mm;right:3mm;font-size:7.5pt;font-weight:800;color:#C8102E;border:1px solid #C8102E;padding:.3mm 1.5mm;border-radius:2px;letter-spacing:.05em; }
@@ -198,9 +223,55 @@
   </details>
 
   <details class="sec" open>
-    <summary>계약 상대방 (갑) <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <summary>계약 종류 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
     <div class="body">
-      <div><label class="f">단체 · 회사명</label><input class="in" data-k="cl.org" placeholder="예) 고흥군청 문화관광과"></div>
+      <div class="kind-pick">
+        <button type="button" class="kind" data-kind="service">
+          <b>행사 대행</b><small>고객이 갑 · 우리가 을<br>우리가 일을 받습니다</small>
+        </button>
+        <button type="button" class="kind" data-kind="cast">
+          <b>출연 섭외</b><small>우리가 갑 · 출연자가 을<br>MC · 가수를 우리가 씁니다</small>
+        </button>
+      </div>
+      <p class="hint" id="kind-hint"></p>
+    </div>
+  </details>
+
+  <details class="sec cast-only" open hidden>
+    <summary>출연 내용 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <div class="kind-pick">
+        <button type="button" class="who" data-who="person">
+          <b>개인</b><small>3.3% 원천징수</small>
+        </button>
+        <button type="button" class="who" data-who="biz">
+          <b>소속사 · 사업자</b><small>세금계산서 · 부가세 10%</small>
+        </button>
+      </div>
+      <div class="row2 biz-only" hidden>
+        <div><label class="f">소속사 상호</label><input class="in" data-k="cast.agency" placeholder="예) ○○엔터테인먼트"></div>
+        <div><label class="f">사업자번호</label><input class="in" data-k="cast.agencyBiz" placeholder="000-00-00000"></div>
+      </div>
+      <div><label class="f">출연 구분</label><input class="in" data-k="cast.role" placeholder="예) 행사 MC / 초대가수 / 댄스 공연팀 4인"></div>
+      <div><label class="f">공연 내용</label><textarea class="in" data-k="cast.program" placeholder="예) 트로트 4곡, 앙코르 1곡 포함 / 식전 공연 및 본 행사 진행"></textarea></div>
+      <div class="row2">
+        <div><label class="f">공연 시간</label><input class="in" data-k="cast.runtime" placeholder="예) 40분"></div>
+        <div><label class="f">현장 도착</label><input class="in" data-k="cast.arrive" placeholder="예) 공연 2시간 전"></div>
+      </div>
+      <div><label class="f">리허설</label><input class="in" data-k="cast.rehearsal" placeholder="예) 당일 14:00 무대 리허설 참석"></div>
+      <label class="chk" style="padding:.35rem 0;"><input type="checkbox" data-k="cast.exclusive"> 같은 날 인근 지역 동종 행사 중복 출연을 하지 않는다 (겹치기 제한)</label>
+      <label class="chk" style="padding:.35rem 0;"><input type="checkbox" data-k="cast.minor"> 출연자가 미성년자다 — 법정대리인 동의란을 넣는다</label>
+      <div class="row2 minor-only" hidden>
+        <div><label class="f">법정대리인 성명</label><input class="in" data-k="cast.guardian" placeholder="보호자 성명"></div>
+        <div><label class="f">관계</label><input class="in" data-k="cast.guardianRel" placeholder="예) 모"></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec" open>
+    <summary><span id="party-title">계약 상대방 (갑)</span> <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
+    <div class="body">
+      <div><label class="f" id="party-org-label">단체 · 회사명</label><input class="in" data-k="cl.org" placeholder="예) 고흥군청 문화관광과"></div>
       <div class="row2">
         <div><label class="f">담당자 (서명자)</label><input class="in" data-k="cl.name" placeholder="홍길동"></div>
         <div><label class="f">연락처</label><input class="in" data-k="cl.tel" placeholder="010-0000-0000" inputmode="tel"></div>
@@ -249,8 +320,8 @@
   <details class="sec">
     <summary>특약 · 계약일 <iconify-icon class="chev" icon="solar:alt-arrow-down-linear"></iconify-icon></summary>
     <div class="body">
-      <div><label class="f">특약 사항</label><textarea class="in" data-k="sp" placeholder="예) 우천 시 실내 대체 장소 협의, 전력·주차 공간은 갑이 제공 등"></textarea></div>
-      <label class="chk" style="padding:.2rem 0;"><input type="checkbox" data-k="photo"> 행사 사진·영상을 을의 포트폴리오·홍보에 사용하는 것에 동의 (제10조)</label>
+      <div><label class="f">특약 사항</label><textarea class="in" data-k="sp" placeholder="예) 우천 시 실내 대체 장소 협의 / 교통비·숙박비 부담 주체 등"></textarea></div>
+      <label class="chk" style="padding:.2rem 0;"><input type="checkbox" data-k="photo"> <span id="photo-label">행사 사진·영상을 을의 포트폴리오·홍보에 사용하는 것에 동의</span></label>
       <div class="row2">
         <div><label class="f">계약 체결일</label><input class="in" type="date" data-k="date"></div>
         <div><label class="f">계약 번호</label><input class="in" data-k="no" placeholder="자동"></div>
@@ -309,7 +380,7 @@
       <div class="pad-hint" id="pad-hint">여기에 서명해 주세요</div>
     </div>
     <div class="pad-tools">
-      <span>서명은 이미지로 저장되어 계약서 갑 서명란에 들어갑니다.</span>
+      <span id="pad-hint">서명은 이미지로 저장되어 계약서 서명란에 들어갑니다.</span>
       <button class="btn btn-ghost btn-sm" id="pad-clear" type="button"><iconify-icon icon="solar:eraser-bold"></iconify-icon> 지우기</button>
     </div>
     <label class="chk"><input type="checkbox" id="agree1"> 계약서의 모든 조항(계약금액, 지급조건, 취소·위약 규정, 특약)을 읽고 이해했으며 이에 동의합니다.</label>
@@ -373,8 +444,30 @@ const LS = window.localStorage;
 const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const genNo = () => { const d=new Date(); return 'KG-'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).slice(2,5).toUpperCase(); };
 
+/* 취소·위약 기본표. 계약 종류마다 다르다. */
+const CANCEL_DEF = {
+  service: [
+    ['행사일 30일 전까지', '위약금 없음 (기지급 계약금 전액 환불)'],
+    ['행사일 29일 ~ 15일 전', '계약금액의 10%'],
+    ['행사일 14일 ~ 7일 전',  '계약금액의 30%'],
+    ['행사일 6일 전 ~ 당일',   '계약금액의 50% (기투입 실비 별도)'],
+  ],
+  cast: [
+    ['행사일 10일 전까지',    '위약금 없음'],
+    ['행사일 9일 ~ 5일 전',   '출연료의 30%'],
+    ['행사일 4일 ~ 2일 전',   '출연료의 50%'],
+    ['행사일 1일 전 ~ 당일',  '출연료의 100%'],
+  ],
+};
+
 const DEF = () => ({
   v:1, no:'', date: today(), api:'',
+  /* 'service' 행사 대행 — 갑 고객 · 을 우리 (우리가 일을 받는다)
+     'cast'    출연 섭외 — 갑 우리 · 을 출연자 (우리가 일을 준다)
+     우리는 어느 쪽이든 날인하고, 상대는 어느 쪽이든 링크로 전자서명한다. */
+  kind:'service',
+  cast:{ who:'person', role:'', program:'', runtime:'', arrive:'', rehearsal:'',
+         minor:false, guardian:'', guardianRel:'', exclusive:false, agency:'', agencyBiz:'' },
   co:{ name:'주식회사 브리지미디어', brand:'큰길이벤트기획', rep:'김동길', biz:'813-81-02252', corp:'204611-0065269',
        addr:'전남광주통합특별시 광양시 광양읍 강변동길 1, 2층', tel:'1533-7295', email:'gilcaro@naver.com',
        bank:'KB국민은행 788101-01-397776 (예금주: 주식회사 브리지미디어)' },
@@ -382,14 +475,15 @@ const DEF = () => ({
   ev:{ title:'', date:'', place:'', people:'', scope:'' },
   items:[],
   m:{ disc:0, depPct:30, depDue:'계약 체결일로부터 3일 이내', balDue:'행사 종료일로부터 7일 이내' },
-  cancel:[
-    ['행사일 30일 전까지', '위약금 없음 (기지급 계약금 전액 환불)'],
-    ['행사일 29일 ~ 15일 전', '계약금액의 10%'],
-    ['행사일 14일 ~ 7일 전',  '계약금액의 30%'],
-    ['행사일 6일 전 ~ 당일',   '계약금액의 50% (기투입 실비 별도)'],
-  ],
+  cancel: CANCEL_DEF.service.map(r => r.slice()),
   sp:'', photo:true,
 });
+
+/* 우리(큰길)는 늘 날인, 상대는 늘 전자서명. 갑/을 딱지만 계약 종류에 따라 바뀐다. */
+const 우리딱지 = () => C.kind === 'cast' ? '갑' : '을';
+const 상대딱지 = () => C.kind === 'cast' ? '을' : '갑';
+const 출연계약 = () => C.kind === 'cast';
+const 개인출연 = () => 출연계약() && C.cast.who === 'person';
 let C = DEF();
 let MODE = 'customer';       // admin | customer | signed | preview
 let SIGNED = null;           // { sig, name, tel, ts, hash, pdfUrl }
@@ -422,10 +516,19 @@ function calc(){
   for(const it of C.items){ if(it.price==null||it.price==='') { tbd++; continue; } supply += num(it.qty)*num(it.days||1)*num(it.price); }
   const disc = Math.min(supply, num(C.m.disc));
   const base = supply - disc;
+
+  /* 개인 출연자는 부가세가 아니라 사업소득 3.3% 원천징수다.
+     계약금액은 총액 그대로이고, 실제로 통장에 꽂히는 돈은 그보다 적다. */
+  if (개인출연()) {
+    const tax = Math.round(base * 0.033);
+    const dep = Math.round(base * (num(C.m.depPct)/100));
+    return { supply, disc, base, vat:0, tax, net: base - tax, total: base, dep, bal: base-dep, tbd };
+  }
+
   const vat = Math.round(base*0.1);
   const total = base + vat;
   const dep = Math.round(total * (num(C.m.depPct)/100));
-  return { supply, disc, base, vat, total, dep, bal: total-dep, tbd };
+  return { supply, disc, base, vat, tax:0, net:total, total, dep, bal: total-dep, tbd };
 }
 function 한글금액(n){
   n = Math.round(n); if(!n) return '영';
@@ -474,6 +577,8 @@ function render(){
   const signedBlock = SIGNED
     ? `<img class="sig-img" src="${SIGNED.sig}" alt="갑 서명"><span class="signed-name">${esc(SIGNED.name)} (전자서명 · ${fmtTs(SIGNED.ts)})</span>`
     : `<span>${MODE==='admin'||MODE==='preview' ? '고객 전자서명 (서명 후 자동 표시)' : '아래에서 서명해 주세요'}</span>`;
+
+  if (출연계약()) { renderCast(t, rows, cancelRows, signedBlock); return; }
 
   $('#paper').innerHTML = `
     <h1>행사 대행 계약서</h1>
@@ -596,9 +701,179 @@ function render(){
   docHash().then(h => { HASH=h; const el=$('#v-hash'); if(el) el.textContent = h.slice(0,32)+'…'; });
   renderSum(t);
 }
+
+/* ── 출연 계약서 ───────────────────────────────────────────────────
+   우리(큰길)가 갑, 출연자가 을. 행사 대행 계약서와 갑·을이 뒤집힌다.
+   개인이면 사업소득 3.3% 원천징수, 소속사·사업자면 세금계산서. */
+function renderCast(t, rows, cancelRows, signedBlock){
+  const 을이름 = or(C.cast.who==='biz' ? (C.cast.agency||C.cl.org) : (C.cl.name||C.cl.org), '(을)');
+  const 개인 = 개인출연();
+
+  /* 우리 자리(날인)와 상대 자리(전자서명). 딱지만 바꿔 그대로 쓴다. */
+  const 우리칸 = `
+      <div class="party">
+        <span class="role">갑 (섭외자)</span>
+        <span class="stamp-flag ok">날인 완료</span>
+        <div class="line"><span>상호</span><b>${coFull()}</b></div>
+        <div class="line"><span>대표자</span><span>${or(C.co.rep)}</span></div>
+        <div class="line"><span>사업자번호</span><span>${or(C.co.biz)}${C.co.corp?` <span style="color:#777;">· 법인 ${esc(C.co.corp)}</span>`:''}</span></div>
+        <div class="line"><span>주소</span><span>${or(C.co.addr)}</span></div>
+        <div class="line"><span>연락처</span><span>${esc(C.co.tel)} · ${esc(C.co.email)}</span></div>
+        <div class="sig-slot"><span class="lab">날인</span><div class="box"><span style="color:#333;font-weight:700;letter-spacing:.06em;font-size:9pt;line-height:1.5;text-align:center;margin-right:14mm;position:relative;">${esc(C.co.name)}<br>대표이사 ${or(C.co.rep,'')} <span style="color:#999;font-weight:400;">(인)</span></span>${sealHTML()}</div></div>
+      </div>`;
+  const 상대칸 = `
+      <div class="party">
+        <span class="role">을 (출연자)</span>
+        <span class="stamp-flag ${SIGNED?'ok':''}">${SIGNED?'서명 완료':'서명 대기'}</span>
+        <div class="line"><span>${개인?'성명':'상호'}</span><b>${개인?or(C.cl.name):or(C.cast.agency||C.cl.org)}</b></div>
+        ${개인?`<div class="line"><span>소속 · 팀명</span><span>${or(C.cl.org,'-')}</span></div>`
+              :`<div class="line"><span>사업자번호</span><span>${or(C.cast.agencyBiz)}</span></div>
+                <div class="line"><span>담당자</span><span>${or(C.cl.name)}</span></div>`}
+        <div class="line"><span>연락처</span><span>${or(C.cl.tel)}</span></div>
+        <div class="line"><span>주소</span><span>${or(C.cl.addr)}</span></div>
+        <div class="sig-slot"><span class="lab">서명</span><div class="box">${signedBlock}</div></div>
+      </div>`;
+
+  const 대금 = 개인 ? `
+    <table class="items">
+      <thead><tr><th class="c" style="width:7%">No</th><th>항목 · 내용</th><th class="c" style="width:16%">수량</th><th class="r" style="width:16%">단가</th><th class="r" style="width:18%">금액</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot class="sum">
+        <tr><td colspan="4" class="r">출연료 합계</td><td class="r">${won(t.supply)}</td></tr>
+        ${t.disc?`<tr><td colspan="4" class="r">조정</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
+        <tr class="tot"><td colspan="4" class="r">출연료 (총액)</td><td class="r">${won(t.base)}</td></tr>
+        <tr><td colspan="4" class="r">원천징수 (사업소득 3.3%)</td><td class="r">- ${won(t.tax)}</td></tr>
+        <tr class="tot"><td colspan="4" class="r">실지급액</td><td class="r">${won(t.net)}</td></tr>
+      </tfoot>
+    </table>
+    <div class="amount-box"><span>출연료 : 금 ${한글금액(t.base)}원정 (₩${Math.round(t.base).toLocaleString('ko-KR')})</span><small>원천징수 ${won(t.tax)} 공제 후 실지급 ${won(t.net)}${t.tbd?` · 협의 항목 ${t.tbd}건 별도`:''}</small></div>`
+  : `
+    <table class="items">
+      <thead><tr><th class="c" style="width:7%">No</th><th>항목 · 내용</th><th class="c" style="width:16%">수량</th><th class="r" style="width:16%">단가</th><th class="r" style="width:18%">금액</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot class="sum">
+        <tr><td colspan="4" class="r">공급가액</td><td class="r">${won(t.supply)}</td></tr>
+        ${t.disc?`<tr><td colspan="4" class="r">조정</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
+        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${won(t.vat)}</td></tr>
+        <tr class="tot"><td colspan="4" class="r">출연료 (부가세 포함)</td><td class="r">${won(t.total)}</td></tr>
+      </tfoot>
+    </table>
+    <div class="amount-box"><span>출연료 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>부가세 포함 · 을이 세금계산서를 발행한다${t.tbd?` · 협의 항목 ${t.tbd}건 별도`:''}</small></div>`;
+
+  $('#paper').innerHTML = `
+    <h1>출연 계약서</h1>
+    <div class="doc-no"><span>계약번호 <b>${or(C.no)}</b></span><span>${esc(C.co.brand||C.co.name)} 출연계약서 v1</span></div>
+
+    <p class="preamble"><b>${coFull()}</b>(이하 "갑"이라 한다)과(와) <b>${을이름}</b>(이하 "을"이라 한다)은 아래 행사의 출연에 관하여 다음과 같이 계약을 체결한다.</p>
+
+    <h2>제1조 (계약의 목적)</h2>
+    <p>본 계약은 갑이 기획·운영하는 행사에 을이 출연하여 공연 또는 진행을 수행함에 있어 필요한 사항을 정함을 목적으로 한다.</p>
+
+    <h2>제2조 (행사 및 출연의 내용)</h2>
+    <table class="info">
+      <tr><th>행사명</th><td>${or(C.ev.title)}</td></tr>
+      <tr><th>행사 일시</th><td>${or(C.ev.date)}</td></tr>
+      <tr><th>행사 장소</th><td>${or(C.ev.place)}</td></tr>
+      <tr><th>출연 구분</th><td>${or(C.cast.role)}</td></tr>
+      <tr><th>공연 내용</th><td style="white-space:pre-wrap;">${or(C.cast.program, '아래 제3조 항목에 따름')}</td></tr>
+      <tr><th>공연 시간</th><td>${or(C.cast.runtime)}</td></tr>
+      <tr><th>리허설</th><td>${or(C.cast.rehearsal, '별도 협의')}</td></tr>
+      <tr><th>현장 도착</th><td>${or(C.cast.arrive, '별도 협의')}</td></tr>
+    </table>
+
+    <h2>제3조 (출연료)</h2>
+    ${대금}
+    <ol>
+      <li>출연 내용·시간의 변경으로 출연료의 증감이 필요한 경우 양 당사자가 협의하여 서면(전자문서 포함)으로 조정한다.</li>
+      <li>교통비·숙박비·의상비 등 부대비용의 부담 주체는 제7조 특약 사항에 따르며, 정함이 없으면 출연료에 포함된 것으로 본다.</li>
+    </ol>
+
+    <h2>제4조 (지급 방법)</h2>
+    <ol>
+      <li>계약금 : 출연료의 ${num(C.m.depPct)}% (${won(t.dep)})를 ${esc(C.m.depDue)}에 지급한다.</li>
+      <li>잔금 : 나머지 ${won(t.bal)}을 ${esc(C.m.balDue)}에 지급한다.</li>
+      ${개인
+        ? `<li>갑은 소득세법에 따라 <b>사업소득 3.3%(${won(t.tax)})를 원천징수</b>한 후 실지급액 ${won(t.net)}을 을이 지정한 계좌로 입금하고, 원천징수영수증을 발급한다.</li>`
+        : `<li>을은 갑에게 세금계산서를 발행하고, 갑은 을이 지정한 계좌로 입금한다.</li>`}
+      <li>갑이 지급기일을 경과한 경우 연 6%의 지연이자를 가산할 수 있다.</li>
+    </ol>
+
+    <h2>제5조 (을의 의무)</h2>
+    <ol>
+      <li>을은 제2조에 정한 시각까지 현장에 도착하여 리허설에 참여하고, 정해진 시간에 공연 또는 진행을 성실히 수행한다.</li>
+      <li>을은 공연에 필요한 음원·큐시트·자기소개 자료를 행사일 3일 전까지 갑에게 제공한다.</li>
+      <li>을은 행사의 성격에 어울리는 복장과 태도를 유지하며, 주최 측의 명예를 훼손하는 언동을 하지 아니한다.</li>
+      <li>을은 음주·약물 등으로 공연에 지장을 주어서는 아니 된다.</li>
+      ${C.cast.exclusive ? '<li>을은 본 행사 당일 인근 지역에서 동종 행사에 중복 출연하지 아니한다.</li>' : ''}
+    </ol>
+
+    <h2>제6조 (갑의 의무)</h2>
+    <ol>
+      <li>갑은 공연에 필요한 무대·음향·조명 등 시설을 갖추고, 을이 리허설을 진행할 수 있도록 시간을 확보한다.</li>
+      <li>갑은 을에게 대기 공간을 제공하고, 공연 시간이 식사 시간에 걸치는 경우 식사를 제공하거나 실비를 지급한다.</li>
+      <li>갑은 행사장 진입·주차에 필요한 사항을 사전에 안내한다.</li>
+      <li>갑은 행사 현장의 안전 관리에 관한 책임을 진다.</li>
+    </ol>
+
+    <h2>제7조 (계약의 해제 · 취소)</h2>
+    <ol>
+      <li>갑이 계약을 해제·취소하는 경우 아래 기준에 따른 위약금을 을에게 지급한다.</li>
+    </ol>
+    <table class="cancel"><thead><tr><th style="width:38%">취소 통보 시점</th><th>위약금</th></tr></thead><tbody>${cancelRows||'<tr><td colspan="2" style="color:#999;">-</td></tr>'}</tbody></table>
+    <ol start="2">
+      <li>을이 정당한 사유 없이 출연하지 아니한 경우, 을은 기수령 금액을 전액 반환하고 <b>출연료 상당액을 갑에게 배상</b>한다. 갑이 대체 출연자를 섭외하기 위하여 지출한 비용이 이를 초과하는 경우 그 초과분을 추가로 청구할 수 있다.</li>
+      <li>을이 부득이한 사유로 출연할 수 없게 된 경우 즉시 갑에게 알리고, 동등한 수준의 대체 출연자를 추천하도록 협조한다.</li>
+    </ol>
+
+    <h2>제8조 (불가항력)</h2>
+    <p>천재지변, 감염병 확산에 따른 행정명령, 전쟁·폭동 등 당사자가 통제할 수 없는 사유로 행사가 취소·연기되는 경우, 양 당사자는 상대방에게 책임을 묻지 아니하며 일정 변경 또는 계약 종료를 협의한다. 이 경우 을이 이미 지출한 실비는 정산한다.</p>
+
+    <h2>제9조 (초상권 · 저작권)</h2>
+    <p>${C.photo
+      ? '을은 갑이 본 행사에서 촬영한 을의 사진·영상을 행사 기록 및 갑의 홍보물·홈페이지·사회관계망서비스에 사용하는 것에 동의한다. 다만 갑은 이를 제3자에게 판매하거나 을의 명예를 훼손하는 방식으로 사용하지 아니한다.'
+      : '갑은 본 행사에서 촬영한 을의 사진·영상을 을의 사전 서면 동의 없이 홍보 목적으로 사용하지 아니한다. 행사 기록 보관을 위한 내부 사용은 예외로 한다.'}</p>
+    <p>공연에 사용되는 음악의 저작권료(공연사용료) 납부 의무는 행사 주최자에게 있으며, 을은 갑의 요청 시 사용 곡목을 제공한다.</p>
+
+    <h2>제10조 (특약 사항)</h2>
+    <div class="special">${C.sp ? esc(C.sp) : '해당 없음'}</div>
+
+    <h2>제11조 (분쟁의 해결)</h2>
+    <p>본 계약에 명시되지 않은 사항은 관련 법령과 상관례에 따라 상호 협의하여 정하며, 분쟁이 발생한 경우 갑의 소재지를 관할하는 법원을 제1심 관할 법원으로 한다.</p>
+
+    <h2>제12조 (전자계약)</h2>
+    <p>본 계약은 전자문서 및 전자거래 기본법과 전자서명법에 따라 전자문서로 작성되고 전자서명으로 체결되며, 양 당사자는 이것이 서면 계약과 동일한 효력을 가짐에 동의한다. 서명 시각과 문서 확인 코드는 아래에 기록되며, 계약서 사본은 양 당사자에게 전자적으로 교부된다.</p>
+
+    <p class="closing">위 계약을 증명하기 위하여 본 계약서를 작성하고 갑과 을이 각각 서명 또는 날인한다.</p>
+    <p class="sign-date">${fmtDate(C.date)}</p>
+
+    <div class="parties">${우리칸}${상대칸}</div>
+
+    ${C.cast.minor ? `
+    <div class="guardian">
+      <h2 style="margin-top:0;">법정대리인 동의</h2>
+      <p>본인은 미성년자인 을의 법정대리인으로서 위 출연 계약의 내용을 확인하고 이에 동의합니다.</p>
+      <div class="gline"><span>성명</span><b>${or(C.cast.guardian)}</b><span class="rel">관계 ${or(C.cast.guardianRel,'-')}</span><span class="seal">(서명 또는 인)</span></div>
+    </div>` : ''}
+
+    <div class="verify">
+      <span>문서 확인 코드 <code id="v-hash">${HASH ? HASH.slice(0,32)+'…' : '계산 중'}</code></span>
+      <span>${SIGNED ? '전자서명 '+fmtTs(SIGNED.ts,true)+' (KST) · 서명자 '+esc(SIGNED.name) : '서명 전'}${DOC_ID?' · 문서 ID '+esc(DOC_ID):''}</span>
+    </div>`;
+
+  docHash().then(h => { HASH=h; const el=$('#v-hash'); if(el) el.textContent = h.slice(0,32)+'…'; });
+  renderSum(t);
+}
 function renderSum(t){
   const b=$('#sum-box'); if(!b) return;
-  b.innerHTML = `<div class="kv"><span>공급가액</span><b>${won(t.supply)}</b></div>${t.disc?`<div class="kv"><span>할인</span><b>- ${won(t.disc)}</b></div>`:''}<div class="kv"><span>부가세</span><b>${won(t.vat)}</b></div><div class="kv" style="font-size:.95rem;"><span>계약금액</span><b style="color:#FCD34D;">${won(t.total)}</b></div><div class="kv"><span>계약금 ${num(C.m.depPct)}% / 잔금</span><b>${won(t.dep)} / ${won(t.bal)}</b></div>`;
+  const 세금줄 = 개인출연()
+    ? `<div class="kv"><span>원천징수 3.3%</span><b>- ${won(t.tax)}</b></div>
+       <div class="kv"><span>실지급액</span><b>${won(t.net)}</b></div>`
+    : `<div class="kv"><span>부가세</span><b>${won(t.vat)}</b></div>`;
+  b.innerHTML = `<div class="kv"><span>${개인출연()?'출연료':'공급가액'}</span><b>${won(t.supply)}</b></div>`
+    + (t.disc?`<div class="kv"><span>${출연계약()?'조정':'할인'}</span><b>- ${won(t.disc)}</b></div>`:'')
+    + 세금줄
+    + `<div class="kv" style="font-size:.95rem;"><span>${출연계약()?'출연료 총액':'계약금액'}</span><b style="color:#FCD34D;">${won(t.total)}</b></div>`
+    + `<div class="kv"><span>계약금 ${num(C.m.depPct)}% / 잔금</span><b>${won(t.dep)} / ${won(t.bal)}</b></div>`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -613,16 +888,62 @@ function bindForm(){
     el.addEventListener('input', ()=>{
       let val = el.type==='checkbox' ? el.checked : el.value;
       if(k==='m.disc'||k==='m.depPct') val = num(val);
-      setPath(C,k,val); render(); saveHashDebounced();
+      setPath(C,k,val);
+      if(k==='cast.minor') paintKind();   // 법정대리인 칸을 열고 닫는다
+      render(); saveHashDebounced();
       /* 계약 서버 주소만은 「회사 정보 저장」을 누르지 않아도 바로 기억한다.
          저장을 깜빡하면 다음 계약서에서 칸이 비고, 그러면 링크가 1,400자로
          길어지는 데다 고객이 서명해도 자동으로 통보가 오지 않는다. */
       if(k==='api'){ saveCo(); 서버안내(); }
     });
   });
+  bindKind();
   renderItems(); renderCancel();
 }
-function refreshForm(){ $$('#admin [data-k]').forEach(el=>{ const v=getPath(C,el.dataset.k); if(el.type==='checkbox') el.checked=!!v; else el.value=(v==null?'':v); }); renderItems(); renderCancel(); }
+function refreshForm(){ $$('#admin [data-k]').forEach(el=>{ const v=getPath(C,el.dataset.k); if(el.type==='checkbox') el.checked=!!v; else el.value=(v==null?'':v); }); paintKind(); renderItems(); renderCancel(); }
+
+/* ── 계약 종류 고르기 ────────────────────────────────────────────
+   행사 대행이냐 출연 섭외냐에 따라 갑·을이 뒤집히고 조항이 통째로 바뀐다.
+   서명 흐름은 건드리지 않는다 — 우리는 늘 날인, 상대는 늘 링크로 전자서명. */
+function paintKind(){
+  $$('.kind-pick .kind').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kind === C.kind)));
+  $$('.kind-pick .who').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.who === C.cast.who)));
+  $$('.cast-only').forEach(e => e.hidden = !출연계약());
+  $$('.biz-only').forEach(e => e.hidden = !(출연계약() && C.cast.who === 'biz'));
+  $$('.minor-only').forEach(e => e.hidden = !(출연계약() && C.cast.minor));
+
+  const 힌트 = $('#kind-hint');
+  if (힌트) 힌트.innerHTML = 출연계약()
+    ? '<b style="color:#FBBF24;">우리가 갑</b>입니다. 출연자가 링크를 받아 서명하고, 우리 직인은 갑 자리에 찍힙니다.'
+      + (개인출연() ? ' 개인이므로 <b style="color:#FBBF24;">3.3% 원천징수</b>로 계산합니다.' : ' 사업자이므로 세금계산서·부가세 10%로 계산합니다.')
+    : '<b style="color:#FBBF24;">우리가 을</b>입니다. 고객이 링크를 받아 서명하고, 우리 직인은 을 자리에 찍힙니다.';
+
+  const 제목 = $('#party-title');
+  if (제목) 제목.textContent = 출연계약() ? '출연자 (을)' : '계약 상대방 (갑)';
+  const 라벨 = $('#party-org-label');
+  if (라벨) 라벨.textContent = 출연계약() ? '소속 · 팀명 (없으면 비워두세요)' : '단체 · 회사명';
+  const 사진 = $('#photo-label');
+  if (사진) 사진.textContent = 출연계약()
+    ? '공연 사진·영상을 우리 홍보에 쓰는 것에 출연자가 동의 (제9조)'
+    : '행사 사진·영상을 을의 포트폴리오·홍보에 사용하는 것에 동의 (제10조)';
+}
+function bindKind(){
+  $$('.kind-pick .kind').forEach(b => b.addEventListener('click', () => {
+    if (C.kind === b.dataset.kind) return;
+    C.kind = b.dataset.kind;
+    /* 취소·위약 기준을 손대지 않았으면 그 종류의 기본표로 갈아준다.
+       손댄 흔적이 있으면 사장님이 고친 것이므로 그대로 둔다. */
+    const 그대로 = JSON.stringify(C.cancel) === JSON.stringify(CANCEL_DEF.service)
+                || JSON.stringify(C.cancel) === JSON.stringify(CANCEL_DEF.cast);
+    if (그대로) C.cancel = CANCEL_DEF[C.kind].map(r => r.slice());
+    paintKind(); renderCancel(); render(); saveHashDebounced();
+  }));
+  $$('.kind-pick .who').forEach(b => b.addEventListener('click', () => {
+    C.cast.who = b.dataset.who;
+    paintKind(); render(); saveHashDebounced();
+  }));
+  paintKind();
+}
 function renderItems(){
   const tb=$('#items-body'); if(!tb) return;
   tb.innerHTML = C.items.map((it,i)=>`<tr>
@@ -683,7 +1004,7 @@ async function apiPost(body){
   if(!j.ok) throw new Error(j.error||'서버 오류'); return j;
 }
 $('#btn-share')?.addEventListener('click', async ()=>{
-  if(!C.cl.name || !C.ev.title){ toast('갑 담당자와 행사명을 먼저 입력해 주세요'); return; }
+  if(!C.cl.name || !C.ev.title){ toast((출연계약()?'출연자 성명':'갑 담당자')+'과 행사명을 먼저 입력해 주세요'); return; }
   if(!C.no){ C.no=genNo(); refreshForm(); render(); }
   const btn=$('#btn-share'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 링크 만드는 중…';
   let url='', note='';
