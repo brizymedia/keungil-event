@@ -360,7 +360,10 @@
 /* ═══════════════════════════════════════════════════════
    설정
 ═══════════════════════════════════════════════════════ */
-const 서버주소_기본 = '';                          // Apps Script 웹앱 URL을 여기 고정해도 됨
+/* 계약 서버 주소를 여기 박아둔다. 그래야 어느 컴퓨터·휴대폰에서 열어도
+   설정 없이 바로 짧은 링크가 나오고, 고객이 서명하면 자동으로 메일이 온다.
+   (이 주소는 고객에게 보내는 링크의 &s= 에도 어차피 들어간다. 비밀이 아니다) */
+const 서버주소_기본 = 'https://script.google.com/macros/s/AKfycbwgO5RyEllYeUuugmr9r4wuLjJv8FX02onvcK9JSmejs_nb0J7YrhyL5tN4p_ruS061/exec';
 const 회사_수신_이메일 = 'gilauto325@gmail.com';   // 서버 없을 때 서명본 메일 폴백(FormSubmit)
 const STAMP_SRC = 'stamp-keungil.png';             // 도장 이미지 (투명 PNG). 없으면 CSS 도장으로 대체
 const $ = (s, r=document) => r.querySelector(s);
@@ -836,6 +839,7 @@ async function init(){
     MODE='admin'; document.body.classList.add('admin'); $('#admin').hidden=false;
     $('#mode-pill').className='pill admin'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:shield-user-bold"></iconify-icon> 관리자 · 작성 모드';
     if(!C.no) C.no=genNo();
+    if(!C.api) C.api = 서버주소_기본;   // 칸이 비어 보이면 또 헷갈리니 눈에도 보이게
     bindForm(); render(); saveHashDebounced(); 서버안내();
   } else if(SIGNED && SIGNED.sig){
     MODE='signed'; render();
