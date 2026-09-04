@@ -153,6 +153,7 @@ ${더넣기}
   .foot{ background:var(--dark);color:#7E7889;font-size:.78rem;padding:2rem 1.25rem;text-align:center;line-height:1.8; }
   .foot a{ color:#B9B3C2;text-decoration:none; }
 </style>
+  <script defer src="https://www.ai-make.co.kr/stats/stats.js" data-site="keungil"></script>
 </head>
 <body>
 <div class="topbar"><div class="topbar-in">

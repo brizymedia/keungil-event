@@ -365,6 +365,7 @@ function 만들기(c) {
   H.push('<script type="application/ld+json">');
   H.push(JSON.stringify(ld, null, 2));
   H.push('</script>');
+  H.push('  <script defer src="https://www.ai-make.co.kr/stats/stats.js" data-site="keungil"></script>');
   H.push('</head>');
   H.push('<body>');
 
