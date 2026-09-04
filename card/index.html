@@ -216,8 +216,19 @@
           </div>
           <p class="hint">
             카톡·문자에 이 주소만 보내면 됩니다. <b>미리보기가 뜨기까지 1~2분</b> 걸립니다.
-            카톡에서 미리보기가 안 보이면 잠시 뒤 다시 보내보세요.
           </p>
+
+          <div id="again" hidden>
+            <p class="hint" style="margin-top:1.1rem;">
+              <b class="warn">고쳐서 다시 발행하셨나요?</b><br>
+              카톡은 <b>한 번 본 주소의 미리보기를 오래 기억합니다.</b> 예전 그림이 그대로 뜹니다.
+              그럴 땐 아래 주소로 보내세요 — 카톡이 새로 읽어옵니다. 열리는 명함은 똑같습니다.
+            </p>
+            <code class="link" id="fresh-url"></code>
+            <div class="row-btn">
+              <button class="btn" id="btn-copy2">새로 읽는 링크 복사</button>
+            </div>
+          </div>
         </div>
         <p class="hint" id="pub-msg" hidden></p>
       </div>
@@ -642,6 +653,12 @@ async function 발행(){
     $('#done').hidden = false;
     $('#done-url').textContent = url;
     $('#btn-open').href = url;
+
+    /* 카톡은 한 번 읽은 주소의 미리보기를 오래 붙들고 있다. 고쳐서 다시 발행하면
+       예전 그림이 그대로 뜬다. 주소가 달라 보이면 새로 읽어오므로 시각을 붙여 둔다. */
+    $('#fresh-url').textContent = url + '?v=' + Date.now().toString(36);
+    $('#again').hidden = false;
+
     toast('명함을 발행했습니다');
     $('#done').scrollIntoView({ behavior:'smooth', block:'nearest' });
   } catch (e) {
@@ -715,6 +732,11 @@ function 사진칸(칸, 단추, 지우기, 썸, 폭, 비율, 빈글, 담기){
       (u, i) => { 배경 = u; 원본배경 = i; });
 
 $('#btn-pub').addEventListener('click', 발행);
+$('#btn-copy2').addEventListener('click', async () => {
+  const t = $('#fresh-url').textContent;
+  try { await navigator.clipboard.writeText(t); toast('새로 읽는 링크를 복사했습니다'); }
+  catch(e){ prompt('이 주소를 복사하세요', t); }
+});
 $('#btn-copy').addEventListener('click', async () => {
   const t = $('#done-url').textContent;
   try { await navigator.clipboard.writeText(t); toast('링크를 복사했습니다'); }
