@@ -217,6 +217,10 @@
         </div>
         <label class="f" for="f-pw">발행 비밀번호</label>
         <input id="f-pw" type="password" placeholder="관리자에게 받으세요" autocomplete="current-password">
+        <label style="display:flex;gap:.55rem;align-items:flex-start;margin-top:.9rem;font-size:.85rem;color:var(--ink2);cursor:pointer;line-height:1.5;">
+          <input type="checkbox" id="f-consent" style="margin-top:.25rem;accent-color:var(--amber);flex:none;">
+          <span>새 행사 입찰·일감 소식을 <b style="color:var(--ink);">문자</b>로 받겠습니다 <small style="color:var(--ink3);">(이벤트 코리아 · 주 1회 안팎 · 언제든 거부)</small></span>
+        </label>
         <button class="btn pri wide" id="btn-pub" style="margin-top:.9rem;">명함 발행하기</button>
         <div id="done" hidden>
           <p class="hint" style="margin-top:1rem;"><b>내 명함 주소</b></p>
@@ -227,6 +231,11 @@
           </div>
           <p class="hint">
             카톡·문자에 이 주소만 보내면 됩니다. <b>미리보기가 뜨기까지 1~2분</b> 걸립니다.
+          </p>
+          <p class="hint" style="margin-top:.9rem;padding:.8rem .95rem;border-left:3px solid var(--amber);background:rgba(245,165,36,.08);">
+            <b style="color:var(--ink);">명함 다음은 홈페이지입니다.</b> 이 명함처럼 링크 하나로 실적·장비·견적 문의까지 —
+            <a href="https://www.ai-make.co.kr/#demo" target="_blank" rel="noopener" style="color:var(--amber);">내 업종 무료 시안 보기</a> ·
+            <a href="https://www.event-korea.co.kr/" target="_blank" rel="noopener" style="color:var(--amber);">이벤트 코리아</a>
           </p>
 
           <div id="again" hidden>
@@ -661,6 +670,9 @@ async function 발행(){
         photo: 사진 ? 사진.split(',')[1] : '',
         bg: 배경 ? 배경.split(',')[1] : '',
         og: OG ? OG.split(',')[1] : '',
+        /* 명단 — 누가 명함을 만들었는지 이벤트 코리아 시트에 남긴다 (명함에 적은 내용 그대로) */
+        lead: { name: d.n, tel: d.p, job: (d.g || []).slice(0, 3).join('·') || d.t || '', co: d.c || '',
+                consent: !!($('#f-consent') && $('#f-consent').checked) },
       }),
     });
     const 답 = await 응.json();

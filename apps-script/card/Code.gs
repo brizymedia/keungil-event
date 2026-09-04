@@ -91,7 +91,14 @@ function 명함발행(요청) {
   const r = 깃허브에올리기('card/' + 주소 + '/index.html', base64(요청.html), '명함 발행: ' + 주소);
   if (!r.ok) return r;
 
-  return { ok: true, slug: 주소 };
+  // 명단 — 누가 명함을 만들었는지 시트에 남긴다. 여기서 실패해도 발행은 된 것이다.
+  let 명단 = null;
+  if (요청.lead) {
+    try { 명단 = 명단남기기(요청.lead, 주소); }
+    catch (err) { 명단 = { ok: false, error: String(err && err.message ? err.message : err) }; }
+  }
+
+  return { ok: true, slug: 주소, lead: 명단 };
 }
 
 function 명함삭제(요청) {
@@ -230,4 +237,72 @@ function 점검() {
   } catch (err) {
     Logger.log('깃허브를 읽지 못했습니다: ' + err.message);
   }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   이벤트인 명단 — 명함을 만든 사람을 「이벤트 코리아 / 이벤트인 명단」 시트에 남긴다.
+   이벤트 코리아 명단 서버와 같은 폴더·같은 파일 이름을 쓰므로 한 시트에 모인다.
+   (둘 다 형님 계정으로 돌아가니 같은 드라이브다)
+   열: 등록시각 · 이름 · 전화 · 직군 · 지역 · 출처 · 문자동의 · 최근활동 · 메모 · 마지막문자
+══════════════════════════════════════════════════════════════ */
+const 명단폴더 = '이벤트 코리아';
+const 명단파일 = '이벤트인 명단';
+
+function 명단남기기(l, slug) {
+  const 이름 = 다듬기_(l.name, 40), 전화 = 전화정리_(l.tel), 직군 = 다듬기_(l.job, 30);
+  const 동의 = l.consent === true || l.consent === 'Y' ? 'Y' : 'N';
+  const 메모 = 다듬기_((l.co ? l.co + ' · ' : '') + '명함 ' + slug, 200);
+  if (!전화 || !이름) return { ok: false, error: '이름·휴대폰이 없어 명단에는 남기지 않음' };
+
+  const sh = 명단시트_();
+  const 끝 = sh.getLastRow();
+  if (끝 >= 2) {
+    const 값 = sh.getRange(2, 1, 끝 - 1, 10).getValues();
+    for (let i = 0; i < 값.length; i++) {
+      if (String(값[i][2]) === 전화) {
+        const 줄 = i + 2;
+        let 출처들 = String(값[i][5] || '');
+        if (출처들.indexOf('명함') < 0) 출처들 = 출처들 ? 출처들 + ' · 명함' : '명함';
+        sh.getRange(줄, 2).setValue(이름);
+        if (직군) sh.getRange(줄, 4).setValue(직군);
+        sh.getRange(줄, 6).setValue(출처들);
+        if (동의 === 'Y') sh.getRange(줄, 7).setValue('Y');
+        sh.getRange(줄, 8).setValue(new Date());
+        sh.getRange(줄, 9).setValue(메모);
+        return { ok: true, new: false };
+      }
+    }
+  }
+  sh.appendRow([new Date(), 이름, 전화, 직군, '', '명함', 동의, new Date(), 메모, '']);
+  return { ok: true, new: true };
+}
+
+function 명단시트_() {
+  const 폴더 = (function () {
+    const 뿌리 = DriveApp.getRootFolder(), it = 뿌리.getFoldersByName(명단폴더);
+    return it.hasNext() ? it.next() : 뿌리.createFolder(명단폴더);
+  })();
+  let ss = null;
+  const it = 폴더.getFilesByType(MimeType.GOOGLE_SHEETS);
+  while (it.hasNext()) { const f = it.next(); if (f.getName() === 명단파일) { ss = SpreadsheetApp.open(f); break; } }
+  if (!ss) { ss = SpreadsheetApp.create(명단파일); DriveApp.getFileById(ss.getId()).moveTo(폴더); }
+  let sh = ss.getSheetByName('명단');
+  if (sh) return sh;
+  sh = ss.insertSheet('명단');
+  sh.appendRow(['등록시각', '이름', '전화', '직군', '지역', '출처', '문자동의', '최근활동', '메모', '마지막문자']);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#E1EAE2');
+  const 기본 = ss.getSheetByName('시트1') || ss.getSheetByName('Sheet1');
+  if (기본 && ss.getSheets().length > 1) { try { ss.deleteSheet(기본); } catch (err) { /* 무시 */ } }
+  return sh;
+}
+
+function 다듬기_(v, 길이) { if (v === null || v === undefined) return ''; return String(v).replace(/[\r\n\t]/g, ' ').trim().slice(0, 길이); }
+
+/* 010-1234-5678 · +82 10 1234 5678 → 01012345678. 휴대폰이 아니면 빈 값 */
+function 전화정리_(v) {
+  let d = String(v || '').replace(/[^0-9]/g, '');
+  if (d.indexOf('8210') === 0) d = '0' + d.slice(2);
+  return /^01[016789][0-9]{7,8}$/.test(d) ? d : '';
 }

@@ -41,6 +41,31 @@
   }
   .get:active{ transform:translateY(1px); }
   .meta{ text-align:center; font-size:.8rem; color:var(--ink3); margin-top:.7rem; }
+  .get{ border:0; width:100%; cursor:pointer; font-family:inherit; }
+  .get[disabled]{ opacity:.6; cursor:default; }
+  .get[hidden],.gate[hidden],.meta[hidden]{ display:none!important; }
+
+  /* 등록 문 — 이름·번호를 남겨야 내려받기 단추가 열린다 */
+  .gate{ margin-top:2rem; padding:1.1rem 1.1rem 1.2rem; border-radius:1rem; background:var(--surface); border:1px solid var(--line); }
+  .gate-h{ display:flex; justify-content:space-between; align-items:baseline; gap:1rem; font-size:.95rem; }
+  .gate-h b{ color:var(--ink); font-weight:700; }
+  .gate-h span{ font-size:.75rem; color:var(--amber); font-weight:900; letter-spacing:.08em; white-space:nowrap; }
+  .g-row{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-top:.7rem; }
+  .gate input,.gate select{
+    width:100%; min-width:0; padding:.8rem .85rem; border-radius:.6rem;
+    border:1px solid var(--line); background:#12100C; color:var(--ink); font:inherit; font-size:.95rem;
+  }
+  .gate input::placeholder{ color:var(--ink3); }
+  .gate select{ color:var(--ink2); }
+  .gate input:focus,.gate select:focus{ outline:2px solid var(--amber); outline-offset:1px; }
+  .g-ck{ display:flex; gap:.55rem; align-items:flex-start; margin-top:.85rem; font-size:.85rem; color:var(--ink2); cursor:pointer; line-height:1.5; }
+  .g-ck input{ width:auto; margin-top:.25rem; accent-color:var(--amber); flex:none; }
+  .g-ck b{ color:var(--ink); font-weight:700; }
+  .g-ck small{ color:var(--ink3); }
+  .gate .get{ margin-top:1rem; }
+  .gate .meta{ text-align:left; }
+  .warn{ color:#F08A72; }
+  @media (max-width:420px){ .g-row{ grid-template-columns:1fr; } }
 
   h2{
     font-size:1.05rem; font-weight:900; letter-spacing:-.02em;
@@ -84,18 +109,45 @@
   <p class="sub">
     카톡방에 올라오는 글 중에 <b style="color:#F6F1E7;font-weight:700;">내 직군 구인 글만</b> 골라서 울립니다.
     알림을 누르면 그 카톡방이 바로 열립니다.
+    나라장터에 새로 뜬 <b style="color:#F6F1E7;font-weight:700;">행사 입찰</b>도 매일 아침 알려드립니다.
   </p>
 
-  <a class="get" href="keungil-alert.apk" download>
-    앱 내려받기
-  </a>
-  <p class="meta">안드로이드 전용 · 약 3MB</p>
+  <form class="gate" id="gate" novalidate>
+    <div class="gate-h"><b>이름과 번호만 남기고 받으세요</b><span>20초</span></div>
+    <div class="g-row">
+      <input id="g-name" name="name" placeholder="이름" maxlength="20" autocomplete="name" required>
+      <input id="g-tel" name="tel" type="tel" inputmode="numeric" placeholder="휴대폰 010-0000-0000" maxlength="13" autocomplete="tel" required>
+    </div>
+    <div class="g-row">
+      <select id="g-job" name="job">
+        <option value="">직군 (고르세요)</option>
+        <option>음향</option><option>조명</option><option>LED·영상</option><option>무대·트러스</option>
+        <option>특수효과</option><option>MC·사회</option><option>가수·공연</option><option>마술·버블</option>
+        <option>기획·운영</option><option>렌탈·설치</option><option>인력·경호</option><option>기타</option>
+      </select>
+      <select id="g-region" name="region">
+        <option value="">주로 다니는 지역</option>
+        <option>서울·경기</option><option>인천</option><option>강원</option><option>충청·대전</option>
+        <option>전북</option><option>광주·전남</option><option>대구·경북</option><option>부산·울산·경남</option>
+        <option>제주</option><option>전국</option>
+      </select>
+    </div>
+    <label class="g-ck">
+      <input type="checkbox" id="g-consent" name="consent">
+      <span>새 행사 입찰·일감 소식을 <b>문자</b>로도 받겠습니다 <small>(주 1회 안팎 · 언제든 거부)</small></span>
+    </label>
+    <button class="get" type="submit" id="g-go">등록하고 앱 내려받기</button>
+    <p class="meta" id="g-msg">안드로이드 전용 · 약 3MB · 이름과 번호는 앱 안내와 입찰·일감 소식에만 쓰고, 지워달라 하시면 바로 지웁니다.</p>
+  </form>
+  <a class="get" id="dl" href="keungil-alert.apk" download hidden>앱 내려받기 (APK)</a>
+  <p class="meta" id="dl-msg" hidden></p>
 
   <h2>깔기 전에 알아두실 것</h2>
   <div class="why">
     설치할 때 <b>「기기와 데이터에 위험을 줄 수 있다」</b>는 경고가 뜹니다.
     이 앱이 <b>카톡 알림을 읽어야</b> 하기 때문이고, 구글이 이런 권한을 쓰는 앱에는 다 띄웁니다.
-    읽은 내용은 <b>폰 밖으로 절대 나가지 않습니다</b> — 서버로 보내는 코드가 아예 없습니다.
+    읽은 내용은 <b>폰 밖으로 절대 나가지 않습니다</b> — 카톡 내용을 어디로 보내는 코드가 없습니다.
+    앱이 인터넷을 쓰는 건 <b>공개된 행사 입찰 공고를 받아올 때</b> 하나뿐입니다.
   </div>
 
   <h2>설치하고 켜기</h2>
@@ -112,6 +164,8 @@
       <small>직군을 <b>길게 누르면</b> 그 안에 무슨 단어가 들어있는지 보입니다. 빠진 장비 이름이 있으면 알려주세요.</small></li>
     <li><b>다니는 지역을 고릅니다. 안 고르면 전국이 다 울립니다.</b>
       <small>처음엔 안 고르고 써보시다가, 너무 자주 울리면 그때 좁히세요.</small></li>
+    <li><b>행사 입찰 알림은 처음부터 켜져 있습니다.</b>
+      <small>「지금 확인해 보기」를 누르면 첫 알림이 바로 옵니다. 매일 아침 새 공고·마감 임박만 한 번 울립니다.</small></li>
   </ol>
 
   <h2>잘 안 될 때</h2>
@@ -130,5 +184,63 @@
   </div>
 
 </div>
+<script>
+(function () {
+  /* 이벤트 코리아 명단 서버 /exec 주소. 비어 있으면 저장 없이 내려받기만 열린다(시험 모드). */
+  var 서버 = '';
+
+  var form = document.getElementById('gate'), dl = document.getElementById('dl');
+  var go = document.getElementById('g-go'), msg = document.getElementById('g-msg'), dlMsg = document.getElementById('dl-msg');
+  var 이름 = document.getElementById('g-name'), 전화 = document.getElementById('g-tel');
+
+  function 열기(글) {
+    form.hidden = true; dl.hidden = false; dlMsg.hidden = false; dlMsg.textContent = 글;
+  }
+
+  /* 이미 등록한 폰이면 바로 내려받기 */
+  var 이미 = null;
+  try { 이미 = JSON.parse(localStorage.getItem('keungil-app-reg') || 'null'); } catch (e) {}
+  if (이미 && 이미.tel) 열기((이미.name ? 이미.name + ' 님, ' : '') + '이미 등록되어 있습니다 · 안드로이드 전용 · 약 3MB');
+
+  /* 010-1234-5678 모양으로 */
+  전화.addEventListener('input', function () {
+    var d = 전화.value.replace(/[^0-9]/g, '').slice(0, 11);
+    전화.value = d.length > 7 ? d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7)
+             : d.length > 3 ? d.slice(0, 3) + '-' + d.slice(3) : d;
+  });
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = 이름.value.trim(), tel = 전화.value.replace(/[^0-9]/g, '');
+    if (!name) { 이름.focus(); return 알림('이름을 넣어 주세요', true); }
+    if (!/^01[016789][0-9]{7,8}$/.test(tel)) { 전화.focus(); return 알림('휴대폰 번호를 확인해 주세요 (010-0000-0000)', true); }
+
+    var 자료 = {
+      action: 'lead', name: name, tel: tel,
+      job: document.getElementById('g-job').value, region: document.getElementById('g-region').value,
+      src: '앱', consent: document.getElementById('g-consent').checked
+    };
+    go.disabled = true; go.textContent = '등록 중…';
+
+    var 끝 = function (ok) {
+      try { localStorage.setItem('keungil-app-reg', JSON.stringify({ name: name, tel: tel, at: Date.now() })); } catch (e) {}
+      열기(name + ' 님, 등록됐습니다. 내려받기가 시작됩니다 — 안 되면 위 단추를 눌러 주세요.' + (ok ? '' : ' (명단 저장은 잠시 뒤 다시 시도됩니다)'));
+      try { dl.click(); } catch (e) {}
+    };
+
+    if (!서버) return 끝(true);
+    fetch(서버, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(자료) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.ok) return 끝(true);
+        go.disabled = false; go.textContent = '등록하고 앱 내려받기';
+        알림((j && j.error) || '등록하지 못했습니다. 다시 눌러 주세요', true);
+      })
+      .catch(function () { 끝(false); });   /* 서버가 잠깐 안 돼도 사람을 놓치진 않는다 */
+  });
+
+  function 알림(글, 나쁨) { msg.textContent = 글; msg.className = 'meta' + (나쁨 ? ' warn' : ''); }
+})();
+</script>
 </body>
 </html>
