@@ -3,97 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>전자명함 — 큰길이벤트기획</title>
-<meta name="description" content="행사팀 전자명함. 링크 하나로 연락처·직군·홈페이지를 한 번에 전달하고, 받은 분은 한 번 눌러 폰에 저장합니다.">
+<title>전자명함 만들기 — 큰길이벤트기획</title>
+<meta name="description" content="행사팀 전자명함. 사진과 하는 일을 담아 짧은 링크 하나로. 카톡에 보내면 미리보기가 뜨고, 받은 분은 한 번 눌러 폰에 저장합니다.">
+<meta name="robots" content="index,follow">
 <meta name="theme-color" content="#12100C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#12100C; --surface:#1C1913; --surface2:#241F17; --line:rgba(246,241,231,.13);
+    --bg:#12100C; --surface:#1C1913; --line:rgba(246,241,231,.13);
     --ink:#F6F1E7; --ink2:#B8AF9E; --ink3:#8A8171;
-    --amber:#F5A524; --amber-deep:#C77700;
-    --ok:#5BC98D;
+    --amber:#F5A524;
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   body{
     background:var(--bg); color:var(--ink); line-height:1.7; word-break:keep-all;
     font-family:'Noto Sans KR',system-ui,'Malgun Gothic',sans-serif;
-    padding:1.5rem 1rem calc(2.5rem + env(safe-area-inset-bottom));
+    padding:1.6rem 1rem calc(3rem + env(safe-area-inset-bottom));
   }
-  .wrap{ max-width:26rem; margin:0 auto; }
-  .wide{ max-width:40rem; }
+  .wrap{ max-width:62rem; margin:0 auto; }
+  .cols{ display:grid; grid-template-columns:1fr; gap:1.4rem; }
+  @media (min-width:900px){ .cols{ grid-template-columns:1fr 22.5rem; align-items:start; } }
 
-  /* ── 명함 ─────────────────────────────────────────── */
-  .card{
-    position:relative; overflow:hidden;
-    background:linear-gradient(160deg,var(--surface2),var(--surface));
-    border:1px solid var(--line); border-radius:1.3rem;
-    padding:2rem 1.6rem 1.7rem;
-  }
-  .card::after{
-    content:''; position:absolute; right:-25%; top:-45%;
-    width:80%; height:80%; border-radius:50%;
-    background:radial-gradient(circle,rgba(245,165,36,.22),transparent 66%);
-    filter:blur(46px); pointer-events:none;
-  }
-  .co{ font-size:.82rem; font-weight:800; letter-spacing:.13em; color:var(--amber); }
-  .nm{ font-size:2.1rem; font-weight:900; letter-spacing:-.035em; line-height:1.15; margin-top:.5rem; }
-  .nm small{ font-size:.95rem; font-weight:700; color:var(--ink2); letter-spacing:0; margin-left:.5rem; }
-  .bio{ font-size:.93rem; color:var(--ink2); margin-top:.7rem; }
-  .tags{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:1rem; }
-  .tag{
-    font-size:.76rem; font-weight:700; padding:.3rem .7rem; border-radius:9999px;
-    background:rgba(245,165,36,.13); color:var(--amber);
-  }
-
-  .rows{ margin-top:1.4rem; display:flex; flex-direction:column; gap:.55rem; }
-  .row{
-    display:flex; align-items:center; gap:.85rem;
-    background:rgba(0,0,0,.25); border:1px solid var(--line);
-    border-radius:.8rem; padding:.8rem .95rem;
-    color:var(--ink); text-decoration:none; font-size:.94rem;
-  }
-  .row .ico{ flex:none; width:1.7rem; text-align:center; font-size:1.05rem; }
-  .row .k{ flex:none; width:3.1rem; font-size:.78rem; color:var(--ink3); font-weight:700; }
-  .row .v{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
-  a.row:active{ background:rgba(245,165,36,.1); }
-
-  .acts{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-top:1.1rem; }
-  .btn{
-    display:flex; align-items:center; justify-content:center; gap:.45rem;
-    padding:.95rem .6rem; border-radius:.8rem; border:1px solid var(--line);
-    background:var(--surface); color:var(--ink); cursor:pointer;
-    font-family:inherit; font-size:.92rem; font-weight:700; text-decoration:none;
-  }
-  .btn.pri{ background:var(--amber); color:#12100C; border-color:transparent; grid-column:1/-1; font-size:1rem; }
-  .btn:active{ transform:translateY(1px); }
-
-  .qr{ margin-top:1.3rem; text-align:center; }
-  .qr .box{ display:inline-block; background:#fff; padding:.7rem; border-radius:.8rem; line-height:0; }
-  .qr p{ font-size:.78rem; color:var(--ink3); margin-top:.6rem; }
-
-  .by{ text-align:center; font-size:.75rem; color:var(--ink3); margin-top:1.6rem; }
-  .by a{ color:var(--amber); text-decoration:none; }
-
-  /* ── 만들기 ───────────────────────────────────────── */
   .eyebrow{ display:inline-flex; align-items:center; gap:.7rem; font-size:.76rem; font-weight:900; letter-spacing:.18em; color:var(--amber); }
   .eyebrow::before{ content:''; width:1.9rem; height:2px; background:var(--amber); }
-  h1{ font-size:1.75rem; font-weight:900; letter-spacing:-.03em; margin-top:.8rem; }
+  h1{ font-size:1.85rem; font-weight:900; letter-spacing:-.03em; margin-top:.8rem; }
   .lead{ color:var(--ink2); font-size:.95rem; margin-top:.6rem; }
 
   .box{ background:var(--surface); border:1px solid var(--line); border-radius:1rem; padding:1.1rem; margin-top:1.1rem; }
-  .box h2{ font-size:.95rem; font-weight:800; margin-bottom:.8rem; }
-  label.f{ display:block; font-size:.79rem; font-weight:700; color:var(--ink3); margin:.75rem 0 .3rem; }
-  label.f:first-of-type{ margin-top:0; }
+  .box h2{ font-size:.95rem; font-weight:800; margin-bottom:.2rem; }
+  .box .sub{ font-size:.79rem; color:var(--ink3); margin-bottom:.9rem; }
+  label.f{ display:block; font-size:.79rem; font-weight:700; color:var(--ink3); margin:.8rem 0 .3rem; }
   input,textarea{
     width:100%; padding:.75rem .85rem; border-radius:.65rem; color:var(--ink);
-    background:rgba(0,0,0,.3); border:1px solid var(--line);
+    background:rgba(0,0,0,.32); border:1px solid var(--line);
     font-family:inherit; font-size:.95rem;
   }
-  textarea{ resize:vertical; min-height:60px; line-height:1.6; }
+  textarea{ resize:vertical; min-height:64px; line-height:1.6; }
   input::placeholder,textarea::placeholder{ color:#57503F; }
   input:focus,textarea:focus{ outline:none; border-color:rgba(245,165,36,.6); background:rgba(245,165,36,.06); }
   .two{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
@@ -105,14 +52,47 @@
   }
   .pick[aria-pressed="true"]{ background:rgba(245,165,36,.16); border-color:rgba(245,165,36,.55); color:var(--amber); }
 
-  .out{ margin-top:1.1rem; }
-  .link{
-    display:block; width:100%; word-break:break-all; font-size:.8rem; line-height:1.6;
-    background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:.65rem;
-    padding:.7rem .8rem; color:var(--ink2); font-family:ui-monospace,monospace;
+  .colors{ display:flex; gap:.55rem; flex-wrap:wrap; }
+  .swatch{ width:2.4rem; height:2.4rem; border-radius:.7rem; border:2px solid transparent; cursor:pointer; padding:0; }
+  .swatch[aria-pressed="true"]{ border-color:var(--ink); box-shadow:0 0 0 3px rgba(246,241,231,.18); }
+
+  .shot{ display:flex; gap:.9rem; align-items:center; }
+  .shot .thumb{
+    width:5rem; height:5rem; flex:none; border-radius:.85rem; overflow:hidden;
+    background:rgba(0,0,0,.35); border:1px dashed var(--line);
+    display:grid; place-items:center; font-size:.72rem; color:var(--ink3); text-align:center;
   }
-  .hint{ font-size:.79rem; color:var(--ink3); line-height:1.7; margin-top:.6rem; }
+  .shot .thumb img{ width:100%; height:100%; object-fit:cover; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+    padding:.85rem 1rem; border-radius:.75rem; border:1px solid var(--line);
+    background:rgba(255,255,255,.05); color:var(--ink); cursor:pointer;
+    font-family:inherit; font-size:.9rem; font-weight:700; text-decoration:none;
+  }
+  .btn.pri{ background:var(--amber); color:#12100C; border-color:transparent; font-size:1rem; }
+  .btn.wide{ width:100%; }
+  .btn:disabled{ opacity:.45; cursor:default; }
+  .btn:active:not(:disabled){ transform:translateY(1px); }
+  .row-btn{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-top:.7rem; }
+
+  /* 미리보기 */
+  .side{ position:sticky; top:1rem; }
+  .frame{
+    background:#000; border:1px solid var(--line); border-radius:1.4rem; padding:.55rem;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.9);
+  }
+  .frame iframe{ width:100%; height:34rem; border:0; border-radius:1rem; background:#fff; display:block; }
+  .side .cap{ text-align:center; font-size:.78rem; color:var(--ink3); margin-top:.6rem; }
+
+  .link{
+    display:block; word-break:break-all; font-size:.86rem; line-height:1.6; font-weight:700;
+    background:rgba(0,0,0,.32); border:1px solid var(--line); border-radius:.65rem;
+    padding:.75rem .85rem; color:var(--amber); font-family:ui-monospace,monospace;
+  }
+  .hint{ font-size:.79rem; color:var(--ink3); line-height:1.75; margin-top:.6rem; }
   .hint b{ color:var(--ink2); }
+  .warn{ color:#F0A98F; }
 
   #toast{
     position:fixed; left:50%; bottom:1.5rem; transform:translate(-50%,1.5rem);
@@ -126,98 +106,114 @@
 </style>
 </head>
 <body>
-
-<!-- ═══════ 명함 보기 ═══════ -->
-<div class="wrap" id="view" hidden>
-  <div class="card">
-    <div class="co" id="v-co"></div>
-    <div class="nm"><span id="v-nm"></span><small id="v-t"></small></div>
-    <p class="bio" id="v-bio" hidden></p>
-    <div class="tags" id="v-tags"></div>
-    <div class="rows" id="v-rows"></div>
-    <div class="acts">
-      <a class="btn pri" id="a-save">📇 연락처 저장</a>
-      <a class="btn" id="a-tel">📞 전화</a>
-      <a class="btn" id="a-sms">💬 문자</a>
-    </div>
-  </div>
-
-  <div class="qr" id="qr-wrap">
-    <div class="box" id="qr"></div>
-    <p>현장에서 이 화면을 보여주세요</p>
-  </div>
-
-  <div class="acts" style="grid-template-columns:1fr 1fr;">
-    <button class="btn" id="a-copy">🔗 링크 복사</button>
-    <button class="btn" id="a-share">📤 공유</button>
-  </div>
-
-  <p class="by">전자명함 · <a href="/" id="by-link">큰길이벤트기획</a></p>
-  <p class="by" style="margin-top:.4rem;"><a href="?new=1">내 명함도 만들기</a></p>
-</div>
-
-<!-- ═══════ 명함 만들기 ═══════ -->
-<div class="wrap wide" id="edit" hidden>
+<div class="wrap">
   <div class="eyebrow">행사팀 전자명함</div>
-  <h1>명함을 링크 하나로</h1>
+  <h1>사진 한 장이 이름을 기억시킵니다</h1>
   <p class="lead">
-    받은 분이 <b style="color:#F6F1E7;">한 번 눌러 폰에 저장</b>합니다.
-    종이 명함처럼 지갑에서 사라지지 않습니다.
+    만들면 <b style="color:#F6F1E7;">짧은 주소</b>가 나옵니다. 카톡에 보내면 사진이 크게 뜨고,
+    받은 분은 한 번 눌러 폰에 저장합니다.
   </p>
 
-  <div class="box">
-    <h2>기본</h2>
-    <label class="f" for="f-nm">이름</label>
-    <input id="f-nm" data-k="n" placeholder="홍길동" autocomplete="name">
-    <div class="two">
-      <div><label class="f" for="f-t">직함</label><input id="f-t" data-k="t" placeholder="대표 · 음향감독"></div>
-      <div><label class="f" for="f-co">팀 · 회사명</label><input id="f-co" data-k="c" placeholder="○○이벤트"></div>
-    </div>
-    <label class="f" for="f-bio">한 줄 소개</label>
-    <input id="f-bio" data-k="b" placeholder="예) 광양·순천 음향·조명 20년">
-  </div>
-
-  <div class="box">
-    <h2>연락</h2>
-    <label class="f" for="f-p">휴대폰</label>
-    <input id="f-p" data-k="p" placeholder="010-0000-0000" inputmode="tel" autocomplete="tel">
-    <div class="two">
-      <div><label class="f" for="f-p2">사무실</label><input id="f-p2" data-k="p2" placeholder="선택" inputmode="tel"></div>
-      <div><label class="f" for="f-e">이메일</label><input id="f-e" data-k="e" placeholder="선택" inputmode="email"></div>
-    </div>
-    <div class="two">
-      <div><label class="f" for="f-k">카카오톡 ID</label><input id="f-k" data-k="k" placeholder="선택"></div>
-      <div><label class="f" for="f-w">홈페이지</label><input id="f-w" data-k="w" placeholder="선택"></div>
-    </div>
-    <label class="f" for="f-a">주소</label>
-    <input id="f-a" data-k="a" placeholder="선택 — 누르면 길찾기가 열립니다">
-  </div>
-
-  <div class="box">
-    <h2>하는 일</h2>
-    <p class="hint" style="margin:0 0 .7rem;">고르면 명함에 표시됩니다.</p>
-    <div class="picks" id="picks"></div>
-    <label class="f" for="f-g2">직접 적기 (쉼표로 구분)</label>
-    <input id="f-g2" placeholder="예) 드론쇼, 불꽃">
-  </div>
-
-  <div class="out">
-    <button class="btn pri" id="a-make" style="width:100%;">명함 만들기</button>
-    <div id="made" hidden>
-      <p class="hint" style="margin-top:.9rem;"><b>내 명함 주소</b> — 이 링크를 문자·카톡으로 보내면 됩니다.</p>
-      <code class="link" id="made-url"></code>
-      <div class="acts">
-        <button class="btn" id="a-copy2">🔗 링크 복사</button>
-        <a class="btn" id="a-open" target="_blank" rel="noopener">👁 열어보기</a>
+  <div class="cols">
+    <div>
+      <div class="box">
+        <h2>사진</h2>
+        <p class="sub">얼굴이 나온 사진이 좋습니다. 카톡 미리보기에도 이 사진이 쓰입니다.</p>
+        <div class="shot">
+          <div class="thumb" id="thumb">사진<br>없음</div>
+          <div style="flex:1;min-width:0;">
+            <input type="file" id="pick-photo" accept="image/*" hidden>
+            <button class="btn wide" id="btn-photo">사진 고르기</button>
+            <button class="btn wide" id="btn-photo-x" style="margin-top:.45rem;" hidden>사진 빼기</button>
+          </div>
+        </div>
       </div>
-      <p class="hint">
-        주소가 길어 보여도 괜찮습니다. <b>명함 내용이 주소 안에 통째로 들어있어서</b>
-        서버 없이도 어디서나 열립니다. 이 링크를 저장해 두시면 계속 쓰실 수 있습니다.
-      </p>
+
+      <div class="box">
+        <h2>기본</h2>
+        <label class="f" for="f-nm">이름</label>
+        <input id="f-nm" data-k="n" placeholder="홍길동" autocomplete="name">
+        <div class="two">
+          <div><label class="f" for="f-t">직함</label><input id="f-t" data-k="t" placeholder="대표 · 음향감독"></div>
+          <div><label class="f" for="f-co">팀 · 회사명</label><input id="f-co" data-k="c" placeholder="○○이벤트"></div>
+        </div>
+        <label class="f" for="f-bio">한 줄 소개</label>
+        <input id="f-bio" data-k="b" placeholder="예) 광양·순천 음향·조명 20년 · 축제 현장 500회">
+      </div>
+
+      <div class="box">
+        <h2>연락</h2>
+        <label class="f" for="f-p">휴대폰</label>
+        <input id="f-p" data-k="p" placeholder="010-0000-0000" inputmode="tel" autocomplete="tel">
+        <div class="two">
+          <div><label class="f" for="f-p2">사무실</label><input id="f-p2" data-k="p2" placeholder="선택" inputmode="tel"></div>
+          <div><label class="f" for="f-e">이메일</label><input id="f-e" data-k="e" placeholder="선택" inputmode="email"></div>
+        </div>
+        <div class="two">
+          <div><label class="f" for="f-k">카카오톡</label><input id="f-k" data-k="k" placeholder="아이디 또는 오픈채팅 주소"></div>
+          <div><label class="f" for="f-w">홈페이지</label><input id="f-w" data-k="w" placeholder="선택"></div>
+        </div>
+        <label class="f" for="f-a">주소</label>
+        <input id="f-a" data-k="a" placeholder="선택 — 누르면 길찾기가 열립니다">
+      </div>
+
+      <div class="box">
+        <h2>하는 일</h2>
+        <p class="sub">명함에 표시됩니다. 이걸 보고 연락이 옵니다.</p>
+        <div class="picks" id="picks"></div>
+        <label class="f" for="f-g2">직접 적기 (쉼표로 구분)</label>
+        <input id="f-g2" placeholder="예) 드론쇼, 냉불꽃">
+      </div>
+
+      <div class="box">
+        <h2>색</h2>
+        <p class="sub">명함 윗부분 색입니다.</p>
+        <div class="colors" id="colors"></div>
+      </div>
+
+      <div class="box">
+        <h2>주소 정하기</h2>
+        <p class="sub">비워두면 알아서 짧게 만들어 드립니다.</p>
+        <label class="f" for="f-slug">큰길이벤트.com/card/<b style="color:#F5A524;">여기</b></label>
+        <input id="f-slug" placeholder="예) gildong — 영문·숫자·하이픈만" autocapitalize="off" autocorrect="off" spellcheck="false">
+      </div>
+
+      <div class="box">
+        <h2>발행</h2>
+        <p class="sub">만들면 인터넷에 올라가고, 누구나 링크로 볼 수 있습니다.</p>
+        <div id="api-box" hidden>
+          <label class="f" for="f-api">명함 서버 주소</label>
+          <input id="f-api" placeholder="https://script.google.com/macros/s/.../exec" autocapitalize="off" spellcheck="false">
+          <p class="hint">한 번만 넣으면 이 브라우저가 기억합니다. 관리자에게 받으세요.</p>
+        </div>
+        <label class="f" for="f-pw">발행 비밀번호</label>
+        <input id="f-pw" type="password" placeholder="관리자에게 받으세요" autocomplete="current-password">
+        <button class="btn pri wide" id="btn-pub" style="margin-top:.9rem;">명함 발행하기</button>
+        <div id="done" hidden>
+          <p class="hint" style="margin-top:1rem;"><b>내 명함 주소</b></p>
+          <code class="link" id="done-url"></code>
+          <div class="row-btn">
+            <button class="btn" id="btn-copy">링크 복사</button>
+            <a class="btn" id="btn-open" target="_blank" rel="noopener">열어보기</a>
+          </div>
+          <p class="hint">
+            카톡·문자에 이 주소만 보내면 됩니다. <b>미리보기가 뜨기까지 1~2분</b> 걸립니다.
+            카톡에서 미리보기가 안 보이면 잠시 뒤 다시 보내보세요.
+          </p>
+        </div>
+        <p class="hint" id="pub-msg" hidden></p>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="frame"><iframe id="pv" title="명함 미리보기"></iframe></div>
+      <p class="cap">받는 분에게 이렇게 보입니다</p>
     </div>
   </div>
 
-  <p class="by">전자명함 · <a href="/">큰길이벤트기획</a> · <a href="tel:15337295">1533-7295</a></p>
+  <p class="hint" style="text-align:center;margin-top:2rem;">
+    전자명함 · <a href="/" style="color:var(--amber);">큰길이벤트기획</a> · <a href="tel:15337295" style="color:var(--amber);">1533-7295</a>
+  </p>
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -225,167 +221,438 @@
 <script>
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-
-/* 명함 내용을 주소에 통째로 싣는다. 서버가 없어도 어디서나 열린다. */
-const b64u   = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-const unb64u = (s) => { let t=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(t.length%4) t+='='; return decodeURIComponent(escape(atob(t))); };
 const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* 명함 서버 (apps-script/card/Code.gs 를 배포한 주소).
+   배포하고 한 번 넣으면 이 브라우저가 기억한다. 주소를 여기 박아두면 그 뒤로는 물어보지 않는다. */
+const 서버기본 = '';
+const 서버 = () => 서버기본 || localStorage.getItem('keungil-card-api') || '';
+const 집   = 'https://xn--wk0bn7yi8h24iszc.com';
 
 const 직군들 = ['음향','조명','LED·영상','무대·트러스','MC·사회','가수·공연','마술·버블',
                 '도우미·모델','부스·천막','포토부스','케이터링','발전기','드론쇼','특수효과',
                 '카메라·중계','행사기획'];
 
-let D = { n:'', t:'', c:'', b:'', p:'', p2:'', e:'', k:'', w:'', a:'', g:[] };
+/* 명함 윗부분 색. 어두운 바탕에 흰 글씨라 어느 것이든 글씨가 또렷하다. */
+const 색들 = [
+  { id:'navy',  bg:'#1B2A4A', bg2:'#132038' },
+  { id:'ink',   bg:'#1F1D28', bg2:'#141219' },
+  { id:'amber', bg:'#7A4A0B', bg2:'#5A3608' },
+  { id:'green', bg:'#14432F', bg2:'#0D2E20' },
+  { id:'wine',  bg:'#4A1626', bg2:'#340F1B' },
+  { id:'steel', bg:'#26343D', bg2:'#1A242B' },
+];
+
+let D = { n:'', t:'', c:'', b:'', p:'', p2:'', e:'', k:'', w:'', a:'', g:[], col:'navy' };
+let 사진 = '';     // 명함에 넣을 정사각 사진 (data URL)
+let OG   = '';     // 카톡 미리보기용 1200×630 (data URL)
 
 function toast(m){
   const t=$('#toast'); t.textContent=m; t.classList.add('on');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), 2400);
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), 2600);
 }
-
 const 전화숫자 = (s) => String(s||'').replace(/[^0-9+]/g,'');
+const 색찾기 = () => 색들.find(c=>c.id===D.col) || 색들[0];
 
-/* ── 명함 보기 ────────────────────────────────────────────────── */
-function 보이기(){
-  $('#view').hidden = false;
-  $('#edit').hidden = true;
-  document.title = (D.n || '전자명함') + (D.c ? ' · ' + D.c : '');
+/* ── 아이콘 — 그림 파일 없이 글자처럼 쓴다 ─────────────────────── */
+const 아이콘 = {
+  tel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.8 8.4 8.4 0 0 1 8.4-9h.6a8.4 8.4 0 0 1 8 8z"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
+  web:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  save:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>',
+};
 
-  $('#v-co').textContent = D.c || '';
-  $('#v-nm').textContent = D.n || '이름 없음';
-  $('#v-t').textContent  = D.t || '';
-  const bio = $('#v-bio'); bio.hidden = !D.b; bio.textContent = D.b || '';
-
-  $('#v-tags').innerHTML = (D.g||[]).map(g => `<span class="tag">${esc(g)}</span>`).join('');
-
-  const 줄 = [];
-  const 넣기 = (ico,k,v,href) => { if(v) 줄.push(
-    `<${href?'a':'div'} class="row"${href?` href="${esc(href)}"`:''}>`
-    + `<span class="ico">${ico}</span><span class="k">${k}</span><span class="v">${esc(v)}</span></${href?'a':'div'}>`); };
-
-  넣기('📱','휴대폰', D.p,  D.p  ? 'tel:'+전화숫자(D.p)  : '');
-  넣기('☎️','사무실', D.p2, D.p2 ? 'tel:'+전화숫자(D.p2) : '');
-  넣기('✉️','메일',   D.e,  D.e  ? 'mailto:'+D.e : '');
-  /* 카톡 아이디는 눌러서 갈 곳이 없다. 오픈채팅 주소를 적었을 때만 링크로 만든다. */
-  넣기('💬','카톡',   D.k,  /^(https?:\/\/)?open\.kakao\.com\//i.test(D.k) ? (/^https?:/i.test(D.k)?D.k:'https://'+D.k) : '');
-  넣기('🌐','홈피',   D.w,  D.w  ? (/^https?:/i.test(D.w) ? D.w : 'https://'+D.w) : '');
-  넣기('📍','주소',   D.a,  D.a  ? 'https://map.kakao.com/?q=' + encodeURIComponent(D.a) : '');
-  $('#v-rows').innerHTML = 줄.join('');
-
-  const tel = 전화숫자(D.p);
-  $('#a-tel').href = tel ? 'tel:'+tel : '#';
-  $('#a-sms').href = tel ? 'sms:'+tel : '#';
-  $('#a-tel').hidden = $('#a-sms').hidden = !tel;
-  $('#a-save').href = vcardURL();
-  $('#a-save').download = (D.n || 'card') + '.vcf';
-
-  if (D.w) { const b=$('#by-link'); b.textContent = D.c || D.w; b.href = /^https?:/i.test(D.w)?D.w:'https://'+D.w; }
-  그리기QR();
-}
-
-/* 폰 연락처에 그대로 들어가는 형식 */
-function vcardURL(){
+/* ── vCard — 폰 주소록에 그대로 들어간다 ───────────────────────── */
+function vcard(d){
   const L = ['BEGIN:VCARD','VERSION:3.0'];
-  L.push('N:' + (D.n||'') + ';;;;');   // 성;이름;중간;접두;접미 — 한국 이름은 통째로 앞칸에
-  L.push('FN:' + (D.n||''));
-  if(D.c)  L.push('ORG:' + D.c);
-  if(D.t)  L.push('TITLE:' + D.t);
-  if(D.p)  L.push('TEL;TYPE=CELL:' + D.p);
-  if(D.p2) L.push('TEL;TYPE=WORK:' + D.p2);
-  if(D.e)  L.push('EMAIL:' + D.e);
-  if(D.w)  L.push('URL:' + (/^https?:/i.test(D.w)?D.w:'https://'+D.w));
-  if(D.a)  L.push('ADR;TYPE=WORK:;;' + D.a + ';;;;');
-  const 메모 = [D.b, (D.g||[]).join(' · '), D.k?('카카오톡 '+D.k):''].filter(Boolean).join(' / ');
+  L.push('N:' + (d.n||'') + ';;;;');
+  L.push('FN:' + (d.n||''));
+  if(d.c)  L.push('ORG:' + d.c);
+  if(d.t)  L.push('TITLE:' + d.t);
+  if(d.p)  L.push('TEL;TYPE=CELL:' + d.p);
+  if(d.p2) L.push('TEL;TYPE=WORK:' + d.p2);
+  if(d.e)  L.push('EMAIL:' + d.e);
+  if(d.w)  L.push('URL:' + (/^https?:/i.test(d.w)?d.w:'https://'+d.w));
+  if(d.a)  L.push('ADR;TYPE=WORK:;;' + d.a + ';;;;');
+  const 메모 = [d.b, (d.g||[]).join(' · '), d.k?('카카오톡 '+d.k):''].filter(Boolean).join(' / ');
   if(메모) L.push('NOTE:' + 메모);
   L.push('END:VCARD');
-  return 'data:text/vcard;charset=utf-8,' + encodeURIComponent(L.join('\r\n'));
+  return L.join('\r\n');
 }
 
-function 그리기QR(){
-  const box = $('#qr');
-  if (typeof QRCode === 'undefined') { $('#qr-wrap').hidden = true; return; }
-  box.innerHTML = '';
-  try {
-    new QRCode(box, { text: location.href, width: 168, height: 168,
-                      colorDark:'#12100C', colorLight:'#ffffff',
-                      correctLevel: QRCode.CorrectLevel.L });
-  } catch(e) { $('#qr-wrap').hidden = true; }
+/* ── 명함 한 장을 통째로 만든다 ─────────────────────────────────
+   미리보기와 발행이 같은 함수를 쓴다. 보이는 것과 나가는 것이 어긋나면 안 된다. */
+function 명함HTML(d, opt){
+  opt = opt || {};
+  const 색 = 색들.find(c=>c.id===d.col) || 색들[0];
+  const 사진주소 = opt.photo || '';
+  const og  = opt.og  || '';
+  const url = opt.url || '';
+  const 이름 = d.n || '이름';
+  const 소속 = [d.c, d.t].filter(Boolean).join(' · ');
+
+  const 줄 = [];
+  const 넣기 = (ico, 라벨, 값, href) => { if(!값) return;
+    const 안 = `<span class="ic">${아이콘[ico]}</span><span class="tx"><span class="lb">${라벨}</span><span class="vl">${esc(값)}</span></span>`;
+    줄.push(href ? `<a class="r" href="${esc(href)}">${안}<span class="go">›</span></a>` : `<div class="r">${안}</div>`);
+  };
+  넣기('tel','휴대폰', d.p,  d.p  ? 'tel:'+전화숫자(d.p)  : '');
+  넣기('tel','사무실', d.p2, d.p2 ? 'tel:'+전화숫자(d.p2) : '');
+  넣기('mail','이메일', d.e,  d.e ? 'mailto:'+d.e : '');
+  넣기('chat','카카오톡', d.k, /^(https?:\/\/)?open\.kakao\.com\//i.test(d.k||'') ? (/^https?:/i.test(d.k)?d.k:'https://'+d.k) : '');
+  넣기('web','홈페이지', d.w, d.w ? (/^https?:/i.test(d.w)?d.w:'https://'+d.w) : '');
+  넣기('pin','주소', d.a, d.a ? 'https://map.kakao.com/?q='+encodeURIComponent(d.a) : '');
+
+  const 태그 = (d.g||[]).map(g=>`<span class="tag">${esc(g)}</span>`).join('');
+  const 설명 = [소속, d.b].filter(Boolean).join(' · ') || '전자명함';
+
+  return `<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>${esc(이름)}${소속?' · '+esc(소속):''}</title>
+<meta name="description" content="${esc(설명)}">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="${esc(이름)}${d.t?' '+esc(d.t):''}">
+<meta property="og:description" content="${esc(설명)}">
+${og ? `<meta property="og:image" content="${esc(og)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">` : ''}
+${url ? `<meta property="og:url" content="${esc(url)}">
+<link rel="canonical" href="${esc(url)}">` : ''}
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{ --top:${색.bg}; --top2:${색.bg2}; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{
+    background:#EEF0F4; color:#15171C; line-height:1.65; word-break:keep-all;
+    font-family:'Noto Sans KR',system-ui,'Malgun Gothic',sans-serif;
+    padding:0 0 calc(2.5rem + env(safe-area-inset-bottom));
+  }
+  .card{ max-width:26rem; margin:0 auto; background:#fff; min-height:100vh; }
+  @media (min-width:520px){
+    body{ padding-top:1.5rem; }
+    .card{ min-height:0; border-radius:1.4rem; overflow:hidden; box-shadow:0 20px 50px -24px rgba(10,14,25,.45); }
+  }
+
+  .head{ position:relative; background:linear-gradient(165deg,var(--top),var(--top2)); color:#fff; }
+  .photo{ width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  .head .txt{ padding:1.35rem 1.4rem 1.5rem; }
+  .head.has-photo .txt{ padding-top:1.15rem; }
+  .nm{ font-size:1.9rem; font-weight:900; letter-spacing:-.035em; line-height:1.2; }
+  .ttl{ font-size:.98rem; font-weight:700; margin-top:.35rem; color:rgba(255,255,255,.93); }
+  .org{ font-size:.9rem; margin-top:.1rem; color:rgba(255,255,255,.72); }
+  .bio{ font-size:.9rem; margin-top:.75rem; color:rgba(255,255,255,.85); }
+  .tags{ display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.95rem; }
+  .tag{
+    font-size:.76rem; font-weight:700; padding:.32rem .68rem; border-radius:9999px;
+    background:rgba(255,255,255,.16); color:#fff;
+  }
+
+  .rows{ padding:.35rem 0; }
+  .r{
+    display:flex; align-items:center; gap:.85rem; width:100%;
+    padding:.95rem 1.4rem; text-decoration:none; color:inherit;
+    border-bottom:1px solid #EDEFF3;
+  }
+  .r:last-child{ border-bottom:none; }
+  a.r:active{ background:#F4F6FA; }
+  .ic{ flex:none; width:1.35rem; height:1.35rem; color:var(--top); }
+  .ic svg{ width:100%; height:100%; display:block; }
+  .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .lb{ font-size:.72rem; font-weight:700; color:#8A8FA0; letter-spacing:.02em; }
+  .vl{ font-size:1.02rem; font-weight:700; color:#15171C; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .go{ flex:none; color:#B9BECC; font-size:1.3rem; line-height:1; }
+
+  .acts{ padding:1.1rem 1.4rem 1.4rem; display:grid; gap:.55rem; }
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:.5rem;
+    padding:1.05rem 1rem; border-radius:.8rem; border:1px solid #DDE1EA;
+    background:#fff; color:#15171C; text-decoration:none;
+    font-family:inherit; font-size:1rem; font-weight:800; cursor:pointer;
+  }
+  .btn svg{ width:1.2rem; height:1.2rem; }
+  .btn.pri{ background:var(--top); color:#fff; border-color:transparent; }
+  .btn:active{ transform:translateY(1px); }
+  .btn2{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; }
+
+  .foot{ padding:0 1.4rem 1.6rem; text-align:center; font-size:.76rem; color:#9AA0B0; }
+  .foot a{ color:#6B7284; text-decoration:none; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head${사진주소?' has-photo':''}">
+    ${사진주소 ? `<img class="photo" src="${esc(사진주소)}" alt="${esc(이름)}">` : ''}
+    <div class="txt">
+      <div class="nm">${esc(이름)}</div>
+      ${d.t ? `<div class="ttl">${esc(d.t)}</div>` : ''}
+      ${d.c ? `<div class="org">${esc(d.c)}</div>` : ''}
+      ${d.b ? `<div class="bio">${esc(d.b)}</div>` : ''}
+      ${태그 ? `<div class="tags">${태그}</div>` : ''}
+    </div>
+  </div>
+
+  <div class="rows">${줄.join('')}</div>
+
+  <div class="acts">
+    <button class="btn pri" id="save">${아이콘.save} 연락처 저장</button>
+    <div class="btn2">
+      ${d.p ? `<a class="btn" href="tel:${esc(전화숫자(d.p))}">${아이콘.tel} 전화</a>` : ''}
+      ${d.p ? `<a class="btn" href="sms:${esc(전화숫자(d.p))}">${아이콘.msg} 문자</a>` : ''}
+    </div>
+    <button class="btn" id="share">명함 링크 공유</button>
+  </div>
+
+  <p class="foot">전자명함 · <a href="${집}/card/">나도 만들기</a></p>
+</div>
+
+<script>
+(function(){
+  var vcf = ${JSON.stringify(vcard(d))};
+  var 이름 = ${JSON.stringify(이름)};
+  document.getElementById('save').addEventListener('click', function(){
+    var blob = new Blob([vcf], { type:'text/vcard;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 이름 + '.vcf';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  });
+  document.getElementById('share').addEventListener('click', async function(){
+    if (navigator.share) { try { await navigator.share({ title:이름+' 명함', url:location.href }); return; } catch(e){ if(e.name==='AbortError') return; } }
+    try { await navigator.clipboard.writeText(location.href); alert('명함 주소를 복사했습니다'); }
+    catch(e){ prompt('이 주소를 복사하세요', location.href); }
+  });
+})();
+<\/script>
+</body>
+</html>`;
 }
 
-/* ── 명함 만들기 ──────────────────────────────────────────────── */
-function 만들기화면(){
-  $('#edit').hidden = false;
-  $('#view').hidden = true;
+/* ── 미리보기 ─────────────────────────────────────────────────── */
+let 그리기예약 = null;
+function 미리보기(){
+  clearTimeout(그리기예약);
+  그리기예약 = setTimeout(() => {
+    const d = 지금값();
+    $('#pv').srcdoc = 명함HTML(d, { photo: 사진 });
+  }, 160);
+}
 
-  $('#picks').innerHTML = 직군들.map(g =>
-    `<button type="button" class="pick" data-g="${esc(g)}" aria-pressed="${(D.g||[]).includes(g)}">${esc(g)}</button>`).join('');
-  $$('#picks .pick').forEach(b => b.addEventListener('click', () => {
-    const g = b.dataset.g;
-    D.g = (D.g||[]).includes(g) ? D.g.filter(x=>x!==g) : [...(D.g||[]), g];
-    b.setAttribute('aria-pressed', String(D.g.includes(g)));
-  }));
+function 지금값(){
+  const 직접 = $('#f-g2').value.split(',').map(s=>s.trim()).filter(Boolean);
+  return Object.assign({}, D, { g: [...(D.g||[]), ...직접] });
+}
 
-  $$('[data-k]').forEach(el => {
-    el.value = D[el.dataset.k] || '';
-    el.addEventListener('input', () => { D[el.dataset.k] = el.value.trim(); });
+/* ── 사진 — 정사각으로 자르고 줄인다 ───────────────────────────── */
+function 사진줄이기(file, 변){
+  return new Promise((풀기, 깨기) => {
+    const fr = new FileReader();
+    fr.onerror = () => 깨기(new Error('사진을 읽지 못했습니다'));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => 깨기(new Error('사진을 열지 못했습니다'));
+      img.onload = () => {
+        const 짧은쪽 = Math.min(img.width, img.height);
+        const sx = (img.width - 짧은쪽) / 2, sy = (img.height - 짧은쪽) / 2;
+        const cv = document.createElement('canvas');
+        cv.width = cv.height = 변;
+        const g = cv.getContext('2d');
+        g.drawImage(img, sx, sy, 짧은쪽, 짧은쪽, 0, 0, 변, 변);
+        풀기({ url: cv.toDataURL('image/jpeg', .86), img: img });
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
   });
 }
 
-function 주소만들기(){
-  const 직접 = $('#f-g2').value.split(',').map(s=>s.trim()).filter(Boolean);
-  const d = Object.assign({}, D, { g: [...(D.g||[]), ...직접] });
-  for (const k of Object.keys(d)) {                    // 빈 칸은 주소에서 뺀다
-    if (d[k] === '' || (Array.isArray(d[k]) && !d[k].length)) delete d[k];
+/* 카톡 미리보기용 1200×630. 사진 + 이름 + 소속을 얹는다.
+   사진이 없으면 색 바탕에 글자만 크게 넣는다. */
+function OG만들기(img){
+  const W = 1200, H = 630;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const g = cv.getContext('2d');
+  const 색 = 색찾기();
+
+  const 바탕 = g.createLinearGradient(0, 0, W, H);
+  바탕.addColorStop(0, 색.bg); 바탕.addColorStop(1, 색.bg2);
+  g.fillStyle = 바탕; g.fillRect(0, 0, W, H);
+
+  if (img) {
+    // 오른쪽에 사진을 놓고, 왼쪽으로 길게 스며들게 해서 경계가 띠처럼 보이지 않게 한다
+    const 폭 = Math.round(W * .48);
+    const 시작 = W - 폭;
+    const 배 = Math.max(폭 / img.width, H / img.height);
+    const w = img.width * 배, h = img.height * 배;
+    g.save();
+    g.beginPath(); g.rect(시작, 0, 폭, H); g.clip();
+    g.drawImage(img, 시작 - (w - 폭) / 2, (H - h) / 2, w, h);
+    const 가림 = g.createLinearGradient(시작, 0, 시작 + 폭 * .8, 0);
+    가림.addColorStop(0,   색.bg);
+    가림.addColorStop(.45, 'rgba(0,0,0,0)');
+    가림.addColorStop(1,   'rgba(0,0,0,0)');
+    g.fillStyle = 가림; g.fillRect(시작, 0, 폭, H);
+    g.restore();
   }
-  return location.origin + location.pathname + '#c=' + b64u(JSON.stringify(d));
+
+  /* 글자는 baseline 기준으로 그려진다. 줄 간격을 글자 크기보다 넉넉히 잡지 않으면
+     위 줄의 밑동과 아래 줄의 머리가 겹친다 — 회사명이 이름에 깔렸던 이유다. */
+  const d = 지금값();
+  const 왼 = 78;
+  const 글폭 = (img ? Math.round(W * .5) : W) - 왼 * 2;
+
+  const 줄들 = [];
+  if (d.c) 줄들.push({ f:'700 30px "Noto Sans KR", sans-serif', c:'rgba(255,255,255,.74)', t:d.c, h:44 });
+  줄들.push({ f:'900 92px "Noto Sans KR", sans-serif', c:'#ffffff', t:(d.n || '이름'), h:108 });
+  if (d.t) 줄들.push({ f:'700 34px "Noto Sans KR", sans-serif', c:'rgba(255,255,255,.92)', t:d.t, h:50 });
+  const 아래 = [(d.g||[]).slice(0,3).join(' · '), d.b].filter(Boolean)[0];
+  if (아래) 줄들.push({ f:'500 28px "Noto Sans KR", sans-serif', c:'rgba(255,255,255,.68)', t:아래, h:44 });
+
+  const 전체 = 줄들.reduce((a, r) => a + r.h, 0);
+  let y = (H - 전체) / 2;                       // 세로 가운데
+  for (const r of 줄들) {
+    g.font = r.f; g.fillStyle = r.c;
+    y += r.h * .74;                             // baseline 은 줄 높이의 4분의 3쯤
+    g.fillText(자르기(g, r.t, 글폭), 왼, y);
+    y += r.h * .26;
+  }
+  return cv.toDataURL('image/jpeg', .88);
 }
 
-async function 복사(text, 말){
-  try { await navigator.clipboard.writeText(text); toast(말); return true; }
-  catch(e){
-    const ta=document.createElement('textarea');
-    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    let ok=false; try{ ok=document.execCommand('copy'); }catch(err){}
-    ta.remove(); toast(ok?말:'복사가 막혀 있습니다 · 주소를 길게 눌러 복사해 주세요'); return ok;
+function 자르기(g, s, 최대){
+  if (g.measureText(s).width <= 최대) return s;
+  let t = s;
+  while (t.length > 1 && g.measureText(t + '…').width > 최대) t = t.slice(0, -1);
+  return t + '…';
+}
+
+/* ── 발행 ─────────────────────────────────────────────────────── */
+const 주소다듬기 = (s) => String(s||'').toLowerCase().replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+const 아무주소 = () => Math.random().toString(36).slice(2, 8);
+
+async function 발행(){
+  const d = 지금값();
+  if (!d.n) { toast('이름을 적어주세요'); $('#f-nm').focus(); return; }
+  if (!d.p) { toast('휴대폰 번호를 적어주세요'); $('#f-p').focus(); return; }
+  const pw = $('#f-pw').value.trim();
+  if (!pw) { toast('발행 비밀번호를 넣어주세요'); $('#f-pw').focus(); return; }
+
+  const api = ($('#f-api').value.trim() || 서버()).trim();
+  if (!api) { $('#api-box').hidden = false; toast('명함 서버 주소를 먼저 넣어주세요'); $('#f-api').focus(); return; }
+  localStorage.setItem('keungil-card-api', api);
+
+  const slug = 주소다듬기($('#f-slug').value) || 아무주소();
+  const btn = $('#btn-pub');
+  btn.disabled = true; btn.textContent = '올리는 중…';
+  $('#pub-msg').hidden = true;
+
+  try {
+    const url   = 집 + '/card/' + slug + '/';
+    const 사진길 = 사진 ? (집 + '/card/img/' + slug + '.jpg') : '';
+    const og길   = 집 + '/card/og/' + slug + '.jpg';
+    const html  = 명함HTML(d, { photo: 사진길, og: og길, url: url });
+
+    const 응 = await fetch(api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },  // 미리 확인 요청을 피한다
+      body: JSON.stringify({
+        action: 'card', pw: pw, slug: slug,
+        html: html,
+        photo: 사진 ? 사진.split(',')[1] : '',
+        og: OG ? OG.split(',')[1] : '',
+      }),
+    });
+    const 답 = await 응.json();
+    if (!답.ok) throw new Error(답.error || '서버가 거절했습니다');
+
+    $('#done').hidden = false;
+    $('#done-url').textContent = url;
+    $('#btn-open').href = url;
+    toast('명함을 발행했습니다');
+    $('#done').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } catch (e) {
+    const m = $('#pub-msg');
+    m.hidden = false;
+    m.innerHTML = '<span class="warn"><b>발행하지 못했습니다.</b><br>' + esc(e.message || e) +
+      '<br>비밀번호가 맞는지, 인터넷이 되는지 확인해 주세요.</span>';
+  } finally {
+    btn.disabled = false; btn.textContent = '명함 발행하기';
   }
 }
 
-$('#a-make').addEventListener('click', () => {
-  if (!D.n) { toast('이름을 적어주세요'); $('#f-nm').focus(); return; }
-  const url = 주소만들기();
-  $('#made').hidden = false;
-  $('#made-url').textContent = url;
-  $('#a-open').href = url;
-  $('#made').scrollIntoView({ behavior:'smooth', block:'nearest' });
+/* ── 화면 붙이기 ──────────────────────────────────────────────── */
+$('#picks').innerHTML = 직군들.map(g =>
+  `<button type="button" class="pick" data-g="${esc(g)}" aria-pressed="false">${esc(g)}</button>`).join('');
+$$('#picks .pick').forEach(b => b.addEventListener('click', () => {
+  const g = b.dataset.g;
+  D.g = (D.g||[]).includes(g) ? D.g.filter(x=>x!==g) : [...(D.g||[]), g];
+  b.setAttribute('aria-pressed', String(D.g.includes(g)));
+  미리보기();
+}));
+
+$('#colors').innerHTML = 색들.map(c =>
+  `<button type="button" class="swatch" data-c="${c.id}" aria-pressed="${c.id===D.col}"
+    aria-label="${c.id}" style="background:linear-gradient(160deg,${c.bg},${c.bg2});"></button>`).join('');
+$$('#colors .swatch').forEach(b => b.addEventListener('click', () => {
+  D.col = b.dataset.c;
+  $$('#colors .swatch').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.c===D.col)));
+  미리보기();
+  if (원본사진) OG만들기준비();
+}));
+
+$$('[data-k]').forEach(el => el.addEventListener('input', () => { D[el.dataset.k] = el.value.trim(); 미리보기(); }));
+$('#f-g2').addEventListener('input', 미리보기);
+
+let 원본사진 = null;
+function OG만들기준비(){ OG = OG만들기(원본사진); }
+
+$('#btn-photo').addEventListener('click', () => $('#pick-photo').click());
+$('#pick-photo').addEventListener('change', async (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  try {
+    const r = await 사진줄이기(f, 640);
+    사진 = r.url; 원본사진 = r.img;
+    $('#thumb').innerHTML = '<img src="' + 사진 + '" alt="">';
+    $('#btn-photo-x').hidden = false;
+    OG만들기준비();
+    미리보기();
+  } catch (e) { toast(e.message || '사진을 넣지 못했습니다'); }
+  ev.target.value = '';
 });
-$('#a-copy2').addEventListener('click', () => 복사($('#made-url').textContent, '명함 주소를 복사했습니다'));
-$('#a-copy').addEventListener('click',  () => 복사(location.href, '명함 주소를 복사했습니다'));
-$('#a-share').addEventListener('click', async () => {
-  const 글 = (D.n||'') + (D.c?' · '+D.c:'') + ' 명함';
-  if (navigator.share) { try { await navigator.share({ title:글, url:location.href }); return; } catch(e){ if(e.name==='AbortError') return; } }
-  복사(location.href, '명함 주소를 복사했습니다');
+$('#btn-photo-x').addEventListener('click', () => {
+  사진 = ''; 원본사진 = null;
+  $('#thumb').textContent = '사진 없음';
+  $('#btn-photo-x').hidden = true;
+  OG = OG만들기(null);
+  미리보기();
 });
 
-/* ── 시작 ─────────────────────────────────────────────────────── */
-function start(){
-  const h = location.hash;
-  const 새로 = new URLSearchParams(location.search).get('new');
-  if (h.startsWith('#c=') && !새로) {
-    try {
-      const d = JSON.parse(unb64u(h.slice(3)));
-      D = Object.assign({ n:'',t:'',c:'',b:'',p:'',p2:'',e:'',k:'',w:'',a:'',g:[] }, d);
-      if (!Array.isArray(D.g)) D.g = [];
-      보이기();
-      return;
-    } catch(e) { toast('명함 주소를 읽지 못했습니다'); }
-  }
-  만들기화면();
-}
-start();
+$('#btn-pub').addEventListener('click', 발행);
+$('#btn-copy').addEventListener('click', async () => {
+  const t = $('#done-url').textContent;
+  try { await navigator.clipboard.writeText(t); toast('링크를 복사했습니다'); }
+  catch(e){ prompt('이 주소를 복사하세요', t); }
+});
 
-/* 주소의 해시만 바뀌면 브라우저는 페이지를 다시 읽지 않는다.
-   만들기 화면에서 자기 명함 주소로 넘어갈 때 아무 일도 안 일어나면 안 된다. */
-window.addEventListener('hashchange', start);
+/* 글꼴이 늦게 오면 OG 글씨가 기본 글꼴로 그려진다. 다 온 뒤 다시 그린다. */
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (원본사진 || D.n) OG만들기준비(); });
+
+/* 서버 주소를 아직 안 넣었으면 그 칸을 펼쳐 둔다 */
+if (!서버()) $('#api-box').hidden = false;
+$('#f-api').value = 서버();
+
+미리보기();
 </script>
 </body>
 </html>
