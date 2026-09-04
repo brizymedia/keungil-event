@@ -104,6 +104,28 @@ class Store(context: Context) {
     // ── 최근 걸린 목록 ─────────────────────────────
     // 줄바꿈으로 구분해 통째로 저장한다. 건수가 적어 이 정도면 충분하다.
 
+    // ── 행사 입찰 알림 ─────────────────────────────
+    // 알림판 공개 JSON 을 하루 한 번 읽는다. 본 공고 번호를 기억해 새것만 알린다.
+
+    var bidOn: Boolean
+        get() = sp.getBoolean("bid_on", true)
+        set(v) = sp.edit().putBoolean("bid_on", v).apply()
+
+    /** 마지막으로 확인한 시각. 0 이면 아직 한 번도 안 돈 것 */
+    var bidLast: Long
+        get() = sp.getLong("bid_last", 0L)
+        set(v) = sp.edit().putLong("bid_last", v).apply()
+
+    /** 마지막 확인에서 새로 뜬 공고 수 (설정 화면 표시용) */
+    var bidLastCount: Int
+        get() = sp.getInt("bid_last_count", 0)
+        set(v) = sp.edit().putInt("bid_last_count", v).apply()
+
+    /** 이미 본 공고 번호들 — 지금 판에 있는 것만 유지되므로 무한히 커지지 않는다 */
+    var bidSeen: Set<String>
+        get() = sp.getStringSet("bid_seen", emptySet()) ?: emptySet()
+        set(v) = sp.edit().putStringSet("bid_seen", v).apply()
+
     data class Hit(val at: Long, val room: String, val text: String)
 
     fun addHit(room: String, text: String) {

@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var countText: TextView
     private var cbOnBtn: Button? = null
     private var cbState: TextView? = null
+    private var bidState: TextView? = null
 
     private val ink = Color.parseColor("#F6F1E7")
     private val ink2 = Color.parseColor("#B8AF9E")
@@ -63,12 +64,15 @@ class MainActivity : AppCompatActivity() {
 
         // 서비스가 아직 안 켜졌어도 채널이 있어야 설정 화면이 제대로 열린다
         AlertListenerService.ensureChannel(this)
+        BidWorker.ensureChannel(this)
+        if (store.bidOn) BidWorker.schedule(this)      // 이미 걸려 있으면 그대로 둔다 (KEEP)
 
         header()
         statusCard()
         jobSection()
         regionSection()
         callbackSection()
+        bidSection()
         hitSection()
 
         askNotificationPermission()
@@ -359,6 +363,56 @@ class MainActivity : AppCompatActivity() {
             store.cbAsk -> "켜짐 · 통화가 끝나면 알림으로 물어봅니다. 오늘 " + store.sentToday() + "건 보냄"
             else -> "켜짐 · 통화가 끝나면 바로 보냅니다. 오늘 " + store.sentToday() + "건 보냄"
         }
+    }
+
+    /**
+     * 행사 입찰 알림. 카톡 알림과는 별개로, 공개 입찰 JSON 을 하루 한 번 읽어 새 공고를 알린다.
+     * 「지금 확인해 보기」로 바로 한 번 돌려 볼 수 있다 — 처음 깐 사람에게 첫 알림을 보여주는 용도.
+     */
+    private fun bidSection() {
+        root.addView(sectionTitle("행사 입찰 알림"))
+        root.addView(text(
+            "나라장터에 새로 뜬 행사 입찰과 마감 임박 공고를 하루 한 번 알려드립니다. " +
+                "알림을 누르면 이벤트 코리아 입찰판이 열립니다. 카톡과는 무관하게 공개 자료만 받아옵니다.",
+            13f, ink2, top = 2
+        ))
+
+        val card = card()
+        val state = text("", 12f, ink3, top = 8)
+        bidState = state
+        val onBtn = Button(this)
+
+        fun paint() {
+            val on = store.bidOn
+            onBtn.text = if (on) "✓ 입찰 알림 켜짐 — 누르면 끄기" else "입찰 알림 켜기"
+            onBtn.setTextColor(if (on) ink else ink2)
+            onBtn.setBackgroundColor(if (on) Color.parseColor("#3A2E14") else Color.parseColor("#252017"))
+            val last = store.bidLast
+            state.text = if (!on) "꺼져 있습니다"
+                else if (last == 0L) "아직 확인한 적 없음 — 오늘부터 하루 한 번 확인합니다"
+                else "마지막 확인 " + DateUtils.getRelativeTimeSpanString(
+                    last, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS) +
+                    " · 그때 새 공고 " + store.bidLastCount + "건"
+        }
+        onBtn.setOnClickListener {
+            store.bidOn = !store.bidOn
+            if (store.bidOn) BidWorker.schedule(this) else BidWorker.cancel(this)
+            paint()
+        }
+        paint()
+        card.addView(onBtn)
+
+        card.addView(Button(this).apply {
+            text = "지금 확인해 보기"
+            setOnClickListener {
+                if (!store.bidOn) { store.bidOn = true; BidWorker.schedule(this@MainActivity); paint() }
+                BidWorker.runNow(this@MainActivity)
+                android.widget.Toast.makeText(this@MainActivity,
+                    "확인 중입니다. 잠시 뒤 알림이 옵니다", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        })
+        card.addView(state)
+        root.addView(card)
     }
 
     private fun hitSection() {

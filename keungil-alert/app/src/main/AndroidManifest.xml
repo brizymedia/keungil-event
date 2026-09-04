@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- 배터리 최적화 제외 화면으로 보내기 위해 -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!--
+        행사 입찰 알림 — 행사 고시 알림판의 공개 JSON 을 하루 한 번 받아온다.
+        이 앱이 인터넷을 쓰는 곳은 그것 하나뿐이다. 카톡 내용은 여전히 폰 밖으로 나가지 않는다.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
         콜백 문자 — 전화를 끊으면 명함 링크를 문자로 보낸다.

@@ -11,8 +11,8 @@ android {
         applicationId = "com.brizymedia.keungilalert"
         minSdk = 26          // 안드로이드 8.0 — 알림 채널이 이때 생겼다
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = 2
+        versionName = "0.2"
     }
 
     buildTypes {
@@ -33,4 +33,6 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    // 하루 한 번 입찰 공고 확인 (폰이 자는 동안에도 깨워 준다)
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 }
