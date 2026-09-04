@@ -121,6 +121,17 @@
   <div class="cols">
     <div>
       <div class="box">
+        <h2>이미 만든 명함 고치기</h2>
+        <p class="sub">주소만 넣으면 그때 넣은 내용이 그대로 올라옵니다. 고칠 데만 고쳐서 다시 발행하세요.</p>
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <span class="hint" style="margin:0;flex:none;">/card/</span>
+          <input id="f-load" placeholder="khm" autocapitalize="off" spellcheck="false" style="flex:1;">
+          <button class="btn" id="btn-load" style="flex:none;">불러오기</button>
+        </div>
+        <p class="hint" id="load-msg" hidden></p>
+      </div>
+
+      <div class="box">
         <h2>사진</h2>
         <p class="sub">배경은 크게 깔리고, 인물 사진은 그 아래 작은 동그라미로 들어갑니다.</p>
 
@@ -463,6 +474,9 @@ ${'' /* og:url 과 canonical 은 일부러 넣지 않는다.
   <p class="foot">전자명함 · <a href="${집}/card/">나도 만들기</a></p>
 </div>
 
+<!-- 고칠 때 이 내용을 그대로 불러온다. 사람 눈에는 안 보인다. -->
+<script type="application/json" id="card-data">${JSON.stringify(d).replace(/</g, '\\u003c')}<\/script>
+
 <script>
 (function(){
   var vcf = ${JSON.stringify(vcard(d))};
@@ -732,6 +746,78 @@ function 사진칸(칸, 단추, 지우기, 썸, 폭, 비율, 빈글, 담기){
       (u, i) => { 사진 = u; 원본사진 = i; });
 사진칸('#pick-bg', '#btn-bg', '#btn-bg-x', '#bg-thumb', 1280, 1.6, '배경 없음',
       (u, i) => { 배경 = u; 원본배경 = i; });
+
+/* ── 이미 만든 명함 불러오기 ──────────────────────────────────────
+   발행할 때 명함 안에 내용을 JSON 으로 심어 뒀다. 그걸 도로 읽어 칸을 채운다.
+   사진도 주소에서 받아와 담아두므로, 고쳐서 다시 발행해도 사진이 사라지지 않는다.
+   만든 기기가 아니어도 된다 — 주소만 알면 어디서든 고칠 수 있다. */
+async function 그림담기(주소){
+  try {
+    const 응 = await fetch(주소 + '?t=' + Date.now());
+    if (!응.ok) return null;
+    const blob = await 응.blob();
+    const url = await new Promise((풀기) => {
+      const fr = new FileReader(); fr.onload = () => 풀기(fr.result); fr.readAsDataURL(blob);
+    });
+    const img = await new Promise((풀기, 깨기) => {
+      const i = new Image(); i.onload = () => 풀기(i); i.onerror = 깨기; i.src = url;
+    });
+    return { url, img };
+  } catch (e) { return null; }
+}
+
+async function 명함불러오기(){
+  const slug = 주소다듬기($('#f-load').value);
+  const 말 = $('#load-msg');
+  말.hidden = false;
+  if (!slug) { 말.innerHTML = '<span class="warn">명함 주소를 넣어주세요.</span>'; return; }
+
+  const btn = $('#btn-load');
+  btn.disabled = true; btn.textContent = '읽는 중…';
+  말.textContent = '';
+
+  try {
+    // 상대 주소로 읽는다 — 같은 사이트 안이라 도메인을 박을 이유가 없다
+    const 응 = await fetch('/card/' + slug + '/?t=' + Date.now());
+    if (!응.ok) throw new Error('그런 명함이 없습니다 (' + 응.status + ')');
+
+    const 글 = await 응.text();
+    const 문서 = new DOMParser().parseFromString(글, 'text/html');
+    const 칸 = 문서.getElementById('card-data');
+    if (!칸) throw new Error('이 명함은 옛 방식으로 만들어져 불러올 수 없습니다. 새로 만들어 주세요');
+
+    const d = JSON.parse(칸.textContent);
+    D = Object.assign({ n:'',t:'',c:'',b:'',p:'',p2:'',e:'',k:'',w:'',a:'',g:[],col:'navy' }, d);
+    if (!Array.isArray(D.g)) D.g = [];
+
+    // 칸 채우기
+    $$('[data-k]').forEach(el => { el.value = D[el.dataset.k] || ''; });
+    $('#f-g2').value = '';
+    $$('#picks .pick').forEach(b => b.setAttribute('aria-pressed', String(D.g.includes(b.dataset.g))));
+    $$('#colors .swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === D.col)));
+    $('#f-slug').value = slug;
+
+    // 사진 되찾기 — 없으면 그냥 넘어간다
+    const [인물, 배경그림] = await Promise.all([
+      그림담기('/card/img/' + slug + '.jpg'),
+      그림담기('/card/bg/'  + slug + '.jpg'),
+    ]);
+    if (인물)   { 사진 = 인물.url;      원본사진 = 인물.img;      $('#thumb').innerHTML    = '<img src="' + 사진 + '" alt="">'; $('#btn-photo-x').hidden = false; }
+    else        { 사진 = ''; 원본사진 = null; $('#thumb').textContent = '인물 없음'; $('#btn-photo-x').hidden = true; }
+    if (배경그림){ 배경 = 배경그림.url;  원본배경 = 배경그림.img;  $('#bg-thumb').innerHTML = '<img src="' + 배경 + '" alt="">'; $('#btn-bg-x').hidden    = false; }
+    else        { 배경 = ''; 원본배경 = null; $('#bg-thumb').textContent = '배경 없음'; $('#btn-bg-x').hidden = true; }
+
+    미리보기(); OG만들기준비();
+    말.innerHTML = '<b>' + esc(D.n || slug) + '</b> 명함을 불러왔습니다. 고치고 나서 아래 <b>발행</b>을 누르시면 덮어씁니다.';
+    toast('명함을 불러왔습니다');
+  } catch (e) {
+    말.innerHTML = '<span class="warn">' + esc(e.message || e) + '</span>';
+  } finally {
+    btn.disabled = false; btn.textContent = '불러오기';
+  }
+}
+$('#btn-load').addEventListener('click', 명함불러오기);
+$('#f-load').addEventListener('keydown', (e) => { if (e.key === 'Enter') 명함불러오기(); });
 
 $('#btn-pub').addEventListener('click', 발행);
 $('#btn-copy2').addEventListener('click', async () => {
