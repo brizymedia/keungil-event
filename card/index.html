@@ -358,8 +358,10 @@ function 명함HTML(d, opt){
 ${og ? `<meta property="og:image" content="${esc(og)}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">` : ''}
-${url ? `<meta property="og:url" content="${esc(url)}">
-<link rel="canonical" href="${esc(url)}">` : ''}
+${'' /* og:url 과 canonical 은 일부러 넣지 않는다.
+        그 태그가 있으면 카톡이 「이 글의 진짜 주소는 이것」이라며 뒤의 ?v= 를 떼어버리고,
+        예전에 읽어둔 미리보기를 계속 보여준다. 명함을 고쳐도 새 그림이 안 뜬다.
+        명함은 주소 하나에 내용 하나뿐이라 canonical 로 묶을 것도 없다. */}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
