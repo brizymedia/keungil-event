@@ -1074,6 +1074,8 @@ function paperHTMLForPDF(stampURI){
    서명 제출
 ═══════════════════════════════════════════════════════ */
 $('#btn-sign').addEventListener('click', async ()=>{
+  // 미리보기(예시) 화면에서는 서명을 받지 않는다. 포털의 예시 계약서가 실제 계약으로 저장되는 걸 막는다.
+  if(MODE==='preview'){ toast('예시 계약서입니다 — 실제 서명은 저장되지 않습니다'); return; }
   const name=$('#s-name').value.trim(), tel=$('#s-tel').value.trim(), email=$('#s-email').value.trim();
   if(!name){ toast('서명자 성명을 입력해 주세요'); $('#s-name').focus(); return; }
   if(!tel){ toast('연락처를 입력해 주세요'); $('#s-tel').focus(); return; }
