@@ -194,12 +194,34 @@ function 응답(값) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/** 설치가 제대로 됐는지 여기서 한 번 눌러 보세요 */
-function 설치확인() {
+/* ══════════════════════════════════════════════════════════════
+   설치할 때 한 번씩 눌러보는 것들 (갤러리 스크립트와 같은 이름)
+══════════════════════════════════════════════════════════════ */
+
+function 권한받기() {
+  // 바깥 인터넷에 연결하는 권한 하나만 씁니다 (깃허브에 명함을 올릴 때)
+  UrlFetchApp.fetch('https://api.github.com/rate_limit', { muteHttpExceptions: true });
+  Logger.log('권한 확인 완료 — 이제 배포를 새 버전으로 다시 해주세요.');
+}
+
+function 점검() {
+  const 속성 = PropertiesService.getScriptProperties();
   ['UPLOAD_PW', 'GITHUB_TOKEN', 'GITHUB_REPO'].forEach(function (k) {
-    const v = PropertiesService.getScriptProperties().getProperty(k);
-    Logger.log(k + ' : ' + (v ? '있음' : '★ 비어 있음'));
+    Logger.log(k + ': ' + (속성.getProperty(k) ? '있음' : '── 없음 ──'));
   });
-  const 응 = 깃허브('card', 'get');
-  Logger.log('깃허브 응답 : ' + 응.getResponseCode() + ' (200 이나 404 면 정상)');
+  try {
+    const 응 = 깃허브('card', 'get');
+    const 코드 = 응.getResponseCode();
+    if (코드 === 200) {
+      let n = 0;
+      try { n = JSON.parse(응.getContentText()).length; } catch (err) { /* 무시 */ }
+      Logger.log('깃허브 연결 정상 — card 폴더에 ' + n + '개 있습니다');
+    } else if (코드 === 404) {
+      Logger.log('깃허브 연결 정상 — card 폴더는 아직 비어 있습니다 (처음이면 맞습니다)');
+    } else {
+      Logger.log('깃허브가 거절했습니다 (' + 코드 + ') ' + 사유읽기(응));
+    }
+  } catch (err) {
+    Logger.log('깃허브를 읽지 못했습니다: ' + err.message);
+  }
 }
