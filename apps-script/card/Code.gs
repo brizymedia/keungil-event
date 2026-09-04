@@ -6,7 +6,8 @@
  * 1~2분 안에 올려주고, 짧은 주소로 열립니다.
  *
  *   card/{주소}/index.html   완성된 명함 (og 태그가 박혀 있어 카톡 미리보기가 뜬다)
- *   card/img/{주소}.jpg      명함 안에 보이는 사진
+ *   card/img/{주소}.jpg      인물 사진 (작은 동그라미)
+ *   card/bg/{주소}.jpg       배경 사진 (크게 깔린다)
  *   card/og/{주소}.jpg       카톡·문자 미리보기용 1200×630
  *
  * ── 설치 ────────────────────────────────────────────────
@@ -75,7 +76,11 @@ function 명함발행(요청) {
 
   // 사진부터 올린다. 사진이 없는 채로 명함이 먼저 뜨면 깨져 보인다.
   if (요청.photo) {
-    const r = 깃허브에올리기('card/img/' + 주소 + '.jpg', 요청.photo, '명함 사진: ' + 주소);
+    const r = 깃허브에올리기('card/img/' + 주소 + '.jpg', 요청.photo, '명함 인물: ' + 주소);
+    if (!r.ok) return r;
+  }
+  if (요청.bg) {
+    const r = 깃허브에올리기('card/bg/' + 주소 + '.jpg', 요청.bg, '명함 배경: ' + 주소);
     if (!r.ok) return r;
   }
   if (요청.og) {
@@ -93,7 +98,8 @@ function 명함삭제(요청) {
   const 주소 = String(요청.slug || '').toLowerCase();
   if (!주소틀.test(주소)) return { ok: false, error: '주소가 이상합니다' };
 
-  const 결과 = ['card/' + 주소 + '/index.html', 'card/img/' + 주소 + '.jpg', 'card/og/' + 주소 + '.jpg']
+  const 결과 = ['card/' + 주소 + '/index.html', 'card/img/' + 주소 + '.jpg',
+                'card/bg/' + 주소 + '.jpg', 'card/og/' + 주소 + '.jpg']
     .map(function (경로) { return 깃허브에서지우기(경로); });
 
   const 지운것 = 결과.filter(function (r) { return r.ok; }).length;
@@ -112,7 +118,7 @@ function 쓸수있나(주소) {
 
 /** 사이트가 이미 쓰고 있는 이름은 명함 주소로 내주면 안 된다 */
 function 막힌주소(주소) {
-  return ['img', 'og', 'index', 'admin', 'api', 'new', 'card'].indexOf(주소) >= 0;
+  return ['img', 'bg', 'og', 'index', 'admin', 'api', 'new', 'card'].indexOf(주소) >= 0;
 }
 
 /* ══════════════════════════════════════════════════════════════

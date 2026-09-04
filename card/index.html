@@ -63,6 +63,8 @@
     display:grid; place-items:center; font-size:.72rem; color:var(--ink3); text-align:center;
   }
   .shot .thumb img{ width:100%; height:100%; object-fit:cover; }
+  .shot .round-thumb{ border-radius:50%; }
+  .shot .wide-thumb{ width:8rem; height:5rem; }
 
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
@@ -120,15 +122,29 @@
     <div>
       <div class="box">
         <h2>사진</h2>
-        <p class="sub">얼굴이 나온 사진이 좋습니다. 카톡 미리보기에도 이 사진이 쓰입니다.</p>
+        <p class="sub">배경은 크게 깔리고, 인물 사진은 그 아래 작은 동그라미로 들어갑니다.</p>
+
+        <label class="f" style="margin-top:0;">배경 — 크게</label>
         <div class="shot">
-          <div class="thumb" id="thumb">사진<br>없음</div>
+          <div class="thumb wide-thumb" id="bg-thumb">배경<br>없음</div>
           <div style="flex:1;min-width:0;">
-            <input type="file" id="pick-photo" accept="image/*" hidden>
-            <button class="btn wide" id="btn-photo">사진 고르기</button>
-            <button class="btn wide" id="btn-photo-x" style="margin-top:.45rem;" hidden>사진 빼기</button>
+            <input type="file" id="pick-bg" accept="image/*" hidden>
+            <button class="btn wide" id="btn-bg">배경 고르기</button>
+            <button class="btn wide" id="btn-bg-x" style="margin-top:.45rem;" hidden>배경 빼기</button>
           </div>
         </div>
+        <p class="hint">무대·현장 사진이 좋습니다. 없으면 고른 색이 그대로 깔립니다.</p>
+
+        <label class="f">인물 — 동그랗게</label>
+        <div class="shot">
+          <div class="thumb round-thumb" id="thumb">인물<br>없음</div>
+          <div style="flex:1;min-width:0;">
+            <input type="file" id="pick-photo" accept="image/*" hidden>
+            <button class="btn wide" id="btn-photo">인물 사진 고르기</button>
+            <button class="btn wide" id="btn-photo-x" style="margin-top:.45rem;" hidden>인물 사진 빼기</button>
+          </div>
+        </div>
+        <p class="hint">얼굴이 가운데 오게 잘립니다. 카톡 미리보기에도 이 얼굴이 들어갑니다.</p>
       </div>
 
       <div class="box">
@@ -251,7 +267,8 @@ const 색들 = [
 ];
 
 let D = { n:'', t:'', c:'', b:'', p:'', p2:'', e:'', k:'', w:'', a:'', g:[], col:'navy' };
-let 사진 = '';     // 명함에 넣을 정사각 사진 (data URL)
+let 사진 = '';     // 인물 — 정사각으로 잘라 원으로 쓴다 (data URL)
+let 배경 = '';     // 배경 — 16:10 으로 잘라 크게 깐다 (data URL)
 let OG   = '';     // 카톡 미리보기용 1200×630 (data URL)
 
 function toast(m){
@@ -295,7 +312,8 @@ function vcard(d){
 function 명함HTML(d, opt){
   opt = opt || {};
   const 색 = 색들.find(c=>c.id===d.col) || 색들[0];
-  const 사진주소 = opt.photo || '';
+  const 사진주소 = opt.photo || '';     // 인물 — 작은 원
+  const 배경주소 = opt.bg    || '';     // 배경 — 크게 깔리는 것
   const og  = opt.og  || '';
   const url = opt.url || '';
   const 이름 = d.n || '이름';
@@ -350,9 +368,19 @@ ${url ? `<meta property="og:url" content="${esc(url)}">
   }
 
   .head{ position:relative; background:linear-gradient(165deg,var(--top),var(--top2)); color:#fff; }
-  .photo{ width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  /* 배경은 크게 깔고, 인물은 그 아래 걸치는 작은 원으로 */
+  .bg{ width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
   .head .txt{ padding:1.35rem 1.4rem 1.5rem; }
-  .head.has-photo .txt{ padding-top:1.15rem; }
+  .head.has-bg .txt{ padding-top:1.15rem; }
+  .head.has-face .txt{ padding-top:0; }
+  .head.has-bg.has-face .txt{ padding-top:0; }
+  .face{
+    width:5.4rem; height:5.4rem; border-radius:50%; object-fit:cover; display:block;
+    border:4px solid #fff; box-shadow:0 6px 18px -6px rgba(0,0,0,.55);
+    margin:-2.7rem 0 .9rem 1.4rem;      /* 배경 아래 절반쯤 걸치게 */
+    position:relative; background:#DDE1EA;
+  }
+  .head:not(.has-bg) .face{ margin:1.4rem 0 .9rem 1.4rem; }
   .nm{ font-size:1.9rem; font-weight:900; letter-spacing:-.035em; line-height:1.2; }
   .ttl{ font-size:.98rem; font-weight:700; margin-top:.35rem; color:rgba(255,255,255,.93); }
   .org{ font-size:.9rem; margin-top:.1rem; color:rgba(255,255,255,.72); }
@@ -396,8 +424,9 @@ ${url ? `<meta property="og:url" content="${esc(url)}">
 </head>
 <body>
 <div class="card">
-  <div class="head${사진주소?' has-photo':''}">
-    ${사진주소 ? `<img class="photo" src="${esc(사진주소)}" alt="${esc(이름)}">` : ''}
+  <div class="head${배경주소?' has-bg':''}${사진주소?' has-face':''}">
+    ${배경주소 ? `<img class="bg" src="${esc(배경주소)}" alt="">` : ''}
+    ${사진주소 ? `<img class="face" src="${esc(사진주소)}" alt="${esc(이름)}">` : ''}
     <div class="txt">
       <div class="nm">${esc(이름)}</div>
       ${d.t ? `<div class="ttl">${esc(d.t)}</div>` : ''}
@@ -450,7 +479,7 @@ function 미리보기(){
   clearTimeout(그리기예약);
   그리기예약 = setTimeout(() => {
     const d = 지금값();
-    $('#pv').srcdoc = 명함HTML(d, { photo: 사진 });
+    $('#pv').srcdoc = 명함HTML(d, { photo: 사진, bg: 배경 });
     OG만들기준비();          // 글자를 칠 때마다 카톡 그림도 같이 다시 그린다
   }, 160);
 }
@@ -461,7 +490,8 @@ function 지금값(){
 }
 
 /* ── 사진 — 정사각으로 자르고 줄인다 ───────────────────────────── */
-function 사진줄이기(file, 변){
+function 사진줄이기(file, 폭, 비율){
+  비율 = 비율 || 1;                       // 1 = 정사각(인물), 1.6 = 16:10(배경)
   return new Promise((풀기, 깨기) => {
     const fr = new FileReader();
     fr.onerror = () => 깨기(new Error('사진을 읽지 못했습니다'));
@@ -469,12 +499,15 @@ function 사진줄이기(file, 변){
       const img = new Image();
       img.onerror = () => 깨기(new Error('사진을 열지 못했습니다'));
       img.onload = () => {
-        const 짧은쪽 = Math.min(img.width, img.height);
-        const sx = (img.width - 짧은쪽) / 2, sy = (img.height - 짧은쪽) / 2;
+        // 원본에서 원하는 비율만큼 가운데를 잘라낸다
+        let sw = img.width, sh = Math.round(img.width / 비율);
+        if (sh > img.height) { sh = img.height; sw = Math.round(img.height * 비율); }
+        const sx = (img.width - sw) / 2, sy = (img.height - sh) / 2;
+
         const cv = document.createElement('canvas');
-        cv.width = cv.height = 변;
+        cv.width = 폭; cv.height = Math.round(폭 / 비율);
         const g = cv.getContext('2d');
-        g.drawImage(img, sx, sy, 짧은쪽, 짧은쪽, 0, 0, 변, 변);
+        g.drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
         풀기({ url: cv.toDataURL('image/jpeg', .86), img: img });
       };
       img.src = fr.result;
@@ -485,7 +518,7 @@ function 사진줄이기(file, 변){
 
 /* 카톡 미리보기용 1200×630. 사진 + 이름 + 소속을 얹는다.
    사진이 없으면 색 바탕에 글자만 크게 넣는다. */
-function OG만들기(img){
+function OG만들기(얼굴, 배경그림){
   const W = 1200, H = 630;
   const cv = document.createElement('canvas');
   cv.width = W; cv.height = H;
@@ -496,28 +529,42 @@ function OG만들기(img){
   바탕.addColorStop(0, 색.bg); 바탕.addColorStop(1, 색.bg2);
   g.fillStyle = 바탕; g.fillRect(0, 0, W, H);
 
-  if (img) {
-    // 오른쪽에 사진을 놓고, 왼쪽으로 길게 스며들게 해서 경계가 띠처럼 보이지 않게 한다
-    const 폭 = Math.round(W * .48);
-    const 시작 = W - 폭;
-    const 배 = Math.max(폭 / img.width, H / img.height);
-    const w = img.width * 배, h = img.height * 배;
-    g.save();
-    g.beginPath(); g.rect(시작, 0, 폭, H); g.clip();
-    g.drawImage(img, 시작 - (w - 폭) / 2, (H - h) / 2, w, h);
-    const 가림 = g.createLinearGradient(시작, 0, 시작 + 폭 * .8, 0);
+  if (배경그림) {
+    // 배경은 화면 전체에 깔고, 글씨가 읽히게 왼쪽부터 어둡게 덮는다
+    const 배 = Math.max(W / 배경그림.width, H / 배경그림.height);
+    const w = 배경그림.width * 배, h = 배경그림.height * 배;
+    g.drawImage(배경그림, (W - w) / 2, (H - h) / 2, w, h);
+
+    const 가림 = g.createLinearGradient(0, 0, W, 0);
     가림.addColorStop(0,   색.bg);
-    가림.addColorStop(.45, 'rgba(0,0,0,0)');
-    가림.addColorStop(1,   'rgba(0,0,0,0)');
-    g.fillStyle = 가림; g.fillRect(시작, 0, 폭, H);
+    가림.addColorStop(.52, 색.bg + 'D9');       // 거의 불투명
+    가림.addColorStop(1,   색.bg + '4D');       // 오른쪽은 사진이 비친다
+    g.fillStyle = 가림; g.fillRect(0, 0, W, H);
+  }
+
+  /* 인물은 작은 동그라미로. 배경이 주인공이고 얼굴은 누구인지 알려주는 표식이다. */
+  const 반지름 = 96;
+  const 원중심 = { x: 78 + 반지름, y: H / 2 };
+  let 왼 = 78;
+  if (얼굴) {
+    g.save();
+    g.beginPath(); g.arc(원중심.x, 원중심.y, 반지름, 0, Math.PI * 2); g.closePath();
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.fill();
+    g.clip();
+    const 짧은쪽 = Math.min(얼굴.width, 얼굴.height);
+    g.drawImage(얼굴, (얼굴.width - 짧은쪽) / 2, (얼굴.height - 짧은쪽) / 2, 짧은쪽, 짧은쪽,
+                원중심.x - 반지름, 원중심.y - 반지름, 반지름 * 2, 반지름 * 2);
     g.restore();
+    // 흰 테두리 — 어두운 배경에서 원이 또렷하게 떨어진다
+    g.beginPath(); g.arc(원중심.x, 원중심.y, 반지름, 0, Math.PI * 2);
+    g.lineWidth = 7; g.strokeStyle = 'rgba(255,255,255,.92)'; g.stroke();
+    왼 = 원중심.x + 반지름 + 46;
   }
 
   /* 글자는 baseline 기준으로 그려진다. 줄 간격을 글자 크기보다 넉넉히 잡지 않으면
      위 줄의 밑동과 아래 줄의 머리가 겹친다 — 회사명이 이름에 깔렸던 이유다. */
   const d = 지금값();
-  const 왼 = 78;
-  const 글폭 = (img ? Math.round(W * .5) : W) - 왼 * 2;
+  const 글폭 = W - 왼 - 70;
 
   const 줄들 = [];
   if (d.c) 줄들.push({ f:'700 30px "Noto Sans KR", sans-serif', c:'rgba(255,255,255,.74)', t:d.c, h:44 });
@@ -569,13 +616,14 @@ async function 발행(){
      이름이 비어 있다. 실제로 「이름」이라고 박힌 채 카톡에 나간 적이 있다.
      글꼴이 아직 안 왔으면 기본 글꼴로 그려지므로 그것도 기다린다. */
   try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
-  OG = OG만들기(원본사진);
+  OG = OG만들기(원본사진, 원본배경);
 
   try {
     const url   = 집 + '/card/' + slug + '/';
     const 사진길 = 사진 ? (집 + '/card/img/' + slug + '.jpg') : '';
+    const 배경길 = 배경 ? (집 + '/card/bg/'  + slug + '.jpg') : '';
     const og길   = 집 + '/card/og/' + slug + '.jpg';
-    const html  = 명함HTML(d, { photo: 사진길, og: og길, url: url });
+    const html  = 명함HTML(d, { photo: 사진길, bg: 배경길, og: og길, url: url });
 
     const 응 = await fetch(api, {
       method: 'POST',
@@ -584,6 +632,7 @@ async function 발행(){
         action: 'card', pw: pw, slug: slug,
         html: html,
         photo: 사진 ? 사진.split(',')[1] : '',
+        bg: 배경 ? 배경.split(',')[1] : '',
         og: OG ? OG.split(',')[1] : '',
       }),
     });
@@ -622,40 +671,48 @@ $$('#colors .swatch').forEach(b => b.addEventListener('click', () => {
   D.col = b.dataset.c;
   $$('#colors .swatch').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.c===D.col)));
   미리보기();
-  if (원본사진) OG만들기준비();
+  if (원본사진 || 원본배경) OG만들기준비();
 }));
 
 $$('[data-k]').forEach(el => el.addEventListener('input', () => { D[el.dataset.k] = el.value.trim(); 미리보기(); }));
 $('#f-g2').addEventListener('input', 미리보기);
 
-let 원본사진 = null;
+let 원본사진 = null;     // 인물 원본 (OG 에 원으로 그릴 때 쓴다)
+let 원본배경 = null;     // 배경 원본
+
 function OG만들기준비(){
-  OG = OG만들기(원본사진);
-  const im = document.getElementById("og-pv");
+  OG = OG만들기(원본사진, 원본배경);
+  const im = document.getElementById('og-pv');
   if (im) im.src = OG;
 }
 
-$('#btn-photo').addEventListener('click', () => $('#pick-photo').click());
-$('#pick-photo').addEventListener('change', async (ev) => {
-  const f = ev.target.files && ev.target.files[0];
-  if (!f) return;
-  try {
-    const r = await 사진줄이기(f, 640);
-    사진 = r.url; 원본사진 = r.img;
-    $('#thumb').innerHTML = '<img src="' + 사진 + '" alt="">';
-    $('#btn-photo-x').hidden = false;
-    OG만들기준비();
-    미리보기();
-  } catch (e) { toast(e.message || '사진을 넣지 못했습니다'); }
-  ev.target.value = '';
-});
-$('#btn-photo-x').addEventListener('click', () => {
-  사진 = ''; 원본사진 = null;
-  $('#thumb').textContent = '사진 없음';
-  $('#btn-photo-x').hidden = true;
-  OG만들기준비();
-  미리보기();
-});
+/** 파일 고르는 칸 하나를 통째로 엮는다 — 인물과 배경이 하는 일이 같다 */
+function 사진칸(칸, 단추, 지우기, 썸, 폭, 비율, 빈글, 담기){
+  $(단추).addEventListener('click', () => $(칸).click());
+  $(칸).addEventListener('change', async (ev) => {
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    try {
+      const r = await 사진줄이기(f, 폭, 비율);
+      담기(r.url, r.img);
+      $(썸).innerHTML = '<img src="' + r.url + '" alt="">';
+      $(지우기).hidden = false;
+      OG만들기준비(); 미리보기();
+    } catch (e) { toast(e.message || '사진을 넣지 못했습니다'); }
+    ev.target.value = '';
+  });
+  $(지우기).addEventListener('click', () => {
+    담기('', null);
+    $(썸).textContent = 빈글;
+    $(지우기).hidden = true;
+    OG만들기준비(); 미리보기();
+  });
+}
+
+사진칸('#pick-photo', '#btn-photo', '#btn-photo-x', '#thumb', 640, 1, '인물 없음',
+      (u, i) => { 사진 = u; 원본사진 = i; });
+사진칸('#pick-bg', '#btn-bg', '#btn-bg-x', '#bg-thumb', 1280, 1.6, '배경 없음',
+      (u, i) => { 배경 = u; 원본배경 = i; });
 
 $('#btn-pub').addEventListener('click', 발행);
 $('#btn-copy').addEventListener('click', async () => {
@@ -665,7 +722,7 @@ $('#btn-copy').addEventListener('click', async () => {
 });
 
 /* 글꼴이 늦게 오면 OG 글씨가 기본 글꼴로 그려진다. 다 온 뒤 다시 그린다. */
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (원본사진 || D.n) OG만들기준비(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (원본사진 || 원본배경 || D.n) OG만들기준비(); });
 
 /* 서버 주소를 아직 안 넣었으면 그 칸을 펼쳐 둔다 */
 if (!서버()) $('#api-box').hidden = false;
