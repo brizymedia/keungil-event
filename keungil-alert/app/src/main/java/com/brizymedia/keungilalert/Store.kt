@@ -33,6 +33,74 @@ class Store(context: Context) {
         return Rules.REGIONS.filter { it.id in ids }.flatMap { it.cities }.distinct()
     }
 
+    // ── 콜백 문자 ──────────────────────────────────
+    // 전화를 받고 끊으면 내 명함 링크를 문자로 보낸다.
+    // 문자는 통신사 요금이 붙으므로 안전장치를 여럿 둔다.
+
+    var callbackOn: Boolean
+        get() = sp.getBoolean(KEY_CB_ON, false)
+        set(v) = sp.edit().putBoolean(KEY_CB_ON, v).apply()
+
+    /** 내 전자명함 주소. 문자에 이 링크가 실린다. */
+    var cardUrl: String
+        get() = sp.getString(KEY_CB_URL, "") ?: ""
+        set(v) = sp.edit().putString(KEY_CB_URL, v.trim()).apply()
+
+    var cbText: String
+        get() = sp.getString(KEY_CB_TEXT, DEFAULT_CB_TEXT) ?: DEFAULT_CB_TEXT
+        set(v) = sp.edit().putString(KEY_CB_TEXT, v).apply()
+
+    /** 켜면 바로 보내지 않고 알림으로 물어본다 (요금·오발송이 걱정될 때) */
+    var cbAsk: Boolean
+        get() = sp.getBoolean(KEY_CB_ASK, true)
+        set(v) = sp.edit().putBoolean(KEY_CB_ASK, v).apply()
+
+    /** 주소록에 있는 사람에게는 안 보낸다 — 아는 사이엔 명함이 필요 없다 */
+    var cbSkipKnown: Boolean
+        get() = sp.getBoolean(KEY_CB_SKIP, true)
+        set(v) = sp.edit().putBoolean(KEY_CB_SKIP, v).apply()
+
+    /** 걸려온 전화만 (내가 건 전화는 제외) */
+    var cbIncomingOnly: Boolean
+        get() = sp.getBoolean(KEY_CB_IN, true)
+        set(v) = sp.edit().putBoolean(KEY_CB_IN, v).apply()
+
+    var cbDailyCap: Int
+        get() = sp.getInt(KEY_CB_CAP, 30)
+        set(v) = sp.edit().putInt(KEY_CB_CAP, v).apply()
+
+    /** 오늘 보낸 건수. 날이 바뀌면 0 부터 다시 센다. */
+    fun sentToday(): Int {
+        val 오늘 = 날짜도장()
+        return if (sp.getString(KEY_CB_DAY, "") == 오늘) sp.getInt(KEY_CB_COUNT, 0) else 0
+    }
+    fun countSend() {
+        val 오늘 = 날짜도장()
+        val n = if (sp.getString(KEY_CB_DAY, "") == 오늘) sp.getInt(KEY_CB_COUNT, 0) else 0
+        sp.edit().putString(KEY_CB_DAY, 오늘).putInt(KEY_CB_COUNT, n + 1).apply()
+    }
+
+    /** 같은 번호에 며칠 안에 또 보내지 않는다 */
+    fun sentRecently(number: String, days: Int = 30): Boolean {
+        val at = sp.getLong(KEY_CB_SENT + number, 0L)
+        return at > 0 && System.currentTimeMillis() - at < days * 86_400_000L
+    }
+    fun markSent(number: String) =
+        sp.edit().putLong(KEY_CB_SENT + number, System.currentTimeMillis()).apply()
+
+    private fun 날짜도장(): String {
+        val c = java.util.Calendar.getInstance()
+        return "%04d-%02d-%02d".format(c.get(java.util.Calendar.YEAR),
+            c.get(java.util.Calendar.MONTH) + 1, c.get(java.util.Calendar.DAY_OF_MONTH))
+    }
+
+    /** 문자에 실제로 나갈 글. 링크가 없으면 빈 문자열 — 그러면 보내지 않는다. */
+    fun cbMessage(): String {
+        val url = cardUrl
+        if (url.isBlank()) return ""
+        return cbText.trim() + "\n" + url
+    }
+
     // ── 최근 걸린 목록 ─────────────────────────────
     // 줄바꿈으로 구분해 통째로 저장한다. 건수가 적어 이 정도면 충분하다.
 
@@ -65,6 +133,20 @@ class Store(context: Context) {
         private const val KEY_HITS = "hits"
         private const val SEP = ""      // 본문에 나올 일 없는 글자
         private const val MAX_HITS = 200
+
+        private const val KEY_CB_ON = "cb_on"
+        private const val KEY_CB_URL = "cb_url"
+        private const val KEY_CB_TEXT = "cb_text"
+        private const val KEY_CB_ASK = "cb_ask"
+        private const val KEY_CB_SKIP = "cb_skip"
+        private const val KEY_CB_IN = "cb_in"
+        private const val KEY_CB_CAP = "cb_cap"
+        private const val KEY_CB_DAY = "cb_day"
+        private const val KEY_CB_COUNT = "cb_count"
+        private const val KEY_CB_SENT = "cb_sent_"
+
+        /** 짧게 둔다. 한글 45자가 넘으면 문자가 쪼개져 요금이 배로 든다. */
+        const val DEFAULT_CB_TEXT = "통화 감사합니다. 명함 보내드립니다."
 
         /** 처음 깔면 장비팀 기준으로 시작한다 — 큰길이벤트기획이 그 일을 한다 */
         private val DEFAULT_JOBS = setOf("sound", "led", "light")

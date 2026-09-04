@@ -6,6 +6,16 @@
     <!-- 배터리 최적화 제외 화면으로 보내기 위해 -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <!--
+        콜백 문자 — 전화를 끊으면 명함 링크를 문자로 보낸다.
+        이 권한들은 구글이 제한한 것이라 플레이스토어 등록이 어렵다.
+        (직접 배포는 문제 없다.) 콜백을 안 쓰면 물어보지도 않는다.
+    -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:label="큰길행사알림"
@@ -37,6 +47,19 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- 통화가 끝나면 깨어나 명함 문자를 보낸다 -->
+        <receiver
+            android:name=".CallWatcher"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.brizymedia.keungilalert.CB_SEND" />
+                <action android:name="com.brizymedia.keungilalert.CB_SKIP" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

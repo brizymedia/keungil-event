@@ -1,5 +1,6 @@
 package com.brizymedia.keungilalert
 
+import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -9,11 +10,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -33,6 +37,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var notifyBtn: Button
     private lateinit var hitBox: LinearLayout
     private lateinit var countText: TextView
+    private var cbOnBtn: Button? = null
+    private var cbState: TextView? = null
 
     private val ink = Color.parseColor("#F6F1E7")
     private val ink2 = Color.parseColor("#B8AF9E")
@@ -62,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         statusCard()
         jobSection()
         regionSection()
+        callbackSection()
         hitSection()
 
         askNotificationPermission()
@@ -80,12 +87,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, perms, results)
+        if (code == 200) {
+            // 문자와 통화기록이 있어야 보낼 수 있다.
+            // 주소록은 없어도 되지만, 그러면 「모르는 번호에만」을 못 가린다.
+            val 필수 =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
+            if (필수) { store.callbackOn = true; CallWatcher.ensureChannel(this) }
+            else android.widget.Toast.makeText(this,
+                "문자와 통화기록 권한이 있어야 켤 수 있습니다", android.widget.Toast.LENGTH_LONG).show()
+            refreshCallback()
+        }
         refreshStatus()
     }
 
     override fun onResume() {
         super.onResume()
         refreshStatus()
+        refreshCallback()
         refreshHits()
     }
 
@@ -212,6 +231,134 @@ class MainActivity : AppCompatActivity() {
             12f, ink3, top = 10
         ))
         root.addView(card)
+    }
+
+    /**
+     * 콜백 문자 — 전화를 받고 끊으면 내 전자명함 링크를 문자로 보낸다.
+     * 문자는 요금이 붙고 되돌릴 수 없다. 그래서 기본값은 「물어보고 보내기」다.
+     */
+    private fun callbackSection() {
+        root.addView(sectionTitle("콜백 문자"))
+        root.addView(text(
+            "전화를 받고 끊으면 내 명함을 문자로 보내드립니다. 통화 중에 이름·번호를 " +
+                "받아적지 않아도 상대 폰에 내 연락처가 남습니다.",
+            13f, ink2, top = 2
+        ))
+
+        val card = card()
+
+        card.addView(text("① 내 전자명함 주소", 13f, ink, bold = true))
+        val 주소칸 = EditText(this).apply {
+            setText(store.cardUrl)
+            hint = "큰길이벤트.com/card/#c=..."
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+            setTextColor(ink); setHintTextColor(ink3)
+            setSingleLine(true)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        card.addView(주소칸)
+        card.addView(text(
+            "큰길이벤트.com/card 에서 명함을 만들고 「링크 복사」를 누른 뒤 여기 붙여넣으세요.",
+            11f, ink3, top = 4
+        ))
+        card.addView(Button(this).apply {
+            text = "명함 만들러 가기"
+            setOnClickListener {
+                try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(CARD_URL))) }
+                catch (e: Exception) {}
+            }
+        })
+
+        card.addView(text("② 보낼 글", 13f, ink, bold = true, top = 14))
+        val 글칸 = EditText(this).apply {
+            setText(store.cbText)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+            setTextColor(ink); setHintTextColor(ink3)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        card.addView(글칸)
+        val 길이줄 = text("", 11f, ink3, top = 4)
+        card.addView(길이줄)
+        fun 길이보기() {
+            val 글 = 글칸.text.toString().trim() + "\n" + 주소칸.text.toString().trim()
+            val n = 글.length
+            길이줄.text = "문자 길이 " + n + "자" +
+                (if (n > 45) " · 45자가 넘어 여러 통으로 쪼개집니다 (요금 배)" else " · 한 통")
+        }
+        길이보기()
+        val 지켜보기 = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                store.cardUrl = 주소칸.text.toString()
+                store.cbText = 글칸.text.toString()
+                길이보기(); refreshCallback()
+            }
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+        }
+        주소칸.addTextChangedListener(지켜보기)
+        글칸.addTextChangedListener(지켜보기)
+
+        card.addView(text("③ 어떻게 보낼까요", 13f, ink, bold = true, top = 14))
+        val grid = GridLayout(this).apply { columnCount = 2 }
+        grid.addView(toggle("보내기 전에 물어보기", store.cbAsk) { on -> store.cbAsk = on; refreshCallback() })
+        grid.addView(toggle("걸려온 전화만", store.cbIncomingOnly) { on -> store.cbIncomingOnly = on })
+        grid.addView(toggle("모르는 번호에만", store.cbSkipKnown) { on -> store.cbSkipKnown = on })
+        card.addView(grid)
+
+        cbOnBtn = Button(this).apply { setOnClickListener { toggleCallback() } }
+        card.addView(cbOnBtn)
+
+        cbState = text("", 12f, ink3, top = 8)
+        card.addView(cbState)
+
+        card.addView(text(
+            "같은 번호에는 30일 안에 다시 보내지 않고, 하루 " + store.cbDailyCap + "건을 넘기지 않습니다. " +
+                "받지 않은 전화에는 보내지 않습니다.",
+            11f, ink3, top = 8
+        ))
+
+        root.addView(card)
+        refreshCallback()
+    }
+
+    private fun toggleCallback() {
+        if (store.callbackOn) { store.callbackOn = false; refreshCallback(); return }
+
+        if (store.cardUrl.isBlank()) {
+            android.widget.Toast.makeText(this, "먼저 명함 주소를 넣어주세요", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        val 필요 = listOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_CALL_LOG,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_CONTACTS
+        ).filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+
+        if (필요.isNotEmpty()) { requestPermissions(필요.toTypedArray(), 200); return }
+
+        store.callbackOn = true
+        CallWatcher.ensureChannel(this)
+        refreshCallback()
+    }
+
+    private fun refreshCallback() {
+        val btn = cbOnBtn ?: return
+        val 켜짐 = store.callbackOn
+        btn.text = if (켜짐) "콜백 문자 끄기" else "콜백 문자 켜기"
+
+        val 권한 = listOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_CALL_LOG)
+            .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+
+        cbState?.text = when {
+            store.cardUrl.isBlank() -> "명함 주소를 넣어야 켤 수 있습니다."
+            !켜짐 -> "꺼져 있습니다."
+            !권한 -> "권한이 빠져 있어 보내지 못합니다. 껐다 다시 켜주세요."
+            store.cbAsk -> "켜짐 · 통화가 끝나면 알림으로 물어봅니다. 오늘 " + store.sentToday() + "건 보냄"
+            else -> "켜짐 · 통화가 끝나면 바로 보냅니다. 오늘 " + store.sentToday() + "건 보냄"
+        }
     }
 
     private fun hitSection() {
@@ -362,6 +509,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ── 작은 도구들 ────────────────────────────────
+
+    private val CARD_URL = "https://xn--wk0bn7yi8h24iszc.com/card/"
 
     private fun dp(v: Int): Int = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, v.toFloat(), resources.displayMetrics

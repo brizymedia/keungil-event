@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>전자명함 — 큰길이벤트기획</title>
+<meta name="description" content="행사팀 전자명함. 링크 하나로 연락처·직군·홈페이지를 한 번에 전달하고, 받은 분은 한 번 눌러 폰에 저장합니다.">
+<meta name="theme-color" content="#12100C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#12100C; --surface:#1C1913; --surface2:#241F17; --line:rgba(246,241,231,.13);
+    --ink:#F6F1E7; --ink2:#B8AF9E; --ink3:#8A8171;
+    --amber:#F5A524; --amber-deep:#C77700;
+    --ok:#5BC98D;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  body{
+    background:var(--bg); color:var(--ink); line-height:1.7; word-break:keep-all;
+    font-family:'Noto Sans KR',system-ui,'Malgun Gothic',sans-serif;
+    padding:1.5rem 1rem calc(2.5rem + env(safe-area-inset-bottom));
+  }
+  .wrap{ max-width:26rem; margin:0 auto; }
+  .wide{ max-width:40rem; }
+
+  /* ── 명함 ─────────────────────────────────────────── */
+  .card{
+    position:relative; overflow:hidden;
+    background:linear-gradient(160deg,var(--surface2),var(--surface));
+    border:1px solid var(--line); border-radius:1.3rem;
+    padding:2rem 1.6rem 1.7rem;
+  }
+  .card::after{
+    content:''; position:absolute; right:-25%; top:-45%;
+    width:80%; height:80%; border-radius:50%;
+    background:radial-gradient(circle,rgba(245,165,36,.22),transparent 66%);
+    filter:blur(46px); pointer-events:none;
+  }
+  .co{ font-size:.82rem; font-weight:800; letter-spacing:.13em; color:var(--amber); }
+  .nm{ font-size:2.1rem; font-weight:900; letter-spacing:-.035em; line-height:1.15; margin-top:.5rem; }
+  .nm small{ font-size:.95rem; font-weight:700; color:var(--ink2); letter-spacing:0; margin-left:.5rem; }
+  .bio{ font-size:.93rem; color:var(--ink2); margin-top:.7rem; }
+  .tags{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:1rem; }
+  .tag{
+    font-size:.76rem; font-weight:700; padding:.3rem .7rem; border-radius:9999px;
+    background:rgba(245,165,36,.13); color:var(--amber);
+  }
+
+  .rows{ margin-top:1.4rem; display:flex; flex-direction:column; gap:.55rem; }
+  .row{
+    display:flex; align-items:center; gap:.85rem;
+    background:rgba(0,0,0,.25); border:1px solid var(--line);
+    border-radius:.8rem; padding:.8rem .95rem;
+    color:var(--ink); text-decoration:none; font-size:.94rem;
+  }
+  .row .ico{ flex:none; width:1.7rem; text-align:center; font-size:1.05rem; }
+  .row .k{ flex:none; width:3.1rem; font-size:.78rem; color:var(--ink3); font-weight:700; }
+  .row .v{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+  a.row:active{ background:rgba(245,165,36,.1); }
+
+  .acts{ display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-top:1.1rem; }
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:.45rem;
+    padding:.95rem .6rem; border-radius:.8rem; border:1px solid var(--line);
+    background:var(--surface); color:var(--ink); cursor:pointer;
+    font-family:inherit; font-size:.92rem; font-weight:700; text-decoration:none;
+  }
+  .btn.pri{ background:var(--amber); color:#12100C; border-color:transparent; grid-column:1/-1; font-size:1rem; }
+  .btn:active{ transform:translateY(1px); }
+
+  .qr{ margin-top:1.3rem; text-align:center; }
+  .qr .box{ display:inline-block; background:#fff; padding:.7rem; border-radius:.8rem; line-height:0; }
+  .qr p{ font-size:.78rem; color:var(--ink3); margin-top:.6rem; }
+
+  .by{ text-align:center; font-size:.75rem; color:var(--ink3); margin-top:1.6rem; }
+  .by a{ color:var(--amber); text-decoration:none; }
+
+  /* ── 만들기 ───────────────────────────────────────── */
+  .eyebrow{ display:inline-flex; align-items:center; gap:.7rem; font-size:.76rem; font-weight:900; letter-spacing:.18em; color:var(--amber); }
+  .eyebrow::before{ content:''; width:1.9rem; height:2px; background:var(--amber); }
+  h1{ font-size:1.75rem; font-weight:900; letter-spacing:-.03em; margin-top:.8rem; }
+  .lead{ color:var(--ink2); font-size:.95rem; margin-top:.6rem; }
+
+  .box{ background:var(--surface); border:1px solid var(--line); border-radius:1rem; padding:1.1rem; margin-top:1.1rem; }
+  .box h2{ font-size:.95rem; font-weight:800; margin-bottom:.8rem; }
+  label.f{ display:block; font-size:.79rem; font-weight:700; color:var(--ink3); margin:.75rem 0 .3rem; }
+  label.f:first-of-type{ margin-top:0; }
+  input,textarea{
+    width:100%; padding:.75rem .85rem; border-radius:.65rem; color:var(--ink);
+    background:rgba(0,0,0,.3); border:1px solid var(--line);
+    font-family:inherit; font-size:.95rem;
+  }
+  textarea{ resize:vertical; min-height:60px; line-height:1.6; }
+  input::placeholder,textarea::placeholder{ color:#57503F; }
+  input:focus,textarea:focus{ outline:none; border-color:rgba(245,165,36,.6); background:rgba(245,165,36,.06); }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+
+  .picks{ display:flex; flex-wrap:wrap; gap:.4rem; }
+  .pick{
+    font-size:.8rem; font-weight:700; padding:.45rem .8rem; border-radius:9999px; cursor:pointer;
+    background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--ink2); font-family:inherit;
+  }
+  .pick[aria-pressed="true"]{ background:rgba(245,165,36,.16); border-color:rgba(245,165,36,.55); color:var(--amber); }
+
+  .out{ margin-top:1.1rem; }
+  .link{
+    display:block; width:100%; word-break:break-all; font-size:.8rem; line-height:1.6;
+    background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:.65rem;
+    padding:.7rem .8rem; color:var(--ink2); font-family:ui-monospace,monospace;
+  }
+  .hint{ font-size:.79rem; color:var(--ink3); line-height:1.7; margin-top:.6rem; }
+  .hint b{ color:var(--ink2); }
+
+  #toast{
+    position:fixed; left:50%; bottom:1.5rem; transform:translate(-50%,1.5rem);
+    background:#F6F1E7; color:#12100C; font-size:.88rem; font-weight:700;
+    padding:.7rem 1.2rem; border-radius:9999px; opacity:0; pointer-events:none;
+    transition:opacity .2s, transform .2s; z-index:50; max-width:90vw; text-align:center;
+  }
+  #toast.on{ opacity:1; transform:translate(-50%,0); }
+  [hidden]{ display:none!important; }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none!important; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════ 명함 보기 ═══════ -->
+<div class="wrap" id="view" hidden>
+  <div class="card">
+    <div class="co" id="v-co"></div>
+    <div class="nm"><span id="v-nm"></span><small id="v-t"></small></div>
+    <p class="bio" id="v-bio" hidden></p>
+    <div class="tags" id="v-tags"></div>
+    <div class="rows" id="v-rows"></div>
+    <div class="acts">
+      <a class="btn pri" id="a-save">📇 연락처 저장</a>
+      <a class="btn" id="a-tel">📞 전화</a>
+      <a class="btn" id="a-sms">💬 문자</a>
+    </div>
+  </div>
+
+  <div class="qr" id="qr-wrap">
+    <div class="box" id="qr"></div>
+    <p>현장에서 이 화면을 보여주세요</p>
+  </div>
+
+  <div class="acts" style="grid-template-columns:1fr 1fr;">
+    <button class="btn" id="a-copy">🔗 링크 복사</button>
+    <button class="btn" id="a-share">📤 공유</button>
+  </div>
+
+  <p class="by">전자명함 · <a href="/" id="by-link">큰길이벤트기획</a></p>
+  <p class="by" style="margin-top:.4rem;"><a href="?new=1">내 명함도 만들기</a></p>
+</div>
+
+<!-- ═══════ 명함 만들기 ═══════ -->
+<div class="wrap wide" id="edit" hidden>
+  <div class="eyebrow">행사팀 전자명함</div>
+  <h1>명함을 링크 하나로</h1>
+  <p class="lead">
+    받은 분이 <b style="color:#F6F1E7;">한 번 눌러 폰에 저장</b>합니다.
+    종이 명함처럼 지갑에서 사라지지 않습니다.
+  </p>
+
+  <div class="box">
+    <h2>기본</h2>
+    <label class="f" for="f-nm">이름</label>
+    <input id="f-nm" data-k="n" placeholder="홍길동" autocomplete="name">
+    <div class="two">
+      <div><label class="f" for="f-t">직함</label><input id="f-t" data-k="t" placeholder="대표 · 음향감독"></div>
+      <div><label class="f" for="f-co">팀 · 회사명</label><input id="f-co" data-k="c" placeholder="○○이벤트"></div>
+    </div>
+    <label class="f" for="f-bio">한 줄 소개</label>
+    <input id="f-bio" data-k="b" placeholder="예) 광양·순천 음향·조명 20년">
+  </div>
+
+  <div class="box">
+    <h2>연락</h2>
+    <label class="f" for="f-p">휴대폰</label>
+    <input id="f-p" data-k="p" placeholder="010-0000-0000" inputmode="tel" autocomplete="tel">
+    <div class="two">
+      <div><label class="f" for="f-p2">사무실</label><input id="f-p2" data-k="p2" placeholder="선택" inputmode="tel"></div>
+      <div><label class="f" for="f-e">이메일</label><input id="f-e" data-k="e" placeholder="선택" inputmode="email"></div>
+    </div>
+    <div class="two">
+      <div><label class="f" for="f-k">카카오톡 ID</label><input id="f-k" data-k="k" placeholder="선택"></div>
+      <div><label class="f" for="f-w">홈페이지</label><input id="f-w" data-k="w" placeholder="선택"></div>
+    </div>
+    <label class="f" for="f-a">주소</label>
+    <input id="f-a" data-k="a" placeholder="선택 — 누르면 길찾기가 열립니다">
+  </div>
+
+  <div class="box">
+    <h2>하는 일</h2>
+    <p class="hint" style="margin:0 0 .7rem;">고르면 명함에 표시됩니다.</p>
+    <div class="picks" id="picks"></div>
+    <label class="f" for="f-g2">직접 적기 (쉼표로 구분)</label>
+    <input id="f-g2" placeholder="예) 드론쇼, 불꽃">
+  </div>
+
+  <div class="out">
+    <button class="btn pri" id="a-make" style="width:100%;">명함 만들기</button>
+    <div id="made" hidden>
+      <p class="hint" style="margin-top:.9rem;"><b>내 명함 주소</b> — 이 링크를 문자·카톡으로 보내면 됩니다.</p>
+      <code class="link" id="made-url"></code>
+      <div class="acts">
+        <button class="btn" id="a-copy2">🔗 링크 복사</button>
+        <a class="btn" id="a-open" target="_blank" rel="noopener">👁 열어보기</a>
+      </div>
+      <p class="hint">
+        주소가 길어 보여도 괜찮습니다. <b>명함 내용이 주소 안에 통째로 들어있어서</b>
+        서버 없이도 어디서나 열립니다. 이 링크를 저장해 두시면 계속 쓰실 수 있습니다.
+      </p>
+    </div>
+  </div>
+
+  <p class="by">전자명함 · <a href="/">큰길이벤트기획</a> · <a href="tel:15337295">1533-7295</a></p>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+/* 명함 내용을 주소에 통째로 싣는다. 서버가 없어도 어디서나 열린다. */
+const b64u   = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u = (s) => { let t=String(s).replace(/-/g,'+').replace(/_/g,'/'); while(t.length%4) t+='='; return decodeURIComponent(escape(atob(t))); };
+const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+const 직군들 = ['음향','조명','LED·영상','무대·트러스','MC·사회','가수·공연','마술·버블',
+                '도우미·모델','부스·천막','포토부스','케이터링','발전기','드론쇼','특수효과',
+                '카메라·중계','행사기획'];
+
+let D = { n:'', t:'', c:'', b:'', p:'', p2:'', e:'', k:'', w:'', a:'', g:[] };
+
+function toast(m){
+  const t=$('#toast'); t.textContent=m; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'), 2400);
+}
+
+const 전화숫자 = (s) => String(s||'').replace(/[^0-9+]/g,'');
+
+/* ── 명함 보기 ────────────────────────────────────────────────── */
+function 보이기(){
+  $('#view').hidden = false;
+  $('#edit').hidden = true;
+  document.title = (D.n || '전자명함') + (D.c ? ' · ' + D.c : '');
+
+  $('#v-co').textContent = D.c || '';
+  $('#v-nm').textContent = D.n || '이름 없음';
+  $('#v-t').textContent  = D.t || '';
+  const bio = $('#v-bio'); bio.hidden = !D.b; bio.textContent = D.b || '';
+
+  $('#v-tags').innerHTML = (D.g||[]).map(g => `<span class="tag">${esc(g)}</span>`).join('');
+
+  const 줄 = [];
+  const 넣기 = (ico,k,v,href) => { if(v) 줄.push(
+    `<${href?'a':'div'} class="row"${href?` href="${esc(href)}"`:''}>`
+    + `<span class="ico">${ico}</span><span class="k">${k}</span><span class="v">${esc(v)}</span></${href?'a':'div'}>`); };
+
+  넣기('📱','휴대폰', D.p,  D.p  ? 'tel:'+전화숫자(D.p)  : '');
+  넣기('☎️','사무실', D.p2, D.p2 ? 'tel:'+전화숫자(D.p2) : '');
+  넣기('✉️','메일',   D.e,  D.e  ? 'mailto:'+D.e : '');
+  /* 카톡 아이디는 눌러서 갈 곳이 없다. 오픈채팅 주소를 적었을 때만 링크로 만든다. */
+  넣기('💬','카톡',   D.k,  /^(https?:\/\/)?open\.kakao\.com\//i.test(D.k) ? (/^https?:/i.test(D.k)?D.k:'https://'+D.k) : '');
+  넣기('🌐','홈피',   D.w,  D.w  ? (/^https?:/i.test(D.w) ? D.w : 'https://'+D.w) : '');
+  넣기('📍','주소',   D.a,  D.a  ? 'https://map.kakao.com/?q=' + encodeURIComponent(D.a) : '');
+  $('#v-rows').innerHTML = 줄.join('');
+
+  const tel = 전화숫자(D.p);
+  $('#a-tel').href = tel ? 'tel:'+tel : '#';
+  $('#a-sms').href = tel ? 'sms:'+tel : '#';
+  $('#a-tel').hidden = $('#a-sms').hidden = !tel;
+  $('#a-save').href = vcardURL();
+  $('#a-save').download = (D.n || 'card') + '.vcf';
+
+  if (D.w) { const b=$('#by-link'); b.textContent = D.c || D.w; b.href = /^https?:/i.test(D.w)?D.w:'https://'+D.w; }
+  그리기QR();
+}
+
+/* 폰 연락처에 그대로 들어가는 형식 */
+function vcardURL(){
+  const L = ['BEGIN:VCARD','VERSION:3.0'];
+  L.push('N:' + (D.n||'') + ';;;;');   // 성;이름;중간;접두;접미 — 한국 이름은 통째로 앞칸에
+  L.push('FN:' + (D.n||''));
+  if(D.c)  L.push('ORG:' + D.c);
+  if(D.t)  L.push('TITLE:' + D.t);
+  if(D.p)  L.push('TEL;TYPE=CELL:' + D.p);
+  if(D.p2) L.push('TEL;TYPE=WORK:' + D.p2);
+  if(D.e)  L.push('EMAIL:' + D.e);
+  if(D.w)  L.push('URL:' + (/^https?:/i.test(D.w)?D.w:'https://'+D.w));
+  if(D.a)  L.push('ADR;TYPE=WORK:;;' + D.a + ';;;;');
+  const 메모 = [D.b, (D.g||[]).join(' · '), D.k?('카카오톡 '+D.k):''].filter(Boolean).join(' / ');
+  if(메모) L.push('NOTE:' + 메모);
+  L.push('END:VCARD');
+  return 'data:text/vcard;charset=utf-8,' + encodeURIComponent(L.join('\r\n'));
+}
+
+function 그리기QR(){
+  const box = $('#qr');
+  if (typeof QRCode === 'undefined') { $('#qr-wrap').hidden = true; return; }
+  box.innerHTML = '';
+  try {
+    new QRCode(box, { text: location.href, width: 168, height: 168,
+                      colorDark:'#12100C', colorLight:'#ffffff',
+                      correctLevel: QRCode.CorrectLevel.L });
+  } catch(e) { $('#qr-wrap').hidden = true; }
+}
+
+/* ── 명함 만들기 ──────────────────────────────────────────────── */
+function 만들기화면(){
+  $('#edit').hidden = false;
+  $('#view').hidden = true;
+
+  $('#picks').innerHTML = 직군들.map(g =>
+    `<button type="button" class="pick" data-g="${esc(g)}" aria-pressed="${(D.g||[]).includes(g)}">${esc(g)}</button>`).join('');
+  $$('#picks .pick').forEach(b => b.addEventListener('click', () => {
+    const g = b.dataset.g;
+    D.g = (D.g||[]).includes(g) ? D.g.filter(x=>x!==g) : [...(D.g||[]), g];
+    b.setAttribute('aria-pressed', String(D.g.includes(g)));
+  }));
+
+  $$('[data-k]').forEach(el => {
+    el.value = D[el.dataset.k] || '';
+    el.addEventListener('input', () => { D[el.dataset.k] = el.value.trim(); });
+  });
+}
+
+function 주소만들기(){
+  const 직접 = $('#f-g2').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const d = Object.assign({}, D, { g: [...(D.g||[]), ...직접] });
+  for (const k of Object.keys(d)) {                    // 빈 칸은 주소에서 뺀다
+    if (d[k] === '' || (Array.isArray(d[k]) && !d[k].length)) delete d[k];
+  }
+  return location.origin + location.pathname + '#c=' + b64u(JSON.stringify(d));
+}
+
+async function 복사(text, 말){
+  try { await navigator.clipboard.writeText(text); toast(말); return true; }
+  catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(err){}
+    ta.remove(); toast(ok?말:'복사가 막혀 있습니다 · 주소를 길게 눌러 복사해 주세요'); return ok;
+  }
+}
+
+$('#a-make').addEventListener('click', () => {
+  if (!D.n) { toast('이름을 적어주세요'); $('#f-nm').focus(); return; }
+  const url = 주소만들기();
+  $('#made').hidden = false;
+  $('#made-url').textContent = url;
+  $('#a-open').href = url;
+  $('#made').scrollIntoView({ behavior:'smooth', block:'nearest' });
+});
+$('#a-copy2').addEventListener('click', () => 복사($('#made-url').textContent, '명함 주소를 복사했습니다'));
+$('#a-copy').addEventListener('click',  () => 복사(location.href, '명함 주소를 복사했습니다'));
+$('#a-share').addEventListener('click', async () => {
+  const 글 = (D.n||'') + (D.c?' · '+D.c:'') + ' 명함';
+  if (navigator.share) { try { await navigator.share({ title:글, url:location.href }); return; } catch(e){ if(e.name==='AbortError') return; } }
+  복사(location.href, '명함 주소를 복사했습니다');
+});
+
+/* ── 시작 ─────────────────────────────────────────────────────── */
+function start(){
+  const h = location.hash;
+  const 새로 = new URLSearchParams(location.search).get('new');
+  if (h.startsWith('#c=') && !새로) {
+    try {
+      const d = JSON.parse(unb64u(h.slice(3)));
+      D = Object.assign({ n:'',t:'',c:'',b:'',p:'',p2:'',e:'',k:'',w:'',a:'',g:[] }, d);
+      if (!Array.isArray(D.g)) D.g = [];
+      보이기();
+      return;
+    } catch(e) { toast('명함 주소를 읽지 못했습니다'); }
+  }
+  만들기화면();
+}
+start();
+
+/* 주소의 해시만 바뀌면 브라우저는 페이지를 다시 읽지 않는다.
+   만들기 화면에서 자기 명함 주소로 넘어갈 때 아무 일도 안 일어나면 안 된다. */
+window.addEventListener('hashchange', start);
+</script>
+</body>
+</html>
