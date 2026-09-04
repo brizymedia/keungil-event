@@ -32,9 +32,19 @@
   }
 
   .head{ position:relative; background:linear-gradient(165deg,var(--top),var(--top2)); color:#fff; }
-  .photo{ width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  /* 배경은 크게 깔고, 인물은 그 아래 걸치는 작은 원으로 */
+  .bg{ width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
   .head .txt{ padding:1.35rem 1.4rem 1.5rem; }
-  .head.has-photo .txt{ padding-top:1.15rem; }
+  .head.has-bg .txt{ padding-top:1.15rem; }
+  .head.has-face .txt{ padding-top:0; }
+  .head.has-bg.has-face .txt{ padding-top:0; }
+  .face{
+    width:5.4rem; height:5.4rem; border-radius:50%; object-fit:cover; display:block;
+    border:4px solid #fff; box-shadow:0 6px 18px -6px rgba(0,0,0,.55);
+    margin:-2.7rem 0 .9rem 1.4rem;      /* 배경 아래 절반쯤 걸치게 */
+    position:relative; background:#DDE1EA;
+  }
+  .head:not(.has-bg) .face{ margin:1.4rem 0 .9rem 1.4rem; }
   .nm{ font-size:1.9rem; font-weight:900; letter-spacing:-.035em; line-height:1.2; }
   .ttl{ font-size:.98rem; font-weight:700; margin-top:.35rem; color:rgba(255,255,255,.93); }
   .org{ font-size:.9rem; margin-top:.1rem; color:rgba(255,255,255,.72); }
@@ -78,18 +88,19 @@
 </head>
 <body>
 <div class="card">
-  <div class="head has-photo">
-    <img class="photo" src="https://xn--wk0bn7yi8h24iszc.com/card/img/khm.jpg" alt="김효민">
+  <div class="head has-bg has-face">
+    <img class="bg" src="https://xn--wk0bn7yi8h24iszc.com/card/bg/khm.jpg" alt="">
+    <img class="face" src="https://xn--wk0bn7yi8h24iszc.com/card/img/khm.jpg" alt="김효민">
     <div class="txt">
       <div class="nm">김효민</div>
       <div class="ttl">대표</div>
       <div class="org">큰길브리지</div>
       <div class="bio">팝페라 가수 출신의 행사 경력 15년. 기힉 연출 및 마케팅 전문. 무대에 서본 사람이 무대를 잘 압니다.</div>
-      <div class="tags"><span class="tag">음향</span><span class="tag">조명</span><span class="tag">LED·영상</span><span class="tag">무대·트러스</span><span class="tag">MC·사회</span><span class="tag">가수·공연</span><span class="tag">특수효과</span><span class="tag">카메라·중계</span><span class="tag">행사기획</span><span class="tag">홈페이지 제작</span></div>
+      <div class="tags"><span class="tag">음향</span><span class="tag">조명</span><span class="tag">LED·영상</span><span class="tag">가수·공연</span><span class="tag">특수효과</span><span class="tag">카메라·중계</span><span class="tag">행사기획</span><span class="tag">홈페이지 제작</span></div>
     </div>
   </div>
 
-  <div class="rows"><a class="r" href="tel:01076357886"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="tx"><span class="lb">휴대폰</span><span class="vl">010-7635-7886</span></span><span class="go">›</span></a><a class="r" href="tel:15337295"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="tx"><span class="lb">사무실</span><span class="vl">1533-7295</span></span><span class="go">›</span></a><a class="r" href="mailto:gilcaro@naver.com"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span><span class="tx"><span class="lb">이메일</span><span class="vl">gilcaro@naver.com</span></span><span class="go">›</span></a><a class="r" href="https://open.kakao.com/o/srRAkZGi"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="tx"><span class="lb">카카오톡</span><span class="vl">https://open.kakao.com/o/srRAkZGi</span></span><span class="go">›</span></a><a class="r" href="https://www.큰길이벤트.com"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="tx"><span class="lb">홈페이지</span><span class="vl">www.큰길이벤트.com</span></span><span class="go">›</span></a><a class="r" href="https://map.kakao.com/?q=%EA%B4%91%EC%A3%BC%EC%A0%84%EB%82%A8%ED%86%B5%ED%95%A9%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EA%B4%91%EC%96%91%EC%8B%9C%20%EA%B4%91%EC%96%91%EC%9D%8D%20%EA%B0%95%EB%B3%80%EB%8F%99%EA%B8%B8%201."><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tx"><span class="lb">주소</span><span class="vl">광주전남통합특별시 광양시 광양읍 강변동길 1.</span></span><span class="go">›</span></a></div>
+  <div class="rows"><a class="r" href="tel:01076357886"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="tx"><span class="lb">휴대폰</span><span class="vl">010-7635-7886</span></span><span class="go">›</span></a><a class="r" href="tel:15337295"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="tx"><span class="lb">사무실</span><span class="vl">1533-7295</span></span><span class="go">›</span></a><a class="r" href="mailto:gilcaro@naver.com"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span><span class="tx"><span class="lb">이메일</span><span class="vl">gilcaro@naver.com</span></span><span class="go">›</span></a><a class="r" href="https://open.kakao.com/o/srRAkZGi"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="tx"><span class="lb">카카오톡</span><span class="vl">https://open.kakao.com/o/srRAkZGi</span></span><span class="go">›</span></a><a class="r" href="https://www.큰길이벤트.com"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20"/></svg></span><span class="tx"><span class="lb">홈페이지</span><span class="vl">www.큰길이벤트.com</span></span><span class="go">›</span></a><a class="r" href="https://map.kakao.com/?q=%EC%A0%84%EB%82%A8%EA%B4%91%EC%A3%BC%ED%86%B5%ED%95%A9%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EA%B4%91%EC%96%91%EC%8B%9C%20%EA%B4%91%EC%96%91%EC%9D%8D%20%EA%B0%95%EB%B3%80%EB%8F%99%EA%B8%B8%201"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tx"><span class="lb">주소</span><span class="vl">전남광주통합특별시 광양시 광양읍 강변동길 1</span></span><span class="go">›</span></a></div>
 
   <div class="acts">
     <button class="btn pri" id="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg> 연락처 저장</button>
@@ -105,7 +116,7 @@
 
 <script>
 (function(){
-  var vcf = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:김효민;;;;\r\nFN:김효민\r\nORG:큰길브리지\r\nTITLE:대표\r\nTEL;TYPE=CELL:010-7635-7886\r\nTEL;TYPE=WORK:1533-7295\r\nEMAIL:gilcaro@naver.com\r\nURL:https://www.큰길이벤트.com\r\nADR;TYPE=WORK:;;광주전남통합특별시 광양시 광양읍 강변동길 1.;;;;\r\nNOTE:팝페라 가수 출신의 행사 경력 15년. 기힉 연출 및 마케팅 전문. 무대에 서본 사람이 무대를 잘 압니다. / 음향 · 조명 · LED·영상 · 무대·트러스 · MC·사회 · 가수·공연 · 특수효과 · 카메라·중계 · 행사기획 · 홈페이지 제작 / 카카오톡 https://open.kakao.com/o/srRAkZGi\r\nEND:VCARD";
+  var vcf = "BEGIN:VCARD\r\nVERSION:3.0\r\nN:김효민;;;;\r\nFN:김효민\r\nORG:큰길브리지\r\nTITLE:대표\r\nTEL;TYPE=CELL:010-7635-7886\r\nTEL;TYPE=WORK:1533-7295\r\nEMAIL:gilcaro@naver.com\r\nURL:https://www.큰길이벤트.com\r\nADR;TYPE=WORK:;;전남광주통합특별시 광양시 광양읍 강변동길 1;;;;\r\nNOTE:팝페라 가수 출신의 행사 경력 15년. 기힉 연출 및 마케팅 전문. 무대에 서본 사람이 무대를 잘 압니다. / 음향 · 조명 · LED·영상 · 가수·공연 · 특수효과 · 카메라·중계 · 행사기획 · 홈페이지 제작 / 카카오톡 https://open.kakao.com/o/srRAkZGi\r\nEND:VCARD";
   var 이름 = "김효민";
   document.getElementById('save').addEventListener('click', function(){
     var blob = new Blob([vcf], { type:'text/vcard;charset=utf-8' });
