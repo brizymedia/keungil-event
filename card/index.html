@@ -84,6 +84,8 @@
   }
   .frame iframe{ width:100%; height:34rem; border:0; border-radius:1rem; background:#fff; display:block; }
   .side .cap{ text-align:center; font-size:.78rem; color:var(--ink3); margin-top:.6rem; }
+  .ogbox{ margin-top:1.1rem; }
+  .ogbox img{ width:100%; display:block; border-radius:.7rem; border:1px solid var(--line); background:#000; }
 
   .link{
     display:block; word-break:break-all; font-size:.86rem; line-height:1.6; font-weight:700;
@@ -208,6 +210,11 @@
     <div class="side">
       <div class="frame"><iframe id="pv" title="명함 미리보기"></iframe></div>
       <p class="cap">받는 분에게 이렇게 보입니다</p>
+
+      <div class="ogbox">
+        <p class="cap" style="margin:0 0 .5rem;">카톡에 보내면 이 그림이 뜹니다</p>
+        <img id="og-pv" alt="카톡 미리보기 그림">
+      </div>
     </div>
   </div>
 
@@ -444,6 +451,7 @@ function 미리보기(){
   그리기예약 = setTimeout(() => {
     const d = 지금값();
     $('#pv').srcdoc = 명함HTML(d, { photo: 사진 });
+    OG만들기준비();          // 글자를 칠 때마다 카톡 그림도 같이 다시 그린다
   }, 160);
 }
 
@@ -556,6 +564,13 @@ async function 발행(){
   btn.disabled = true; btn.textContent = '올리는 중…';
   $('#pub-msg').hidden = true;
 
+  /* 미리보기 그림은 반드시 여기서 다시 그린다.
+     사진을 먼저 고르고 이름을 나중에 치면, 사진 고를 때 만든 그림에는
+     이름이 비어 있다. 실제로 「이름」이라고 박힌 채 카톡에 나간 적이 있다.
+     글꼴이 아직 안 왔으면 기본 글꼴로 그려지므로 그것도 기다린다. */
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+  OG = OG만들기(원본사진);
+
   try {
     const url   = 집 + '/card/' + slug + '/';
     const 사진길 = 사진 ? (집 + '/card/img/' + slug + '.jpg') : '';
@@ -614,7 +629,11 @@ $$('[data-k]').forEach(el => el.addEventListener('input', () => { D[el.dataset.k
 $('#f-g2').addEventListener('input', 미리보기);
 
 let 원본사진 = null;
-function OG만들기준비(){ OG = OG만들기(원본사진); }
+function OG만들기준비(){
+  OG = OG만들기(원본사진);
+  const im = document.getElementById("og-pv");
+  if (im) im.src = OG;
+}
 
 $('#btn-photo').addEventListener('click', () => $('#pick-photo').click());
 $('#pick-photo').addEventListener('change', async (ev) => {
@@ -634,7 +653,7 @@ $('#btn-photo-x').addEventListener('click', () => {
   사진 = ''; 원본사진 = null;
   $('#thumb').textContent = '사진 없음';
   $('#btn-photo-x').hidden = true;
-  OG = OG만들기(null);
+  OG만들기준비();
   미리보기();
 });
 
