@@ -133,6 +133,66 @@
     /* 모바일 하단 고정 CTA가 푸터를 가리지 않도록 여백 확보 */
     @media (max-width:639px){ body{ padding-bottom:5rem; } }
 
+
+    /* ── 히어로 모션 인트로 ── */
+    .hero-bg{ position:absolute;inset:0;overflow:hidden;pointer-events:none; }
+
+    /* 흐르는 파형: viewBox 720단위마다 패턴이 반복되고
+       요소 폭이 200%이므로 -50% 이동이 이음매 없이 순환한다 */
+    .wave{
+      position:absolute;left:0;width:200%;height:14rem;
+      animation:waveflow linear infinite;will-change:transform;
+    }
+    @keyframes waveflow{
+      from{ transform:translate3d(0,0,0); }
+      to  { transform:translate3d(-50%,0,0); }
+    }
+    .wave-1{ bottom:6%;  opacity:.26; animation-duration:30s; }
+    .wave-2{ bottom:0;   opacity:.16; animation-duration:44s; animation-direction:reverse; }
+    .wave-3{ bottom:13%; opacity:.09; animation-duration:58s; }
+
+    /* 떠오르는 음표 */
+    .note{
+      position:absolute;bottom:-4rem;color:#c4b5fd;opacity:0;line-height:0;
+      animation:noterise linear infinite;will-change:transform,opacity;
+    }
+    @keyframes noterise{
+      0%  { transform:translate3d(0,0,0) rotate(-10deg); opacity:0; }
+      10% { opacity:.16; }
+      75% { opacity:.10; }
+      100%{ transform:translate3d(18px,-108vh,0) rotate(12deg); opacity:0; }
+    }
+
+    /* 이퀄라이저 바닥 */
+    .eq-floor{
+      position:absolute;left:0;right:0;bottom:0;height:6rem;
+      display:flex;align-items:flex-end;gap:3px;
+      -webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent),
+                          linear-gradient(180deg,transparent,#000 70%);
+      mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent),
+                 linear-gradient(180deg,transparent,#000 70%);
+      -webkit-mask-composite:source-in; mask-composite:intersect;
+    }
+    .eq-floor i{
+      flex:1;height:100%;border-radius:2px 2px 0 0;transform-origin:bottom;
+      background:linear-gradient(180deg,rgba(232,121,249,.34),rgba(139,92,246,.02));
+      animation:eqrise ease-in-out infinite;will-change:transform;
+    }
+    @keyframes eqrise{ 0%,100%{ transform:scaleY(.14); } 50%{ transform:scaleY(1); } }
+
+    /* 비네트 — 가장자리를 눌러 문구에 시선을 모은다 */
+    .vignette{
+      position:absolute;inset:0;
+      background:radial-gradient(115% 85% at 50% 42%,transparent 38%,rgba(10,10,15,.5) 76%,rgba(10,10,15,.88) 100%);
+    }
+
+    /* 모바일에서는 요소 수를 줄여 부담을 낮춘다 */
+    @media (max-width:639px){
+      .notes .note:nth-child(n+5){ display:none; }
+      .eq-floor{ height:4rem; }
+      .wave{ height:10rem; }
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition-duration:.01ms !important; }
       .reveal{ opacity:1;transform:none; }
@@ -202,6 +262,91 @@
   <!-- subtle staff lines -->
   <div class="absolute inset-0 opacity-[.055] pointer-events-none"
        style="background-image:repeating-linear-gradient(180deg,#fff 0 1px,transparent 1px 46px)"></div>
+
+  <!-- 배경 모션 레이어 (전경 사진이 준비되면 이 컨테이너 안에 사진 레이어를 추가) -->
+  <div class="hero-bg" aria-hidden="true">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+      <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#8B5CF6"></stop>
+        <stop offset="50%" stop-color="#D946EF"></stop>
+        <stop offset="100%" stop-color="#6366F1"></stop>
+      </linearGradient>
+    </defs></svg>
+
+    <svg class="wave wave-3" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,100 C90,45 270,45 360,100 C450,155 630,155 720,100 C810,45 990,45 1080,100 C1170,155 1350,155 1440,100 L1440,200 L0,200 Z" fill="url(#waveGrad)"></path>
+    </svg>
+    <svg class="wave wave-2" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,100 C90,45 270,45 360,100 C450,155 630,155 720,100 C810,45 990,45 1080,100 C1170,155 1350,155 1440,100 L1440,200 L0,200 Z" fill="url(#waveGrad)"></path>
+    </svg>
+    <svg class="wave wave-1" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,100 C90,45 270,45 360,100 C450,155 630,155 720,100 C810,45 990,45 1080,100 C1170,155 1350,155 1440,100 L1440,200 L0,200 Z" fill="url(#waveGrad)"></path>
+    </svg>
+
+    <div class="notes">
+      <span class="note" style="left:6%;animation-duration:21s;animation-delay:-3s"><svg width="26" height="26" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:19%;animation-duration:26s;animation-delay:-11s"><svg width="17" height="17" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:33%;animation-duration:24s;animation-delay:-6s"><svg width="30" height="30" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:47%;animation-duration:29s;animation-delay:-16s"><svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:63%;animation-duration:22s;animation-delay:-9s"><svg width="25" height="25" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:78%;animation-duration:27s;animation-delay:-2s"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+      <span class="note" style="left:91%;animation-duration:25s;animation-delay:-13s"><svg width="29" height="29" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M212.92 17.71a7.89 7.89 0 0 0-6.86-1.46l-128 32A8 8 0 0 0 72 56v110.1A36 36 0 1 0 88 196v-93.75l112-28v59.85a36 36 0 1 0 16 29.9V24a8 8 0 0 0-3.08-6.29"></path></svg></span>
+    </div>
+
+    <div class="eq-floor">
+      <i style="animation-duration:1.44s;animation-delay:-1.12s"></i>
+      <i style="animation-duration:2.01s;animation-delay:-0.93s"></i>
+      <i style="animation-duration:1.51s;animation-delay:-1.17s"></i>
+      <i style="animation-duration:1.12s;animation-delay:-1.02s"></i>
+      <i style="animation-duration:1.66s;animation-delay:-1.59s"></i>
+      <i style="animation-duration:1.01s;animation-delay:-0.61s"></i>
+      <i style="animation-duration:1.01s;animation-delay:-1.62s"></i>
+      <i style="animation-duration:1.73s;animation-delay:-0.08s"></i>
+      <i style="animation-duration:2.08s;animation-delay:-1.93s"></i>
+      <i style="animation-duration:1.68s;animation-delay:-1.23s"></i>
+      <i style="animation-duration:1.09s;animation-delay:-0.03s"></i>
+      <i style="animation-duration:1.53s;animation-delay:-0.12s"></i>
+      <i style="animation-duration:1.13s;animation-delay:-0.48s"></i>
+      <i style="animation-duration:0.94s;animation-delay:-0.93s"></i>
+      <i style="animation-duration:1.43s;animation-delay:-1.68s"></i>
+      <i style="animation-duration:1.52s;animation-delay:-1.28s"></i>
+      <i style="animation-duration:1.50s;animation-delay:-1.32s"></i>
+      <i style="animation-duration:1.45s;animation-delay:-0.56s"></i>
+      <i style="animation-duration:2.10s;animation-delay:-1.99s"></i>
+      <i style="animation-duration:1.91s;animation-delay:-1.42s"></i>
+      <i style="animation-duration:1.28s;animation-delay:-0.46s"></i>
+      <i style="animation-duration:1.25s;animation-delay:-0.14s"></i>
+      <i style="animation-duration:1.82s;animation-delay:-0.80s"></i>
+      <i style="animation-duration:1.92s;animation-delay:-0.77s"></i>
+      <i style="animation-duration:2.05s;animation-delay:-1.69s"></i>
+      <i style="animation-duration:0.90s;animation-delay:-0.42s"></i>
+      <i style="animation-duration:1.99s;animation-delay:-0.94s"></i>
+      <i style="animation-duration:2.08s;animation-delay:-0.79s"></i>
+      <i style="animation-duration:0.99s;animation-delay:-1.26s"></i>
+      <i style="animation-duration:1.83s;animation-delay:-0.54s"></i>
+      <i style="animation-duration:1.00s;animation-delay:-0.67s"></i>
+      <i style="animation-duration:2.06s;animation-delay:-1.52s"></i>
+      <i style="animation-duration:1.04s;animation-delay:-0.49s"></i>
+      <i style="animation-duration:1.02s;animation-delay:-0.12s"></i>
+      <i style="animation-duration:1.86s;animation-delay:-0.36s"></i>
+      <i style="animation-duration:1.57s;animation-delay:-0.89s"></i>
+      <i style="animation-duration:1.13s;animation-delay:-1.46s"></i>
+      <i style="animation-duration:1.06s;animation-delay:-1.29s"></i>
+      <i style="animation-duration:1.04s;animation-delay:-0.84s"></i>
+      <i style="animation-duration:1.16s;animation-delay:-0.54s"></i>
+      <i style="animation-duration:2.07s;animation-delay:-1.61s"></i>
+      <i style="animation-duration:1.26s;animation-delay:-1.77s"></i>
+      <i style="animation-duration:1.15s;animation-delay:-0.79s"></i>
+      <i style="animation-duration:1.93s;animation-delay:-1.28s"></i>
+      <i style="animation-duration:1.02s;animation-delay:-1.98s"></i>
+      <i style="animation-duration:1.16s;animation-delay:-0.52s"></i>
+      <i style="animation-duration:1.83s;animation-delay:-0.66s"></i>
+      <i style="animation-duration:1.26s;animation-delay:-0.15s"></i>
+    </div>
+
+    <div class="vignette"></div>
+  </div>
+
 
   <div class="relative max-w-6xl mx-auto px-5 sm:px-8 w-full">
     <div class="reveal">
