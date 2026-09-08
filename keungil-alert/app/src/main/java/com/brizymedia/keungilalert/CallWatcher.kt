@@ -144,7 +144,30 @@ class CallWatcher : BroadcastReceiver() {
     }
 
     /** 「보내기 전에 물어보기」가 켜져 있을 때 — 누르면 그때 나간다 */
+    /**
+     * 알림으로만 물으면 위에서 잠깐 스쳐 지나가 놓친다.
+     * 「다른 앱 위에 표시」 권한이 있으면 화면 한가운데에 창을 띄운다.
+     * 없으면 알림으로 되돌아간다 — 못 물어보는 것보다는 낫다.
+     */
     private fun 물어보기(context: Context, number: String) {
+        if (화면위에띄울수있나(context)) {
+            try {
+                context.startActivity(
+                    Intent(context, AskActivity::class.java)
+                        .putExtra(EXTRA_NUMBER, number)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                                  Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                                  Intent.FLAG_ACTIVITY_NO_USER_ACTION))
+                return
+            } catch (e: Exception) { /* 못 띄우면 아래 알림으로 */ }
+        }
+        알림으로묻기(context, number)
+    }
+
+    private fun 화면위에띄울수있나(context: Context) =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.M || android.provider.Settings.canDrawOverlays(context)
+
+    private fun 알림으로묻기(context: Context, number: String) {
         ensureChannel(context)
         val 보내 = PendingIntent.getBroadcast(context, number.hashCode(),
             Intent(context, CallWatcher::class.java).setAction(ACTION_SEND).putExtra(EXTRA_NUMBER, number),
@@ -153,12 +176,21 @@ class CallWatcher : BroadcastReceiver() {
             Intent(context, CallWatcher::class.java).setAction(ACTION_SKIP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+        // 눌렀을 때도 창이 뜨게 — 알림을 놓쳐도 나중에 열 수 있다
+        val 열기 = PendingIntent.getActivity(context, number.hashCode() + 2,
+            Intent(context, AskActivity::class.java).putExtra(EXTRA_NUMBER, number)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
         val n = Notification.Builder(context, CH_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_email)
             .setContentTitle("명함을 보낼까요?")
             .setContentText(number)
             .setStyle(Notification.BigTextStyle().bigText(number + "\n\n" + Store(context).cbMessage()))
             .setAutoCancel(true)
+            .setContentIntent(열기)
+            .setFullScreenIntent(열기, true)      // 화면을 덮어 보려는 시도. 막히면 그냥 배너로 뜬다.
+            .setCategory(Notification.CATEGORY_REMINDER)
             // null 을 그냥 넘기면 옛 생성자와 헷갈린다. 아이콘 자리임을 밝혀 준다.
             .addAction(Notification.Action.Builder(없는아이콘, "보내기", 보내).build())
             .addAction(Notification.Action.Builder(없는아이콘, "안 보냄", 말아).build())
@@ -186,7 +218,7 @@ class CallWatcher : BroadcastReceiver() {
     private fun 정리(s: String) = s.filter { it.isDigit() || it == '+' }
 
     companion object {
-        const val CH_ID = "keungil-callback"
+        const val CH_ID = "keungil-callback-v2"      // v1 은 중요도가 낮아 배너로만 스쳤다
         const val ACTION_SEND = "com.brizymedia.keungilalert.CB_SEND"
         const val ACTION_SKIP = "com.brizymedia.keungilalert.CB_SKIP"
         const val EXTRA_NUMBER = "number"
@@ -197,10 +229,15 @@ class CallWatcher : BroadcastReceiver() {
 
         fun ensureChannel(context: Context) {
             val nm = context.getSystemService(NotificationManager::class.java) ?: return
+            // 채널은 한 번 만들면 앱이 중요도를 못 바꾼다. 올리려면 ID 를 새로 붙이고 옛 것을 지운다.
+            nm.deleteNotificationChannel("keungil-callback")
             if (nm.getNotificationChannel(CH_ID) != null) return
             nm.createNotificationChannel(NotificationChannel(
-                CH_ID, "콜백 문자", NotificationManager.IMPORTANCE_DEFAULT
-            ).apply { description = "통화 후 명함 문자를 보낼 때 알려줍니다" })
+                CH_ID, "콜백 문자", NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "통화 후 명함 문자를 보낼 때 물어봅니다"
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            })
         }
     }
 }

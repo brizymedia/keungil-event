@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var countText: TextView
     private var cbOnBtn: Button? = null
     private var cbState: TextView? = null
+    private var overlayBtn: Button? = null
+    private var overlayState: TextView? = null
     private var bidState: TextView? = null
 
     private val ink = Color.parseColor("#F6F1E7")
@@ -311,6 +313,13 @@ class MainActivity : AppCompatActivity() {
         grid.addView(toggle("모르는 번호에만", store.cbSkipKnown) { on -> store.cbSkipKnown = on })
         card.addView(grid)
 
+        /* 이 권한이 없으면 통화 뒤에 알림만 스쳐 지나가 놓친다.
+           켜두면 화면 한가운데에 창이 떠서 안 놓친다. */
+        overlayBtn = Button(this).apply { setOnClickListener { openOverlaySettings() } }
+        card.addView(overlayBtn)
+        overlayState = text("", 12f, ink3, top = 6)
+        card.addView(overlayState)
+
         cbOnBtn = Button(this).apply { setOnClickListener { toggleCallback() } }
         card.addView(cbOnBtn)
 
@@ -348,7 +357,34 @@ class MainActivity : AppCompatActivity() {
         refreshCallback()
     }
 
+    /** 화면 위에 띄울 수 있나 — 이게 꺼져 있으면 통화 뒤 알림만 스쳐 지나간다 */
+    private fun canDrawOverlay(): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
+
+    private fun openOverlaySettings() {
+        if (canDrawOverlay()) {
+            android.widget.Toast.makeText(this, "이미 켜져 있습니다", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")))
+        } catch (e: Exception) {
+            try { startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)) } catch (e2: Exception) {}
+        }
+    }
+
     private fun refreshCallback() {
+        overlayBtn?.let { b ->
+            val 켜짐 = canDrawOverlay()
+            b.text = if (켜짐) "화면 위에 띄우기 — 켜짐" else "화면 위에 띄우기 켜기"
+            overlayState?.text = if (켜짐)
+                "통화가 끝나면 화면 한가운데에 창이 떠서 물어봅니다."
+            else
+                "지금은 알림으로만 물어봅니다. 위에서 잠깐 스쳐 지나가 놓치기 쉽습니다. 눌러서 켜주세요."
+            overlayState?.setTextColor(if (켜짐) ink3 else bad)
+        }
+
         val btn = cbOnBtn ?: return
         val 켜짐 = store.callbackOn
         btn.text = if (켜짐) "콜백 문자 끄기" else "콜백 문자 켜기"

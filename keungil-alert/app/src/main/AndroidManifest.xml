@@ -20,6 +20,13 @@
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!--
+        통화가 끝나면 화면 한가운데에 「명함 보낼까요?」 창을 띄운다.
+        배경에서 화면을 띄우는 건 안드로이드 10 부터 막혀 있고, 이 권한이 있으면 풀린다.
+        사용자가 설정에서 직접 켜야 한다. 안 켜면 알림으로 되돌아간다.
+    -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:allowBackup="true"
@@ -52,6 +59,17 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- 통화 직후 화면을 덮고 물어보는 창 -->
+        <activity
+            android:name=".AskActivity"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.KeungilAlert.Ask" />
 
         <!-- 통화가 끝나면 깨어나 명함 문자를 보낸다 -->
         <receiver

@@ -5,4 +5,14 @@
         <item name="android:textColorPrimary">#F6F1E7</item>
         <item name="android:windowBackground">#12100C</item>
     </style>
+
+    <!-- 통화 직후 물어보는 창 — 뒤가 비쳐야 「덮고 떴다」는 느낌이 난다 -->
+    <style name="Theme.KeungilAlert.Ask" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
 </resources>
