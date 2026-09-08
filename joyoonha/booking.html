@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>섭외 신청 — 조윤하 아나운서</title>
+<meta name="description" content="조윤하 아나운서 온라인 섭외 신청. 가능한 날짜를 확인하고 행사 정보를 남기면 24시간 안에 회신드립니다.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/booking.css">
+</head>
+<body>
+
+<header class="nav is-scrolled" id="nav">
+  <div class="nav__progress" id="navProgress"></div>
+  <div class="nav__in">
+    <a href="./" class="brand">
+      <span class="brand__ko">조윤하</span>
+      <span class="brand__en">Yoonha Cho</span>
+    </a>
+    <nav class="links" id="links">
+      <a href="./#about">소개</a>
+      <a href="./#fields">진행 분야</a>
+      <a href="./#career">경력</a>
+      <a href="booking.html" class="is-active">섭외 신청</a>
+    </nav>
+    <a href="tel:01073420744" class="nav__cta">010-7342-0744</a>
+    <button class="burger" id="burger" aria-label="메뉴" aria-expanded="false"><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="bk-head">
+  <div class="wrap">
+    <p class="kicker"><i></i>Online Booking</p>
+    <h1>섭외 신청</h1>
+    <p>가능한 날짜를 고르고 행사 정보를 남겨주세요. 접수 즉시 확인 메일이 가고, <b>24시간 안에</b> 진행 가능 여부와 견적을 회신드립니다.</p>
+    <ol class="steps" id="steps">
+      <li class="step is-on" data-step="1"><i>1</i><span>날짜 확인</span></li>
+      <li class="step" data-step="2"><i>2</i><span>행사 정보</span></li>
+      <li class="step" data-step="3"><i>3</i><span>접수 확인</span></li>
+    </ol>
+  </div>
+</section>
+
+<div class="wrap bk" id="bk">
+
+  <!-- ── 왼쪽: 달력 ── -->
+  <aside class="panel" id="calPanel">
+    <span class="panel__k">Step 1 · Availability</span>
+    <h2>가능한 날짜 확인</h2>
+    <p class="panel__lead">아나운서 캘린더와 연동됩니다. 이미 확정된 날은 회색, 상담 중인 날은 노란색입니다.</p>
+
+    <div class="cal">
+      <div class="cal__bar">
+        <div class="cal__m" id="calTitle"></div>
+        <div class="cal__nav">
+          <button type="button" id="calPrev" aria-label="이전 달"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" id="calNext" aria-label="다음 달"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="cal__grid" id="calGrid"></div>
+      <div class="legend">
+        <span><i></i>가능</span>
+        <span><i class="hold"></i>상담 중</span>
+        <span><i class="busy"></i>확정 · 불가</span>
+        <span><i class="sel"></i>선택한 날</span>
+      </div>
+      <div class="cal__note" id="calNote">날짜를 누르면 오른쪽 신청서에 반영됩니다. <b>같은 날 2건</b>(오전·오후)은 이동 시간에 따라 가능할 수 있으니 상담 중인 날도 문의해 주세요.</div>
+    </div>
+
+    <dl class="sum" id="sum">
+      <div><dt>Date</dt><dd id="sDate"></dd></div>
+      <div><dt>Event</dt><dd id="sEvent"></dd></div>
+      <div><dt>Place</dt><dd id="sPlace"></dd></div>
+      <div><dt>Lang</dt><dd id="sLang"></dd></div>
+      <div><dt>Contact</dt><dd id="sContact"></dd></div>
+    </dl>
+  </aside>
+
+  <!-- ── 오른쪽: 신청서 ── -->
+  <section class="panel" id="formPanel">
+    <span class="panel__k">Step 2 · Request</span>
+    <h2>행사 정보</h2>
+    <p class="panel__lead">정확한 견적을 위해 아는 범위에서만 적어주셔도 됩니다.</p>
+
+    <form class="fm" id="fm" novalidate>
+      <div class="datebox" id="dateBox">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        <span id="dateText">왼쪽 달력에서 행사 날짜를 골라주세요</span>
+      </div>
+
+      <div class="fld">
+        <label for="fEvent">행사명 <i>*</i></label>
+        <input id="fEvent" name="event" placeholder="예) 2026 스마트제조 혁신 컨퍼런스" required>
+      </div>
+
+      <div class="fm__row">
+        <div class="fld">
+          <label for="fType">행사 유형 <i>*</i></label>
+          <select id="fType" name="type" required>
+            <option value="">선택</option>
+            <option>국제 컨퍼런스 · 심포지엄</option>
+            <option>정부 · 공공기관 공식행사</option>
+            <option>기업 기념식 · 컨퍼런스</option>
+            <option>전시 · 박람회 VIP 도슨트</option>
+            <option>음악회 · 북콘서트 · 시상식</option>
+            <option>기자간담회 · 발표회</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label for="fPlace">장소 <i>*</i></label>
+          <input id="fPlace" name="place" placeholder="예) 서울 코엑스 그랜드볼룸" required>
+        </div>
+      </div>
+
+      <div class="fm__row">
+        <div class="fld">
+          <label for="fStart">시작 시각</label>
+          <input id="fStart" name="start" type="time" value="10:00">
+        </div>
+        <div class="fld">
+          <label for="fEnd">종료 시각</label>
+          <input id="fEnd" name="end" type="time" value="12:00">
+        </div>
+      </div>
+
+      <div class="fld">
+        <label>진행 언어 <i>*</i><em>복수 선택</em></label>
+        <div class="chips" id="langs">
+          <label class="chip"><input type="checkbox" name="lang" value="한국어" checked><span><b>KO</b> 한국어</span></label>
+          <label class="chip"><input type="checkbox" name="lang" value="영어"><span><b>EN</b> 영어</span></label>
+          <label class="chip"><input type="checkbox" name="lang" value="일본어"><span><b>JP</b> 일본어</span></label>
+          <label class="chip"><input type="checkbox" name="lang" value="순차통역"><span>순차통역 포함</span></label>
+        </div>
+      </div>
+
+      <div class="fm__row">
+        <div class="fld">
+          <label for="fSize">예상 인원</label>
+          <select id="fSize" name="size">
+            <option>~100명</option><option selected>100~300명</option><option>300~1,000명</option><option>1,000명 이상</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label for="fBudget">예산 범위 <em>선택</em></label>
+          <select id="fBudget" name="budget">
+            <option value="">미정 · 견적 요청</option><option>100만 원 내외</option><option>100~200만 원</option><option>200만 원 이상</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="fm__row">
+        <div class="fld">
+          <label for="fName">담당자 <i>*</i></label>
+          <input id="fName" name="name" placeholder="홍길동 주임" autocomplete="name" required>
+        </div>
+        <div class="fld">
+          <label for="fOrg">소속 <i>*</i></label>
+          <input id="fOrg" name="org" placeholder="기관 · 회사명" autocomplete="organization" required>
+        </div>
+      </div>
+
+      <div class="fm__row">
+        <div class="fld">
+          <label for="fPhone">연락처 <i>*</i></label>
+          <input id="fPhone" name="phone" type="tel" placeholder="010-0000-0000" inputmode="tel" autocomplete="tel" required>
+        </div>
+        <div class="fld">
+          <label for="fMail">이메일 <i>*</i></label>
+          <input id="fMail" name="email" type="email" placeholder="name@company.kr" autocomplete="email" required>
+        </div>
+      </div>
+
+      <div class="fld">
+        <label for="fMemo">요청사항 <em>선택</em></label>
+        <textarea id="fMemo" name="memo" placeholder="내빈 소개 순서, 외국인 참석자 유무, 대본 유무, 리허설 시간 등"></textarea>
+      </div>
+
+      <label class="agree">
+        <input type="checkbox" id="fAgree" required>
+        <span>섭외 상담을 위해 담당자 정보를 수집·이용하는 데 동의합니다. 상담 종료 후 1년 보관 뒤 파기합니다. <a href="#">개인정보 처리방침</a></span>
+      </label>
+
+      <div class="fm__btns">
+        <button type="submit" class="btn btn--ink" id="submitBtn">섭외 신청 보내기</button>
+        <a href="tel:01073420744" class="btn btn--line">급하면 전화</a>
+        <span class="fm__hint">접수 후 확인 메일이 자동 발송됩니다.</span>
+      </div>
+    </form>
+
+    <!-- 접수 완료 -->
+    <div class="done" id="done" hidden>
+      <div class="done__ico"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h2>신청이 접수되었습니다</h2>
+      <p id="doneText"></p>
+      <span class="done__no" id="doneNo"></span>
+      <ol class="done__next">
+        <li><i>1</i><span>담당자 이메일로 <b>접수 확인 메일</b>이 발송되었습니다.</span></li>
+        <li><i>2</i><span>24시간 안에 <b>진행 가능 여부와 견적</b>을 문자·메일로 회신드립니다.</span></li>
+        <li><i>3</i><span>확정 시 <b>전자계약서 링크</b>가 발송되고, 날짜가 캘린더에 잠깁니다.</span></li>
+      </ol>
+      <div class="done__btns">
+        <a href="./" class="btn btn--line">프로필로 돌아가기</a>
+        <button type="button" class="btn btn--soft" id="again">다른 날짜로 다시 신청</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div>
+      <p class="foot__name">조윤하 <span class="lat" style="font-style:italic;font-weight:500;color:var(--mute)">Yoonha Cho</span></p>
+      <p class="foot__tag">섭외 문의 010-7342-0744 · yoonhacho.mc@gmail.com</p>
+    </div>
+  </div>
+  <p class="wrap foot__copy">© <span id="year"></span> 조윤하 아나운서 · 온라인 섭외 신청 (MVP 샘플)</p>
+</footer>
+
+<div class="demo">샘플 화면 · 실제 전송되지 않습니다</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/booking.js"></script>
+</body>
+</html>
