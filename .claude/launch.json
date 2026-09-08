@@ -66,6 +66,27 @@
         ".claude/keungil-server.js"
       ],
       "port": 8822
+    },
+    {
+      "name": "event-korea",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/eventkorea-server.js"
+      ],
+      "port": 8833
+    },
+    {
+      "name": "aimake-card",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "http-server",
+        "C:/Users/gilau/Documents/ai-make",
+        "-p",
+        "8161",
+        "-c-1"
+      ],
+      "port": 8161
     }
   ]
 }

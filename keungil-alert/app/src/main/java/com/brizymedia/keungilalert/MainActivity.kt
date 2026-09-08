@@ -564,7 +564,7 @@ class MainActivity : AppCompatActivity() {
 
     // ── 작은 도구들 ────────────────────────────────
 
-    private val CARD_URL = "https://xn--wk0bn7yi8h24iszc.com/card/"
+    private val CARD_URL = "https://www.ai-make.co.kr/card/"
 
     private fun dp(v: Int): Int = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, v.toFloat(), resources.displayMetrics
