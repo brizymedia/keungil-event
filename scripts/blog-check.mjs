@@ -4,14 +4,15 @@
  *   node scripts/blog-check.mjs                 모든 글 검사(중복 비교는 가장 최근 날짜 글만)
  *   node scripts/blog-check.mjs --new a.json …  새로 쓴 글만 엄격히 검사하고, 기존 글 전부와 중복 비교
  *
- * 형식·자료가 틀린 글, 지어낼 위험이 있는 표현(가격·순위·연혁·후기), 목록에 없는 사진,
- * 사진 장소를 속이는 캡션, 근거 없는 사실, 손으로 만든 공식 출처 주소,
- * 다른 지역 글을 이름만 바꾼 글을 막는다. 실패하면 exit 1.
+ * 형식·자료가 틀린 글, 지어낼 위험이 있는 표현(가격·순위·연혁·후기·경험 늘려 말하기),
+ * 목록에 없는 사진, 사진 장소를 속이는 캡션, 근거 없는 사실, 손으로 만든 공식 출처 주소,
+ * 견적서에 없는 품목 약속, 동네에 지어낸 특징 붙이기, 지역 이름만 바꾼 글을 막는다. 실패하면 exit 1.
+ * 시험 실행 두 번에서 실제로 나온 잘못을 규칙으로 옮겼다 — _blog/GUIDE.md 2장의 예시와 짝.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들 } from './build-blog.mjs';
+import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들, 글자만 } from './build-blog.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const 인자 = process.argv.slice(2);
@@ -25,6 +26,19 @@ const 도메인 = (u) => { try { return new URL(u).hostname.replace(/^(www|m)\./
 const 공식도메인 = new Set(공식출처.map((s) => 도메인(s.url)));
 const 오늘 = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // 한국 날짜
 const 지역이름들 = [...지역.values()].filter((r) => r.slug !== 'common').map((r) => r.이름);
+const 정규식글자 = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/* 자동 견적서(quote.html) 품목 — 견적 항목표에는 이 낱말과 운반 · 설치 · 인력 같은 공통 항목만 */
+const 품목이름 = [...readFileSync(resolve(ROOT, 'quote.html'), 'utf8').matchAll(/name:'([^']+)'/g)].map((m) => m[1]).filter(Boolean);
+const 낱말로 = (s) => String(s).split(/[^가-힣A-Za-z]+/).filter((t) => t.length >= 2);
+const 견적낱말 = new Set([
+  ...품목이름.flatMap(낱말로),
+  '운반', '설치', '철수', '출장', '인력', '인건비', '스탭', '요원', '리허설', '오퍼레이터', '진행',
+  '발전', '천막', '텐트', '음향', '조명', '무대', '마이크', '스피커', '영상', '중계', '송출', '특수효과',
+]);
+const 견적품목인가 = (칸) => 낱말로(글자만(칸)).some((t) => [...견적낱말].some((w) => t.includes(w) || w.includes(t)));
+const 없는품목 = ['테이블보', '테이블', '파라솔', '냉풍기', '온풍기', '난방기', '이동식 화장실', '케이터링', '도시락', '셔틀버스', '풍선', '꽃장식', '가구', '행사용품'];
+const 약속말 = /(빌릴 수 있습니다|빌려 드립니다|대여가 가능|대여해 드립니다|대여합니다|신청하실 수 있습니다|골라 보내 주시면|골라 신청|보유하고 있|준비해 드립니다|(^|\s)네,)/;
 
 const 오류 = [];
 const 경고 = [];
@@ -32,6 +46,7 @@ const 틀림 = (p, m) => 오류.push(`✗ ${p._파일}: ${m}`);
 const 주의 = (p, m) => 경고.push(`△ ${p._파일}: ${m}`);
 const 붙여 = (s) => String(s || '').replace(/\*\*/g, '').replace(/\s+/g, '');
 const 글자수 = (s) => [...String(s || '')].length;
+const 문장들 = (t) => String(t || '').split(/(?<=[.!?])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
 
 /* 확인할 수 없는 회사 자랑 · 가격 · 후기는 쓰지 않는다 */
 const 금지 = [
@@ -41,6 +56,7 @@ const 금지 = [
   [/\d+\s*년\s*(경력|전통|노하우|업력)|설립\s*(연도|이래|이후)/, '회사 연혁·경력 연수 — 쓰지 않는다'],
   [/후기|고객님\s*말씀|만족도|별점|리뷰/, '후기·만족도 — 지어낼 위험이 있어 쓰지 않는다'],
   [/\d[\d,]*\s*(건|회)\s*(이상|넘게|넘는)?\s*(의\s*)?(행사|진행|실적)/, '행사 건수 — 쓰지 않는다'],
+  [/(대응해|맡아|진행해|운영해|해|도와|준비해)\s*(왔|온\s*경험)/, "경험을 늘려 말하는 표현('~해 왔습니다') — 현장기록의 행사 이름으로만 말한다"],
   [/(?<!옛\s?)광주광역시/, "현재형 '광주광역시' — 2026-07-01 부터 전남광주통합특별시. '옛 광주광역시' 로 쓴다"],
 ];
 
@@ -147,6 +163,35 @@ for (const p of 검사대상) {
   }
   if (!링크들(원문).some((u) => u.startsWith('/quote.html'))) 주의(p, '자동 견적서(/quote.html) 링크가 없다');
 
+  /* 견적서에 없는 품목을 약속하지 않는다 */
+  p.sections.forEach((s) => {
+    if (!/견적/.test(s.h2)) return;
+    (s.blocks || []).filter((b) => b.table).forEach((b) => b.table.rows.forEach((row) => {
+      if (!견적품목인가(row[0])) 틀림(p, `견적 항목표의 '${글자만(row[0])}' 은 자동 견적서 품목이 아니다 — 견적서에 없는 것을 견적 항목으로 적지 않는다`);
+    }));
+  });
+  const 약속단위 = [...문장들(글자만([p.description, ...(p.points || []), ...p.sections.flatMap((s) => (s.blocks || []).flatMap((b) => [b.p, b.tip, ...(b.ul || []), ...(b.ol || [])]))].filter(Boolean).join('\n'))),
+    ...(p.faq || []).map((f) => 글자만(`${f.q} ${f.a}`))];
+  for (const 단위 of 약속단위) {
+    const 품목 = 없는품목.find((w) => 단위.includes(w));
+    if (품목 && 약속말.test(단위)) 틀림(p, `견적서에 없는 '${품목}' 을 빌려준다고 약속했다 — "${단위.slice(0, 60)}…"`);
+  }
+
+  /* 동네에 지어낸 특징을 붙이거나, 지역 문의 통계를 지어내지 않는다 */
+  if (r && p.region !== 'common') {
+    for (const 동네 of r.동네 || []) {
+      const 식 = new RegExp(`${정규식글자(동네)}[^.!?\\n]{0,20}(처럼|같은|같이)|${정규식글자(동네)}\\s*(인근|근처|일대|주변|쪽)\\s*(은|는|처럼|의|에서는)`);
+      const m = 본문.match(식);
+      if (m) 틀림(p, `동네 '${동네}' 에 특징을 붙인 문장 — 동네 이름은 괄호 속 나열로만 쓴다: "${m[0]}"`);
+    }
+    const 지역말 = [r.이름, ...(r.동네 || [])];
+    for (const 문장 of 문장들(본문)) {
+      if (지역말.some((w) => 문장.includes(w)) && /(경우[가도]|문의[가도]|요청[이도]|찾는\s*분[이도])\s*(흔|잦|많)/.test(문장)) {
+        틀림(p, `지역 문의 · 요청이 흔하다는 통계를 지어낸 문장 — "${문장.slice(0, 60)}…"`);
+      }
+    }
+  }
+
   /* 출처 — 공식 기관 도메인은 사람이 확인한 주소(_blog/sources.json)만 */
   const 출처주소 = new Set();
   (p.sources || []).forEach((s, i) => {
@@ -158,24 +203,26 @@ for (const p of 검사대상) {
   });
   if (/「|법\s*(제\s*\d|에\s*따라|상의?\s)|시행령|조례|기상청|고시|지침|데이터랩/.test(본문) && !(p.sources || []).length) 틀림(p, '법·기준·기관·통계 이야기를 했는데 sources 가 비었다');
 
-  /* 근거 — 글에 쓴 사실이 어디서 왔는지. 지역 글은 하나 이상 regions.json 에서 */
+  /* 근거 — 글에 쓴 사실이 어디서 왔는지 */
   if (p.region !== 'common') {
     const 근거 = p.근거;
     if (!Array.isArray(근거) || 근거.length < 3) 틀림(p, '근거는 3개 이상 — { "내용": 본문에 그대로 있는 구절, "출처": "regions.json" 또는 sources 의 주소 }');
     else {
       const 본문붙임 = 붙여([본문, ...캡션들, p.title, p.description].join(' '));
       const 지역자료 = 붙여(JSON.stringify(r || {}));
-      let 지역근거 = 0;
+      const 핵심자료 = 붙여(JSON.stringify({ 이동: r?.이동, 주의: r?.주의, 현장기록: r?.현장기록 }));
+      let 핵심근거 = 0;
       근거.forEach((g, i) => {
         if (!g || !g.내용 || !g.출처) { 틀림(p, `근거[${i}] 에 내용 · 출처가 없다`); return; }
         if (글자수(g.내용) < 4) 틀림(p, `근거[${i}] 내용이 너무 짧다`);
         if (!본문붙임.includes(붙여(g.내용))) 틀림(p, `근거[${i}] "${g.내용}" 이 본문에 그대로 없다`);
         if (g.출처 === 'regions.json') {
+          if (글자수(g.내용) > 25) 틀림(p, `근거[${i}] regions.json 근거는 25자 이하 핵심어로 — 자료 문장을 통째로 본문에 붙이면 문체가 깨진다`);
           if (!지역자료.includes(붙여(g.내용))) 틀림(p, `근거[${i}] "${g.내용}" 은 regions.json 의 ${r ? r.이름 : p.region} 자료에 없다`);
-          else 지역근거 += 1;
+          else if (핵심자료.includes(붙여(g.내용))) 핵심근거 += 1;
         } else if (!출처주소.has(g.출처)) 틀림(p, `근거[${i}] 출처는 'regions.json' 이거나 이 글 sources 에 있는 주소여야 한다: ${g.출처}`);
       });
-      if (지역근거 < 1) 틀림(p, '근거 중 하나 이상은 regions.json 에서 가져온 지역 사실이어야 한다');
+      if (핵심근거 < 1) 틀림(p, 'regions.json 근거 중 하나 이상은 이동 · 주의 · 현장기록에서 가져온다(동네 이름 · 행사 종류만으로는 근거가 안 된다)');
     }
   }
 
