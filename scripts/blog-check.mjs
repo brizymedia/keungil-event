@@ -60,6 +60,9 @@ const 금지 = [
   [/(?<!옛\s?)광주광역시/, "현재형 '광주광역시' — 2026-07-01 부터 전남광주통합특별시. '옛 광주광역시' 로 쓴다"],
 ];
 
+/* 작성자용 메모(regions.json 주의 칸)를 글에 옮기지 않는다 — 3차 시험에서 '진주 현장 사진은 아직 없습니다'가 첫 문단 · FAQ 로 나갔다 */
+금지.push([/사진[은이]?\s*아직\s*없|사진이\s*쌓이는\s*대로|(이\s*글|글|사진)[을은도]?\s*(바꿀|고칠|갱신할|보탤|더할|업데이트할)\s*예정|작성자용/, '작성자용 메모를 글에 옮겼거나 글을 나중에 고치겠다고 약속했다 — 루틴은 지난 글을 고치지 않는다']);
+
 const 링크들 = (글) => [...String(글 || '').matchAll(/\[([^\]]+)\]\(([^)\s]*)\)/g)].map((m) => m[2]);
 const 허브주소 = new Set(['/blog/', ...[...지역.keys()].map((k) => `/blog/${k}/`)]);
 const 글주소들 = new Set(posts.flatMap((p) => [`/blog/${p.slug}/`, `/blog/${encodeURIComponent(p.slug)}/`]));
@@ -209,8 +212,9 @@ for (const p of 검사대상) {
     if (!Array.isArray(근거) || 근거.length < 3) 틀림(p, '근거는 3개 이상 — { "내용": 본문에 그대로 있는 구절, "출처": "regions.json" 또는 sources 의 주소 }');
     else {
       const 본문붙임 = 붙여([본문, ...캡션들, p.title, p.description].join(' '));
-      const 지역자료 = 붙여(JSON.stringify(r || {}));
-      const 핵심자료 = 붙여(JSON.stringify({ 이동: r?.이동, 주의: r?.주의, 현장기록: r?.현장기록 }));
+      const 쓸자료 = r ? { ...r, 주의: (r.주의 || []).filter((x) => !String(x).startsWith('(작성자용')) } : {};   // 작성자용 메모는 근거가 될 수 없다
+      const 지역자료 = 붙여(JSON.stringify(쓸자료));
+      const 핵심자료 = 붙여(JSON.stringify({ 이동: 쓸자료.이동, 주의: 쓸자료.주의, 현장기록: 쓸자료.현장기록 }));
       let 핵심근거 = 0;
       근거.forEach((g, i) => {
         if (!g || !g.내용 || !g.출처) { 틀림(p, `근거[${i}] 에 내용 · 출처가 없다`); return; }
