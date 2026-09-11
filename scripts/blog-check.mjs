@@ -5,12 +5,13 @@
  *   node scripts/blog-check.mjs --new a.json …  새로 쓴 글만 엄격히 검사하고, 기존 글 전부와 중복 비교
  *
  * 형식·자료가 틀린 글, 지어낼 위험이 있는 표현(가격·순위·연혁·후기), 목록에 없는 사진,
- * 사진 장소를 속이는 캡션, 다른 지역 글을 이름만 바꾼 글을 막는다. 실패하면 exit 1.
+ * 사진 장소를 속이는 캡션, 근거 없는 사실, 손으로 만든 공식 출처 주소,
+ * 다른 지역 글을 이름만 바꾼 글을 막는다. 실패하면 exit 1.
  */
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들, 글자만 } from './build-blog.mjs';
+import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들 } from './build-blog.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const 인자 = process.argv.slice(2);
@@ -19,6 +20,9 @@ const 새글 = 인자[0] === '--new' ? new Set(인자.slice(1).map((f) => f.spli
 const 지역 = 지역표(ROOT);
 const 사진 = 사진목록(ROOT);
 const posts = 글읽기(ROOT);
+const 공식출처 = JSON.parse(readFileSync(resolve(ROOT, '_blog', 'sources.json'), 'utf8')).출처;
+const 도메인 = (u) => { try { return new URL(u).hostname.replace(/^(www|m)\./, ''); } catch { return null; } };
+const 공식도메인 = new Set(공식출처.map((s) => 도메인(s.url)));
 const 오늘 = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // 한국 날짜
 const 지역이름들 = [...지역.values()].filter((r) => r.slug !== 'common').map((r) => r.이름);
 
@@ -26,7 +30,7 @@ const 오류 = [];
 const 경고 = [];
 const 틀림 = (p, m) => 오류.push(`✗ ${p._파일}: ${m}`);
 const 주의 = (p, m) => 경고.push(`△ ${p._파일}: ${m}`);
-const 붙여 = (s) => String(s || '').replace(/\s+/g, '');
+const 붙여 = (s) => String(s || '').replace(/\*\*/g, '').replace(/\s+/g, '');
 const 글자수 = (s) => [...String(s || '')].length;
 
 /* 확인할 수 없는 회사 자랑 · 가격 · 후기는 쓰지 않는다 */
@@ -72,13 +76,14 @@ if (새글 && 검사대상.length !== 새글.size) 오류.push(`✗ --new 로 �
 for (const p of 검사대상) {
   const r = 지역.get(p.region);
   /* 형식 */
+  const 전 = 오류.length;
   for (const k of ['slug', 'date', 'region', 'topic', 'title', 'description', 'lead']) if (typeof p[k] !== 'string' || !p[k].trim()) 틀림(p, `${k} 없음`);
   if (!p.keyword || typeof p.keyword.main !== 'string') 틀림(p, 'keyword.main 없음');
   if (!Array.isArray(p.points) || p.points.length < 3 || p.points.length > 5) 틀림(p, 'points 는 3~5개');
   if (!Array.isArray(p.sections) || p.sections.length < 4) 틀림(p, 'sections 는 4개 이상');
   if (!Array.isArray(p.faq) || p.faq.length < 2 || p.faq.length > 6) 틀림(p, 'faq 는 2~6개');
   if (!Array.isArray(p.sources)) 틀림(p, 'sources 배열 없음(없으면 [])');
-  if (오류.length && 오류.at(-1).includes(p._파일) && (!p.sections || !p.keyword)) continue;
+  if (오류.length > 전 && (!Array.isArray(p.sections) || !p.keyword || !p.cover)) continue;
 
   if (!/^[가-힣a-z0-9]+(-[가-힣a-z0-9]+)*$/.test(p.slug) || 글자수(p.slug) > 70) 틀림(p, 'slug 는 한글·영소문자·숫자와 - 만, 70자 이하');
   if (지역.has(p.slug) || p.slug === 'page') 틀림(p, 'slug 가 예약된 주소와 같다');
@@ -126,14 +131,14 @@ for (const p of 검사대상) {
     if (글자수(im.alt) < 8 || 글자수(im.alt) > 120) 틀림(p, `사진 ${im.path} alt 는 8~120자`);
     if (!im.caption) 틀림(p, `사진 ${im.path} caption 없음`);
     const 설명 = `${im.alt} ${im.caption}`;
-    const 말한지역 = 지역이름들.filter((n) => 설명.includes(n));
-    for (const n of 말한지역) {
+    for (const n of 지역이름들.filter((x) => 설명.includes(x))) {
       if (정보.지역 !== n && !String(정보.행사 || '').includes(n)) 틀림(p, `사진 ${im.path} 설명에 '${n}' — 목록상 이 사진의 지역은 '${정보.지역 || '모름'}'. 찍은 곳을 바꿔 쓰지 않는다`);
     }
   }
 
-  /* 표현 · 링크 · 출처 */
-  const 전체글 = [p.title, p.description, 본문, ...이미지.map((im) => `${im.alt} ${im.caption}`)].join('\n');
+  /* 표현 · 링크 */
+  const 캡션들 = 이미지.map((im) => `${im.alt} ${im.caption}`);
+  const 전체글 = [p.title, p.description, 본문, ...캡션들].join('\n');
   for (const [식, 이유] of 금지) { const m = 전체글.match(식); if (m) 틀림(p, `${이유} — "${m[0]}"`); }
   const 원문 = JSON.stringify(p);
   for (const u of 링크들(원문)) {
@@ -141,8 +146,38 @@ for (const p of 검사대상) {
     else if (!u.startsWith('https://')) 틀림(p, `링크는 / 또는 https:// 로 시작: ${u}`);
   }
   if (!링크들(원문).some((u) => u.startsWith('/quote.html'))) 주의(p, '자동 견적서(/quote.html) 링크가 없다');
-  (p.sources || []).forEach((s, i) => { if (!s.name || !/^https:\/\//.test(s.url || '')) 틀림(p, `sources[${i}] 는 name 과 https:// url 이 필요`); });
+
+  /* 출처 — 공식 기관 도메인은 사람이 확인한 주소(_blog/sources.json)만 */
+  const 출처주소 = new Set();
+  (p.sources || []).forEach((s, i) => {
+    if (!s.name || !/^https:\/\//.test(s.url || '')) { 틀림(p, `sources[${i}] 는 name 과 https:// url 이 필요`); return; }
+    출처주소.add(s.url);
+    const d = 도메인(s.url);
+    if (!d) 틀림(p, `sources[${i}] 주소 형식이 틀렸다: ${s.url}`);
+    else if (공식도메인.has(d) && !공식출처.some((o) => o.url === s.url)) 틀림(p, `sources[${i}] ${d} 주소는 _blog/sources.json 에 있는 것을 그대로 쓴다(주소를 손으로 만들지 않는다): ${s.url}`);
+  });
   if (/「|법\s*(제\s*\d|에\s*따라|상의?\s)|시행령|조례|기상청|고시|지침|데이터랩/.test(본문) && !(p.sources || []).length) 틀림(p, '법·기준·기관·통계 이야기를 했는데 sources 가 비었다');
+
+  /* 근거 — 글에 쓴 사실이 어디서 왔는지. 지역 글은 하나 이상 regions.json 에서 */
+  if (p.region !== 'common') {
+    const 근거 = p.근거;
+    if (!Array.isArray(근거) || 근거.length < 3) 틀림(p, '근거는 3개 이상 — { "내용": 본문에 그대로 있는 구절, "출처": "regions.json" 또는 sources 의 주소 }');
+    else {
+      const 본문붙임 = 붙여([본문, ...캡션들, p.title, p.description].join(' '));
+      const 지역자료 = 붙여(JSON.stringify(r || {}));
+      let 지역근거 = 0;
+      근거.forEach((g, i) => {
+        if (!g || !g.내용 || !g.출처) { 틀림(p, `근거[${i}] 에 내용 · 출처가 없다`); return; }
+        if (글자수(g.내용) < 4) 틀림(p, `근거[${i}] 내용이 너무 짧다`);
+        if (!본문붙임.includes(붙여(g.내용))) 틀림(p, `근거[${i}] "${g.내용}" 이 본문에 그대로 없다`);
+        if (g.출처 === 'regions.json') {
+          if (!지역자료.includes(붙여(g.내용))) 틀림(p, `근거[${i}] "${g.내용}" 은 regions.json 의 ${r ? r.이름 : p.region} 자료에 없다`);
+          else 지역근거 += 1;
+        } else if (!출처주소.has(g.출처)) 틀림(p, `근거[${i}] 출처는 'regions.json' 이거나 이 글 sources 에 있는 주소여야 한다: ${g.출처}`);
+      });
+      if (지역근거 < 1) 틀림(p, '근거 중 하나 이상은 regions.json 에서 가져온 지역 사실이어야 한다');
+    }
+  }
 
   /* 같은 지역 · 같은 주제 중복 */
   const 같은것 = posts.filter((o) => o !== p && o.region === p.region && o.topic === p.topic);

@@ -123,6 +123,12 @@
     { "q": "몇 동이 필요한지 모르겠어요.", "a": "참석 인원과 천막 아래에 둘 것(접수·내빈·대기·식음)을 알려 주시면 수량부터 잡아 드립니다. 상담은 무료입니다." },
     { "q": "사람이 많이 오는 야외 행사인데 따로 신고할 것이 있나요?", "a": "공연장이 아닌 곳에서 1천 명 이상 관람이 예상되는 공연을 하면 공연법에 따라 공연 시작 14일 전까지 재해대처계획을 관할 시·군·구에 신고해야 합니다. 순간 최대 관람객이 1천 명 이상으로 예상되는 지역축제는 재난안전법에 따라 축제 3주 전까지 안전관리계획을 내야 합니다. 행사 성격에 따라 달라지니 관할 구청에 먼저 확인하세요." }
   ],
+  "근거": [
+    { "내용": "동구·서구·남구·북구·광산구", "출처": "regions.json" },
+    { "내용": "광양에서 약 1시간 10분", "출처": "regions.json" },
+    { "내용": "풍속 14m/s 이상 또는 순간풍속 20m/s 이상", "출처": "https://www.weather.go.kr/w/forecast/guide/standard.do" },
+    { "내용": "공연 시작 14일 전까지 재해대처계획", "출처": "https://m.easylaw.go.kr/MOB/OnhunqnaInfoRetrieve.laf?onhunqnaAstSeq=86&onhunqueSeq=6423" }
+  ],
   "sources": [
     { "name": "기상청 날씨누리 — 기상특보 발표기준", "url": "https://www.weather.go.kr/w/forecast/guide/standard.do" },
     { "name": "찾기쉬운 생활법령정보 — 공연장 외 공연 시 재해대처계획 신고 의무", "url": "https://m.easylaw.go.kr/MOB/OnhunqnaInfoRetrieve.laf?onhunqnaAstSeq=86&onhunqueSeq=6423" },

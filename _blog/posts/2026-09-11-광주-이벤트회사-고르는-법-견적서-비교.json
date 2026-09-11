@@ -125,6 +125,11 @@
     { "q": "장비만 빌릴 수도 있나요?", "a": "가능합니다. 음향·조명·LED 영상장비를 단독으로 빌려 드립니다. 대형 음향과 LED는 세팅에 숙련이 필요해 인력을 함께 두시는 편을 권합니다." },
     { "q": "기관 행사도 맡나요?", "a": "지자체 정책 설명회, 기념식, 협의회 같은 기관 행사 현장을 [행사 갤러리](/gallery.html)에서 행사별로 보실 수 있습니다." }
   ],
+  "근거": [
+    { "내용": "광양에서 약 1시간 10분", "출처": "regions.json" },
+    { "내용": "공연 시작 14일 전까지 재해대처계획 신고", "출처": "https://m.easylaw.go.kr/MOB/OnhunqnaInfoRetrieve.laf?onhunqnaAstSeq=86&onhunqueSeq=6423" },
+    { "내용": "축제 3주 전까지 안전관리계획 제출", "출처": "https://www.law.go.kr/법령/재난및안전관리기본법시행령" }
+  ],
   "sources": [
     { "name": "찾기쉬운 생활법령정보 — 공연장 외 공연 시 재해대처계획 신고 의무", "url": "https://m.easylaw.go.kr/MOB/OnhunqnaInfoRetrieve.laf?onhunqnaAstSeq=86&onhunqueSeq=6423" },
     { "name": "국가법령정보센터 — 공연법 시행령", "url": "https://www.law.go.kr/법령/공연법시행령" },

@@ -127,6 +127,11 @@
     { "q": "에어바운스만 따로 빌릴 수 있나요?", "a": "견적서에서 에어바운스만 골라 문의하실 수 있습니다. 가능 여부는 날짜와 설치 장소, 운영 인원에 따라 달라 상담 때 안내드립니다." },
     { "q": "몇 동이나 필요할까요?", "a": "전체 참가 인원보다 **동시에 이용할 인원**과 운영 시간으로 정합니다. 체육대회라면 게임 순서에 맞춰 팀별로 돌아가며 쓰도록 짜면 줄이 길어지지 않습니다." }
   ],
+  "근거": [
+    { "내용": "옛 광주광역시", "출처": "regions.json" },
+    { "내용": "풍속 14m/s 이상 또는 순간풍속 20m/s 이상", "출처": "https://www.weather.go.kr/w/forecast/guide/standard.do" },
+    { "내용": "「관광진흥법」에서 유기기구로 관리", "출처": "https://www.kca.go.kr/home//sub.do?menukey=4002&mode=view&no=1001783614" }
+  ],
   "sources": [
     { "name": "기상청 날씨누리 — 기상특보 발표기준", "url": "https://www.weather.go.kr/w/forecast/guide/standard.do" },
     { "name": "한국소비자원 — 에어바운스 안전관리 실태 보도자료", "url": "https://www.kca.go.kr/home//sub.do?menukey=4002&mode=view&no=1001783614" },
