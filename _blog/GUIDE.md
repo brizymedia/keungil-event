@@ -104,7 +104,8 @@
 ## 7. 커밋과 푸시
 
 ```bash
-D=$(TZ=Asia/Seoul date +%F)
+# 한국 날짜 — 루틴은 오전 7시(UTC 전날 22시)에 돌기 때문에 date 는 하루 전 날짜를 줄 수 있다. 반드시 이 식으로.
+D=$(node -e "console.log(new Date(Date.now()+9*3600e3).toISOString().slice(0,10))")
 git checkout -b claude/blog-$D
 git add _blog/posts/
 git commit -m "블로그 글 5개 — 광주·순천·여수…"
