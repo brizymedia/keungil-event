@@ -154,7 +154,8 @@ const jsonld = {
         description: g.desc || '',
         keywords: [...(g.regions || []).flatMap((r) => [`${r} ${g.name}`, `${r} 이벤트회사`, `${r} 행사대행`]), ...(g.events || [])].join(', '),
         contentLocation: (g.regions || []).map((r) => ({ '@type': 'Place', name: r, address: { '@type': 'PostalAddress', addressLocality: r, addressCountry: 'KR' } })),
-        about: (g.events || []).map((e) => ({ '@type': 'Event', name: e })),
+        /* 지난 행사 이름이다. Event 로 두면 구글이 앞으로 열릴 행사로 보고 날짜·장소가 없다고 경고한다(2026-09-11 서치콘솔). */
+        about: (g.events || []).map((e) => ({ '@type': 'Thing', name: e })),
         image: g.photos.slice(0, 12).map((p) => imgUrl(p)) })) }
   ]
 };
