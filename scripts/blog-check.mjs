@@ -1,0 +1,168 @@
+/**
+ * 블로그 글 검사 — 올리기 전에 반드시 통과해야 한다
+ * ──────────────────────────────────────────────
+ *   node scripts/blog-check.mjs                 모든 글 검사(중복 비교는 가장 최근 날짜 글만)
+ *   node scripts/blog-check.mjs --new a.json …  새로 쓴 글만 엄격히 검사하고, 기존 글 전부와 중복 비교
+ *
+ * 형식·자료가 틀린 글, 지어낼 위험이 있는 표현(가격·순위·연혁·후기), 목록에 없는 사진,
+ * 사진 장소를 속이는 캡션, 다른 지역 글을 이름만 바꾼 글을 막는다. 실패하면 exit 1.
+ */
+import { existsSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들, 글자만 } from './build-blog.mjs';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const 인자 = process.argv.slice(2);
+const 새글 = 인자[0] === '--new' ? new Set(인자.slice(1).map((f) => f.split(/[\\/]/).pop())) : null;
+
+const 지역 = 지역표(ROOT);
+const 사진 = 사진목록(ROOT);
+const posts = 글읽기(ROOT);
+const 오늘 = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // 한국 날짜
+const 지역이름들 = [...지역.values()].filter((r) => r.slug !== 'common').map((r) => r.이름);
+
+const 오류 = [];
+const 경고 = [];
+const 틀림 = (p, m) => 오류.push(`✗ ${p._파일}: ${m}`);
+const 주의 = (p, m) => 경고.push(`△ ${p._파일}: ${m}`);
+const 붙여 = (s) => String(s || '').replace(/\s+/g, '');
+const 글자수 = (s) => [...String(s || '')].length;
+
+/* 확인할 수 없는 회사 자랑 · 가격 · 후기는 쓰지 않는다 */
+const 금지 = [
+  [/\d[\d,]*\s*(만|천|억)?\s*원(?=$|[\s.,)·~/]|대|이|을|은|부터|까지|씩|선|정도|가량|짜리)/, '가격(원) — 가격은 쓰지 않는다'],
+  [/최저가|업계\s*최초|업계\s*1위|지역\s*1위|실적\s*1위|No\.?\s*1|넘버원/i, '확인할 수 없는 1위·최초 표현'],
+  [/100\s*%|무조건|보장합니다|보장해\s*드립니다/, '보장·100% 표현'],
+  [/\d+\s*년\s*(경력|전통|노하우|업력)|설립\s*(연도|이래|이후)/, '회사 연혁·경력 연수 — 쓰지 않는다'],
+  [/후기|고객님\s*말씀|만족도|별점|리뷰/, '후기·만족도 — 지어낼 위험이 있어 쓰지 않는다'],
+  [/\d[\d,]*\s*(건|회)\s*(이상|넘게|넘는)?\s*(의\s*)?(행사|진행|실적)/, '행사 건수 — 쓰지 않는다'],
+  [/(?<!옛\s?)광주광역시/, "현재형 '광주광역시' — 2026-07-01 부터 전남광주통합특별시. '옛 광주광역시' 로 쓴다"],
+];
+
+const 링크들 = (글) => [...String(글 || '').matchAll(/\[([^\]]+)\]\(([^)\s]*)\)/g)].map((m) => m[2]);
+const 허브주소 = new Set(['/blog/', ...[...지역.keys()].map((k) => `/blog/${k}/`)]);
+const 글주소들 = new Set(posts.flatMap((p) => [`/blog/${p.slug}/`, `/blog/${encodeURIComponent(p.slug)}/`]));
+function 내부주소있나(u) {
+  const 경로 = u.split('#')[0].split('?')[0];
+  if (허브주소.has(경로) || 글주소들.has(경로)) return true;
+  if (경로.startsWith('/blog/')) return false;
+  const 파일 = resolve(ROOT, '.' + decodeURIComponent(경로));
+  return 경로.endsWith('/') ? existsSync(resolve(파일, 'index.html')) : existsSync(파일);
+}
+
+/* 글자 4개씩 묶어 겹치는 비율 — 지역 이름만 바꾼 글을 잡는다 */
+function 조각들(p) {
+  let t = 본문글(p);
+  for (const n of 지역이름들) t = t.split(n).join('');
+  t = t.replace(/[\s\d.,·—\-()［\]\[/:%~]+/g, '');
+  const s = new Set();
+  for (let i = 0; i + 4 <= t.length; i++) s.add(t.slice(i, i + 4));
+  return s;
+}
+const 겹침 = (a, b) => { let n = 0; for (const x of a) if (b.has(x)) n++; return n / (a.size + b.size - n || 1); };
+
+const 슬러그수 = new Map();
+posts.forEach((p) => 슬러그수.set(p.slug, (슬러그수.get(p.slug) || 0) + 1));
+const 최근날짜 = posts[0] ? posts[0].date : '';
+const 검사대상 = posts.filter((p) => (새글 ? 새글.has(p._파일) : true));
+const 비교대상 = posts.filter((p) => (새글 ? 새글.has(p._파일) : p.date === 최근날짜));
+if (새글 && 검사대상.length !== 새글.size) 오류.push(`✗ --new 로 준 파일 중 _blog/posts 에 없는 것이 있다: ${[...새글].join(', ')}`);
+
+for (const p of 검사대상) {
+  const r = 지역.get(p.region);
+  /* 형식 */
+  for (const k of ['slug', 'date', 'region', 'topic', 'title', 'description', 'lead']) if (typeof p[k] !== 'string' || !p[k].trim()) 틀림(p, `${k} 없음`);
+  if (!p.keyword || typeof p.keyword.main !== 'string') 틀림(p, 'keyword.main 없음');
+  if (!Array.isArray(p.points) || p.points.length < 3 || p.points.length > 5) 틀림(p, 'points 는 3~5개');
+  if (!Array.isArray(p.sections) || p.sections.length < 4) 틀림(p, 'sections 는 4개 이상');
+  if (!Array.isArray(p.faq) || p.faq.length < 2 || p.faq.length > 6) 틀림(p, 'faq 는 2~6개');
+  if (!Array.isArray(p.sources)) 틀림(p, 'sources 배열 없음(없으면 [])');
+  if (오류.length && 오류.at(-1).includes(p._파일) && (!p.sections || !p.keyword)) continue;
+
+  if (!/^[가-힣a-z0-9]+(-[가-힣a-z0-9]+)*$/.test(p.slug) || 글자수(p.slug) > 70) 틀림(p, 'slug 는 한글·영소문자·숫자와 - 만, 70자 이하');
+  if (지역.has(p.slug) || p.slug === 'page') 틀림(p, 'slug 가 예약된 주소와 같다');
+  if (슬러그수.get(p.slug) > 1) 틀림(p, 'slug 가 다른 글과 같다');
+  if (p._파일 !== `${p.date}-${p.slug}.json`) 틀림(p, `파일 이름은 ${p.date}-${p.slug}.json`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(p.date) || p.date > 오늘) 틀림(p, `date 형식이 틀렸거나 오늘(${오늘})보다 뒤`);
+  if (!r) 틀림(p, `region '${p.region}' 은 _blog/regions.json 에 없다`);
+
+  /* 제목 · 설명 · 키워드 */
+  if (글자수(p.title) < 15 || 글자수(p.title) > 50) 틀림(p, `title 은 15~50자 (지금 ${글자수(p.title)})`);
+  if (글자수(p.description) < 70 || 글자수(p.description) > 160) 틀림(p, `description 은 70~160자 (지금 ${글자수(p.description)})`);
+  if (글자수(p.lead) < 80 || 글자수(p.lead) > 420) 틀림(p, `lead 는 80~420자 (지금 ${글자수(p.lead)})`);
+  if (r && p.region !== 'common' && !p.title.includes(r.이름)) 틀림(p, `title 에 지역 이름(${r.이름})이 없다`);
+  const 키 = 붙여(p.keyword.main);
+  if (!붙여(p.title).includes(키)) 틀림(p, `title 에 핵심 키워드 '${p.keyword.main}' 가 없다`);
+  if (!붙여(p.description + p.lead).includes(키)) 틀림(p, `description 이나 lead 에 핵심 키워드가 없다`);
+  const 본문 = 본문글(p);
+  const 키횟수 = 붙여(본문).split(키).length - 1;
+  if (키횟수 > 12) 주의(p, `핵심 키워드가 본문에 ${키횟수}번 — 억지로 넣은 느낌이 난다`);
+  if (!p.sections.some((s) => 붙여(s.h2).includes(키) || (r && s.h2.includes(r.이름)))) 주의(p, '소제목(h2) 어디에도 키워드·지역 이름이 없다');
+
+  /* 분량 · 구성 */
+  const 길이 = 글자수(본문);
+  if (길이 < 1800) 틀림(p, `본문이 짧다 (${길이}자, 1800자 이상)`);
+  else if (길이 < 2500) 주의(p, `본문 ${길이}자 — 2500자 이상을 권한다`);
+  const 블록들 = p.sections.flatMap((s) => s.blocks || []);
+  p.sections.forEach((s, i) => { if (!s.h2 || !(s.blocks || []).length) 틀림(p, `sections[${i}] 에 h2 나 blocks 가 없다`); });
+  if (!블록들.some((b) => b.table)) 주의(p, '표(table)가 하나도 없다');
+  블록들.forEach((b) => {
+    if (b.table && (!Array.isArray(b.table.head) || !b.table.rows.every((row) => row.length === b.table.head.length))) 틀림(p, '표의 칸 수가 머리와 다르다');
+  });
+  (p.faq || []).forEach((f, i) => { if (!f.q || !f.a) 틀림(p, `faq[${i}] 에 q 나 a 가 없다`); });
+
+  /* 사진 */
+  const 이미지 = 글이미지들(p);
+  if (!p.cover) 틀림(p, 'cover 사진이 없다');
+  if (이미지.length < 3) 틀림(p, `사진은 표지 포함 3장 이상 (지금 ${이미지.length})`);
+  const 묶음 = new Set();
+  for (const im of 이미지) {
+    const 정보 = 사진.get(im.path);
+    if (!정보) { 틀림(p, `사진 ${im.path} 은 _blog/photos.json 에 없다`); continue; }
+    if (정보.제외) { 틀림(p, `사진 ${im.path} 은 쓰지 않는 사진 — ${정보.제외}`); continue; }
+    if (묶음.has(정보.묶음번호)) 틀림(p, `사진 ${im.path} — 같은 장면 묶음의 사진을 한 글에 두 장 썼다`);
+    묶음.add(정보.묶음번호);
+    if (글자수(im.alt) < 8 || 글자수(im.alt) > 120) 틀림(p, `사진 ${im.path} alt 는 8~120자`);
+    if (!im.caption) 틀림(p, `사진 ${im.path} caption 없음`);
+    const 설명 = `${im.alt} ${im.caption}`;
+    const 말한지역 = 지역이름들.filter((n) => 설명.includes(n));
+    for (const n of 말한지역) {
+      if (정보.지역 !== n && !String(정보.행사 || '').includes(n)) 틀림(p, `사진 ${im.path} 설명에 '${n}' — 목록상 이 사진의 지역은 '${정보.지역 || '모름'}'. 찍은 곳을 바꿔 쓰지 않는다`);
+    }
+  }
+
+  /* 표현 · 링크 · 출처 */
+  const 전체글 = [p.title, p.description, 본문, ...이미지.map((im) => `${im.alt} ${im.caption}`)].join('\n');
+  for (const [식, 이유] of 금지) { const m = 전체글.match(식); if (m) 틀림(p, `${이유} — "${m[0]}"`); }
+  const 원문 = JSON.stringify(p);
+  for (const u of 링크들(원문)) {
+    if (u.startsWith('/')) { if (!내부주소있나(u)) 틀림(p, `없는 내부 주소 링크: ${u}`); }
+    else if (!u.startsWith('https://')) 틀림(p, `링크는 / 또는 https:// 로 시작: ${u}`);
+  }
+  if (!링크들(원문).some((u) => u.startsWith('/quote.html'))) 주의(p, '자동 견적서(/quote.html) 링크가 없다');
+  (p.sources || []).forEach((s, i) => { if (!s.name || !/^https:\/\//.test(s.url || '')) 틀림(p, `sources[${i}] 는 name 과 https:// url 이 필요`); });
+  if (/「|법\s*(제\s*\d|에\s*따라|상의?\s)|시행령|조례|기상청|고시|지침|데이터랩/.test(본문) && !(p.sources || []).length) 틀림(p, '법·기준·기관·통계 이야기를 했는데 sources 가 비었다');
+
+  /* 같은 지역 · 같은 주제 중복 */
+  const 같은것 = posts.filter((o) => o !== p && o.region === p.region && o.topic === p.topic);
+  if (같은것.length) 틀림(p, `같은 지역·같은 주제 글이 이미 있다: ${같은것.map((o) => o._파일).join(', ')}`);
+}
+
+/* 이름만 바꾼 글 */
+const 조각표 = new Map();
+const 조각 = (p) => { if (!조각표.has(p)) 조각표.set(p, 조각들(p)); return 조각표.get(p); };
+for (const p of 비교대상) {
+  for (const o of posts) {
+    if (o === p || (비교대상.includes(o) && o._파일 < p._파일)) continue;
+    const v = 겹침(조각(p), 조각(o));
+    if (v > 0.3) 틀림(p, `${o._파일} 와 본문이 ${(v * 100).toFixed(0)}% 겹친다 — 지역 이름만 바꾼 글은 올리지 않는다`);
+    else if (v > 0.2) 주의(p, `${o._파일} 와 본문이 ${(v * 100).toFixed(0)}% 겹친다`);
+  }
+}
+
+console.log(`블로그 검사 — 글 ${posts.length}개 중 ${검사대상.length}개 검사, 중복 비교 ${비교대상.length}개`);
+경고.forEach((m) => console.log(m));
+오류.forEach((m) => console.log(m));
+if (오류.length) { console.log(`실패 ${오류.length}건`); process.exit(1); }
+console.log(`통과${경고.length ? ` (주의 ${경고.length}건)` : ''}`);

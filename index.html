@@ -190,9 +190,9 @@
       .crew-sub{ font-size:.85rem; }
     }
 
-    @media (max-width:767.98px){ .burger{ display:flex; } }
+    @media (max-width:1023.98px){ .burger{ display:flex; } }
     /* 열어둔 채로 화면이 넓어져도 남지 않게 — 자바스크립트에만 기대지 않는다 */
-    @media (min-width:768px){ #nav-menu{ display:none!important; } }
+    @media (min-width:1024px){ #nav-menu{ display:none!important; } }
     @media (prefers-reduced-motion:reduce){ .burger span{ transition:none; } }
 
     /* ── Icon badge (중립) ── */
@@ -515,12 +515,13 @@
       <img src="logo-kgm-transparent.png" alt="큰길이벤트기획" class="nav-logo">
       <span class="nav-brand">큰길이벤트기획</span>
     </a>
-    <div class="hidden md:flex items-center gap-7">
+    <div class="hidden lg:flex items-center gap-7">
       <a href="company.html" class="nav-link">회사소개</a>
       <a href="#services"  class="nav-link">서비스</a>
       <a href="#gear"      class="nav-link">보유장비</a>
       <a href="#record"    class="nav-link">행사약력</a>
       <a href="#gallery"   class="nav-link">갤러리</a>
+      <a href="/blog/"     class="nav-link">블로그</a>
       <a href="/stories/"  class="nav-link">행사 이야기</a>
       <a href="quote.html" class="nav-link">견적 · 문의</a>
     </div>
@@ -539,6 +540,7 @@
     <a href="#gear">보유장비</a>
     <a href="#record">행사약력</a>
     <a href="#gallery">갤러리</a>
+    <a href="/blog/">블로그</a>
     <a href="/stories/">행사 이야기</a>
     <a href="quote.html">견적 · 문의</a>
   </div>
@@ -1184,6 +1186,7 @@
       <a href="#gear" class="nav-link">보유장비</a>
       <a href="#record" class="nav-link">행사약력</a>
       <a href="#gallery" class="nav-link">갤러리</a>
+      <a href="/blog/" class="nav-link">블로그</a>
       <a href="/stories/" class="nav-link">행사 이야기</a>
       <a href="areas.html" class="nav-link">지역안내</a>
       <a href="quote.html" class="nav-link">견적 · 문의</a>
@@ -1246,7 +1249,7 @@
   });
 
   /* 폰에서 열어둔 채 화면을 넓히면 남아 있으면 안 된다 */
-  const 넓은화면 = window.matchMedia('(min-width:768px)');
+  const 넓은화면 = window.matchMedia('(min-width:1024px)');
   const 정리 = () => { if(넓은화면.matches) 열기(false); };
   넓은화면.addEventListener ? 넓은화면.addEventListener('change', 정리) : 넓은화면.addListener(정리);
 })();

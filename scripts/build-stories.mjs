@@ -160,6 +160,7 @@ ${더넣기}
   <a class="brand" href="/">${BRAND}</a>
   <nav class="topnav">
     <a href="/company.html" class="hide-sm">회사소개</a>
+    <a href="/blog/" class="hide-sm">블로그</a>
     <a href="/stories/">행사 이야기</a>
     <a href="/gallery.html">갤러리</a>
     <a href="/areas.html" class="hide-sm">지역안내</a>
@@ -170,7 +171,7 @@ ${더넣기}
   const 꼬리 = `<div class="foot">
   <div>${BRAND} · 주식회사 브리지미디어 · 대표 김동길 · 사업자등록번호 813-81-02252</div>
   <div>전남광주통합특별시 광양시 광양읍 강변동길 1, 2층 · <a href="tel:1533-7295">1533-7295</a> · gilcaro@naver.com</div>
-  <div style="margin-top:.6rem;"><a href="/">홈</a> · <a href="/stories/">행사 이야기</a> · <a href="/gallery.html">갤러리</a> · <a href="/areas.html">서비스 지역</a> · <a href="/quote.html">자동 견적서</a></div>
+  <div style="margin-top:.6rem;"><a href="/">홈</a> · <a href="/blog/">블로그</a> · <a href="/stories/">행사 이야기</a> · <a href="/gallery.html">갤러리</a> · <a href="/areas.html">서비스 지역</a> · <a href="/quote.html">자동 견적서</a></div>
 </div>
 </body>
 </html>

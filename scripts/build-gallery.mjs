@@ -10,6 +10,7 @@
  */
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { buildStories } from './build-stories.mjs';
+import { buildBlog } from './build-blog.mjs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -251,7 +252,7 @@ const html = `<!DOCTYPE html>
 <body>
 <div class="topbar"><div class="topbar-in">
   <a class="brand" href="index.html"><img src="logo-kgm-transparent.png" alt="${BRAND}"><span>${BRAND}</span></a>
-  <nav class="topnav"><a href="index.html#services">서비스</a><a href="/stories/">행사 이야기</a><a href="areas.html">지역안내</a><a href="quote.html">견적 · 문의</a><a href="tel:15337295" style="color:var(--amber-2);font-weight:700;">1533-7295</a></nav>
+  <nav class="topnav"><a href="index.html#services">서비스</a><a href="/blog/">블로그</a><a href="/stories/">행사 이야기</a><a href="areas.html">지역안내</a><a href="quote.html">견적 · 문의</a><a href="tel:15337295" style="color:var(--amber-2);font-weight:700;">1533-7295</a></nav>
 </div></div>
 
 <header class="hero"><div class="hero-in">
@@ -272,7 +273,7 @@ ${sections}
 <div id="lb" onclick="if(event.target===this)lbClose()"><button class="p" onclick="lbMove(-1)">‹</button><img id="lb-img" alt=""><button class="n" onclick="lbMove(1)">›</button><button class="x" onclick="lbClose()">✕</button><div class="c" id="lb-c"></div></div>
 <footer class="foot">
   주식회사 브리지미디어 (${BRAND}) · 대표 김동길 · 사업자등록번호 813-81-02252 · 전남광주통합특별시 광양시 광양읍 강변동길 1, 2층 · <a href="tel:15337295">1533-7295</a> · <a href="mailto:gilcaro@naver.com">gilcaro@naver.com</a><br>
-  <a href="index.html">홈</a> · <a href="/stories/">행사 이야기</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
+  <a href="index.html">홈</a> · <a href="/blog/">블로그</a> · <a href="/stories/">행사 이야기</a> · <a href="areas.html">서비스 지역</a> · <a href="quote.html">자동 견적서</a> · <a href="upload.html">사진 올리기</a> · 마지막 갱신 ${new Date().toISOString().slice(0, 10)}
 </footer>
 <script>
 /* 해시(#festival 등)로 들어왔을 때 해당 분야로 확실히 이동
@@ -315,6 +316,10 @@ const { stories, pages: storyPages, rssItems: storyRss } = buildStories({
   photos, ROOT, SITE, BRAND, esc, imgUrl, slug, categories: data.categories || [],
 });
 
+// ── 블로그 (blog) ───────────────────────────────────────
+/* _blog/posts/*.json 을 글로 만든다. 목록은 sitemap·RSS 에도 넣는다. 형식은 _blog/GUIDE.md */
+const { posts: blogPosts, pages: blogPages, rssItems: blogRss } = buildBlog({ ROOT, SITE, BRAND, CDN });
+
 // ── sitemap.xml ─────────────────────────────────────────
 /* 사진 사이트맵 제목·설명에도 지역 키워드를 넣는다 */
 const catOf = new Map(events.map((g) => [g.slug, g]));
@@ -348,6 +353,7 @@ const pages = [
   { loc: '/gallery.html', lastmod: latest, priority: '0.8', changefreq: 'weekly', images: photos.slice(0, 500) },
   { loc: '/quote.html', lastmod: today, priority: '0.7', changefreq: 'monthly' },
   ...storyPages,
+  ...blogPages,
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -374,6 +380,7 @@ const rssItems = [
   { title: '서비스 지역 안내 — 광양·순천·여수·고흥·하동·남원·광주·진주·통영',
     link: SITE + '/areas.html',
     desc: '광양에서 출발해 차량 1~2시간권 전역 당일 세팅. 지역별 행사 사례와 자주 받는 문의를 안내합니다.' },
+  ...blogRss,
   ...storyRss,
   ...events.map((g) => ({
     title: `${(g.regions && g.regions[0]) ? g.regions[0] + ' ' : ''}${g.name} 현장 사진 ${g.photos.length}장`,
@@ -402,4 +409,4 @@ ${rssItems.map((it) => `  <item>
 `;
 writeFileSync(resolve(ROOT, 'rss.xml'), rss, 'utf8');
 
-console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · 행사 이야기 ${stories.length}건 · sitemap.xml 갱신 완료`);
+console.log(`gallery.html: ${events.length}개 분야, 사진 ${totalPhotos}장 · 행사 이야기 ${stories.length}건 · 블로그 ${blogPosts.length}건 · sitemap.xml 갱신 완료`);
