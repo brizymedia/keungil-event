@@ -11,6 +11,7 @@
 import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { buildStories } from './build-stories.mjs';
 import { buildBlog } from './build-blog.mjs';
+import { buildNaver } from './build-naver.mjs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -320,6 +321,10 @@ const { stories, pages: storyPages, rssItems: storyRss } = buildStories({
 // ── 블로그 (blog) ───────────────────────────────────────
 /* _blog/posts/*.json 을 글로 만든다. 목록은 sitemap·RSS 에도 넣는다. 형식은 _blog/GUIDE.md */
 const { posts: blogPosts, pages: blogPages, rssItems: blogRss } = buildBlog({ ROOT, SITE, BRAND, CDN });
+
+// ── 네이버 블로그용 원고 (naver) ─────────────────────────
+/* 검색에 잡히지 않는 내부 페이지. 사람이 복사해서 네이버 블로그에 올린다(사이트맵에 넣지 않는다). */
+buildNaver({ ROOT, BRAND, CDN });
 
 // ── sitemap.xml ─────────────────────────────────────────
 /* 사진 사이트맵 제목·설명에도 지역 키워드를 넣는다 */

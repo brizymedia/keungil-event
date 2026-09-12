@@ -2,7 +2,7 @@ name: 블로그 글 게시
 
 # 블로그 루틴(클라우드 에이전트)이 claude/blog-YYYY-MM-DD 가지에 새 글 JSON 을 올리면
 #   검사 → 사이트 생성(블로그 · sitemap · RSS) → main 반영 → 가지 삭제 → 네이버 · IndexNow 에 새 주소 알림.
-# 가지에서 가져오는 것은 _blog/posts/ 에 새로 생긴 글 파일뿐이다. 루틴은 다른 파일을 바꿀 수 없다.
+# 가지에서 가져오는 것은 _blog/posts/ 와 _blog/naver/(네이버 블로그용 원고) 에 새로 생긴 파일뿐이다. 루틴은 다른 파일을 바꿀 수 없다.
 on:
   push:
     branches: ['claude/blog-2*']
@@ -34,7 +34,7 @@ jobs:
           BR="${GITHUB_REF_NAME}"
           if [ "$BR" = "main" ]; then echo "new=" >> "$GITHUB_OUTPUT"; exit 0; fi
           git fetch origin "$BR"
-          NEW=$(git -c core.quotepath=false diff --name-only --diff-filter=A origin/main "origin/$BR" -- '_blog/posts/*.json' | tr '\n' ' ' | sed 's/ *$//')
+          NEW=$(git -c core.quotepath=false diff --name-only --diff-filter=A origin/main "origin/$BR" -- '_blog/posts/*.json' '_blog/naver/*.json' | tr '\n' ' ' | sed 's/ *$//')
           if [ -z "$NEW" ]; then echo "새 글 없음"; echo "new=" >> "$GITHUB_OUTPUT"; exit 0; fi
           git checkout "origin/$BR" -- $NEW
           echo "new=$NEW" >> "$GITHUB_OUTPUT"
@@ -51,10 +51,10 @@ jobs:
           git config user.email "blog-bot@users.noreply.github.com"
           BR="${GITHUB_REF_NAME}"
           NEW="${{ steps.take.outputs.new }}"
-          COUNT=$(echo $NEW | wc -w)
+          COUNT=$(echo $NEW | tr ' ' '\n' | grep -c '_blog/posts/' || true)
           for i in 1 2 3; do
             node scripts/build-gallery.mjs
-            git add -A _blog/posts blog gallery.html sitemap.xml rss.xml stories
+            git add -A _blog/posts _blog/naver blog naver gallery.html sitemap.xml rss.xml stories
             if git diff --cached --quiet; then echo "변경 없음"; break; fi
             git commit -m "블로그 글 ${COUNT}개 게시 — ${BR#claude/blog-}"
             if git push origin HEAD:main; then break; fi
@@ -76,6 +76,7 @@ jobs:
             const 주소 = ["/blog/"];
             for (const f of process.argv.slice(1)) {
               const p = JSON.parse(fs.readFileSync(f, "utf8"));
+              if (!p.slug) continue;   // 네이버 원고는 홈페이지 주소가 없다
               주소.push("/blog/" + p.region + "/", "/blog/" + encodeURIComponent(p.slug) + "/");
             }
             console.log(JSON.stringify([...new Set(주소)].map((u) => "https://xn--wk0bn7yi8h24iszc.com" + u)));

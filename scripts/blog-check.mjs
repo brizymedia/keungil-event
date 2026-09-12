@@ -13,10 +13,14 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { 글읽기, 지역표, 사진목록, 본문글, 글이미지들, 글자만 } from './build-blog.mjs';
+import { 네이버검사 } from './naver-check.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const 인자 = process.argv.slice(2);
-const 새글 = 인자[0] === '--new' ? new Set(인자.slice(1).map((f) => f.split(/[\\/]/).pop())) : null;
+const 새파일 = 인자[0] === '--new' ? 인자.slice(1) : null;
+const 이름만 = (목록) => new Set(목록.map((f) => f.split(/[\\/]/).pop()));
+const 새글 = 새파일 ? 이름만(새파일.filter((f) => !/[\\/]naver[\\/]/.test(f))) : null;
+const 새네이버 = 새파일 ? 이름만(새파일.filter((f) => /[\\/]naver[\\/]/.test(f))) : null;   // 네이버 블로그용 원고
 
 const 지역 = 지역표(ROOT);
 const 사진 = 사진목록(ROOT);
@@ -75,8 +79,9 @@ function 내부주소있나(u) {
 }
 
 /* 글자 4개씩 묶어 겹치는 비율 — 지역 이름만 바꾼 글을 잡는다 */
-function 조각들(p) {
-  let t = 본문글(p);
+function 조각들(p) { return 조각만들기(본문글(p)); }
+function 조각만들기(글) {
+  let t = String(글 || '');
   for (const n of 지역이름들) t = t.split(n).join('');
   t = t.replace(/[\s\d.,·—\-()［\]\[/:%~]+/g, '');
   const s = new Set();
@@ -247,7 +252,10 @@ for (const p of 비교대상) {
   }
 }
 
-console.log(`블로그 검사 — 글 ${posts.length}개 중 ${검사대상.length}개 검사, 중복 비교 ${비교대상.length}개`);
+/* 네이버 블로그용 원고(_blog/naver/*.json)도 같이 검사한다 — 규칙은 scripts/naver-check.mjs */
+const { 검사수: 원고수 } = 네이버검사({ ROOT, posts, 지역, 사진, 금지, 없는품목, 약속말, 문장들, 글자수, 붙여, 정규식글자, 지역이름들, 조각만들기, 겹침, 오류, 경고, 새네이버 });
+
+console.log(`블로그 검사 — 글 ${posts.length}개 중 ${검사대상.length}개 검사, 중복 비교 ${비교대상.length}개, 네이버 원고 ${원고수}개`);
 경고.forEach((m) => console.log(m));
 오류.forEach((m) => console.log(m));
 if (오류.length) { console.log(`실패 ${오류.length}건`); process.exit(1); }
