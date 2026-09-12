@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 무대 시안 만들기 · 큰길이벤트기획</title>
+<meta name="description" content="행사 유형과 인원만 고르면 무대·LED·조명·음향·텐트·객석이 3D로 바로 그려집니다. 그림·3D 파일로 저장하고 견적서로 이어집니다.">
+<meta property="og:title" content="3D 무대 시안 만들기 · 큰길이벤트기획">
+<meta property="og:description" content="행사 유형과 인원만 고르면 무대 시안이 3D로 바로 그려집니다.">
+<meta property="og:image" content="https://xn--wk0bn7yi8h24iszc.com/stage3d/og.jpg">
+<link rel="icon" href="../favicon.svg">
+<script defer src="https://www.ai-make.co.kr/stats/stats.js" data-site="keungil"></script>
+<style>
+:root{--bg:#09090b;--panel:#111114;--line:rgba(255,255,255,.09);--txt:#f4f4f5;--mut:#a1a1aa;--amber:#F59E0B;--amber2:#D97706;--cyan:#2FD4FF;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;word-break:keep-all;overflow:hidden}
+a{color:inherit}
+button,select,input{font:inherit;color:inherit}
+.top{position:fixed;left:0;right:0;top:0;height:52px;display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(9,9,11,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);z-index:20}
+.top .logo{font-weight:900;letter-spacing:-.02em;font-size:15px;text-decoration:none}
+.top .logo b{color:var(--amber)}
+.top .sub{color:var(--mut);font-size:12px}
+.top .sp{flex:1}
+.top .tb{display:flex;gap:6px}
+.chip{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:6px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:rgba(255,255,255,.3)}
+.chip.on{background:var(--amber);color:#111;border-color:var(--amber);font-weight:700}
+.wrap{position:fixed;inset:52px 0 0 0;display:grid;grid-template-columns:340px 1fr}
+.panel{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px 14px 90px}
+.panel h2{font-size:12px;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin:16px 0 8px}
+.panel h2:first-child{margin-top:4px}
+.row{display:flex;align-items:center;gap:8px;margin:6px 0}
+.row label{flex:1;font-size:13px;color:var(--txt)}
+.row small{color:var(--mut);font-size:11px;display:block}
+.row select,.row input[type=text],.row input[type=number]{background:#18181b;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;width:150px}
+.row input[type=text]{width:100%}
+.row input[type=range]{width:150px;accent-color:var(--amber)}
+.row .v{width:56px;text-align:right;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+.sw{position:relative;width:40px;height:22px;flex:none}
+.sw input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0}
+.sw i{position:absolute;inset:0;border-radius:999px;background:#27272a;transition:.15s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#71717a;transition:.15s}
+.sw input:checked+i{background:var(--amber)}
+.sw input:checked+i:after{left:21px;background:#111}
+.types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.types button{border:1px solid var(--line);background:#18181b;border-radius:10px;padding:9px 4px;font-size:12px;cursor:pointer;line-height:1.25}
+.types button.on{background:rgba(245,158,11,.14);border-color:var(--amber);color:#fde68a;font-weight:700}
+.sum{background:#0d0d10;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--mut);line-height:1.7;margin-top:8px}
+.sum b{color:var(--txt);font-weight:600}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.btn{border:1px solid var(--line);background:#18181b;border-radius:10px;padding:10px 8px;font-size:12.5px;cursor:pointer;text-align:center}
+.btn:hover{border-color:rgba(255,255,255,.3)}
+.btn.pri{background:linear-gradient(100deg,var(--amber),var(--amber2));color:#111;font-weight:800;border:none;grid-column:1/-1}
+.view{position:relative;background:#000}
+.view canvas{display:block;width:100%;height:100%;touch-action:none}
+.cams{position:absolute;left:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:5}
+.hud{position:absolute;right:12px;bottom:12px;background:rgba(9,9,11,.7);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:11.5px;color:var(--mut);line-height:1.6;max-width:260px;backdrop-filter:blur(8px)}
+.hud b{color:var(--txt)}
+.badge{position:absolute;left:12px;bottom:12px;font-size:11px;color:var(--mut);background:rgba(9,9,11,.6);padding:5px 9px;border-radius:8px;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#fff;color:#111;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:.2s;z-index:50;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.load{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut);font-size:13px;background:#000;z-index:4}
+.view.photo{background-size:cover;background-position:center}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;z-index:60;padding:16px}
+.modal[hidden]{display:none!important}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;width:100%;max-width:420px;max-height:92vh;overflow:auto}
+.mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:15px}
+.mx{border:0;background:none;color:var(--mut);font-size:16px;cursor:pointer;padding:4px 6px}
+.mnote{font-size:11.5px;color:var(--mut);line-height:1.6;margin:0 0 10px}
+.mrow{margin:6px 0}
+.mrow input,.mrow textarea{width:100%;background:#18181b;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:13px;resize:vertical}
+.btn.pri{grid-column:1/-1}
+[hidden]{display:none!important}
+.mtog{display:none}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .panel{order:2;border-right:0;border-top:1px solid var(--line);max-height:46vh;padding-bottom:24px}
+  .panel.min{max-height:52px;overflow:hidden}
+  .view{order:1;min-height:0}
+  .top .sub{display:none}
+  .mtog{display:block;width:100%;margin:-4px 0 8px;border:0;background:none;color:var(--amber);font-size:12px;text-align:center;cursor:pointer}
+  .hud{display:none}
+  .types{grid-template-columns:1fr 1fr 1fr}
+  .row select,.row input[type=range]{width:130px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="../">큰길<b>이벤트기획</b></a>
+  <span class="sub">3D 무대 시안 만들기 · 유형과 인원만 고르면 무대가 그려집니다</span>
+  <span class="sp"></span>
+  <div class="tb">
+    <button class="chip" id="b-day">낮</button>
+    <button class="chip on" id="b-night">밤</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel" id="panel">
+    <button class="mtog" id="mtog">▲ 설정 접기</button>
+    <h2>행사 정보</h2>
+    <div class="row"><input type="text" id="f-title" placeholder="행사명 (현수막 · LED 에 표시)" maxlength="30"></div>
+    <div class="types" id="types"></div>
+    <div class="row"><label>예상 인원<small>객석 · 무대 · 음향 규모가 따라 바뀝니다</small></label><input type="range" id="f-people" min="50" max="2000" step="50"><span class="v" id="v-people"></span></div>
+    <div class="row"><label>실내 · 야외</label><select id="f-io"><option value="out">야외 (광장 · 운동장)</option><option value="in">실내 (체육관 · 홀)</option></select></div>
+
+    <h2>무대 · 구조물</h2>
+    <div class="row"><label>무대 크기</label><select id="f-stage"><option value="d1">10평 (7×5m)</option><option value="d6">20평 (10×6.6m)</option><option value="d7">30평 (12×8m)</option><option value="d8">40평 이상 (15×10m)</option><option value="none">무대 없음</option></select></div>
+    <div class="row"><label>무대 높이</label><input type="range" id="f-sh" min="0.3" max="1.5" step="0.1"><span class="v" id="v-sh"></span></div>
+    <div class="row"><label>백드롭 트러스 + 현수막</label><span class="sw"><input type="checkbox" id="f-backdrop"><i></i></span></div>
+    <div class="row"><label>LED 전광판</label><select id="f-led"><option value="">없음</option><option value="c1">200인치 (4.4×2.5m)</option><option value="c2">300인치 (6.6×3.7m)</option><option value="c3">400인치 (8.9×5m)</option><option value="c4">빔 프로젝터 스크린</option></select></div>
+    <div class="row"><label>LED 색감</label><input type="color" id="f-color" value="#F59E0B" style="width:44px;height:28px;border:0;background:none;cursor:pointer"></div>
+    <div class="row"><label>연단 (식순 · 축사)</label><span class="sw"><input type="checkbox" id="f-podium"><i></i></span></div>
+    <div class="row"><label>관객 안전 펜스</label><span class="sw"><input type="checkbox" id="f-fence"><i></i></span></div>
+
+    <h2>조명 · 음향 · 연출</h2>
+    <div class="row"><label>조명 트러스 (골대형)</label><span class="sw"><input type="checkbox" id="f-truss"><i></i></span></div>
+    <div class="row"><label>무빙라이트</label><input type="range" id="f-moving" min="0" max="16" step="2"><span class="v" id="v-moving"></span></div>
+    <div class="row"><label>음향</label><select id="f-sound"><option value="">없음</option><option value="a1">소형 (포터블 2통)</option><option value="a2">중형 (스택 4통)</option><option value="a3">대형 (라인어레이)</option></select></div>
+    <div class="row"><label>스모그 · 헤이저</label><span class="sw"><input type="checkbox" id="f-fog"><i></i></span></div>
+    <div class="row"><label>무대 불꽃 (스파클러)</label><span class="sw"><input type="checkbox" id="f-spark"><i></i></span></div>
+
+    <h2>객석 · 부스 · 기타</h2>
+    <div class="row"><label>의자</label><input type="range" id="f-chairs" min="0" max="1000" step="10"><span class="v" id="v-chairs"></span></div>
+    <div class="row"><label>텐트 종류</label><select id="f-tentkind"><option value="d3">자바라 3×3m</option><option value="d10">자바라 3×6m</option><option value="d11">몽골텐트</option></select></div>
+    <div class="row"><label>텐트 수</label><input type="range" id="f-tents" min="0" max="30" step="1"><span class="v" id="v-tents"></span></div>
+    <div class="row"><label>포토존</label><span class="sw"><input type="checkbox" id="f-photo"><i></i></span></div>
+    <div class="row"><label>발전차</label><span class="sw"><input type="checkbox" id="f-gen"><i></i></span></div>
+
+    <h2>저장 · 다음 단계</h2>
+    <div class="sum" id="sum"></div>
+    <div class="acts">
+      <button class="btn pri" id="b-quote">이 시안으로 견적서 만들기</button>
+      <button class="btn" id="b-png">그림 저장 (PNG)</button>
+      <button class="btn" id="b-link">공유 링크 복사</button>
+      <button class="btn" id="b-glb">3D 파일 (GLB)</button>
+      <button class="btn" id="b-json">시안 파일 (JSON)</button>
+      <button class="btn" id="b-load">시안 파일 불러오기</button>
+      <button class="btn" id="b-ar" title="휴대폰(안드로이드 크롬)에서 실제 크기로 띄워 봅니다">AR로 보기</button>
+      <input type="file" id="f-file" accept=".json" hidden>
+    </div>
+
+    <h2>현장 사진 위에 얹어 보기</h2>
+    <div class="acts" style="margin-top:0">
+      <button class="btn" id="b-photo">현장 사진 올리기</button>
+      <button class="btn" id="b-photo-off" hidden>사진 빼기</button>
+      <input type="file" id="f-photo" accept="image/*" hidden>
+    </div>
+    <p style="font-size:11px;color:var(--mut);margin-top:6px;line-height:1.6">광장·운동장 사진을 올리면 바닥 대신 사진이 깔립니다. 화면을 끌어 무대 각도를 사진에 맞추고 「그림 저장」을 누르세요.</p>
+
+    <h2>고화질 렌더 의뢰</h2>
+    <div class="acts" style="margin-top:0">
+      <button class="btn pri" id="b-order">이 시안으로 고화질 렌더 의뢰</button>
+    </div>
+    <p style="font-size:11px;color:var(--mut);margin-top:6px;line-height:1.6">화면은 배치와 크기를 확인하는 시안입니다. 제안서·보고용 사진급 렌더(블렌더, 4K)는 의뢰해 주시면 비용·기간을 회신드립니다. 실제 장비 모양·색상은 현장 협의로 정합니다.</p>
+  </aside>
+
+  <main class="view" id="view">
+    <div class="load" id="load">3D 무대를 준비하는 중…</div>
+    <div class="cams">
+      <button class="chip on" data-cam="audience">관객석에서</button>
+      <button class="chip" data-cam="front">정면</button>
+      <button class="chip" data-cam="bird">위에서</button>
+      <button class="chip" data-cam="side">옆에서</button>
+      <button class="chip" data-cam="stage">무대 위에서</button>
+    </div>
+    <div class="hud" id="hud"></div>
+    <div class="badge">끌어서 회전 · 휠(두 손가락) 확대 · 우클릭 이동</div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- 고화질 렌더 의뢰 -->
+<div class="modal" id="order" hidden>
+  <div class="mbox">
+    <div class="mhead"><b>고화질 렌더 의뢰</b><button class="mx" id="order-x" aria-label="닫기">✕</button></div>
+    <p class="mnote">지금 화면의 시안 링크가 함께 전달됩니다. 비용·기간은 규모를 보고 회신드립니다. (보통 1~2일)</p>
+    <div class="mrow"><input type="text" id="o-name" placeholder="이름 · 소속 *" maxlength="40"></div>
+    <div class="mrow"><input type="tel" id="o-tel" placeholder="연락처 (휴대폰) *" maxlength="20"></div>
+    <div class="mrow"><input type="text" id="o-date" placeholder="행사 날짜 · 장소 (아는 만큼)" maxlength="80"></div>
+    <div class="mrow"><textarea id="o-memo" rows="3" placeholder="원하는 시점(관객석·정면·위에서), 넣을 로고·문구, 참고할 것"></textarea></div>
+    <div class="mrow" style="font-size:11px;color:var(--mut)"><label style="display:flex;gap:6px;align-items:flex-start;cursor:pointer"><input type="checkbox" id="o-agree" style="margin-top:2px">회신을 위해 이름·연락처를 큰길이벤트기획이 보관하는 데 동의합니다. (문의 처리 뒤 삭제 요청 가능)</label></div>
+    <button class="btn pri" id="o-send" style="width:100%">의뢰 보내기</button>
+    <p class="mnote" style="margin-top:8px">전화가 편하시면 <a href="tel:1533-7295" style="color:var(--amber)">1533-7295</a></p>
+  </div>
+</div>
+
+<!-- AR 보기 -->
+<div class="modal" id="arbox" hidden>
+  <div class="mbox" style="max-width:720px">
+    <div class="mhead"><b>AR로 보기</b><button class="mx" id="ar-x" aria-label="닫기">✕</button></div>
+    <div id="ar-slot" style="height:min(60vh,520px);background:#000;border-radius:10px;overflow:hidden"></div>
+    <p class="mnote">안드로이드 크롬에서 아래 「AR」 단추를 누르면 카메라 화면에 실제 크기로 뜹니다. 아이폰은 3D 파일(GLB)을 저장해 「파일」 앱에서 여세요. 이 창에서도 끌어서 돌려볼 수 있습니다.</p>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+
+/* ══ 1. 유형별 뼈대 — 이벤트 코리아 행사 기획서(plan.html)와 같은 9가지 ══ */
+const TYPES = {
+  festival:  {name:'지역 축제',        io:'out', led:'c2', backdrop:true, truss:true, moving:8,  sound:'a2', fog:true,  spark:true,  tents:8,  tentkind:'d3',  podium:false, fence:false, photo:true,  gen:true,  chairs:.6},
+  ceremony:  {name:'기념식 · 준공식',   io:'out', led:'c1', backdrop:true, truss:false,moving:0,  sound:'a2', fog:false, spark:false, tents:2,  tentkind:'d11', podium:true,  fence:false, photo:true,  gen:false, chairs:1},
+  sports:    {name:'체육대회',          io:'out', led:'',   backdrop:true, truss:false,moving:0,  sound:'a2', fog:false, spark:false, tents:10, tentkind:'d10', podium:false, fence:false, photo:true,  gen:true,  chairs:0},
+  conference:{name:'컨퍼런스 · 세미나', io:'in',  led:'c1', backdrop:true, truss:false,moving:0,  sound:'a1', fog:false, spark:false, tents:0,  tentkind:'d3',  podium:true,  fence:false, photo:false, gen:false, chairs:1},
+  award:     {name:'시상식 · 이취임식', io:'in',  led:'c2', backdrop:true, truss:true, moving:6,  sound:'a2', fog:true,  spark:true,  tents:0,  tentkind:'d3',  podium:true,  fence:false, photo:true,  gen:false, chairs:1},
+  concert:   {name:'콘서트 · 공연',     io:'out', led:'c3', backdrop:true, truss:true, moving:12, sound:'a3', fog:true,  spark:true,  tents:2,  tentkind:'d11', podium:false, fence:true,  photo:false, gen:true,  chairs:0},
+  corporate: {name:'기업 워크숍 · 송년회',io:'in', led:'c1', backdrop:true, truss:true, moving:4,  sound:'a2', fog:false, spark:false, tents:0,  tentkind:'d3',  podium:false, fence:false, photo:true,  gen:false, chairs:1},
+  expo:      {name:'박람회 · 전시',     io:'out', led:'c1', backdrop:true, truss:false,moving:0,  sound:'a1', fog:false, spark:false, tents:20, tentkind:'d3',  podium:false, fence:false, photo:true,  gen:true,  chairs:.2},
+  etc:       {name:'기타 행사',         io:'out', led:'',   backdrop:true, truss:false,moving:0,  sound:'a1', fog:false, spark:false, tents:2,  tentkind:'d3',  podium:false, fence:false, photo:false, gen:false, chairs:.5},
+};
+const STAGE = { d1:[7,5], d6:[10,6.6], d7:[12,8], d8:[15,10] };           // 가로 × 깊이 (m)
+const LED   = { c1:[4.43,2.49,'LED 200인치'], c2:[6.64,3.74,'LED 300인치'], c3:[8.86,4.98,'LED 400인치'], c4:[4,3,'빔 스크린'] };
+const TENT  = { d3:[3,3,'자바라 3×3'], d10:[3,6,'자바라 3×6'], d11:[6,6,'몽골텐트'] };
+const scaleOf = n => n<=100?'소형':n<=300?'중형':n<=1000?'대형':'초대형';
+
+function preset(type, people){
+  const t = TYPES[type], T = scaleOf(people);
+  return {
+    type, title:S?.title||'', people, io:t.io, night:S?.night??true,
+    stage: {소형:'d1',중형:'d6',대형:'d7',초대형:'d8'}[T], sh: T==='소형'?0.6:T==='초대형'?1.2:0.9,
+    backdrop:t.backdrop, led: t.led && (T==='초대형' ? 'c3' : T==='대형' && t.led==='c1' ? 'c2' : t.led), color:S?.color||'#F59E0B',
+    podium:t.podium, fence:t.fence, truss:t.truss, moving: t.truss ? Math.min(16,{소형:2,중형:4,대형:8,초대형:12}[T]+ (t.moving>=8?2:0)) : 0,
+    sound: T==='초대형'||T==='대형' ? (t.sound==='a1'?'a2':'a3') : t.sound, fog:t.fog, spark:t.spark,
+    chairs: Math.round(Math.min(1000, people*t.chairs)/10)*10,
+    tentkind:t.tentkind, tents: t.tentkind==='d11' ? t.tents : Math.min(30, t.tents ? Math.max(t.tents, Math.round(people/(type==='expo'?25:80))) : 0),
+    photo:t.photo, gen:t.gen && t.io==='out',
+  };
+}
+
+/* ══ 2. 상태 ══ */
+let S = null;
+const $ = s => document.querySelector(s);
+const b64u = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64 = t => { t=t.replace(/-/g,'+').replace(/_/g,'/'); while(t.length%4) t+='='; return decodeURIComponent(escape(atob(t))); };
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('on'),2400); }
+
+(function init(){
+  // 주소의 #s= 에 시안 전체가 들어 있다. 기획서(plan.html)처럼 일부만 넘어와도 나머지는 프리셋으로 채운다
+  const h = location.hash.match(/[#&]s=([^&]+)/);
+  let o = null; if (h) { try { o = JSON.parse(unb64(h[1])); } catch(e){} }
+  if (o && TYPES[o.type]) { const base = preset(o.type, +o.people || 300); S = { ...base, ...o, people: +o.people || 300 }; }
+  else S = preset('festival', 300);
+})();
+
+/* ══ 3. UI ↔ 상태 ══ */
+const F = ['title','people','io','stage','sh','backdrop','led','color','podium','fence','truss','moving','sound','fog','spark','chairs','tentkind','tents','photo','gen'];
+function fill(){
+  $('#types').innerHTML = Object.keys(TYPES).map(k=>`<button data-t="${k}" class="${k===S.type?'on':''}">${TYPES[k].name}</button>`).join('');
+  F.forEach(k=>{ const el=$('#f-'+k); if(!el) return; if(el.type==='checkbox') el.checked=!!S[k]; else el.value=S[k]??''; });
+  $('#v-people').textContent = S.people.toLocaleString()+'명';
+  $('#v-sh').textContent = S.sh.toFixed(1)+'m';
+  $('#v-moving').textContent = S.moving+'대';
+  $('#v-chairs').textContent = S.chairs+'개';
+  $('#v-tents').textContent = S.tents+'동';
+  $('#b-day').classList.toggle('on', !S.night); $('#b-night').classList.toggle('on', !!S.night);
+  summary();
+}
+function read(){
+  F.forEach(k=>{ const el=$('#f-'+k); if(!el) return; if(el.type==='checkbox') S[k]=el.checked; else if(el.type==='range'||el.type==='number') S[k]=+el.value; else S[k]=el.value; });
+}
+$('#types').addEventListener('click', e=>{ const b=e.target.closest('button[data-t]'); if(!b) return; S=preset(b.dataset.t, S.people); fill(); rebuild(); });
+$('#f-people').addEventListener('input', ()=>{ S=preset(S.type, +$('#f-people').value); fill(); rebuild(); });
+document.querySelectorAll('.panel input, .panel select').forEach(el=>{
+  if (el.id==='f-people' || el.id==='f-file') return;
+  el.addEventListener(el.type==='range'||el.type==='text'||el.type==='color'?'input':'change', ()=>{ read(); fill(); rebuild(); });
+});
+$('#b-day').onclick = ()=>{ S.night=false; fill(); rebuild(); };
+$('#b-night').onclick = ()=>{ S.night=true; fill(); rebuild(); };
+$('#mtog').onclick = ()=>{ const p=$('#panel'); p.classList.toggle('min'); $('#mtog').textContent = p.classList.contains('min')?'▼ 설정 펼치기':'▲ 설정 접기'; setTimeout(resize,50); };
+
+function summary(){
+  const st = STAGE[S.stage], led = LED[S.led], tent = TENT[S.tentkind];
+  const rows = Math.ceil(S.chairs/20);
+  const parts = [];
+  if (st) parts.push(`<b>무대</b> ${st[0]}×${st[1]}m · 높이 ${S.sh.toFixed(1)}m`);
+  if (S.backdrop) parts.push(`<b>백드롭 트러스</b> ${st?st[0]+2:8}m`);
+  if (led) parts.push(`<b>${led[2]}</b> ${led[0]}×${led[1]}m`);
+  if (S.truss) parts.push(`<b>조명 트러스</b> + 무빙 ${S.moving}대`);
+  if (S.sound) parts.push(`<b>음향</b> ${ {a1:'소형',a2:'중형',a3:'대형 라인어레이'}[S.sound] }`);
+  if (S.chairs) parts.push(`<b>객석</b> ${S.chairs}석 (약 ${rows}줄 · ${Math.round(Math.min(20,S.chairs)*0.55)}×${Math.round(rows*0.9)}m)`);
+  if (S.tents) parts.push(`<b>${tent[2]}</b> ${S.tents}동`);
+  [['podium','연단'],['fence','안전 펜스'],['fog','스모그'],['spark','스파클러'],['photo','포토존'],['gen','발전차']].forEach(([k,n])=>{ if(S[k]) parts.push(n); });
+  $('#sum').innerHTML = parts.join(' · ');
+  $('#hud').innerHTML = `<b>${S.title||TYPES[S.type].name}</b> · ${S.people.toLocaleString()}명 · ${S.io==='in'?'실내':'야외'} · ${S.night?'야간':'주간'}<br>${st?`무대 ${st[0]}×${st[1]}m`:'무대 없음'}${led?` · ${led[2]}`:''}${S.chairs?` · 의자 ${S.chairs}`:''}${S.tents?` · 텐트 ${S.tents}`:''}`;
+}
+
+/* ══ 4. 3D 장면 ══ */
+const view = $('#view');
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true, alpha:true });
+let photo = null;   // 현장 사진 (data URL). 있으면 바닥·하늘·별을 빼고 사진 위에 무대만 그린다
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI/2 - 0.02; controls.minDistance = 2; controls.maxDistance = 120;
+let root = new THREE.Group(); scene.add(root);
+const lightsGroup = new THREE.Group(); scene.add(lightsGroup);
+const animated = [];
+
+const M = {
+  black: new THREE.MeshStandardMaterial({ color:0x18181b, roughness:.8 }),
+  dark:  new THREE.MeshStandardMaterial({ color:0x2a2a2e, roughness:.9 }),
+  gray:  new THREE.MeshStandardMaterial({ color:0x8a8a90, roughness:.6, metalness:.3 }),
+  alu:   new THREE.MeshStandardMaterial({ color:0xc9ccd1, roughness:.35, metalness:.8 }),
+  white: new THREE.MeshStandardMaterial({ color:0xf0f0f0, roughness:.7 }),
+  red:   new THREE.MeshStandardMaterial({ color:0xb91c1c, roughness:.6 }),
+  chair: new THREE.MeshStandardMaterial({ color:0xd4d4d8, roughness:.6 }),
+  chairB:new THREE.MeshStandardMaterial({ color:0x3f3f46, roughness:.5, metalness:.4 }),
+  tentW: new THREE.MeshStandardMaterial({ color:0xfafafa, roughness:.9, side:THREE.DoubleSide }),
+  tentB: new THREE.MeshStandardMaterial({ color:0x1d4ed8, roughness:.9, side:THREE.DoubleSide }),
+  skin:  new THREE.MeshStandardMaterial({ color:0x52525b, roughness:.8 }),
+  glass: new THREE.MeshStandardMaterial({ color:0x111, roughness:.1, metalness:.6 }),
+};
+const box = (w,h,d,m)=>{ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m); o.castShadow=o.receiveShadow=true; return o; };
+const cyl = (r,h,m,seg=10)=>{ const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg), m); o.castShadow=true; return o; };
+
+/* 트러스: 사각 알루미늄 트러스(30cm) — 세로 4개 + 가로 살 */
+function truss(len, axis='x', size=.3){
+  // 항상 가로(x)로 만든 뒤, 세로(y)·앞뒤(z)는 그룹째 돌린다
+  const g = new THREE.Group();
+  const chord = new THREE.CylinderGeometry(.025,.025,len,6);
+  [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([a,b])=>{ const c=new THREE.Mesh(chord, M.alu); c.castShadow=true; c.rotation.z=Math.PI/2; c.position.set(0,a*size/2,b*size/2); g.add(c); });
+  const n = Math.max(1, Math.round(len/.5));
+  const rung = new THREE.CylinderGeometry(.012,.012,size,5);
+  const inst = new THREE.InstancedMesh(rung, M.alu, n*4);
+  const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), sc = new THREE.Vector3(1,1,1);
+  const qV = new THREE.Quaternion(), qH = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI/2,0,0));
+  let i=0;
+  for(let k=0;k<n;k++){
+    const t = -len/2 + (k+.5)*len/n;
+    pos.set(t, 0, size/2);  mm.compose(pos,qV,sc); inst.setMatrixAt(i++, mm);   // 앞면 세로살
+    pos.set(t, 0, -size/2); mm.compose(pos,qV,sc); inst.setMatrixAt(i++, mm);   // 뒷면 세로살
+    pos.set(t, size/2, 0);  mm.compose(pos,qH,sc); inst.setMatrixAt(i++, mm);   // 윗면 가로살
+    pos.set(t, -size/2, 0); mm.compose(pos,qH,sc); inst.setMatrixAt(i++, mm);   // 아랫면 가로살
+  }
+  inst.count = i; inst.castShadow = true; g.add(inst);
+  if (axis==='y') g.rotation.z = Math.PI/2; else if (axis==='z') g.rotation.y = Math.PI/2;
+  return g;
+}
+
+function textTexture(text, w, h, opts={}){
+  const c = document.createElement('canvas'); c.width = 1024; c.height = Math.round(1024*h/w);
+  const x = c.getContext('2d');
+  const grd = x.createLinearGradient(0,0,c.width,c.height);
+  grd.addColorStop(0, opts.bg1||'#0b1020'); grd.addColorStop(1, opts.bg2||'#1a1030');
+  x.fillStyle = grd; x.fillRect(0,0,c.width,c.height);
+  if (opts.glow){ const g2=x.createRadialGradient(c.width/2,c.height/2,10,c.width/2,c.height/2,c.width*.6); g2.addColorStop(0,opts.glow+'aa'); g2.addColorStop(1,'transparent'); x.fillStyle=g2; x.fillRect(0,0,c.width,c.height); }
+  x.textAlign='center'; x.textBaseline='middle'; x.fillStyle = opts.fg||'#fff';
+  const t = text || '행사명';
+  let fs = Math.min(c.height*.42, c.width*1.6/Math.max(4,t.length));
+  x.font = `900 ${fs}px "Pretendard","Noto Sans KR",sans-serif`;
+  x.shadowColor='rgba(0,0,0,.6)'; x.shadowBlur=18;
+  x.fillText(t, c.width/2, c.height/2 - (opts.sub? c.height*.08:0));
+  if (opts.sub){ x.font = `600 ${fs*.36}px "Pretendard","Noto Sans KR",sans-serif`; x.fillStyle=opts.subfg||'#e5e5e5'; x.fillText(opts.sub, c.width/2, c.height/2 + fs*.55); }
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  return tex;
+}
+
+function chairs(n, z0, width, m1, m2){
+  if (!n) return;
+  const perRow = Math.min(20, Math.max(6, Math.round(width/0.55)));
+  const rows = Math.ceil(n/perRow);
+  const seatG = new THREE.BoxGeometry(.45,.06,.45), backG = new THREE.BoxGeometry(.45,.45,.05), legG = new THREE.BoxGeometry(.4,.42,.4);
+  const seat = new THREE.InstancedMesh(seatG, M.chair, n), back = new THREE.InstancedMesh(backG, M.chair, n), leg = new THREE.InstancedMesh(legG, M.chairB, n);
+  const mm = new THREE.Matrix4(); let i=0;
+  const aisle = perRow>10 ? 1.2 : 0;
+  const totalW = perRow*.55 + aisle;
+  for (let r=0; r<rows && i<n; r++) for (let c=0; c<perRow && i<n; c++){
+    let x = -totalW/2 + c*.55 + .275; if (aisle && c>=perRow/2) x += aisle;
+    let extra = (r>0 && r%8===0) ? 1.5 : 0; // 8줄마다 통로
+    const z = z0 + r*.9 + Math.floor(r/8)*1.5;
+    mm.makeTranslation(x, .45, z); seat.setMatrixAt(i, mm);
+    mm.makeTranslation(x, .7, z+.2); back.setMatrixAt(i, mm);
+    mm.makeTranslation(x, .21, z); leg.setMatrixAt(i, mm);
+    i++;
+  }
+  [seat,back,leg].forEach(o=>{ o.castShadow=o.receiveShadow=true; root.add(o); });
+  return z0 + rows*.9 + Math.floor(rows/8)*1.5;
+}
+
+function tent(kind, x, z, rot=0){
+  const [w,d,name] = TENT[kind]; const g = new THREE.Group();
+  const h = kind==='d11' ? 2.6 : 2.2;
+  if (kind==='d11'){
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(3,3,h,16,1,true), M.tentW); wall.position.y=h/2; wall.castShadow=true; g.add(wall);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(3.4,1.8,16), M.tentB); roof.position.y=h+.9; roof.castShadow=true; g.add(roof);
+  } else {
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{ const l=cyl(.03,h,M.alu,6); l.position.set(a*w/2*.95,h/2,b*d/2*.95); g.add(l); });
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.hypot(w,d)/2*1.05, .9, 4), M.tentB); roof.rotation.y=Math.PI/4; roof.position.y=h+.45; roof.scale.set(w/Math.max(w,d),1,d/Math.max(w,d)); roof.castShadow=true; g.add(roof);
+    const tbl = box(w*.7,.05,.6,M.white); tbl.position.set(0,.75,d/2-.5); g.add(tbl);
+    const skirt = box(w*.7,.7,.02,M.tentB); skirt.position.set(0,.4,d/2-.2); g.add(skirt);
+  }
+  g.position.set(x,0,z); g.rotation.y=rot; root.add(g);
+}
+
+function person(x,z,ry=0){
+  const g=new THREE.Group(); const b=new THREE.Mesh(new THREE.CapsuleGeometry(.18,1.0,4,8), M.skin); b.position.y=.85; b.castShadow=true; g.add(b);
+  const hd=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8), M.skin); hd.position.y=1.6; g.add(hd);
+  g.position.set(x,0,z); g.rotation.y=ry; root.add(g);
+}
+
+function dispose(o){ o.traverse(c=>{ if(c.geometry) c.geometry.dispose(); if(c.material && c.material.map && c.userData.ownTex) c.material.map.dispose(); }); }
+
+function rebuild(){
+  scene.remove(root); dispose(root); root = new THREE.Group(); scene.add(root);
+  lightsGroup.clear(); animated.length = 0;
+  const st = STAGE[S.stage] || null;
+  const W = st ? st[0] : 8, D = st ? st[1] : 0, H = st ? S.sh : 0;
+  const night = !!S.night, indoor = S.io==='in';
+  const accent = new THREE.Color(S.color||'#F59E0B');
+
+  /* 바닥 · 하늘 */
+  const groundMat = new THREE.MeshStandardMaterial({ color: indoor ? 0x3b3b40 : (night ? 0x22301c : 0x4f7a35), roughness:1 });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200,200), groundMat); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; root.add(ground);
+  if (photo){
+    // 사진 모드: 그림자만 받는 투명 바닥
+    ground.material = new THREE.ShadowMaterial({ opacity: night ? .5 : .3 });
+    scene.background = null; scene.fog = null; renderer.setClearColor(0x000000, 0);
+  } else if (indoor){
+    const wallM = new THREE.MeshStandardMaterial({ color:0x2b2b30, roughness:1, side:THREE.BackSide });
+    const room = new THREE.Mesh(new THREE.BoxGeometry(60,14,80), wallM); room.position.set(0,7,15); room.receiveShadow=true; root.add(room);
+    scene.background = new THREE.Color(0x111114); scene.fog = new THREE.Fog(0x111114, 40, 120);
+  } else {
+    scene.background = new THREE.Color(night ? 0x0a0f1e : 0x9fc7ee);
+    scene.fog = new THREE.Fog(night ? 0x0a0f1e : 0x9fc7ee, S.fog&&night ? 25 : 60, S.fog&&night ? 110 : 220);
+  }
+  /* 빛 */
+  const hemi = new THREE.HemisphereLight(night ? 0x3b4a7a : 0xdfeeff, night ? 0x0a0a0a : 0x334422, night ? (indoor?.35:.25) : .7); lightsGroup.add(hemi);
+  const sun = new THREE.DirectionalLight(night ? 0x8899cc : 0xfff2dd, night ? .25 : 1.4);
+  sun.position.set(night?-20:25, 30, night?-10:20); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+  Object.assign(sun.shadow.camera, {left:-40,right:40,top:40,bottom:-40,near:1,far:120}); lightsGroup.add(sun);
+  if (indoor){ const a=new THREE.AmbientLight(0x50505a, night?.9:1.4); lightsGroup.add(a); }
+
+  /* 무대 */
+  if (st){
+    const deck = box(W,H,D,M.black); deck.position.set(0,H/2,0); root.add(deck);
+    const top = new THREE.Mesh(new THREE.PlaneGeometry(W,D), new THREE.MeshStandardMaterial({ color:0x26262b, roughness:.55 })); top.rotation.x=-Math.PI/2; top.position.y=H+.005; top.receiveShadow=true; root.add(top);
+    const trim = box(W+.04,.06,D+.04,M.alu); trim.position.y=H; root.add(trim);
+    const skirt = box(W+.02,H,.02,M.dark); skirt.position.set(0,H/2,D/2+.02); root.add(skirt);
+    // 계단 (양쪽)
+    const steps = Math.max(2, Math.round(H/.2));
+    [-1,1].forEach(s=>{ for(let i=0;i<steps;i++){ const b=box(1,.2*(i+1),.3,M.dark); b.position.set(s*(W/2+.5), .1*(i+1), D/2 - .15 - i*.3); root.add(b); } });
+    // 사람 (크기 비교용)
+    person(-1.2, 0, 0); person(1.5, -1, 0);
+  }
+  /* 연단 */
+  if (S.podium && st){ const p=box(.7,1.1,.5,M.dark); p.position.set(W*.3, H+.55, D*.3); root.add(p); const pt=box(.75,.05,.55,M.alu); pt.position.set(W*.3,H+1.1,D*.3); root.add(pt); }
+
+  /* 백드롭 트러스 + 현수막 + LED */
+  const led = LED[S.led] || null;
+  const bdW = W + 2, bdH = Math.max(4.5, (led?led[1]:0) + 2.2 + H);
+  if (S.backdrop){
+    const zb = -D/2 + .3;
+    [-1,1].forEach(s=>{ const c=truss(bdH,'y'); c.position.set(s*bdW/2, bdH/2, zb); root.add(c); const base=box(.8,.08,.8,M.black); base.position.set(s*bdW/2,.04,zb); root.add(base); });
+    const t = truss(bdW,'x'); t.position.set(0,bdH-.15,zb); root.add(t);
+    // 현수막 (LED 있으면 LED 위 띠, 없으면 전체)
+    const banW = bdW - .6, banH = led ? 1.1 : bdH - H - 1.2;
+    const banY = led ? bdH - .35 - banH/2 : H + .6 + banH/2;
+    const tex = textTexture(S.title, banW, banH, { bg1:'#ffffff', bg2:'#f3f4f6', fg:'#111827', sub: led?null:TYPES[S.type].name, subfg:'#374151' });
+    const ban = new THREE.Mesh(new THREE.PlaneGeometry(banW, banH), new THREE.MeshStandardMaterial({ map:tex, roughness:.9 })); ban.userData.ownTex=true;
+    ban.position.set(0, banY, zb+.17); ban.castShadow=true; root.add(ban);
+    if (!led) { const bk = ban.clone(); bk.rotation.y=Math.PI; bk.position.z=zb-.17; root.add(bk); }
+    // 파라이트 (백드롭 상단)
+    const n = Math.max(2, Math.round(bdW/2));
+    for (let i=0;i<n;i++){ const x=-bdW/2+ (i+.5)*bdW/n; const par=cyl(.1,.25,M.black,8); par.rotation.x=Math.PI/2 - .5; par.position.set(x,bdH-.45,zb+.2); root.add(par);
+      if (night && (i===0 || i===n-1)){ const l=new THREE.SpotLight(accent, 30, 18, .55, .6, 1.2); l.position.set(x,bdH-.4,zb+.3); l.target.position.set(x*.6, H, D/4); lightsGroup.add(l); lightsGroup.add(l.target); } }
+  }
+  if (led){
+    const [lw,lh,name] = led; const zl = -D/2 + .3 + (S.backdrop? .35 : 0);
+    const frame = box(lw+.16, lh+.16, .12, M.black); frame.position.set(0, H + 1.2 + lh/2, zl); root.add(frame);
+    const tex = textTexture(S.title, lw, lh, { bg1:'#05060c', bg2:'#101a33', fg:'#ffffff', glow:'#'+accent.getHexString(), sub:TYPES[S.type].name, subfg:'#'+accent.getHexString() });
+    const scr = new THREE.Mesh(new THREE.PlaneGeometry(lw,lh), new THREE.MeshStandardMaterial({ map:tex, emissive:0xffffff, emissiveMap:tex, emissiveIntensity: night? 1.6 : .9, roughness:.4 })); scr.userData.ownTex=true;
+    scr.position.set(0, H + 1.2 + lh/2, zl + .07); root.add(scr);
+    if (!S.backdrop){ [-1,1].forEach(s=>{ const leg=truss(H+1.3+lh,'y'); leg.position.set(s*(lw/2+.4), (H+1.3+lh)/2, zl); root.add(leg); }); }
+    if (night){ const glow=new THREE.PointLight(accent, 40, 16, 1.6); glow.position.set(0,H+1.2+lh/2, zl+1.2); lightsGroup.add(glow); }
+  }
+
+  /* 조명 트러스 (골대형: 무대 앞 양쪽 기둥 + 위 가로대) + 무빙라이트 */
+  if (S.truss && st){
+    const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2;
+    [-1,1].forEach(s=>{ const c=truss(th,'y'); c.position.set(s*tw/2, th/2, zt); root.add(c); const base=box(.8,.08,.8,M.black); base.position.set(s*tw/2,.04,zt); root.add(base); });
+    const t = truss(tw,'x'); t.position.set(0, th-.15, zt); root.add(t);
+    const n = S.moving, per = Math.ceil(n/2);
+    for (let i=0;i<n;i++){
+      const onTop = i < per, k = onTop ? i : i-per, cnt = onTop ? per : n-per;
+      const x = -tw/2 + (k+.5)*tw/Math.max(1,cnt);
+      const g = new THREE.Group(); const head=box(.22,.35,.22,M.black); head.position.y=-.35; g.add(head); const yoke=box(.3,.08,.3,M.black); g.add(yoke);
+      const lens=new THREE.Mesh(new THREE.CircleGeometry(.08,12), new THREE.MeshBasicMaterial({ color: night?accent:0x333 })); lens.position.set(0,-.53,0); lens.rotation.x=-Math.PI/2; g.add(lens);
+      g.position.set(x, th-.45, onTop ? zt : -D/2+.3); root.add(g);
+      if (night){
+        const beam = new THREE.Mesh(new THREE.ConeGeometry(.9, 9, 16, 1, true), new THREE.MeshBasicMaterial({ color:accent, transparent:true, opacity:.10, side:THREE.DoubleSide, depthWrite:false, blending:THREE.AdditiveBlending }));
+        beam.position.set(x, th-.45-4.5, onTop ? zt : -D/2+.3); beam.rotation.set(0,0,0); root.add(beam);
+        animated.push({ o:beam, ph:i*.7, base:{x:x, z:onTop?zt:-D/2+.3, y:th-.45} });
+      }
+    }
+    if (night){ [-1,1].forEach((s,i)=>{ const l=new THREE.SpotLight(0xfff4e0, 60, 25, .5, .5, 1.2); l.position.set(s*tw/3, th-.5, zt); l.target.position.set(s*W/5, H, 0); lightsGroup.add(l); lightsGroup.add(l.target); l.castShadow = i===0; }); }
+  }
+
+  /* 음향 */
+  if (S.sound && st){
+    const zs = D/2 + .3;
+    if (S.sound==='a1'){ [-1,1].forEach(s=>{ const p=cyl(.02,1.4,M.black,6); p.position.set(s*(W/2+.6),.7,zs); root.add(p); const sp=box(.4,.6,.35,M.black); sp.position.set(s*(W/2+.6),1.6,zs); root.add(sp); }); }
+    else if (S.sound==='a2'){ [-1,1].forEach(s=>{ const sub=box(.7,.6,.7,M.black); sub.position.set(s*(W/2+1),.3,zs); root.add(sub); for(let i=0;i<2;i++){ const sp=box(.5,.7,.5,M.black); sp.position.set(s*(W/2+1),.6+.35+i*.72,zs); root.add(sp);} }); }
+    else { [-1,1].forEach(s=>{ const x=s*(W/2+1.6); for(let i=0;i<2;i++){ const sub=box(1.1,.6,.9,M.black); sub.position.set(x,.3+i*.62,zs); root.add(sub);} const top=(S.truss? H+5.2 : bdH-.3);
+      const hang = truss(top-1.5,'y'); hang.position.set(x, 1.5+(top-1.5)/2, zs-.2); root.add(hang);
+      for(let i=0;i<8;i++){ const el=box(.9,.32,.6,M.black); el.position.set(x, top-.3-i*.36, zs+.25); el.rotation.x = -.06*i; root.add(el);} }); }
+  }
+  /* 안전 펜스 */
+  if (S.fence && st){ const zf=D/2+2.2, n=Math.ceil((W+4)/1.2); for(let i=0;i<n;i++){ const x=-(W+4)/2+(i+.5)*1.2; const f=box(1.15,1.2,.05,M.alu); f.position.set(x,.6,zf); root.add(f); const foot=box(.1,.05,.6,M.alu); foot.position.set(x-.5,.02,zf); root.add(foot);} }
+  /* 스모그 · 스파클러 */
+  if (S.fog && night && st){ const haze = new THREE.Mesh(new THREE.BoxGeometry(W+3, 1.2, D+3), new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:.06, depthWrite:false })); haze.position.set(0, H+.6, 0); root.add(haze); }
+  if (S.spark && night && st){ const n=Math.max(3,Math.round(W/2.5)); for(let i=0;i<n;i++){ const x=-W/2+1+(i)*(W-2)/Math.max(1,n-1); const sp=new THREE.Mesh(new THREE.ConeGeometry(.16,2.2,10,1,true), new THREE.MeshBasicMaterial({ color:0xfff1b8, transparent:true, opacity:.32, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide })); sp.position.set(x,H+1.3,D/2-.4); sp.rotation.x=Math.PI; root.add(sp); animated.push({o:sp, spark:true, ph:i}); const pl=new THREE.PointLight(0xffe8a0, 8, 6, 2); pl.position.set(x,H+.6,D/2-.4); lightsGroup.add(pl);} }
+
+  /* 객석 */
+  const zStart = D/2 + (S.fence ? 4 : 3);
+  const zEnd = chairs(S.chairs, zStart, Math.max(W, 10), M.chair, M.chairB) || zStart + 6;
+  if (!S.chairs && S.people){ for(let i=0;i<Math.min(60, S.people/8);i++){ person((Math.random()-.5)*Math.max(W+6,14), zStart+1+Math.random()*Math.max(8,S.people/40), Math.PI); } }
+  else { for(let i=0;i<8;i++) person((Math.random()-.5)*(W+8), zEnd+1+Math.random()*3, Math.PI); }
+
+  /* 텐트 (객석 양옆 + 뒤) */
+  if (S.tents){ const [tw,td] = TENT[S.tentkind]; const gap = .6; let placed=0; const sideX = Math.max(W,10)/2 + 4 + td/2;
+    const perSide = Math.ceil(S.tents/2);
+    for (let side=-1; side<=1 && placed<S.tents; side+=2){ for (let i=0;i<perSide && placed<S.tents;i++){ tent(S.tentkind, side*sideX, zStart + 1 + i*(tw+gap) + tw/2, side<0 ? Math.PI/2 : -Math.PI/2); placed++; } } }
+  /* 포토존 */
+  if (S.photo){ const g=new THREE.Group(); const p=box(3,2.4,.12,M.white); p.position.y=1.2; g.add(p);
+    const tex=textTexture(S.title||'PHOTO ZONE', 3, 2.4, { bg1:'#'+accent.getHexString(), bg2:'#1f2937', fg:'#fff', sub:'PHOTO ZONE' }); const f=new THREE.Mesh(new THREE.PlaneGeometry(2.8,2.2), new THREE.MeshStandardMaterial({map:tex})); f.userData.ownTex=true; f.position.set(0,1.2,.07); g.add(f);
+    g.position.set(Math.max(W,10)/2 + 2, 0, zEnd + 4); g.rotation.y = -Math.PI/4; root.add(g); }
+  /* 발전차 */
+  if (S.gen && !indoor){ const g=new THREE.Group(); const b=box(2.4,2.6,6,M.white); b.position.y=1.8; g.add(b); const cab=box(2.3,1.8,1.8,M.dark); cab.position.set(0,1.4,3.9); g.add(cab);
+    [[-1,-2],[1,-2],[-1,2.6],[1,2.6]].forEach(([x,z])=>{ const w=cyl(.5,.35,M.black,12); w.rotation.z=Math.PI/2; w.position.set(x*1.2,.5,z); g.add(w); });
+    g.position.set(-(Math.max(W,10)/2 + 9), 0, -D/2 - 4); g.rotation.y=.4; root.add(g); }
+
+  /* 별 (야외 밤) */
+  if (night && !indoor && !photo){ const n=600, pos=new Float32Array(n*3); for(let i=0;i<n;i++){ const th=Math.random()*Math.PI*2, ph=Math.random()*1.2; pos[i*3]=Math.cos(th)*Math.cos(ph)*180; pos[i*3+1]=Math.sin(ph)*180+10; pos[i*3+2]=Math.sin(th)*Math.cos(ph)*180; }
+    const g=new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos,3)); const stars=new THREE.Points(g, new THREE.PointsMaterial({ color:0xffffff, size:.6, sizeAttenuation:true, fog:false })); root.add(stars); }
+
+  renderer.toneMappingExposure = night ? 1.15 : 1.0;
+  saveHash();
+}
+
+/* ══ 5. 카메라 ══ */
+function setCam(k){
+  const st = STAGE[S.stage] || [8,0]; const W=st[0], D=st[1], H=S.sh;
+  const far = Math.max(14, S.chairs/25 + 12);
+  const P = { audience:[[W*.4, 2.2, far], [0, H+1.8, -D/4]], front:[[0, H+2.5, D/2+9], [0,H+2,-D/2]], bird:[[8, 32, far*.8], [0,0,far/3]], side:[[W+12, 4, 3], [0,H+1,0]], stage:[[-W*.3, H+1.7, -D/2+1], [0, 1.5, far]] }[k];
+  camera.position.set(...P[0]); controls.target.set(...P[1]); controls.update();
+  document.querySelectorAll('.cams .chip').forEach(b=>b.classList.toggle('on', b.dataset.cam===k));
+}
+document.querySelectorAll('.cams .chip').forEach(b=>b.onclick=()=>setCam(b.dataset.cam));
+
+function resize(){ const w=view.clientWidth, h=view.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize);
+
+const clock = new THREE.Clock();
+function loop(){ requestAnimationFrame(loop); const t=clock.getElapsedTime();
+  animated.forEach(a=>{ if(a.spark){ a.o.scale.y = .8 + .3*Math.sin(t*9+a.ph); a.o.material.opacity=.4+.2*Math.sin(t*13+a.ph); return; }
+    const ang = Math.sin(t*.7 + a.ph)*.45, ang2 = Math.cos(t*.5+a.ph)*.3; a.o.rotation.set(ang2, 0, ang);
+    a.o.position.set(a.base.x + Math.sin(ang)*4.5, a.base.y - Math.cos(ang)*4.5*Math.cos(ang2), a.base.z - Math.sin(ang2)*4.5); });
+  controls.update(); renderer.render(scene, camera); }
+
+/* ══ 6. 저장 · 공유 · 견적 ══ */
+function saveHash(){ history.replaceState(null,'', '#s='+b64u(JSON.stringify(S))); }
+const fname = ext => `무대시안_${(S.title||TYPES[S.type].name).replace(/[\\/:*?"<>|\s]+/g,'_')}_${new Date().toISOString().slice(0,10)}.${ext}`;
+function download(blobOrUrl, name){ const a=document.createElement('a'); a.href = typeof blobOrUrl==='string' ? blobOrUrl : URL.createObjectURL(blobOrUrl); a.download=name; document.body.appendChild(a); a.click(); a.remove(); }
+
+$('#b-png').onclick = ()=>{
+  const w=view.clientWidth, h=view.clientHeight, pr=renderer.getPixelRatio();
+  renderer.setPixelRatio(1); renderer.setSize(1920, 1080, false); camera.aspect=1920/1080; camera.updateProjectionMatrix(); renderer.render(scene,camera);
+  // 워터마크
+  const c=document.createElement('canvas'); c.width=1920; c.height=1080; const x=c.getContext('2d');
+  if (photo && photoImg){ const s=Math.max(1920/photoImg.width, 1080/photoImg.height), pw=photoImg.width*s, ph=photoImg.height*s; x.drawImage(photoImg, (1920-pw)/2, (1080-ph)/2, pw, ph); }
+  x.drawImage(renderer.domElement,0,0);
+  x.fillStyle='rgba(0,0,0,.45)'; x.fillRect(0,1080-64,1920,64); x.fillStyle='#fff'; x.font='700 26px "Pretendard","Noto Sans KR",sans-serif'; x.textBaseline='middle';
+  x.fillText(`${S.title||TYPES[S.type].name} · ${TYPES[S.type].name} · ${S.people.toLocaleString()}명 · ${$('#sum').textContent}`.slice(0,120), 28, 1080-32);
+  x.textAlign='right'; x.fillStyle='#F59E0B'; x.fillText('큰길이벤트기획 3D 무대 시안 · 큰길이벤트.com', 1892, 1080-32);
+  renderer.setPixelRatio(pr); resize(); download(c.toDataURL('image/png'), fname('png')); toast('그림을 저장했습니다');
+};
+$('#b-glb').onclick = ()=>{ new GLTFExporter().parse(root, r=>{ download(new Blob([r],{type:'model/gltf-binary'}), fname('glb')); toast('3D 파일(GLB)을 저장했습니다 — 블렌더·파워포인트에서 열립니다'); }, e=>toast('저장 실패: '+e.message), { binary:true }); };
+$('#b-json').onclick = ()=>{ download(new Blob([JSON.stringify({ ...S, _v:1, _from:'큰길이벤트기획 3D 무대 시안', _at:new Date().toISOString() },null,2)],{type:'application/json'}), fname('json')); toast('시안 파일을 저장했습니다 — 이 파일로 고화질 렌더를 만듭니다'); };
+$('#b-load').onclick = ()=>$('#f-file').click();
+$('#f-file').onchange = e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>{ const o=JSON.parse(t); if(!TYPES[o.type]) throw 0; S={...preset(o.type,o.people||300), ...o}; fill(); rebuild(); toast('시안을 불러왔습니다'); }).catch(()=>toast('시안 파일이 아닙니다')); e.target.value=''; };
+$('#b-link').onclick = ()=>{ saveHash(); navigator.clipboard.writeText(location.href).then(()=>toast('링크를 복사했습니다 — 카톡으로 보내면 같은 화면이 열립니다'), ()=>prompt('링크', location.href)); };
+
+/* ══ 현장 사진 배경 ══ */
+let photoImg = null;
+$('#b-photo').onclick = ()=>$('#f-photo').click();
+function applyPhoto(dataUrl){ const im=new Image(); im.onload=()=>{ photo=dataUrl; photoImg=im; view.classList.add('photo'); view.style.backgroundImage=`url(${dataUrl})`; $('#b-photo-off').hidden=false; rebuild(); setCam('audience'); toast('사진 위에 무대를 얹었습니다 — 끌어서 각도를 맞추세요'); }; im.src=dataUrl; }
+$('#f-photo').onchange = e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>applyPhoto(r.result); r.readAsDataURL(f); e.target.value=''; };
+$('#b-photo-off').onclick = ()=>{ photo=null; photoImg=null; view.classList.remove('photo'); view.style.backgroundImage=''; $('#b-photo-off').hidden=true; rebuild(); };
+
+/* ══ AR 보기 (model-viewer · 안드로이드 크롬 WebXR / Scene Viewer) ══ */
+let mvLoaded = null, arUrl = null;
+$('#b-ar').onclick = ()=>{
+  $('#arbox').hidden=false; $('#ar-slot').innerHTML='<div style="color:#a1a1aa;font-size:13px;padding:24px;text-align:center">3D 파일을 만드는 중…</div>';
+  mvLoaded = mvLoaded || import('https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js').catch(()=>null);
+  new GLTFExporter().parse(root, r=>{
+    if (arUrl) URL.revokeObjectURL(arUrl); arUrl = URL.createObjectURL(new Blob([r],{type:'model/gltf-binary'}));
+    mvLoaded.then(()=>{ $('#ar-slot').innerHTML = `<model-viewer src="${arUrl}" ar ar-modes="webxr scene-viewer" ar-scale="fixed" camera-controls shadow-intensity="1" style="width:100%;height:100%;background:#0a0f1e"><button slot="ar-button" class="btn pri" style="position:absolute;left:12px;bottom:12px;width:auto">📱 AR로 실제 크기 보기</button></model-viewer>`; });
+  }, e=>toast('3D 파일 만들기 실패: '+e.message), { binary:true });
+};
+$('#ar-x').onclick = ()=>{ $('#arbox').hidden=true; $('#ar-slot').innerHTML=''; };
+
+/* ══ 고화질 렌더 의뢰 (FormSubmit → gilauto325@gmail.com, 사이트 문의 폼과 같은 경로) ══ */
+$('#b-order').onclick = ()=>{ $('#order').hidden=false; setTimeout(()=>$('#o-name').focus(),50); };
+$('#order-x').onclick = ()=>{ $('#order').hidden=true; };
+$('#o-send').onclick = async ()=>{
+  const name=$('#o-name').value.trim(), tel=$('#o-tel').value.trim();
+  if (!name||!tel) return toast('이름과 연락처를 넣어주세요');
+  if (!/^[\d\-+() ]{9,}$/.test(tel)) return toast('연락처를 다시 확인해 주세요');
+  if (!$('#o-agree').checked) return toast('개인정보 보관 동의에 체크해 주세요');
+  saveHash();
+  const body = { _subject:'[큰길이벤트기획] 3D 무대 고화질 렌더 의뢰 — '+(S.title||TYPES[S.type].name), _template:'table', _captcha:'false',
+    '이름·소속':name, '연락처':tel, '행사명':S.title||'(미정)', '행사 유형':TYPES[S.type].name, '예상 인원':S.people+'명', '날짜·장소':$('#o-date').value.trim(), '요청사항':$('#o-memo').value.trim(),
+    '시안 요약':$('#sum').textContent, '시안 링크':location.href, '시안 JSON':JSON.stringify(S) };
+  const b=$('#o-send'); b.disabled=true; b.textContent='보내는 중…';
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/gilauto325@gmail.com', { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(res.status);
+    $('#order').hidden=true; toast('의뢰가 접수됐습니다. 회신드리겠습니다'); ['o-name','o-tel','o-date','o-memo'].forEach(id=>$('#'+id).value=''); $('#o-agree').checked=false;
+  } catch(err) {
+    // 전송이 막히면 메일 앱으로 넘긴다
+    location.href = 'mailto:gilauto325@gmail.com?subject='+encodeURIComponent(body._subject)+'&body='+encodeURIComponent(`이름·소속: ${name}\n연락처: ${tel}\n행사: ${body['행사명']} · ${body['행사 유형']} · ${body['예상 인원']}\n날짜·장소: ${body['날짜·장소']}\n요청: ${body['요청사항']}\n\n시안: ${location.href}`);
+    toast('메일 앱으로 엽니다');
+  } finally { b.disabled=false; b.textContent='의뢰 보내기'; }
+};
+
+/* 견적서 품목 매핑 (큰길이벤트 quote.html 품목 번호) */
+function quoteRows(){
+  const r=[], T=scaleOf(S.people), st=STAGE[S.stage];
+  if (st) r.push(S.stage);
+  if (S.backdrop) r.push(['d2', st ? st[0]+2 : 8]);
+  if (S.led) { r.push(S.led); if (S.led==='c2'||S.led==='c3') r.push('c7'); r.push('c6'); }
+  if (S.truss) { r.push('b1'); if (S.moving) r.push(['b2', S.moving]); r.push('b4'); } else if (S.moving) { r.push('b1'); r.push(['b2', S.moving]); }
+  if (S.sound) { r.push(S.sound); r.push(['a4', {소형:2,중형:4,대형:6,초대형:8}[T]]); }
+  if (S.fog) r.push('e1'); if (S.spark) r.push('e2');
+  if (S.tents) r.push([S.tentkind, S.tents]);
+  if (S.chairs) r.push(['d9', S.chairs]);
+  if (S.photo) r.push('d4'); if (S.backdrop||S.photo) r.push(['d5', {소형:2,중형:4,대형:8,초대형:12}[T]]);
+  if (S.gen) r.push('g1'); r.push('g2');
+  return r.map(a=>Array.isArray(a)&&a[1]===1?a[0]:a);
+}
+$('#b-quote').onclick = ()=>{
+  saveHash();
+  const memo = '3D 무대 시안 기준: '+location.href;
+  const q = { i:['','','','',S.title||TYPES[S.type].name,'','',S.people+'명',memo], r:quoteRows() };
+  window.open('https://xn--wk0bn7yi8h24iszc.com/quote.html?admin=1#q='+b64u(JSON.stringify(q)), '_blank', 'noopener');
+};
+
+/* ══ 시작 ══ */
+fill(); resize(); rebuild(); setCam('audience'); loop();
+$('#load').remove();
+window.__STAGE__ = { get S(){ return S; }, set S(v){ S=v; fill(); rebuild(); }, preset, quoteRows, setCam, applyPhoto, get photo(){ return !!photo; } };
+</script>
+</body>
+</html>

@@ -358,6 +358,7 @@ const pages = [
   { loc: '/tongyeong/', lastmod: today, priority: '0.9', changefreq: 'monthly' },
   { loc: '/gallery.html', lastmod: latest, priority: '0.8', changefreq: 'weekly', images: photos.slice(0, 500) },
   { loc: '/quote.html', lastmod: today, priority: '0.7', changefreq: 'monthly' },
+  { loc: '/stage3d/', lastmod: today, priority: '0.8', changefreq: 'monthly' },
   ...storyPages,
   ...blogPages,
 ];
