@@ -41,7 +41,7 @@ button,select,input{font:inherit;color:inherit}
 .row .v{width:56px;text-align:right;font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
 .sw{position:relative;width:40px;height:22px;flex:none}
 .sw input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0}
-.sw i{position:absolute;inset:0;border-radius:999px;background:#27272a;transition:.15s}
+.sw i{position:absolute;inset:0;border-radius:999px;background:#27272a;transition:.15s;pointer-events:none}
 .sw i:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#71717a;transition:.15s}
 .sw input:checked+i{background:var(--amber)}
 .sw input:checked+i:after{left:21px;background:#111}
@@ -53,6 +53,7 @@ button,select,input{font:inherit;color:inherit}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
 .btn{border:1px solid var(--line);background:#18181b;border-radius:10px;padding:10px 8px;font-size:12.5px;cursor:pointer;text-align:center}
 .btn:hover{border-color:rgba(255,255,255,.3)}
+.btn.fx{flex:none;padding:5px 10px;font-size:12px;border-radius:8px}
 .btn.pri{background:linear-gradient(100deg,var(--amber),var(--amber2));color:#111;font-weight:800;border:none;grid-column:1/-1}
 .view{position:relative;background:#000}
 .view canvas{display:block;width:100%;height:100%;touch-action:none}
@@ -111,25 +112,28 @@ button,select,input{font:inherit;color:inherit}
     <h2>무대 · 구조물</h2>
     <div class="row"><label>무대 크기</label><select id="f-stage"><option value="d1">10평 (7×5m)</option><option value="d6">20평 (10×6.6m)</option><option value="d7">30평 (12×8m)</option><option value="d8">40평 이상 (15×10m)</option><option value="none">무대 없음</option></select></div>
     <div class="row"><label>무대 높이</label><input type="range" id="f-sh" min="0.3" max="1.5" step="0.1"><span class="v" id="v-sh"></span></div>
-    <div class="row"><label>백드롭 트러스 + 현수막</label><span class="sw"><input type="checkbox" id="f-backdrop"><i></i></span></div>
+    <div class="row"><label for="f-backdrop">백드롭 트러스 + 현수막</label><span class="sw"><input type="checkbox" id="f-backdrop"><i></i></span></div>
     <div class="row"><label>LED 전광판</label><select id="f-led"><option value="">없음</option><option value="c1">200인치 (4×3m)</option><option value="c2">300인치 (8×3m)</option><option value="c3">400인치 (12×4m)</option><option value="c4">빔 프로젝터 스크린</option></select></div>
     <div class="row"><label>LED 색감</label><input type="color" id="f-color" value="#F59E0B" style="width:44px;height:28px;border:0;background:none;cursor:pointer"></div>
-    <div class="row"><label>연단 (식순 · 축사)</label><span class="sw"><input type="checkbox" id="f-podium"><i></i></span></div>
-    <div class="row"><label>관객 안전 펜스</label><span class="sw"><input type="checkbox" id="f-fence"><i></i></span></div>
+    <div class="row"><label for="f-layher">레이허 구조물<small>LED 를 뒤에서 받치는 비계 틀</small></label><span class="sw"><input type="checkbox" id="f-layher"><i></i></span></div>
+    <div class="row"><label for="f-hex">육각 기둥 트러스<small>무대 양옆 장식 기둥</small></label><span class="sw"><input type="checkbox" id="f-hex"><i></i></span></div>
+    <div class="row"><label for="f-podium">연단 (식순 · 축사)</label><span class="sw"><input type="checkbox" id="f-podium"><i></i></span></div>
+    <div class="row"><label for="f-fence">관객 안전 펜스</label><span class="sw"><input type="checkbox" id="f-fence"><i></i></span></div>
 
     <h2>조명 · 음향 · 연출</h2>
-    <div class="row"><label>조명 트러스 (골대형)</label><span class="sw"><input type="checkbox" id="f-truss"><i></i></span></div>
+    <div class="row"><label for="f-truss">조명 트러스 (골대형)</label><span class="sw"><input type="checkbox" id="f-truss"><i></i></span></div>
     <div class="row"><label>무빙라이트</label><input type="range" id="f-moving" min="0" max="16" step="2"><span class="v" id="v-moving"></span></div>
     <div class="row"><label>음향</label><select id="f-sound"><option value="">없음</option><option value="a1">소형 (포터블 2통)</option><option value="a2">중형 (스택 4통)</option><option value="a3">대형 (라인어레이)</option></select></div>
-    <div class="row"><label>스모그 · 헤이저</label><span class="sw"><input type="checkbox" id="f-fog"><i></i></span></div>
-    <div class="row"><label>무대 불꽃 (스파클러)</label><span class="sw"><input type="checkbox" id="f-spark"><i></i></span></div>
+    <div class="row"><label for="f-fog">스모그 · 헤이저</label><span class="sw"><input type="checkbox" id="f-fog"><i></i></span></div>
+    <div class="row"><label for="f-spark">무대 불꽃 (스파클러)<small>화면에는 단추를 누를 때만 터집니다</small></label><button class="btn fx" id="b-spark">터뜨리기</button><span class="sw"><input type="checkbox" id="f-spark"><i></i></span></div>
+    <div class="row"><label for="f-upfog">업포그 머신<small>무대 바닥에 낮게 깔리는 연기</small></label><button class="btn fx" id="b-upfog">뿜기</button><span class="sw"><input type="checkbox" id="f-upfog"><i></i></span></div>
 
     <h2>객석 · 부스 · 기타</h2>
     <div class="row"><label>의자</label><input type="range" id="f-chairs" min="0" max="1000" step="10"><span class="v" id="v-chairs"></span></div>
     <div class="row"><label>텐트 종류</label><select id="f-tentkind"><option value="d3">자바라 3×3m</option><option value="d10">자바라 3×6m</option><option value="d11">몽골텐트</option></select></div>
     <div class="row"><label>텐트 수</label><input type="range" id="f-tents" min="0" max="30" step="1"><span class="v" id="v-tents"></span></div>
-    <div class="row"><label>포토존</label><span class="sw"><input type="checkbox" id="f-photo"><i></i></span></div>
-    <div class="row"><label>발전차</label><span class="sw"><input type="checkbox" id="f-gen"><i></i></span></div>
+    <div class="row"><label for="f-photo">포토존</label><span class="sw"><input type="checkbox" id="f-photo"><i></i></span></div>
+    <div class="row"><label for="f-gen">발전차</label><span class="sw"><input type="checkbox" id="f-gen"><i></i></span></div>
 
     <h2>저장 · 다음 단계</h2>
     <div class="sum" id="sum"></div>
@@ -230,7 +234,8 @@ function preset(type, people){
     stage: {소형:'d1',중형:'d6',대형:'d7',초대형:'d8'}[T], sh: T==='소형'?0.6:T==='초대형'?1.2:0.9,
     backdrop:t.backdrop, led: t.led && (T==='초대형' ? 'c3' : T==='대형' && t.led==='c1' ? 'c2' : t.led), color:S?.color||'#F59E0B',
     podium:t.podium, fence:t.fence, truss:t.truss, moving: t.truss ? Math.min(16,{소형:2,중형:4,대형:8,초대형:12}[T]+ (t.moving>=8?2:0)) : 0,
-    sound: T==='초대형'||T==='대형' ? (t.sound==='a1'?'a2':'a3') : t.sound, fog:t.fog, spark:t.spark,
+    sound: T==='초대형'||T==='대형' ? (t.sound==='a1'?'a2':'a3') : t.sound, fog:t.fog, spark:t.spark, upfog:false,
+    layher: t.led==='c3' || T==='초대형', hex:false,
     chairs: Math.round(Math.min(1000, people*t.chairs)/10)*10,
     tentkind:t.tentkind, tents: t.tentkind==='d11' ? t.tents : Math.min(30, t.tents ? Math.max(t.tents, Math.round(people/(type==='expo'?25:80))) : 0),
     photo:t.photo, gen:t.gen && t.io==='out',
@@ -253,7 +258,7 @@ function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); 
 })();
 
 /* ══ 3. UI ↔ 상태 ══ */
-const F = ['title','people','io','stage','sh','backdrop','led','color','podium','fence','truss','moving','sound','fog','spark','chairs','tentkind','tents','photo','gen'];
+const F = ['title','people','io','stage','sh','backdrop','led','color','layher','hex','podium','fence','truss','moving','sound','fog','spark','upfog','chairs','tentkind','tents','photo','gen'];
 function fill(){
   $('#types').innerHTML = Object.keys(TYPES).map(k=>`<button data-t="${k}" class="${k===S.type?'on':''}">${TYPES[k].name}</button>`).join('');
   F.forEach(k=>{ const el=$('#f-'+k); if(!el) return; if(el.type==='checkbox') el.checked=!!S[k]; else el.value=S[k]??''; });
@@ -266,7 +271,7 @@ function fill(){
   /* 지금 설정으로는 3D 에 안 그려지는 것들 — 스위치만 켜지고 화면이 그대로면 고장으로 보이니 이유를 적는다 */
   const 조건 = {
     fog:   [S.night, '밤에만 보입니다'],
-    spark: [S.night && S.stage!=='none', '밤 · 무대가 있을 때 보입니다'],
+    upfog: [S.stage!=='none', '무대가 있어야 보입니다'],
     gen:   [S.io==='out', '야외에서만 보입니다'],
     podium:[S.stage!=='none', '무대가 있어야 보입니다'],
     fence: [S.stage!=='none', '무대가 있어야 보입니다'],
@@ -294,6 +299,8 @@ document.querySelectorAll('.panel input, .panel select').forEach(el=>{
 });
 $('#b-day').onclick = ()=>{ S.night=false; fill(); rebuild(); };
 $('#b-night').onclick = ()=>{ S.night=true; fill(); rebuild(); };
+$('#b-spark').onclick = ()=>{ $('#f-spark').checked = true; read(); fill(); 불꽃쏘기(); };
+$('#b-upfog').onclick = ()=>{ $('#f-upfog').checked = true; read(); fill(); 업포그쏘기(); };
 $('#mtog').onclick = ()=>{ const p=$('#panel'); p.classList.toggle('min'); $('#mtog').textContent = p.classList.contains('min')?'▼ 설정 펼치기':'▲ 설정 접기'; setTimeout(resize,50); };
 
 function summary(){
@@ -303,11 +310,13 @@ function summary(){
   if (st) parts.push(`<b>무대</b> ${st[0]}×${st[1]}m · 높이 ${S.sh.toFixed(1)}m`);
   if (S.backdrop) parts.push(`<b>백드롭 트러스</b> ${Math.max(st?st[0]+2:8, led?led[0]+1.6:0).toFixed(1)}m`);
   if (led) parts.push(`<b>${led[2]}</b> ${led[0]}×${led[1]}m`);
+  if (S.layher && led) parts.push('<b>레이허 구조물</b>');
+  if (S.hex) parts.push('<b>육각 기둥 트러스</b> 2본');
   if (S.truss) parts.push(`<b>조명 트러스</b> + 무빙 ${S.moving}대`);
   if (S.sound) parts.push(`<b>음향</b> ${ {a1:'소형',a2:'중형',a3:'대형 라인어레이'}[S.sound] }`);
   if (S.chairs) parts.push(`<b>객석</b> ${S.chairs}석 (약 ${rows}줄 · ${Math.round(Math.min(20,S.chairs)*0.55)}×${Math.round(rows*0.9)}m)`);
   if (S.tents) parts.push(`<b>${tent[2]}</b> ${S.tents}동`);
-  [['podium','연단'],['fence','안전 펜스'],['fog','스모그'],['spark','스파클러'],['photo','포토존'],['gen','발전차']].forEach(([k,n])=>{ if(S[k]) parts.push(n); });
+  [['podium','연단'],['fence','안전 펜스'],['fog','스모그'],['spark','스파클러'],['upfog','업포그'],['photo','포토존'],['gen','발전차']].forEach(([k,n])=>{ if(S[k]) parts.push(n); });
   $('#sum').innerHTML = parts.join(' · ');
   $('#hud').innerHTML = `<b>${S.title||TYPES[S.type].name}</b> · ${S.people.toLocaleString()}명 · ${S.io==='in'?'실내':'야외'} · ${S.night?'야간':'주간'}<br>${st?`무대 ${st[0]}×${st[1]}m`:'무대 없음'}${led?` · ${led[2]}`:''}${S.chairs?` · 의자 ${S.chairs}`:''}${S.tents?` · 텐트 ${S.tents}`:''}`;
 }
@@ -366,6 +375,43 @@ function truss(len, axis='x', size=.3){
   }
   inst.count = i; inst.castShadow = true; g.add(inst);
   if (axis==='y') g.rotation.z = Math.PI/2; else if (axis==='z') g.rotation.y = Math.PI/2;
+  return g;
+}
+
+/* 두 점을 잇는 봉 하나 — 각도 계산을 손으로 하지 않는다 */
+function 잇기(x0,y0,z0, x1,y1,z1, r=.014){
+  const a = new THREE.Vector3(x0,y0,z0), b = new THREE.Vector3(x1,y1,z1);
+  const d = new THREE.Vector3().subVectors(b,a), len = d.length();
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,6), M.alu);
+  m.position.copy(a).add(b).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), d.normalize());
+  m.castShadow = true; return m;
+}
+/* 육각 기둥 트러스 (세로) */
+function hexTruss(len, size=.5){
+  const g = new THREE.Group(), r = size/2, pts = [];
+  for (let i=0;i<6;i++) pts.push([Math.cos(i*Math.PI/3)*r, Math.sin(i*Math.PI/3)*r]);
+  pts.forEach(([x,z])=> g.add(잇기(x,0,z, x,len,z, .028)));
+  const n = Math.max(2, Math.round(len/.55));
+  for (let k=0;k<=n;k++){ const y = k*len/n;
+    for (let i=0;i<6;i++){ const [x0,z0]=pts[i], [x1,z1]=pts[(i+1)%6]; g.add(잇기(x0,y,z0, x1,y,z1, .013)); } }
+  for (let k=0;k<n;k++){ const i=k%6, [x0,z0]=pts[i], [x1,z1]=pts[(i+1)%6]; g.add(잇기(x0,k*len/n,z0, x1,(k+1)*len/n,z1, .011)); }
+  return g;
+}
+/* 레이허 구조물 — LED 뒤를 받치는 비계 틀 */
+function layherFrame(w, h, d=1.1){
+  const g = new THREE.Group();
+  const nx = Math.max(2, Math.round(w/1.8)+1), ny = Math.max(2, Math.round(h/1.9));
+  const xs = [], ys = [];
+  for (let i=0;i<nx;i++) xs.push(-w/2 + i*w/(nx-1));
+  for (let j=0;j<=ny;j++) ys.push(j*h/ny);
+  for (const x of xs) for (const z of [-d/2, d/2]) g.add(잇기(x,0,z, x,h,z, .032));
+  for (const y of ys){
+    for (const z of [-d/2, d/2]) g.add(잇기(-w/2,y,z, w/2,y,z, .026));
+    for (const x of [xs[0], xs[nx-1]]) g.add(잇기(x,y,-d/2, x,y,d/2, .024));
+  }
+  for (let i=0;i<nx-1;i++) for (let j=0;j<ny;j++){ if ((i+j)%2) continue; g.add(잇기(xs[i],ys[j],d/2, xs[i+1],ys[j+1],d/2, .02)); }
+  for (const x of xs) for (const z of [-d/2, d/2]){ const b = box(.28,.06,.28,M.black); b.position.set(x,.03,z); g.add(b); }
   return g;
 }
 
@@ -454,6 +500,7 @@ function rebuild(){
   const st = STAGE[S.stage] || null;
   const W = st ? st[0] : 8, D = st ? st[1] : 0, H = st ? S.sh : 0;
   const night = !!S.night, indoor = S.io==='in';
+  무대 = { W, H, D, st: !!st };
   const accent = new THREE.Color(S.color||'#F59E0B');
 
   /* 바닥 · 하늘 */
@@ -520,6 +567,15 @@ function rebuild(){
     scr.position.set(0, H + 1.2 + lh/2, zl + .07); root.add(scr);
     if (!S.backdrop){ [-1,1].forEach(s=>{ const leg=truss(H+1.3+lh,'y'); leg.position.set(s*(lw/2+.4), (H+1.3+lh)/2, zl); root.add(leg); }); }
     if (night){ const glow=new THREE.PointLight(accent, 40, 16, 1.6); glow.position.set(0,H+1.2+lh/2, zl+1.2); lightsGroup.add(glow); }
+    if (S.layher){ const fr = layherFrame(lw + 1.2, H + 1.2 + lh + .5); fr.position.set(0, 0, zl - .8); root.add(fr); }
+  }
+  /* 육각 기둥 트러스 — 무대 양옆 */
+  if (S.hex && st){
+    const hh = H + 4.2;
+    [-1,1].forEach(sd=>{ const c = hexTruss(hh, .5); c.position.set(sd*(W/2 + 1.1), 0, D/2 - 1.4); root.add(c);
+      const cap = box(.72,.12,.72,M.black); cap.position.set(sd*(W/2 + 1.1), hh + .06, D/2 - 1.4); root.add(cap);
+      const base = box(.8,.1,.8,M.black); base.position.set(sd*(W/2 + 1.1), .05, D/2 - 1.4); root.add(base);
+      if (night){ const l = new THREE.PointLight(accent, 12, 10, 2); l.position.set(sd*(W/2 + 1.1), hh*.6, D/2 - 1.4); lightsGroup.add(l); } });
   }
 
   /* 조명 트러스 (골대형: 무대 앞 양쪽 기둥 + 위 가로대) + 무빙라이트 */
@@ -556,7 +612,7 @@ function rebuild(){
   if (S.fence && st){ const zf=D/2+2.2, n=Math.ceil((W+4)/1.2); for(let i=0;i<n;i++){ const x=-(W+4)/2+(i+.5)*1.2; const f=box(1.15,1.2,.05,M.alu); f.position.set(x,.6,zf); root.add(f); const foot=box(.1,.05,.6,M.alu); foot.position.set(x-.5,.02,zf); root.add(foot);} }
   /* 스모그 · 스파클러 */
   if (S.fog && night && st){ const haze = new THREE.Mesh(new THREE.BoxGeometry(W+3, 1.2, D+3), new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:.06, depthWrite:false })); haze.position.set(0, H+.6, 0); root.add(haze); }
-  if (S.spark && night && st){ const n=Math.max(3,Math.round(W/2.5)); for(let i=0;i<n;i++){ const x=-W/2+1+(i)*(W-2)/Math.max(1,n-1); const sp=new THREE.Mesh(new THREE.ConeGeometry(.16,2.2,10,1,true), new THREE.MeshBasicMaterial({ color:0xfff1b8, transparent:true, opacity:.32, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide })); sp.position.set(x,H+1.3,D/2-.4); sp.rotation.x=Math.PI; root.add(sp); animated.push({o:sp, spark:true, ph:i}); const pl=new THREE.PointLight(0xffe8a0, 8, 6, 2); pl.position.set(x,H+.6,D/2-.4); lightsGroup.add(pl);} }
+  /* 무대 불꽃 · 업포그는 상시로 두면 정신없어서 단추를 누를 때만 터진다 (불꽃쏘기 · 업포그쏘기) */
 
   /* 객석 */
   const zStart = D/2 + (S.fence ? 4 : 3);
@@ -599,11 +655,59 @@ function resize(){ const w=view.clientWidth, h=view.clientHeight; renderer.setSi
 addEventListener('resize', resize);
 
 const clock = new THREE.Clock();
+
+/* ══ 특수효과 — 눌렀을 때만 잠깐 ══ */
+let 무대 = { W:10, H:.9, D:6.6, st:true };
+const fxGroup = new THREE.Group(); scene.add(fxGroup);
+const fx = [];
+function fx버리기(a){ fxGroup.remove(a.o); a.o.geometry.dispose(); a.o.material.dispose(); if (a.light) fxGroup.remove(a.light); }
+function 불꽃쏘기(){
+  const { W, H, D, st } = 무대; if (!st) return toast('무대가 있어야 불꽃을 터뜨립니다');
+  const n = Math.max(3, Math.round(W/2.5)), t0 = clock.getElapsedTime();
+  for (let i=0;i<n;i++){
+    const x = -W/2 + 1 + i*(W-2)/Math.max(1,n-1);
+    const m = new THREE.Mesh(new THREE.ConeGeometry(.18, 2.8, 10, 1, true),
+      new THREE.MeshBasicMaterial({ color:0xfff1b8, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide }));
+    m.position.set(x, H + 1.6, D/2 - .4); m.rotation.x = Math.PI; fxGroup.add(m);
+    const pl = new THREE.PointLight(0xffe8a0, 0, 8, 2); pl.position.set(x, H + .8, D/2 - .4); fxGroup.add(pl);
+    fx.push({ kind:'spark', o:m, light:pl, t0: t0 + i*.06, life:3.2, ph:i*.7 });
+  }
+  toast('불꽃을 터뜨렸습니다');
+}
+function 업포그쏘기(){
+  const { W, H, D, st } = 무대; if (!st) return toast('무대가 있어야 업포그가 보입니다');
+  const t0 = clock.getElapsedTime();
+  for (let i=0;i<4;i++){
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(W*.95, D*.95),
+      new THREE.MeshBasicMaterial({ color:0xdfe7ff, transparent:true, opacity:0, depthWrite:false }));
+    m.rotation.x = -Math.PI/2; m.position.set(0, H + .05 + i*.1, 0); m.scale.set(.3,.3,1); fxGroup.add(m);
+    fx.push({ kind:'fog', o:m, t0: t0 + i*.35, life:5.5, ph:i });
+  }
+  toast('업포그를 뿜었습니다');
+}
+function fx갱신(t){
+  for (let i=fx.length-1;i>=0;i--){
+    const a = fx[i], u = (t - a.t0) / a.life;
+    if (u < 0) continue;
+    if (u >= 1){ fx버리기(a); fx.splice(i,1); continue; }
+    if (a.kind === 'spark'){
+      const 세기 = u < .1 ? u/.1 : u > .72 ? (1-u)/.28 : 1;
+      a.o.material.opacity = .5 * 세기 * (.7 + .3*Math.sin(t*16 + a.ph));
+      a.o.scale.y = .45 + .75 * 세기;
+      a.light.intensity = 22 * 세기;
+    } else {
+      const 세기 = u < .12 ? u/.12 : (1-u)/.88;
+      a.o.material.opacity = .34 * 세기;
+      const k = .3 + u*1.15; a.o.scale.set(k, k, 1);
+      a.o.position.y += .0008;
+    }
+  }
+}
 function loop(){ requestAnimationFrame(loop); const t=clock.getElapsedTime();
   animated.forEach(a=>{ if(a.spark){ a.o.scale.y = .8 + .3*Math.sin(t*9+a.ph); a.o.material.opacity=.4+.2*Math.sin(t*13+a.ph); return; }
     const ang = Math.sin(t*.7 + a.ph)*.45, ang2 = Math.cos(t*.5+a.ph)*.3; a.o.rotation.set(ang2, 0, ang);
     a.o.position.set(a.base.x + Math.sin(ang)*4.5, a.base.y - Math.cos(ang)*4.5*Math.cos(ang2), a.base.z - Math.sin(ang2)*4.5); });
-  controls.update(); renderer.render(scene, camera); }
+  fx갱신(t); controls.update(); renderer.render(scene, camera); }
 
 /* ══ 6. 저장 · 공유 · 견적 ══ */
 function saveHash(){ history.replaceState(null,'', '#s='+b64u(JSON.stringify(S))); }
@@ -676,10 +780,11 @@ function quoteRows(){
   const r=[], T=scaleOf(S.people), st=STAGE[S.stage];
   if (st) r.push(S.stage);
   if (S.backdrop) r.push(['d2', st ? st[0]+2 : 8]);
-  if (S.led) { r.push(S.led); if (S.led==='c2'||S.led==='c3') r.push('c7'); r.push('c6'); }
+  if (S.led) { r.push(S.led); if (S.layher || S.led==='c2'||S.led==='c3') r.push('c7'); r.push('c6'); }
   if (S.truss) { r.push('b1'); if (S.moving) r.push(['b2', S.moving]); r.push('b4'); } else if (S.moving) { r.push('b1'); r.push(['b2', S.moving]); }
   if (S.sound) { r.push(S.sound); r.push(['a4', {소형:2,중형:4,대형:6,초대형:8}[T]]); }
-  if (S.fog) r.push('e1'); if (S.spark) r.push('e2');
+  if (S.fog) r.push('e1'); if (S.spark) r.push('e2'); if (S.upfog) r.push('e3');
+  if (S.hex && !S.truss) r.push('b4');
   if (S.tents) r.push([S.tentkind, S.tents]);
   if (S.chairs) r.push(['d9', S.chairs]);
   if (S.photo) r.push('d4'); if (S.backdrop||S.photo) r.push(['d5', {소형:2,중형:4,대형:8,초대형:12}[T]]);
