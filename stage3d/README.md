@@ -67,7 +67,7 @@ ffmpeg 가 있으면 H.264(CRF 18)로 묶고, 없으면 블렌더 내장 인코�
 
 [ahujasid/blender-mcp](https://github.com/ahujasid/blender-mcp). 설치된 것:
 - `uv`(winget astral-sh.uv) → `uvx blender-mcp` 가 MCP 서버.
-- 블렌더 애드온 `%APPDATA%\Blender Foundation\Blender.2\scriptsddonslender_mcp.py` (활성화·저장됨). **블렌더를 켜기만 하면 9876 포트 서버가 자동으로 뜬다** (사이드바 N → MCP for Blender 탭에서 끄고 켤 수 있음).
+- 블렌더 애드온 `%APPDATA%\Blender Foundation\Blender\5.2\scripts\addons\blender_mcp.py` (활성화·저장됨). **블렌더를 켜기만 하면 9876 포트 서버가 자동으로 뜬다** (사이드바 N → MCP for Blender 탭에서 끄고 켤 수 있음).
 - Claude Code 사용자 설정(`~/.claude.json` 의 `mcpServers.blender`) 에 `uvx blender-mcp` 등록. **Claude 데스크톱 앱을 한 번 껐다 켜야** 새 세션에서 `blender` 도구가 보인다.
 
 쓰는 법: 블렌더를 열어 둔 채로 클로드에게 말한다.
