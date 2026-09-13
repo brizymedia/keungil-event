@@ -227,6 +227,7 @@ const LED   = { c1:[4,3,'LED 200인치'], c2:[8,3,'LED 300인치'], c3:[12,4,'LE
 const TENT  = { d3:[3,3,'자바라 3×3'], d10:[3,6,'자바라 3×6'], d11:[6,6,'몽골텐트'] };
 /* 형님 현장 사진 기준 구조물 이름 (stage3d/README.md 에 사진 설명) */
 const 구조이름 = { line:'외줄 트러스', box:'사각 트러스', hex:'6발 트러스', hexroof:'6발 트러스 + 루프', roof:'6발 트러스 + 루프', layher:'레이허 구조물' };
+const 스피커칸 = 1.25;        // 6발에서 기둥과 기둥 사이(스피커가 걸리는 칸)의 반폭
 const scaleOf = n => n<=100?'소형':n<=300?'중형':n<=1000?'대형':'초대형';
 
 function preset(type, people){
@@ -598,7 +599,7 @@ function rebuild(){
     const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2;
     const 육 = k === 'hex' || k === 'hexroof';
     const 기둥세우기 = (x, z, h = th) => {
-      if (육){ const c = 육발기둥(h); c.position.set(x, 0, z); root.add(c); }
+      if (육){ const c = 육발기둥(h, .85, .7); c.position.set(x, 0, z); root.add(c); }
       else { const c = truss(h,'y'); c.position.set(x, h/2, z); root.add(c); }
       const base = box(.8,.08,.8,M.black); base.position.set(x, .04, z); root.add(base);
     };
@@ -619,6 +620,14 @@ function rebuild(){
     } else {
     [-1,1].forEach(s=> 기둥세우기(s*tw/2, zt));
     가로대(tw, th-.15, zt);
+    if (육){
+      /* 6발은 스피커를 매달려고 바깥에 발을 하나씩 더 세운 것 — 스피커가 두 기둥 사이에 걸린다 */
+      [-1,1].forEach(sd=>{
+        기둥세우기(sd*(tw/2 + 스피커칸*2), zt);
+        const 보 = truss(스피커칸*2, 'x'); 보.position.set(sd*(tw/2 + 스피커칸), th-.15, zt); root.add(보);
+        root.add(잇기(sd*tw/2, th-2.6, zt, sd*(tw/2 + 스피커칸*2), th-.9, zt, .022));   // 버팀대
+      });
+    }
     if (k === 'hexroof'){
       /* 루프 — 가운데 마룻대를 앞뒤로 걸고, 지붕이 좌 · 우로 갈라져 내려온다 (형님 현장 사진 1 · 2 · 9) */
       const zb = -D/2 + .3, ridge = th + 1.6, 처마 = th - .15;
@@ -663,7 +672,7 @@ function rebuild(){
       /* 6발 기둥은 스피커를 매달려고 발을 더 낸 것 — 라인어레이를 기둥 바깥쪽에 리깅한다 */
       const tw = W + 1.2, th = H + 5.5, 통수 = { a1:3, a2:5, a3:9 }[S.sound] || 5;
       [-1,1].forEach(sd=>{
-        const x = sd*(tw/2 + 1.05);
+        const x = sd*(tw/2 + 스피커칸);        // 두 기둥 한가운데
         const 모터 = box(.34,.26,.34,M.black); 모터.position.set(x, th - .55, zs - .35); root.add(모터);
         root.add(잇기(x, th - .7, zs - .35, x, th - 1.05, zs - .1, .015));           // 체인
         const 프레임 = box(1.05,.12,.7,M.black); 프레임.position.set(x, th - 1.1, zs - .05); root.add(프레임);
