@@ -121,7 +121,7 @@ button,select,input{font:inherit;color:inherit}
     <div class="row"><label for="f-fence">관객 안전 펜스</label><span class="sw"><input type="checkbox" id="f-fence"><i></i></span></div>
 
     <h2>조명 · 음향 · 연출</h2>
-    <div class="row"><label for="f-truss">조명 트러스 (골대형)</label><span class="sw"><input type="checkbox" id="f-truss"><i></i></span></div>
+    <div class="row"><label>트러스 모양<small>무대 앞에 세우는 구조물</small></label><select id="f-trussk"><option value="">없음</option><option value="box">사각 트러스 (골대형)</option><option value="hex">6발 트러스 (육각)</option><option value="roof">루프 (지붕형)</option></select></div>
     <div class="row"><label>무빙라이트</label><input type="range" id="f-moving" min="0" max="16" step="2"><span class="v" id="v-moving"></span></div>
     <div class="row"><label>음향</label><select id="f-sound"><option value="">없음</option><option value="a1">소형 (포터블 2통)</option><option value="a2">중형 (스택 4통)</option><option value="a3">대형 (라인어레이)</option></select></div>
     <div class="row"><label for="f-fog">스모그 · 헤이저</label><span class="sw"><input type="checkbox" id="f-fog"><i></i></span></div>
@@ -233,7 +233,7 @@ function preset(type, people){
     type, title:S?.title||'', people, io:t.io, night:S?.night??true,
     stage: {소형:'d1',중형:'d6',대형:'d7',초대형:'d8'}[T], sh: T==='소형'?0.6:T==='초대형'?1.2:0.9,
     backdrop:t.backdrop, led: t.led && (T==='초대형' ? 'c3' : T==='대형' && t.led==='c1' ? 'c2' : t.led), color:S?.color||'#F59E0B',
-    podium:t.podium, fence:t.fence, truss:t.truss, moving: t.truss ? Math.min(16,{소형:2,중형:4,대형:8,초대형:12}[T]+ (t.moving>=8?2:0)) : 0,
+    podium:t.podium, fence:t.fence, trussk: t.truss ? 'box' : '', moving: t.truss ? Math.min(16,{소형:2,중형:4,대형:8,초대형:12}[T]+ (t.moving>=8?2:0)) : 0,
     sound: T==='초대형'||T==='대형' ? (t.sound==='a1'?'a2':'a3') : t.sound, fog:t.fog, spark:t.spark, upfog:false,
     layher: t.led==='c3' || T==='초대형', hex:false,
     chairs: Math.round(Math.min(1000, people*t.chairs)/10)*10,
@@ -253,12 +253,14 @@ function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); 
   // 주소의 #s= 에 시안 전체가 들어 있다. 기획서(plan.html)처럼 일부만 넘어와도 나머지는 프리셋으로 채운다
   const h = location.hash.match(/[#&]s=([^&]+)/);
   let o = null; if (h) { try { o = JSON.parse(unb64(h[1])); } catch(e){} }
-  if (o && TYPES[o.type]) { const base = preset(o.type, +o.people || 300); S = { ...base, ...o, people: +o.people || 300 }; }
+  if (o && TYPES[o.type]) { const base = preset(o.type, +o.people || 300); S = { ...base, ...o, people: +o.people || 300 };
+    if (S.trussk === undefined) S.trussk = S.truss ? 'box' : '';   // 예전 링크(스위치 시절) 호환
+  }
   else S = preset('festival', 300);
 })();
 
 /* ══ 3. UI ↔ 상태 ══ */
-const F = ['title','people','io','stage','sh','backdrop','led','color','layher','hex','podium','fence','truss','moving','sound','fog','spark','upfog','chairs','tentkind','tents','photo','gen'];
+const F = ['title','people','io','stage','sh','backdrop','led','color','layher','hex','podium','fence','trussk','moving','sound','fog','spark','upfog','chairs','tentkind','tents','photo','gen'];
 function fill(){
   $('#types').innerHTML = Object.keys(TYPES).map(k=>`<button data-t="${k}" class="${k===S.type?'on':''}">${TYPES[k].name}</button>`).join('');
   F.forEach(k=>{ const el=$('#f-'+k); if(!el) return; if(el.type==='checkbox') el.checked=!!S[k]; else el.value=S[k]??''; });
@@ -275,7 +277,7 @@ function fill(){
     gen:   [S.io==='out', '야외에서만 보입니다'],
     podium:[S.stage!=='none', '무대가 있어야 보입니다'],
     fence: [S.stage!=='none', '무대가 있어야 보입니다'],
-    moving:[S.truss, '조명 트러스를 켜야 보입니다'],
+    moving:[!!S.trussk, '트러스 모양을 골라야 보입니다'],
   };
   Object.entries(조건).forEach(([k, [보임, 이유]]) => {
     const el = $('#f-'+k), row = el && el.closest('.row'), lab = row && row.querySelector('label');
@@ -312,7 +314,7 @@ function summary(){
   if (led) parts.push(`<b>${led[2]}</b> ${led[0]}×${led[1]}m`);
   if (S.layher && led) parts.push('<b>레이허 구조물</b>');
   if (S.hex) parts.push('<b>육각 기둥 트러스</b> 2본');
-  if (S.truss) parts.push(`<b>조명 트러스</b> + 무빙 ${S.moving}대`);
+  if (S.trussk) parts.push(`<b>${ {box:'사각 트러스',hex:'6발 트러스',roof:'루프(지붕형)'}[S.trussk] }</b>${S.moving?` + 무빙 ${S.moving}대`:''}`);
   if (S.sound) parts.push(`<b>음향</b> ${ {a1:'소형',a2:'중형',a3:'대형 라인어레이'}[S.sound] }`);
   if (S.chairs) parts.push(`<b>객석</b> ${S.chairs}석 (약 ${rows}줄 · ${Math.round(Math.min(20,S.chairs)*0.55)}×${Math.round(rows*0.9)}m)`);
   if (S.tents) parts.push(`<b>${tent[2]}</b> ${S.tents}동`);
@@ -386,6 +388,13 @@ function 잇기(x0,y0,z0, x1,y1,z1, r=.014){
   m.position.copy(a).add(b).multiplyScalar(.5);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), d.normalize());
   m.castShadow = true; return m;
+}
+/* 네 점을 잇는 사각 면 */
+function 면(p1, p2, p3, p4, mat){
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array([...p1,...p2,...p3, ...p1,...p3,...p4]), 3));
+  g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; return m;
 }
 /* 육각 기둥 트러스 (세로) */
 function hexTruss(len, size=.5){
@@ -578,11 +587,38 @@ function rebuild(){
       if (night){ const l = new THREE.PointLight(accent, 12, 10, 2); l.position.set(sd*(W/2 + 1.1), hh*.6, D/2 - 1.4); lightsGroup.add(l); } });
   }
 
-  /* 조명 트러스 (골대형: 무대 앞 양쪽 기둥 + 위 가로대) + 무빙라이트 */
-  if (S.truss && st){
-    const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2;
-    [-1,1].forEach(s=>{ const c=truss(th,'y'); c.position.set(s*tw/2, th/2, zt); root.add(c); const base=box(.8,.08,.8,M.black); base.position.set(s*tw/2,.04,zt); root.add(base); });
-    const t = truss(tw,'x'); t.position.set(0, th-.15, zt); root.add(t);
+  /* 트러스 — 사각(골대형) · 6발(육각 골대형) · 루프(지붕형) + 무빙라이트 */
+  if (S.trussk && st){
+    const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2, 육 = S.trussk === 'hex';
+    const 기둥세우기 = (x, z) => {
+      if (육){ const c = hexTruss(th, .5); c.position.set(x, 0, z); root.add(c); }
+      else { const c = truss(th,'y'); c.position.set(x, th/2, z); root.add(c); }
+      const base = box(.8,.08,.8,M.black); base.position.set(x, .04, z); root.add(base);
+    };
+    const 가로대 = (len, y, z) => {   // 6발이면 가로대도 육각으로
+      if (육){ const t = hexTruss(len, .5); t.rotation.z = Math.PI/2; t.position.set(len/2, y, z); root.add(t); }
+      else { const t = truss(len,'x'); t.position.set(0, y, z); root.add(t); }
+    };
+    [-1,1].forEach(s=> 기둥세우기(s*tw/2, zt));
+    가로대(tw, th-.15, zt);
+    if (S.trussk === 'roof'){
+      /* 루프 — 뒤쪽 기둥 한 쌍을 더 세우고 능선을 올려 지붕을 덮는다 */
+      const zb = -D/2 + .3, ridge = th + 1.5;
+      [-1,1].forEach(s=> 기둥세우기(s*tw/2, zb));
+      가로대(tw, th-.15, zb);
+      가로대(tw, ridge, 0);
+      const n = Math.max(3, Math.round(tw/2.2));
+      for (let i=0;i<=n;i++){ const x = -tw/2 + i*tw/n;
+        root.add(잇기(x, th-.15, zt, x, ridge, 0, .028));
+        root.add(잇기(x, th-.15, zb, x, ridge, 0, .028));
+      }
+      const 천 = new THREE.MeshStandardMaterial({ color:0x17171c, roughness:.95, side:THREE.DoubleSide });
+      root.add(면([-tw/2, ridge, 0], [tw/2, ridge, 0], [tw/2, th-.15, zt], [-tw/2, th-.15, zt], 천));
+      root.add(면([-tw/2, ridge, 0], [tw/2, ridge, 0], [tw/2, th-.15, zb], [-tw/2, th-.15, zb], 천));
+      [-1,1].forEach(s=>{   // 옆면 삼각 가림막
+        root.add(면([s*tw/2, ridge, 0], [s*tw/2, th-.15, zt], [s*tw/2, th-.15, zb], [s*tw/2, ridge, 0], 천));
+      });
+    }
     const n = S.moving, per = Math.ceil(n/2);
     for (let i=0;i<n;i++){
       const onTop = i < per, k = onTop ? i : i-per, cnt = onTop ? per : n-per;
@@ -604,7 +640,7 @@ function rebuild(){
     const zs = D/2 + .3;
     if (S.sound==='a1'){ [-1,1].forEach(s=>{ const p=cyl(.02,1.4,M.black,6); p.position.set(s*(W/2+.6),.7,zs); root.add(p); const sp=box(.4,.6,.35,M.black); sp.position.set(s*(W/2+.6),1.6,zs); root.add(sp); }); }
     else if (S.sound==='a2'){ [-1,1].forEach(s=>{ const sub=box(.7,.6,.7,M.black); sub.position.set(s*(W/2+1),.3,zs); root.add(sub); for(let i=0;i<2;i++){ const sp=box(.5,.7,.5,M.black); sp.position.set(s*(W/2+1),.6+.35+i*.72,zs); root.add(sp);} }); }
-    else { [-1,1].forEach(s=>{ const x=s*(W/2+1.6); for(let i=0;i<2;i++){ const sub=box(1.1,.6,.9,M.black); sub.position.set(x,.3+i*.62,zs); root.add(sub);} const top=(S.truss? H+5.2 : bdH-.3);
+    else { [-1,1].forEach(s=>{ const x=s*(W/2+1.6); for(let i=0;i<2;i++){ const sub=box(1.1,.6,.9,M.black); sub.position.set(x,.3+i*.62,zs); root.add(sub);} const top=(S.trussk? H+5.2 : bdH-.3);
       const hang = truss(top-1.5,'y'); hang.position.set(x, 1.5+(top-1.5)/2, zs-.2); root.add(hang);
       for(let i=0;i<8;i++){ const el=box(.9,.32,.6,M.black); el.position.set(x, top-.3-i*.36, zs+.25); el.rotation.x = -.06*i; root.add(el);} }); }
   }
@@ -781,10 +817,10 @@ function quoteRows(){
   if (st) r.push(S.stage);
   if (S.backdrop) r.push(['d2', st ? st[0]+2 : 8]);
   if (S.led) { r.push(S.led); if (S.layher || S.led==='c2'||S.led==='c3') r.push('c7'); r.push('c6'); }
-  if (S.truss) { r.push('b1'); if (S.moving) r.push(['b2', S.moving]); r.push('b4'); } else if (S.moving) { r.push('b1'); r.push(['b2', S.moving]); }
+  if (S.trussk) { r.push('b1'); if (S.moving) r.push(['b2', S.moving]); r.push('b4'); } else if (S.moving) { r.push('b1'); r.push(['b2', S.moving]); }
   if (S.sound) { r.push(S.sound); r.push(['a4', {소형:2,중형:4,대형:6,초대형:8}[T]]); }
   if (S.fog) r.push('e1'); if (S.spark) r.push('e2'); if (S.upfog) r.push('e3');
-  if (S.hex && !S.truss) r.push('b4');
+  if (S.hex && !S.trussk) r.push('b4');
   if (S.tents) r.push([S.tentkind, S.tents]);
   if (S.chairs) r.push(['d9', S.chairs]);
   if (S.photo) r.push('d4'); if (S.backdrop||S.photo) r.push(['d5', {소형:2,중형:4,대형:8,초대형:12}[T]]);
