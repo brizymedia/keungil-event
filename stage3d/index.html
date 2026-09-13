@@ -116,7 +116,7 @@ button,select,input{font:inherit;color:inherit}
     <div class="row"><label>LED 전광판</label><select id="f-led"><option value="">없음</option><option value="c1">200인치 (4×3m)</option><option value="c2">300인치 (8×3m)</option><option value="c3">400인치 (12×4m)</option><option value="c4">빔 프로젝터 스크린</option></select></div>
     <div class="row"><label>LED 색감</label><input type="color" id="f-color" value="#F59E0B" style="width:44px;height:28px;border:0;background:none;cursor:pointer"></div>
     <div class="row"><label for="f-layher">LED 뒤 지지 틀<small>레이허 비계로 LED 를 받친다</small></label><span class="sw"><input type="checkbox" id="f-layher"><i></i></span></div>
-    <div class="row"><label for="f-hex">육각 기둥 트러스<small>무대 양옆 장식 기둥</small></label><span class="sw"><input type="checkbox" id="f-hex"><i></i></span></div>
+    <div class="row"><label for="f-hex">무대 옆 기둥 2본<small>장식 · 조명용 6발 기둥</small></label><span class="sw"><input type="checkbox" id="f-hex"><i></i></span></div>
     <div class="row"><label for="f-podium">연단 (식순 · 축사)</label><span class="sw"><input type="checkbox" id="f-podium"><i></i></span></div>
     <div class="row"><label for="f-fence">관객 안전 펜스</label><span class="sw"><input type="checkbox" id="f-fence"><i></i></span></div>
 
@@ -315,7 +315,7 @@ function summary(){
   if (S.backdrop) parts.push(`<b>백드롭 트러스</b> ${Math.max(st?st[0]+2:8, led?led[0]+1.6:0).toFixed(1)}m`);
   if (led) parts.push(`<b>${led[2]}</b> ${led[0]}×${led[1]}m`);
   if (S.layher && led) parts.push('<b>LED 뒤 지지 틀</b>');
-  if (S.hex) parts.push('<b>육각 기둥 트러스</b> 2본');
+  if (S.hex) parts.push('<b>무대 옆 기둥</b> 2본');
   if (S.trussk) parts.push(`<b>${ 구조이름[S.trussk] || '무대 구조물' }</b>${S.moving?` + 무빙 ${S.moving}대`:''}`);
   if (S.sound) parts.push(`<b>음향</b> ${ {a1:'소형',a2:'중형',a3:'대형 라인어레이'}[S.sound] }`);
   if (S.chairs) parts.push(`<b>객석</b> ${S.chairs}석 (약 ${rows}줄 · ${Math.round(Math.min(20,S.chairs)*0.55)}×${Math.round(rows*0.9)}m)`);
@@ -399,14 +399,17 @@ function 면(p1, p2, p3, p4, mat){
   const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; return m;
 }
 /* 육각 기둥 트러스 (세로) */
-function hexTruss(len, size=.5){
-  const g = new THREE.Group(), r = size/2, pts = [];
-  for (let i=0;i<6;i++) pts.push([Math.cos(i*Math.PI/3)*r, Math.sin(i*Math.PI/3)*r]);
-  pts.forEach(([x,z])=> g.add(잇기(x,0,z, x,len,z, .028)));
-  const n = Math.max(2, Math.round(len/.55));
+/* 6발 기둥 — 사각 트러스(발 4개)에 스피커를 매달려고 양옆으로 한 발씩 더 낸 것.
+   그래서 발이 6개고, 6발을 쓰면 스피커가 이 기둥에 리깅된다. (형님 설명) */
+function 육발기둥(len, w = 1.7, d = .62){
+  const g = new THREE.Group();
+  const 발 = [[-w/2,0], [-d/2,-d/2], [d/2,-d/2], [w/2,0], [d/2,d/2], [-d/2,d/2]];
+  발.forEach(([x,z])=> g.add(잇기(x,0,z, x,len,z, .032)));
+  const n = Math.max(3, Math.round(len/.7));
   for (let k=0;k<=n;k++){ const y = k*len/n;
-    for (let i=0;i<6;i++){ const [x0,z0]=pts[i], [x1,z1]=pts[(i+1)%6]; g.add(잇기(x0,y,z0, x1,y,z1, .013)); } }
-  for (let k=0;k<n;k++){ const i=k%6, [x0,z0]=pts[i], [x1,z1]=pts[(i+1)%6]; g.add(잇기(x0,k*len/n,z0, x1,(k+1)*len/n,z1, .011)); }
+    for (let i=0;i<6;i++){ const [x0,z0]=발[i], [x1,z1]=발[(i+1)%6]; g.add(잇기(x0,y,z0, x1,y,z1, .015)); } }
+  for (let k=0;k<n;k++){ const y0 = k*len/n, y1 = (k+1)*len/n;
+    for (let i=0;i<6;i+=2){ const [x0,z0]=발[i], [x1,z1]=발[(i+1)%6]; g.add(잇기(x0,y0,z0, x1,y1,z1, .013)); } }
   return g;
 }
 /* 레이허 구조물 — LED 뒤를 받치는 비계 틀 */
@@ -583,7 +586,7 @@ function rebuild(){
   /* 육각 기둥 트러스 — 무대 양옆 */
   if (S.hex && st){
     const hh = H + 4.2;
-    [-1,1].forEach(sd=>{ const c = hexTruss(hh, .5); c.position.set(sd*(W/2 + 1.1), 0, D/2 - 1.4); root.add(c);
+    [-1,1].forEach(sd=>{ const c = 육발기둥(hh, 1.2, .55); c.position.set(sd*(W/2 + 1.1), 0, D/2 - 1.4); root.add(c);
       const cap = box(.72,.12,.72,M.black); cap.position.set(sd*(W/2 + 1.1), hh + .06, D/2 - 1.4); root.add(cap);
       const base = box(.8,.1,.8,M.black); base.position.set(sd*(W/2 + 1.1), .05, D/2 - 1.4); root.add(base);
       if (night){ const l = new THREE.PointLight(accent, 12, 10, 2); l.position.set(sd*(W/2 + 1.1), hh*.6, D/2 - 1.4); lightsGroup.add(l); } });
@@ -595,13 +598,12 @@ function rebuild(){
     const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2;
     const 육 = k === 'hex' || k === 'hexroof';
     const 기둥세우기 = (x, z, h = th) => {
-      if (육){ const c = hexTruss(h, .5); c.position.set(x, 0, z); root.add(c); }
+      if (육){ const c = 육발기둥(h); c.position.set(x, 0, z); root.add(c); }
       else { const c = truss(h,'y'); c.position.set(x, h/2, z); root.add(c); }
       const base = box(.8,.08,.8,M.black); base.position.set(x, .04, z); root.add(base);
     };
-    const 가로대 = (len, y, z) => {   // 6발이면 가로대도 육각으로
-      if (육){ const t = hexTruss(len, .5); t.rotation.z = Math.PI/2; t.position.set(len/2, y, z); root.add(t); }
-      else { const t = truss(len,'x'); t.position.set(0, y, z); root.add(t); }
+    const 가로대 = (len, y, z) => {   // 가로대는 어느 쪽이든 사각 트러스다 (6발은 기둥 이야기)
+      const t = truss(len,'x'); t.position.set(0, y, z); root.add(t);
     };
     if (k === 'layher'){
       /* 트러스 없이 레이허(비계)만 세운 구조물 — 양쪽 타워에 조명 바를 단다 */
@@ -618,22 +620,23 @@ function rebuild(){
     [-1,1].forEach(s=> 기둥세우기(s*tw/2, zt));
     가로대(tw, th-.15, zt);
     if (k === 'hexroof'){
-      /* 루프 — 뒤쪽 기둥 한 쌍을 더 세우고 능선을 올려 지붕을 덮는다 */
-      const zb = -D/2 + .3, ridge = th + 1.5;
+      /* 루프 — 가운데 마룻대를 앞뒤로 걸고, 지붕이 좌 · 우로 갈라져 내려온다 (형님 현장 사진 1 · 2 · 9) */
+      const zb = -D/2 + .3, ridge = th + 1.6, 처마 = th - .15;
       [-1,1].forEach(s=> 기둥세우기(s*tw/2, zb));
-      가로대(tw, th-.15, zb);
-      가로대(tw, ridge, 0);
-      const n = Math.max(3, Math.round(tw/2.2));
-      for (let i=0;i<=n;i++){ const x = -tw/2 + i*tw/n;
-        root.add(잇기(x, th-.15, zt, x, ridge, 0, .028));
-        root.add(잇기(x, th-.15, zb, x, ridge, 0, .028));
+      가로대(tw, 처마, zb);
+      const 마룻 = truss(zt - zb, 'z'); 마룻.position.set(0, ridge, (zt + zb)/2); root.add(마룻);
+      /* 마룻대를 받치는 가운데 기둥 — 앞뒤 가로대 위에 선다 */
+      [zt, zb].forEach(z=>{ root.add(잇기(0, 처마, z, 0, ridge, z, .055)); });
+      /* 서까래 — 앞뒤로 나가며 좌 · 우 처마로 내려간다 */
+      const n = Math.max(3, Math.round((zt - zb)/1.5));
+      for (let i=0;i<=n;i++){ const z = zb + i*(zt - zb)/n;
+        root.add(잇기(-tw/2, 처마, z, 0, ridge, z, .028));
+        root.add(잇기( tw/2, 처마, z, 0, ridge, z, .028));
       }
+      /* 지붕면 두 장 (왼쪽 · 오른쪽) — 앞뒤는 트여 있다 */
       const 천 = new THREE.MeshStandardMaterial({ color:0x17171c, roughness:.95, side:THREE.DoubleSide });
-      root.add(면([-tw/2, ridge, 0], [tw/2, ridge, 0], [tw/2, th-.15, zt], [-tw/2, th-.15, zt], 천));
-      root.add(면([-tw/2, ridge, 0], [tw/2, ridge, 0], [tw/2, th-.15, zb], [-tw/2, th-.15, zb], 천));
-      [-1,1].forEach(s=>{   // 옆면 삼각 가림막
-        root.add(면([s*tw/2, ridge, 0], [s*tw/2, th-.15, zt], [s*tw/2, th-.15, zb], [s*tw/2, ridge, 0], 천));
-      });
+      root.add(면([0, ridge, zb], [0, ridge, zt], [-tw/2, 처마, zt], [-tw/2, 처마, zb], 천));
+      root.add(면([0, ridge, zb], [0, ridge, zt], [ tw/2, 처마, zt], [ tw/2, 처마, zb], 천));
     }
     }
     const n = S.moving, per = Math.ceil(n/2);
@@ -655,7 +658,24 @@ function rebuild(){
   /* 음향 */
   if (S.sound && st){
     const zs = D/2 + .3;
-    if (S.sound==='a1'){ [-1,1].forEach(s=>{ const p=cyl(.02,1.4,M.black,6); p.position.set(s*(W/2+.6),.7,zs); root.add(p); const sp=box(.4,.6,.35,M.black); sp.position.set(s*(W/2+.6),1.6,zs); root.add(sp); }); }
+    const 육발 = S.trussk === 'hex' || S.trussk === 'hexroof' || S.trussk === 'roof';
+    if (육발){
+      /* 6발 기둥은 스피커를 매달려고 발을 더 낸 것 — 라인어레이를 기둥 바깥쪽에 리깅한다 */
+      const tw = W + 1.2, th = H + 5.5, 통수 = { a1:3, a2:5, a3:9 }[S.sound] || 5;
+      [-1,1].forEach(sd=>{
+        const x = sd*(tw/2 + 1.05);
+        const 모터 = box(.34,.26,.34,M.black); 모터.position.set(x, th - .55, zs - .35); root.add(모터);
+        root.add(잇기(x, th - .7, zs - .35, x, th - 1.05, zs - .1, .015));           // 체인
+        const 프레임 = box(1.05,.12,.7,M.black); 프레임.position.set(x, th - 1.1, zs - .05); root.add(프레임);
+        for (let i=0;i<통수;i++){
+          const el = box(.98,.32,.64,M.black);
+          el.position.set(x, th - 1.4 - i*.36, zs - .02 + i*.035);
+          el.rotation.x = -.05*i; root.add(el);
+        }
+        if (S.sound !== 'a1'){ for (let i=0;i<2;i++){ const sub = box(1.1,.6,.9,M.black); sub.position.set(x, .3 + i*.62, zs); root.add(sub); } }
+      });
+    }
+    else if (S.sound==='a1'){ [-1,1].forEach(s=>{ const p=cyl(.02,1.4,M.black,6); p.position.set(s*(W/2+.6),.7,zs); root.add(p); const sp=box(.4,.6,.35,M.black); sp.position.set(s*(W/2+.6),1.6,zs); root.add(sp); }); }
     else if (S.sound==='a2'){ [-1,1].forEach(s=>{ const sub=box(.7,.6,.7,M.black); sub.position.set(s*(W/2+1),.3,zs); root.add(sub); for(let i=0;i<2;i++){ const sp=box(.5,.7,.5,M.black); sp.position.set(s*(W/2+1),.6+.35+i*.72,zs); root.add(sp);} }); }
     else { [-1,1].forEach(s=>{ const x=s*(W/2+1.6); for(let i=0;i<2;i++){ const sub=box(1.1,.6,.9,M.black); sub.position.set(x,.3+i*.62,zs); root.add(sub);} const top=(S.trussk? H+5.2 : bdH-.3);
       const hang = truss(top-1.5,'y'); hang.position.set(x, 1.5+(top-1.5)/2, zs-.2); root.add(hang);
