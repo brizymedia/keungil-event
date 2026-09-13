@@ -9,6 +9,7 @@
 stage3d/
   index.html            시안 만들기 페이지 (Three.js, jsdelivr CDN 에서 읽음)
   blender/stage_gen.py  같은 시안 JSON 을 블렌더 안에 세우고 고화질 렌더하는 스크립트
+  blender/stage_video.py  그 장면에 카메라·조명 움직임을 넣어 MP4 영상으로 (무대영상.ps1 이 런처)
   README.md             이 문서
 ```
 
@@ -41,9 +42,26 @@ stage3d/
 
 ```powershell
 winget install BlenderFoundation.Blender
-& "C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" -b -P stage3d\blender\stage_gen.py -- 시안.json 결과.png --blend 결과.blend --samples 64 --cam audience
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b -P stage3d\blender\stage_gen.py -- 시안.json 결과.png --blend 결과.blend --samples 64 --cam audience
 ```
 `--cam` audience · front · bird · side · stage. `--size 3840x2160` 로 4K. 한글은 맑은고딕(Windows)이 자동으로 잡힌다.
+
+### 1-2) 고화질 **영상** (블렌더 설치 후 · 2026-09-13 추가)
+
+카메라가 객석에서 들어오고(audience) → 크레인처럼 올라가고(crane) → 옆으로 돌고(side) → 하늘에서 내려다본다(bird).
+무빙라이트가 좌우로 돌고, LED 가 숨쉬듯 밝아졌다 어두워지고, 안개 속에 빛줄기가 보이고, 불꽃이 흔들린다.
+
+```powershell
+cd stage3dlender
+.\무대영상.ps1 시안.json                                   # 시안.mp4 · 1080p · 24fps · 12초 (RTX 3050 기준 약 25분)
+.\무대영상.ps1 시안.json -Seconds 20 -Shots audience,led,side,stage,bird
+.\무대영상.ps1 시안.json -Size 3840x2160 -Samples 32      # 4K (시간 4배)
+.\무대영상.ps1 시안.json -NoFog                           # 안개 없이 — 훨씬 빠르지만 빛줄기가 반투명 원뿔로 나온다
+```
+장면 이름: `audience` 객석 진입 · `crane` 크레인 상승 · `side` 옆 회전 · `bird` 조감 · `stage` 무대 위에서 객석 · `led` LED 클로즈업.
+직접 부를 때: `blender -b -P stage_video.py -- 시안.json 결과.mp4 --seconds 12 --fps 24 --size 1920x1080 --samples 24 --shots audience,crane,side,bird`.
+`--frames 100-200` 으로 일부만 다시 그릴 수 있고, `--keep` 을 주면 PNG 프레임 폴더가 남는다. 같은 이름의 `.blend` 도 저장되니 블렌더에서 열어 손으로 고쳐도 된다.
+ffmpeg 가 있으면 H.264(CRF 18)로 묶고, 없으면 블렌더 내장 인코더를 쓴다.
 
 ### 2) 블렌더 MCP (클로드가 블렌더를 직접 조작)
 
