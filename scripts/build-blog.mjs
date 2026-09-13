@@ -346,6 +346,7 @@ ${관련.length ? `<section class="more"><h2>같이 보면 좋은 글</h2><div c
     const 목록 = posts.filter((p) => p.region === r.slug);
     if (r.slug === 'common' && !목록.length) continue;
     const 경로 = `/blog/${r.slug}/`;
+    const 허브제목 = r.slug === 'common' ? '행사 준비 공통 정보' : `${r.이름} 행사 준비 정보`;   // common 은 이름에 이미 '행사 준비' 가 들어 있다
     const 소개 = r.slug === 'common'
       ? '지역과 상관없이 행사 준비에 두루 쓰이는 글입니다.'
       : `${esc(r.이름)}에서 행사를 준비하는 담당자를 위한 글입니다. ${esc(r.이동)}.${r.서비스페이지 ? ` 서비스 안내는 <a href="${r.서비스페이지}">${esc(r.이름)} 행사기획 페이지</a>에 있습니다.` : ''}`;
@@ -353,17 +354,17 @@ ${관련.length ? `<section class="more"><h2>같이 보면 좋은 글</h2><div c
       { '@type': 'BreadcrumbList', itemListElement: [
         { '@type': 'ListItem', position: 1, name: '홈', item: SITE + '/' },
         { '@type': 'ListItem', position: 2, name: '블로그', item: SITE + '/blog/' },
-        { '@type': 'ListItem', position: 3, name: `${r.이름} 행사 준비`, item: SITE + 경로 } ] },
-      { '@type': 'CollectionPage', '@id': SITE + 경로, name: `${r.이름} 행사 준비 정보`, inLanguage: 'ko',
+        { '@type': 'ListItem', position: 3, name: 허브제목, item: SITE + 경로 } ] },
+      { '@type': 'CollectionPage', '@id': SITE + 경로, name: 허브제목, inLanguage: 'ko',
         hasPart: 목록.map((p) => ({ '@type': 'BlogPosting', headline: p.title, url: SITE + 글주소(p.slug) })) } ] };
     const html = 머리({
-      제목: `${r.이름} 행사 준비 정보 — 장소·장비·안전·견적 | ${BRAND}`,
-      설명: `${r.이름}에서 행사를 준비할 때 확인할 것들. 천막·음향·무대 같은 장비, 날씨와 안전, 견적과 계약까지 현장 기준으로 정리한 글 모음입니다.`,
+      제목: `${허브제목} — 장소·장비·안전·견적 | ${BRAND}`,
+      설명: r.slug === 'common' ? '지역과 상관없이 행사 준비에 두루 필요한 내용. 장비 규격과 수량, 안전, 견적 항목을 현장 기준으로 정리한 글 모음입니다.' : `${r.이름}에서 행사를 준비할 때 확인할 것들. 천막·음향·무대 같은 장비, 날씨와 안전, 견적과 계약까지 현장 기준으로 정리한 글 모음입니다.`,
       경로, 이미지: 목록[0] ? 사진주소(목록[0].cover.path) : 대표이미지, 색인: 목록.length > 0, 더넣기: 제이슨(ld) }) + `
 <div class="crumb wide"><a href="/">홈</a> › <a href="/blog/">블로그</a> › ${esc(r.이름)}</div>
 <main class="wrap">
   <p class="eyebrow">${r.slug === 'common' ? 'GUIDE' : esc(`${r.도} ${r.시군}`)}</p>
-  <h1>${esc(r.이름)} 행사 준비 정보</h1>
+  <h1>${esc(허브제목)}</h1>
   <p class="lead" style="max-width:46rem">${소개}</p>
   ${칩(r.slug)}
   ${목록.length ? `<div class="cards">${목록.map(카드).join('\n')}</div>`
