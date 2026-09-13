@@ -28,7 +28,7 @@ from mathutils import Vector, Matrix
 
 STAGE = {'d1': (7, 5), 'd6': (10, 6.6), 'd7': (12, 8), 'd8': (15, 10)}
 LED   = {'c1': (4, 3), 'c2': (8, 3), 'c3': (12, 4), 'c4': (4, 3)}   # 200 · 300 · 400인치 실제 화면 크기
-TENT  = {'d3': (3, 3), 'd10': (3, 6), 'd11': (6, 6)}
+TENT  = {'d3': (3, 3), 'd10': (3, 6), 'd11': (5, 5)}   # 몽골텐트는 5x5m 사각
 TYPE_NAME = {'festival': '지역 축제', 'ceremony': '기념식 · 준공식', 'sports': '체육대회', 'conference': '컨퍼런스 · 세미나',
              'award': '시상식 · 이취임식', 'concert': '콘서트 · 공연', 'corporate': '기업 워크숍 · 송년회', 'expo': '박람회 · 전시', 'etc': '기타 행사'}
 
@@ -356,7 +356,7 @@ def build(spec, render_path=None, blend_path=None, samples=48, size=(1920, 1080)
         for side in (-1, 1):
             for i in range(perSide):
                 if placed >= nt: break
-                x = side * sideX; y = yStart + 1 + i * (tw_ + 0.6) + tw_ / 2; h = 2.6 if tk == 'd11' else 2.2
+                x = side * sideX; y = yStart + 1 + i * (tw_ + 0.6) + tw_ / 2; h = 2.2
                 if tk == 'd11':
                     cylinder('몽골텐트', 3, h, x, y, h / 2, WHITE(), verts=16); cone('몽골지붕', 3.4, 0, 1.8, x, y, h + 0.9, BLUE(), verts=16)
                 else:

@@ -130,7 +130,7 @@ button,select,input{font:inherit;color:inherit}
 
     <h2>객석 · 부스 · 기타</h2>
     <div class="row"><label>의자</label><input type="range" id="f-chairs" min="0" max="1000" step="10"><span class="v" id="v-chairs"></span></div>
-    <div class="row"><label>텐트 종류</label><select id="f-tentkind"><option value="d3">자바라 3×3m</option><option value="d10">자바라 3×6m</option><option value="d11">몽골텐트</option></select></div>
+    <div class="row"><label>텐트 종류</label><select id="f-tentkind"><option value="d3">자바라 3×3m</option><option value="d10">자바라 3×6m</option><option value="d11">몽골텐트 5×5m</option></select></div>
     <div class="row"><label>텐트 수</label><input type="range" id="f-tents" min="0" max="30" step="1"><span class="v" id="v-tents"></span></div>
     <div class="row"><label for="f-photo">포토존</label><span class="sw"><input type="checkbox" id="f-photo"><i></i></span></div>
     <div class="row"><label for="f-gen">발전차</label><span class="sw"><input type="checkbox" id="f-gen"><i></i></span></div>
@@ -224,7 +224,7 @@ const TYPES = {
 };
 const STAGE = { d1:[7,5], d6:[10,6.6], d7:[12,8], d8:[15,10] };           // 가로 × 깊이 (m)
 const LED   = { c1:[4,3,'LED 200인치'], c2:[8,3,'LED 300인치'], c3:[12,4,'LED 400인치'], c4:[4,3,'빔 스크린'] };
-const TENT  = { d3:[3,3,'자바라 3×3'], d10:[3,6,'자바라 3×6'], d11:[6,6,'몽골텐트'] };
+const TENT  = { d3:[3,3,'자바라 3×3'], d10:[3,6,'자바라 3×6'], d11:[5,5,'몽골텐트 5×5'] };
 /* 형님 현장 사진 기준 구조물 이름 (stage3d/README.md 에 사진 설명) */
 const 구조이름 = { line:'외줄 트러스', box:'사각 트러스', hex:'6발 트러스', hexroof:'6발 트러스 + 루프', roof:'6발 트러스 + 루프', layher:'레이허 구조물' };
 const 스피커칸 = 1.5;         // 6발에서 기둥과 기둥 사이(스피커가 걸리는 칸)의 반폭 — 사이 간격 3m
@@ -488,10 +488,19 @@ function chairs(n, z0, width, m1, m2){
 
 function tent(kind, x, z, rot=0){
   const [w,d,name] = TENT[kind]; const g = new THREE.Group();
-  const h = kind==='d11' ? 2.6 : 2.2;
+  const h = 2.2;
   if (kind==='d11'){
-    const wall = new THREE.Mesh(new THREE.CylinderGeometry(3,3,h,16,1,true), M.tentW); wall.position.y=h/2; wall.castShadow=true; g.add(wall);
-    const roof = new THREE.Mesh(new THREE.ConeGeometry(3.4,1.8,16), M.tentB); roof.position.y=h+.9; roof.castShadow=true; g.add(roof);
+    /* 몽골텐트 — 5×5m 사각 골조에 흰 천 원뿔(피라미드) 지붕. 처마 2.2m · 꼭대기 3.4m */
+    const 꼭대기 = 3.4;
+    const 발 = [[-1,-1],[1,-1],[1,1],[-1,1]];
+    발.forEach(([a,b])=>{ const l = cyl(.05, h, M.alu, 8); l.position.set(a*w/2, h/2, b*d/2); l.castShadow = true; g.add(l); });
+    for (let i=0;i<4;i++){                                   // 처마 보
+      const [a0,b0] = 발[i], [a1,b1] = 발[(i+1)%4];
+      g.add(잇기(a0*w/2, h, b0*d/2, a1*w/2, h, b1*d/2, .035));
+    }
+    발.forEach(([a,b])=> g.add(잇기(a*w/2, h, b*d/2, 0, 꼭대기, 0, .03)));   // 지붕 서까래
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.hypot(w,d)/2*1.04, 꼭대기 - h, 4), M.tentW);
+    roof.rotation.y = Math.PI/4; roof.position.y = h + (꼭대기 - h)/2; roof.castShadow = true; g.add(roof);
   } else {
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{ const l=cyl(.03,h,M.alu,6); l.position.set(a*w/2*.95,h/2,b*d/2*.95); g.add(l); });
     const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.hypot(w,d)/2*1.05, .9, 4), M.tentB); roof.rotation.y=Math.PI/4; roof.position.y=h+.45; roof.scale.set(w/Math.max(w,d),1,d/Math.max(w,d)); roof.castShadow=true; g.add(roof);
@@ -599,12 +608,12 @@ function rebuild(){
     const th = H + 5.5, zt = D/2 - .6, tw = W + 1.2;
     const 육 = k === 'hex' || k === 'hexroof';
     const 기둥세우기 = (x, z, h = th) => {
-      if (육){ const c = 육발기둥(h, .85, .7); c.position.set(x, 0, z); root.add(c); }
-      else { const c = truss(h,'y'); c.position.set(x, h/2, z); root.add(c); }
+      if (육){ const c = 육발기둥(h, 1.5, .6); c.position.set(x, 0, z); root.add(c); }   // 600각 + 양옆 한 발
+      else { const c = truss(h,'y',.6); c.position.set(x, h/2, z); root.add(c); }
       const base = box(.8,.08,.8,M.black); base.position.set(x, .04, z); root.add(base);
     };
-    const 가로대 = (len, y, z) => {   // 가로대는 어느 쪽이든 사각 트러스다 (6발은 기둥 이야기)
-      const t = truss(len,'x'); t.position.set(0, y, z); root.add(t);
+    const 가로대 = (len, y, z) => {   // 보도 기둥과 같은 600각 트러스
+      const t = truss(len,'x',.6); t.position.set(0, y, z); root.add(t);
     };
     if (k === 'layher'){
       /* 트러스 없이 레이허(비계)만 세운 구조물 — 양쪽 타워에 조명 바를 단다 */
@@ -624,7 +633,7 @@ function rebuild(){
       /* 6발은 스피커를 매달려고 바깥에 발을 하나씩 더 세운 것 — 스피커가 두 기둥 사이에 걸린다 */
       [-1,1].forEach(sd=>{
         기둥세우기(sd*(tw/2 + 스피커칸*2), zt);
-        const 보 = truss(스피커칸*2, 'x'); 보.position.set(sd*(tw/2 + 스피커칸), th-.15, zt); root.add(보);
+        const 보 = truss(스피커칸*2, 'x', .6); 보.position.set(sd*(tw/2 + 스피커칸), th-.15, zt); root.add(보);
         root.add(잇기(sd*tw/2, th-2.6, zt, sd*(tw/2 + 스피커칸*2), th-.9, zt, .022));   // 버팀대
       });
     }
@@ -633,9 +642,9 @@ function rebuild(){
       const zb = -D/2 + .3, ridge = th + 1.6, 처마 = th - .15;
       [-1,1].forEach(s=> 기둥세우기(s*tw/2, zb));
       가로대(tw, 처마, zb);
-      const 마룻 = truss(zt - zb, 'z'); 마룻.position.set(0, ridge, (zt + zb)/2); root.add(마룻);
+      const 마룻 = truss(zt - zb, 'z', .6); 마룻.position.set(0, ridge, (zt + zb)/2); root.add(마룻);
       /* 양옆 처마 보 — 앞뒤 기둥을 잇고 지붕을 받친다 */
-      [-1,1].forEach(sd=>{ const 처마보 = truss(zt - zb, 'z'); 처마보.position.set(sd*tw/2, 처마, (zt + zb)/2); root.add(처마보); });
+      [-1,1].forEach(sd=>{ const 처마보 = truss(zt - zb, 'z', .6); 처마보.position.set(sd*tw/2, 처마, (zt + zb)/2); root.add(처마보); });
       /* 마룻대를 받치는 가운데 기둥 — 앞뒤 가로대 위에 선다 */
       [zt, zb].forEach(z=>{ root.add(잇기(0, 처마, z, 0, ridge, z, .055)); });
       /* 서까래 — 앞뒤로 나가며 좌 · 우 처마로 내려간다 */
