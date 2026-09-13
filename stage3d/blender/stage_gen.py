@@ -27,7 +27,7 @@ import bpy, json, math, sys, os
 from mathutils import Vector, Matrix
 
 STAGE = {'d1': (7, 5), 'd6': (10, 6.6), 'd7': (12, 8), 'd8': (15, 10)}
-LED   = {'c1': (4.43, 2.49), 'c2': (6.64, 3.74), 'c3': (8.86, 4.98), 'c4': (4, 3)}
+LED   = {'c1': (4, 3), 'c2': (8, 3), 'c3': (12, 4), 'c4': (4, 3)}   # 200 · 300 · 400인치 실제 화면 크기
 TENT  = {'d3': (3, 3), 'd10': (3, 6), 'd11': (6, 6)}
 TYPE_NAME = {'festival': '지역 축제', 'ceremony': '기념식 · 준공식', 'sports': '체육대회', 'conference': '컨퍼런스 · 세미나',
              'award': '시상식 · 이취임식', 'concert': '콘서트 · 공연', 'corporate': '기업 워크숍 · 송년회', 'expo': '박람회 · 전시', 'etc': '기타 행사'}
@@ -134,9 +134,9 @@ def box(name, w, d, h, x, y, z, m, rz=0.0):
 def cylinder(name, r, h, x, y, z, m, rot=(0, 0, 0), verts=12, parent=None):
     return _obj(name, _mesh('cyl%d' % verts, lambda: _g_cone(1, 1, verts), m, smooth=verts >= 8), (x, y, z), rot, (r, r, h), parent)
 
-def cone(name, r1, r2, h, x, y, z, m, rot=(0, 0, 0), verts=16):
+def cone(name, r1, r2, h, x, y, z, m, rot=(0, 0, 0), verts=16, parent=None):
     key = 'cone%d_%.3f_%.3f' % (verts, r1, r2)
-    return _obj(name, _mesh(key, lambda: _g_cone(r1, r2, verts), m, smooth=verts >= 8), (x, y, z), rot, (1, 1, h))
+    return _obj(name, _mesh(key, lambda: _g_cone(r1, r2, verts), m, smooth=verts >= 8), (x, y, z), rot, (1, 1, h), parent)
 
 def sphere(name, r, x, y, z, m):
     return _obj(name, _mesh('sphere', _g_sphere, m, smooth=True), (x, y, z), (0, 0, 0), (r, r, r))
@@ -200,11 +200,11 @@ def _look_at(src, dst):
     direction = Vector(dst) - Vector(src)
     return direction.to_track_quat('-Z', 'Y').to_euler()
 
-def light(name, kind, x, y, z, rgb, energy, target=None, spot=0.6, blend=0.5):
+def light(name, kind, x, y, z, rgb, energy, target=None, spot=0.6, blend=0.5, parent=None):
     d = bpy.data.lights.new(name, kind); d.color = rgb; d.energy = energy
     if kind == 'SPOT': d.spot_size = spot; d.spot_blend = blend; d.shadow_soft_size = 0.2
     if kind == 'AREA': d.size = 4.0
-    o = _obj(name, d, (x, y, z))
+    o = _obj(name, d, (x, y, z), parent=parent)
     if target: o.rotation_euler = _look_at((x, y, z), target)   # 빛은 -Z 로 나간다
     return o
 
@@ -251,7 +251,7 @@ def build(spec, render_path=None, blend_path=None, samples=48, size=(1920, 1080)
             box('연단', 0.7, 0.5, 1.1, W * 0.3, -D * 0.3, H + 0.55, DARK()); box('연단상판', 0.75, 0.55, 0.05, W * 0.3, -D * 0.3, H + 1.1, ALU())
 
     # 백드롭 트러스 · 현수막 · LED
-    bdW = W + 2; bdH = max(4.5, (led[1] if led else 0) + 2.2 + H)
+    bdW = W + 2; bdH = max(4.5, (led[1] + 2.9 if led else 2.2) + H)   # LED 가 있으면 현수막이 LED 위로 올라가게
     yb = -D / 2 + 0.3
     if spec.get('backdrop'):
         for s in (-1, 1):
@@ -288,10 +288,13 @@ def build(spec, render_path=None, blend_path=None, samples=48, size=(1920, 1080)
             if night:
                 ang = math.sin(i * 1.3) * 0.45
                 tgt = (x + math.sin(ang) * 4.5, 0 if top else D / 3, H)
-                light('무빙빛', 'SPOT', x, y, z - 0.5, accent, 1500, target=tgt, spot=0.35, blend=0.3)
-                L = 9.0; src = Vector((x, y, z - 0.5)); d = (Vector(tgt) - src).normalized()
-                c = cone('빔', 0.05, 0.9, L, *(src + d * (L / 2)), beam_m)   # 좁은 쪽(-Z)이 등기구, 넓은 쪽(+Z)이 무대
-                c.rotation_euler = _look_at(tuple(src), tgt); c.rotation_euler.rotate_axis('X', math.pi)
+                # 빛과 빔을 등기구 자리의 빈 객체(무빙기구)에 묶는다 — 영상(stage_video.py)에서 이 빈 객체만 돌리면 둘이 같이 돈다
+                src = Vector((x, y, z - 0.5)); rel = Vector(tgt) - src; d = rel.normalized()
+                g = _obj('무빙기구', None, tuple(src))
+                light('무빙빛', 'SPOT', 0, 0, 0, accent, 1500, target=tuple(rel), spot=0.35, blend=0.3, parent=g)
+                L = 9.0
+                c = cone('빔', 0.05, 0.9, L, *(d * (L / 2)), beam_m, parent=g)   # 좁은 쪽(-Z)이 등기구, 넓은 쪽(+Z)이 무대
+                c.rotation_euler = _look_at((0, 0, 0), tuple(rel)); c.rotation_euler.rotate_axis('X', math.pi)
         if night:
             for s in (-1, 1):
                 light('면조명', 'SPOT', s * tw / 3, yt, th - 0.5, (1, 0.95, 0.85), 2500, target=(s * W / 5, 0, H), spot=0.6)
