@@ -155,7 +155,7 @@
        가운데 선 다섯 사람만 남기고, 위에서 조명이 떨어지는 것처럼 얹는다. */
     .crew{
       position:relative; margin:0 auto 3.5rem; max-width:72rem;
-      border-radius:1.5rem; overflow:hidden; isolation:isolate;
+      border-radius:4px; overflow:hidden; isolation:isolate;
       border:1px solid var(--line); background:#0B0A10;
       box-shadow:0 30px 80px -40px rgba(0,0,0,.9);
     }
@@ -185,7 +185,7 @@
       text-shadow:0 1px 12px rgba(0,0,0,.8);
     }
     @media (max-width:640px){
-      .crew{ border-radius:1.1rem; }
+      .crew{ border-radius:4px; }
       .crew figcaption{ padding:2rem 1.1rem 1.35rem; }
       .crew-sub{ font-size:.85rem; }
     }
@@ -208,7 +208,7 @@
     .bento-card{
       background:var(--card);
       border:1px solid var(--card-line);
-      border-radius:1.25rem;
+      border-radius:4px;
       box-shadow:var(--shadow);
       transition:all .4s cubic-bezier(.16,1,.3,1);
       overflow:hidden;
@@ -401,7 +401,7 @@
     .gear-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:1rem; }
     @media (max-width:900px){ .gear-grid{ grid-template-columns:repeat(2,1fr); } }
     @media (max-width:560px){ .gear-grid{ grid-template-columns:1fr; } }
-    .gear{ background:var(--card);border:1px solid var(--card-line);border-radius:1.1rem;overflow:hidden;
+    .gear{ background:var(--card);border:1px solid var(--card-line);border-radius:4px;overflow:hidden;
            box-shadow:var(--shadow);transition:all .4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column; }
     .gear:hover{ border-color:rgba(245,158,11,.35);transform:translateY(-3px); }
     .gear .ph{ aspect-ratio:16/12;overflow:hidden;background:#16141C;position:relative; }
@@ -784,7 +784,7 @@
     <div style="display:flex;flex-direction:column;gap:5rem;">
 
       <div class="reveal portfolio-case" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
-        <a class="portfolio-img" href="gallery.html#festival" aria-label="녹동바다불꽃축제 — 지역축제 · 공연행사 갤러리로 이동" style="border-radius:1.25rem;overflow:hidden;aspect-ratio:4/3;position:relative;box-shadow:var(--shadow);background:#16141C;">
+        <a class="portfolio-img" href="gallery.html#festival" aria-label="녹동바다불꽃축제 — 지역축제 · 공연행사 갤러리로 이동" style="border-radius:4px;overflow:hidden;aspect-ratio:4/3;position:relative;box-shadow:var(--shadow);background:#16141C;">
           <img src="festival-nokdong.jpg" alt="녹동바다불꽃축제 현장" class="photo-lift-strong" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;" loading="lazy" decoding="async">
           <span style="position:absolute;bottom:1rem;left:1rem;font-size:.72rem;color:#fff;padding:.35rem .9rem;border-radius:9999px;background:rgba(11,10,16,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);">지역축제 &amp; 공연행사</span>
           <span class="portfolio-go">갤러리 보기 <iconify-icon icon="solar:arrow-right-linear" style="font-size:14px;"></iconify-icon></span>
@@ -811,7 +811,7 @@
             <div><div style="font-size:1.5rem;font-weight:800;letter-spacing:-.02em;">47개</div><div class="t3" style="font-size:.72rem;margin-top:.2rem;">관련 보도</div></div>
           </div>
         </div>
-        <a class="portfolio-img" href="gallery.html#conference" aria-label="국립 소록도병원 110주년 기념행사 — 컨퍼런스 · 포럼 · 기념식 갤러리로 이동" style="--zoom:1.28;border-radius:1.25rem;overflow:hidden;aspect-ratio:4/3;position:relative;box-shadow:var(--shadow);background:#16141C;">
+        <a class="portfolio-img" href="gallery.html#conference" aria-label="국립 소록도병원 110주년 기념행사 — 컨퍼런스 · 포럼 · 기념식 갤러리로 이동" style="--zoom:1.28;border-radius:4px;overflow:hidden;aspect-ratio:4/3;position:relative;box-shadow:var(--shadow);background:#16141C;">
           <img src="sorokdo.jpg" alt="국립 소록도병원 110주년 기념행사" class="photo-lift-strong" style="width:100%;height:100%;object-fit:cover;object-position:center 58%;" loading="lazy" decoding="async">
           <span style="position:absolute;bottom:1rem;left:1rem;font-size:.72rem;color:#fff;padding:.35rem .9rem;border-radius:9999px;background:rgba(11,10,16,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);">정부기관 행사</span>
           <span class="portfolio-go">갤러리 보기 <iconify-icon icon="solar:arrow-right-linear" style="font-size:14px;"></iconify-icon></span>
@@ -955,7 +955,7 @@
 <!-- 라이트박스 -->
 <div id="lightbox" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)closeLb()">
   <button onclick="moveLb(-1)" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:none;color:#fff;width:2.75rem;height:2.75rem;border-radius:50%;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
-  <img id="lb-img" src="" alt="" style="max-width:90vw;max-height:88vh;object-fit:contain;border-radius:.75rem;">
+  <img id="lb-img" src="" alt="" style="max-width:90vw;max-height:88vh;object-fit:contain;border-radius:4px;">
   <button onclick="moveLb(1)" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:none;color:#fff;width:2.75rem;height:2.75rem;border-radius:50%;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
   <button onclick="closeLb()" style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:2.2rem;height:2.2rem;border-radius:50%;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
   <div id="lb-count" style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.8rem;color:#B9B3C2;"></div>
@@ -1053,7 +1053,7 @@
       </div>
 
       <div class="reveal" style="position:relative;transition-delay:.15s;">
-        <div style="border-radius:1.25rem;overflow:hidden;aspect-ratio:1;box-shadow:var(--shadow);background:#16141C;">
+        <div style="border-radius:4px;overflow:hidden;aspect-ratio:1;box-shadow:var(--shadow);background:#16141C;">
           <img src="equipment.jpg" alt="큰길이벤트기획 현장 콘솔" class="photo-lift" style="width:100%;height:100%;object-fit:cover;object-position:62% 60%;transform:scale(1.15);" loading="lazy" decoding="async">
         </div>
         <div class="glass animate-float badge-float-hide" style="animation-delay:1s;position:absolute;bottom:-1.5rem;left:-1.5rem;border-radius:1rem;padding:1.1rem 1.4rem;display:flex;align-items:center;gap:.75rem;">
@@ -1393,7 +1393,7 @@
     grid.innerHTML = '';
     photos.forEach((p, i) => {
       const wrap = document.createElement('div');
-      wrap.style.cssText = 'position:relative;aspect-ratio:4/3;border-radius:.9rem;overflow:hidden;cursor:pointer;background:#16141C;box-shadow:0 1px 2px rgba(22,20,28,.05),0 14px 34px -18px rgba(22,20,28,.25);';
+      wrap.style.cssText = 'position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;cursor:pointer;background:#16141C;box-shadow:0 1px 2px rgba(22,20,28,.05),0 14px 34px -18px rgba(22,20,28,.25);';
       const img = document.createElement('img');
       img.src = imgUrl(p); img.loading = 'lazy';
       img.alt = [p.event||'행사 현장', '큰길이벤트기획 현장 사진'].filter(Boolean).join(' — ');
