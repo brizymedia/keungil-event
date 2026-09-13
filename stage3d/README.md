@@ -63,18 +63,22 @@ cd stage3dlender
 `--frames 100-200` 으로 일부만 다시 그릴 수 있고, `--keep` 을 주면 PNG 프레임 폴더가 남는다. 같은 이름의 `.blend` 도 저장되니 블렌더에서 열어 손으로 고쳐도 된다.
 ffmpeg 가 있으면 H.264(CRF 18)로 묶고, 없으면 블렌더 내장 인코더를 쓴다.
 
-### 2) 블렌더 MCP (클로드가 블렌더를 직접 조작)
+### 2) 블렌더 MCP (클로드가 블렌더를 직접 조작) — 2026-09-14 이 PC 에 설치 완료
 
-[ahujasid/blender-mcp](https://github.com/ahujasid/blender-mcp) 설치 순서:
-1. 블렌더 설치(위) + `pip install uv` 또는 `winget install astral-sh.uv`
-2. 블렌더 → 편집 → 환경설정 → 애드온 → `addon.py` 설치 → 사이드바(N) BlenderMCP → **Connect to Claude**
-3. Claude 설정에 MCP 서버 추가:
-   ```json
-   { "mcpServers": { "blender": { "command": "uvx", "args": ["blender-mcp"] } } }
-   ```
-4. 대화에서: 「stage3d/blender/stage_gen.py 를 블렌더에서 exec 하고 이 시안으로 build 해 줘」
-   → 클로드가 `execute_blender_code` 로 `exec(open(...).read()); build(spec, render_path=...)` 를 넣는다.
-   그 다음 「LED 를 더 크게」「트러스에 조명 4대 추가」처럼 말로 고친다. Poly Haven 재질·Hyper3D 모델 생성도 이 MCP 가 지원.
+[ahujasid/blender-mcp](https://github.com/ahujasid/blender-mcp). 설치된 것:
+- `uv`(winget astral-sh.uv) → `uvx blender-mcp` 가 MCP 서버.
+- 블렌더 애드온 `%APPDATA%\Blender Foundation\Blender.2\scriptsddonslender_mcp.py` (활성화·저장됨). **블렌더를 켜기만 하면 9876 포트 서버가 자동으로 뜬다** (사이드바 N → MCP for Blender 탭에서 끄고 켤 수 있음).
+- Claude Code 사용자 설정(`~/.claude.json` 의 `mcpServers.blender`) 에 `uvx blender-mcp` 등록. **Claude 데스크톱 앱을 한 번 껐다 켜야** 새 세션에서 `blender` 도구가 보인다.
+
+쓰는 법: 블렌더를 열어 둔 채로 클로드에게 말한다.
+- 「stage3d/blender/stage_gen.py 를 블렌더에서 exec 하고 이 시안(JSON)으로 build 해 줘」 → `execute_blender_code` 로 `exec(open(...).read()); build(spec, clear=False)`.
+- 「LED 를 더 크게」「트러스에 조명 4대 추가」「카메라를 객석 뒤로」 — 말로 고치고 `get_viewport_screenshot` 으로 확인.
+- 재질·HDRI 는 Poly Haven, 모델은 Sketchfab·Poly Pizza·Hyper3D(Rodin)·Hunyuan3D 도구가 붙어 있다 (각각 애드온 패널에서 켜야 함).
+
+힉스필드(Higgsfield)와 오가기 — 이미 연결된 `scene_builder_3d_*` · `generate_3d` 도구와 짝을 이룬다:
+- 힉스필드 → 블렌더: `scene_builder_3d_get_glb`/`get_blend` 로 받은 파일을 `execute_blender_code` 의 `bpy.ops.import_scene.gltf(filepath=...)` 로 불러온다. 2026-09-14 「큰길이벤트 3D 무대 시안 테스트」 GLB(0.9MB)를 이 PC 블렌더에 불러와 확인함.
+- 블렌더 → 힉스필드: 블렌더에서 GLB 로 내보내(`bpy.ops.export_scene.gltf`) `scene_builder_3d_import_asset` 으로 올리거나, 렌더 PNG 를 `generate_video`(이미지→영상) 의 참조로 쓴다.
+- 사진→3D 모델: 힉스필드 `generate_3d`(image_to_3d) 로 만든 GLB 를 같은 방법으로 블렌더에 얹는다 (크레딧 소모 — 먼저 `get_cost:true`).
 
 ### 3) 클라우드 블렌더 (설치 없이, Higgsfield 3D Jutsu MCP)
 
