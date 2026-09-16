@@ -348,13 +348,13 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/gwangju/</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -366,19 +366,19 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/yeosu/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/gwangyang/</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/jinju/</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -411,6 +411,52 @@
     <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%96%91-%EC%B2%B4%EC%9C%A1%EB%8C%80%ED%9A%8C-%EB%8C%80%ED%96%89-%EB%B3%B8%EC%82%AC%EA%B0%80-%EA%B0%80%EA%B9%8C%EC%9B%8C-%EB%8A%A6%EC%9D%80-%ED%99%95%EC%A0%95%EB%8F%84-%EB%8C%80%EC%9D%91/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/017.jpg</image:loc><image:title>체육관에서 팀별로 나뉜 참가자와 진행요원이 대기하는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/016.jpg</image:loc><image:title>체육관 무대에 LED 화면과 조명, 원탁을 배치한 실내 행사장</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/018.jpg</image:loc><image:title>빨간 콘셉트 복장의 진행요원이 팀 게임을 이끄는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/013.jpg</image:loc><image:title>운동장 무대에 걸린 현수막과 스피커, 앞쪽 내빈석 테이블과 만국기</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%A3%BC-%EB%93%9C%EB%A1%A0%EC%87%BC-%EC%B6%95%EC%A0%9C%EC%99%80-%EB%B8%8C%EB%9E%9C%EB%93%9C-%ED%96%89%EC%82%AC-%EB%A7%88%EB%AC%B4%EB%A6%AC%EB%A5%BC-%EB%B9%9B%EB%83%85%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/006.jpg</image:loc><image:title>밤 무대의 대형 LED 전광판 화면과 그 앞에서 진행되는 공연</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/001.jpg</image:loc><image:title>야외 무대 트러스와 LED 전광판, 그 앞에 놓인 객석 의자 배치</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/conference/004.jpg</image:loc><image:title>음향·영상 조작석에 놓인 디지털 믹서와 노트북, 뒤쪽으로 보이는 LED 화면</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%A3%BC-%EB%A0%88%ED%81%AC%EB%A6%AC%EC%97%90%EC%9D%B4%EC%85%98-%EC%9B%8C%ED%81%AC%EC%88%8D-%EC%86%A1%EB%85%84%ED%9A%8C-%EC%82%AC%ED%9A%8C%EC%9E%90-%EC%84%AD%EC%99%B8/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/006.jpg</image:loc><image:title>실내체육관에서 MC가 팀별로 앉은 참가자 앞을 오가며 진행하는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/020.jpg</image:loc><image:title>체육관에서 콘셉트 복장을 입은 진행요원과 줄 선 참가자들</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/018.jpg</image:loc><image:title>체육관 무대에 LED 화면과 원탁 배치, 바닥 무빙라이트를 세팅한 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EC%97%AC%EC%88%98-%EC%97%90%EC%96%B4%EB%B0%94%EC%9A%B4%EC%8A%A4-%EB%8C%80%EC%97%AC-%EB%B0%94%EB%8B%B7%EA%B0%80-%ED%96%89%EC%82%AC%EC%9E%A5-%EB%B0%94%EB%9E%8C-%EC%97%BC%EB%B6%84-%EC%A0%84%EC%9B%90-%ED%99%95%EC%9D%B8/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/021.jpg</image:loc><image:title>카펫 바닥 대형 홀에서 공기주입식 에어 축구골대로 팀 대결을 하는 단체복 참가자들</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/026.jpg</image:loc><image:title>대형 홀에 세운 에어 골대와 한쪽에 세팅한 음향 장비</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/025.jpg</image:loc><image:title>물놀이 풀에서 멀리서 노는 아이들과 대형 에어 워터슬라이드</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EC%A7%84%EC%A3%BC-%EC%B2%B4%EC%9C%A1%EB%8C%80%ED%9A%8C-%EB%8C%80%ED%96%89-%ED%86%B5%EC%A7%B8%EB%A1%9C-%EB%A7%A1%EA%B8%B8%EC%A7%80-%EC%9E%A5%EB%B9%84%EB%A7%8C-%EB%B9%8C%EB%A6%B4%EC%A7%80/</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/027.jpg</image:loc><image:title>대형 홀 바닥에 단체복을 입은 참가자들이 줄지어 앉아 대기하는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/034.jpg</image:loc><image:title>디지털 음향 믹서와 노트북을 클로즈업한 모습, 뒤로 무대가 보임</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/030.jpg</image:loc><image:title>에어 골대 가까이에서 공을 차는 참가자의 모습</image:title><image:caption></image:caption></image:image>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%A3%BC-%EC%9D%98%EC%9E%90-%EB%8C%80%EC%97%AC-%EC%BB%A8%ED%8D%BC%EB%9F%B0%EC%8A%A4-%EC%A2%8C%EC%84%9D%EC%9D%80-%ED%86%B5%EB%A1%9C-%ED%8F%AD%EB%B6%80%ED%84%B0/</loc>
