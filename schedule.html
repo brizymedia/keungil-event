@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B0A10">
+<title>행사 일정 대장 — 큰길이벤트기획</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<style>
+  :root{ --amber:#F59E0B; --amber-2:#FBBF24; --amber-ink:#B45309; --dark:#0B0A10; --ink:#16141C;
+         --ok:#22C55E; --info:#60A5FA; --bad:#F87171; --mute:#8A8494; --line:rgba(255,255,255,.09); }
+  *{ box-sizing:border-box;font-family:'Pretendard',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all; }
+  html,body{ margin:0;background:var(--dark);color:#fff;-webkit-font-smoothing:antialiased; }
+  a{ color:inherit; }
+  button{ font-family:inherit;cursor:pointer; }
+  [hidden]{ display:none !important; }
+
+  /* ── 상단 바 ── */
+  .topbar{ position:sticky;top:0;z-index:40;background:rgba(11,10,16,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line); }
+  .topbar-in{ max-width:88rem;margin:0 auto;padding:.65rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap; }
+  .brand{ display:flex;align-items:center;gap:.55rem;text-decoration:none;font-weight:800;letter-spacing:-.02em;font-size:.95rem; }
+  .brand img{ height:1.7rem;filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(245,158,11,.5)); }
+  .brand small{ font-weight:600;color:var(--mute);font-size:.78rem;margin-left:.2rem; }
+  .pill{ display:inline-flex;align-items:center;gap:.4rem;padding:.32rem .75rem;border-radius:9999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.14);color:#CFC9D6;background:none; }
+  .pill .dot{ width:.5rem;height:.5rem;border-radius:50%;background:var(--mute); }
+  .pill.on .dot{ background:var(--ok);box-shadow:0 0 8px rgba(34,197,94,.7); }
+  .pill.off .dot{ background:var(--bad); }
+  .tools{ display:flex;align-items:center;gap:.45rem;flex-wrap:wrap; }
+
+  /* ── 버튼 ── */
+  .btn{ display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.05rem;border-radius:9999px;font-weight:700;font-size:.85rem;text-decoration:none;white-space:nowrap;transition:all .25s cubic-bezier(.16,1,.3,1);border:1px solid transparent;line-height:1; }
+  .btn-primary{ background:var(--amber);color:#0a0a0a;box-shadow:0 6px 24px -8px rgba(245,158,11,.5); }
+  .btn-primary:hover{ background:var(--amber-2);transform:translateY(-1px); }
+  .btn-ghost{ background:transparent;color:#fff;border-color:rgba(255,255,255,.2); }
+  .btn-ghost:hover{ border-color:var(--amber);background:rgba(245,158,11,.06); }
+  .btn-danger{ background:transparent;color:var(--bad);border-color:rgba(248,113,113,.4); }
+  .btn-danger:hover{ background:rgba(248,113,113,.1); }
+  .btn-sm{ padding:.45rem .8rem;font-size:.78rem; }
+  .btn:disabled{ opacity:.5;cursor:not-allowed;transform:none; }
+
+  /* ── 레이아웃 ── */
+  .wrap{ max-width:88rem;margin:0 auto;padding:1.1rem 1.1rem 6rem;display:grid;grid-template-columns:340px minmax(0,1fr);gap:1.2rem;align-items:start; }
+  @media (max-width:900px){
+    .wrap{ grid-template-columns:1fr; }
+    body.has-sel #side{ display:none; }
+    body:not(.has-sel) #main{ display:none; }
+  }
+  .card{ background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:1.1rem;padding:1rem; }
+
+  /* ── 요약 ── */
+  .stats{ display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.8rem; }
+  .stat{ background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:.8rem;padding:.6rem .7rem; }
+  .stat b{ display:block;font-size:1.25rem;font-weight:800;letter-spacing:-.02em; }
+  .stat span{ font-size:.7rem;color:var(--mute);font-weight:600; }
+  .stat.ok b{ color:#86EFAC; } .stat.amber b{ color:#FCD34D; }
+
+  /* ── 목록 ── */
+  #side{ position:sticky;top:4.3rem;max-height:calc(100dvh - 5rem);overflow:auto;scrollbar-width:thin; }
+  @media (max-width:900px){ #side{ position:static;max-height:none; } }
+  .filters{ display:flex;gap:.35rem;flex-wrap:wrap;margin:.2rem 0 .7rem; }
+  .chip{ padding:.32rem .7rem;border-radius:9999px;font-size:.74rem;font-weight:700;border:1px solid rgba(255,255,255,.14);background:none;color:#CFC9D6; }
+  .chip[aria-pressed="true"]{ background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.6);color:#FCD34D; }
+  .search{ width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;padding:.55rem .75rem;color:#fff;font-size:.86rem;outline:none;margin-bottom:.6rem; }
+  .search:focus{ border-color:rgba(245,158,11,.6); }
+  .month{ font-size:.7rem;font-weight:800;color:var(--mute);letter-spacing:.06em;margin:.8rem 0 .35rem;padding-left:.2rem; }
+  .ev{ display:grid;grid-template-columns:3.1rem 1fr;gap:.6rem;align-items:center;width:100%;text-align:left;padding:.6rem .65rem;border-radius:.8rem;border:1px solid transparent;background:rgba(255,255,255,.025);margin-bottom:.35rem;color:#fff;transition:border-color .2s,background .2s; }
+  .ev:hover{ background:rgba(255,255,255,.06); }
+  .ev[aria-current="true"]{ border-color:rgba(245,158,11,.55);background:rgba(245,158,11,.09); }
+  .ev .d{ text-align:center;border-right:1px solid var(--line);padding-right:.5rem; }
+  .ev .d b{ display:block;font-size:1.15rem;font-weight:800;line-height:1.1; }
+  .ev .d span{ font-size:.66rem;color:var(--mute);font-weight:700; }
+  .ev .t{ min-width:0; }
+  .ev .t b{ display:block;font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .ev .t small{ display:flex;gap:.4rem;align-items:center;font-size:.72rem;color:var(--mute);margin-top:.2rem;white-space:nowrap;overflow:hidden; }
+  .ev.past{ opacity:.55; }
+  .empty{ color:var(--mute);font-size:.84rem;padding:1rem .3rem;line-height:1.6; }
+
+  /* ── 상태 배지 ── */
+  .badge{ display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:9999px;font-size:.68rem;font-weight:800;letter-spacing:.02em;border:1px solid transparent;flex-shrink:0; }
+  .badge.s-문의{ color:#CFC9D6;border-color:rgba(255,255,255,.2); }
+  .badge.s-견적{ color:#FCD34D;background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4); }
+  .badge.s-확정{ color:#86EFAC;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.45); }
+  .badge.s-완료{ color:#93C5FD;background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.4); }
+  .badge.s-취소{ color:#FCA5A5;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.4);text-decoration:line-through; }
+  .badge.local{ color:#FCD34D;border-color:rgba(245,158,11,.4); }
+  .dday{ font-size:.72rem;font-weight:800;color:#FCD34D; }
+  .dday.today{ color:#86EFAC; }
+
+  /* ── 상세 ── */
+  .head{ display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem; }
+  .head h1{ margin:.2rem 0 .3rem;font-size:1.45rem;font-weight:800;letter-spacing:-.02em;line-height:1.25; }
+  .head .meta{ color:#CFC9D6;font-size:.9rem;line-height:1.6; }
+  .head .meta b{ color:#fff; }
+  .actions{ display:flex;gap:.4rem;flex-wrap:wrap; }
+  h2.sec{ font-size:.95rem;font-weight:800;margin:1.4rem 0 .6rem;display:flex;align-items:center;gap:.5rem;color:#F4F0FA; }
+  h2.sec::before{ content:'';width:.35rem;height:1rem;border-radius:2px;background:var(--amber); }
+  h2.sec small{ font-weight:600;color:var(--mute);font-size:.75rem;margin-left:auto; }
+  .kv{ display:grid;grid-template-columns:6.5rem 1fr;gap:.45rem .8rem;font-size:.9rem;line-height:1.6; }
+  .kv dt{ color:var(--mute);font-weight:700;font-size:.8rem;padding-top:.15rem; }
+  .kv dd{ margin:0;color:#F4F0FA;white-space:pre-line; }
+  .kv dd.empty-v{ color:#5E5868; }
+  @media (max-width:560px){ .kv{ grid-template-columns:1fr; gap:.15rem; } .kv dd{ margin-bottom:.45rem; } }
+  .contract-box{ background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.3);border-radius:.8rem;padding:.7rem .9rem;font-size:.84rem;line-height:1.7;margin-top:.6rem; }
+  .contract-box b{ color:#86EFAC; }
+
+  table.t{ width:100%;border-collapse:collapse;font-size:.86rem; }
+  table.t th{ text-align:left;font-size:.7rem;font-weight:800;color:var(--mute);letter-spacing:.04em;padding:.4rem .5rem;border-bottom:1px solid rgba(255,255,255,.14);white-space:nowrap; }
+  table.t td{ padding:.55rem .5rem;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55;white-space:pre-line; }
+  table.t tr:last-child td{ border-bottom:none; }
+  table.t td.part{ font-weight:800;color:#FCD34D;white-space:nowrap; }
+  table.t td.num{ color:var(--mute);text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums; }
+  table.t td.time{ white-space:nowrap;font-variant-numeric:tabular-nums;color:#E4DFEA; }
+  table.t td.note{ color:var(--mute);font-size:.8rem; }
+  table.t tr.done td{ color:var(--mute); }
+  table.t tr.done td.name{ text-decoration:line-through; }
+  .chk{ width:1.05rem;height:1.05rem;accent-color:var(--ok);cursor:pointer;vertical-align:middle; }
+  .tbl-wrap{ overflow-x:auto; }
+  .progress{ height:.4rem;border-radius:9999px;background:rgba(255,255,255,.08);overflow:hidden;margin:.4rem 0 .2rem; }
+  .progress i{ display:block;height:100%;background:linear-gradient(90deg,#22C55E,#86EFAC);border-radius:9999px;transition:width .3s; }
+  .memo{ white-space:pre-line;font-size:.88rem;line-height:1.7;color:#E4DFEA; }
+  .foot{ margin-top:1.4rem;font-size:.72rem;color:var(--mute); }
+
+  /* ── 편집 폼 ── */
+  label.f{ display:block;font-size:.7rem;color:#A9A3B3;font-weight:700;letter-spacing:.03em;margin-bottom:.25rem; }
+  .in{ width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.55rem;padding:.55rem .7rem;color:#fff;font-size:.88rem;outline:none;transition:border-color .2s; }
+  .in:focus{ border-color:rgba(245,158,11,.6); }
+  .in::placeholder{ color:#6B6675; }
+  .in[type="date"],.in[type="time"]{ color-scheme:dark; }
+  textarea.in{ resize:vertical;min-height:60px;line-height:1.55; }
+  select.in option{ background:#16141C; }
+  .grid2{ display:grid;grid-template-columns:1fr 1fr;gap:.6rem; }
+  .grid3{ display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem; }
+  @media (max-width:560px){ .grid2,.grid3{ grid-template-columns:1fr; } }
+  .fld{ margin-bottom:.6rem; }
+  table.e{ width:100%;border-collapse:collapse;font-size:.82rem; }
+  table.e th{ text-align:left;font-size:.68rem;font-weight:800;color:var(--mute);padding:.2rem .25rem;letter-spacing:.03em; }
+  table.e td{ padding:.15rem .2rem;vertical-align:top; }
+  table.e .in{ padding:.42rem .5rem;font-size:.82rem;border-radius:.45rem; }
+  table.e textarea.in{ min-height:40px; }
+  table.e .ic{ background:none;border:none;color:var(--mute);font-size:1rem;padding:.3rem .25rem;line-height:1; }
+  table.e .ic:hover{ color:#fff; } table.e .ic.del:hover{ color:var(--bad); }
+  .editbar{ position:sticky;bottom:0;z-index:20;display:flex;gap:.5rem;justify-content:flex-end;align-items:center;padding:.8rem 0 .2rem;margin-top:1rem;background:linear-gradient(to top,var(--dark) 70%,transparent); }
+  .editbar .note{ margin-right:auto;font-size:.76rem;color:var(--mute); }
+
+  /* ── 서명완료 계약 안내 ── */
+  .suggest{ border:1px solid rgba(34,197,94,.35);background:rgba(34,197,94,.06);border-radius:.9rem;padding:.75rem .85rem;margin-bottom:.8rem; }
+  .suggest h3{ margin:0 0 .4rem;font-size:.8rem;font-weight:800;color:#86EFAC; }
+  .suggest .row{ display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:.8rem;padding:.3rem 0;border-top:1px solid rgba(34,197,94,.15); }
+  .suggest .row b{ display:block;font-size:.84rem; }
+  .suggest .row small{ color:var(--mute); }
+
+  /* ── 모달 ── */
+  .modal{ position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1rem; }
+  .modal .box{ width:min(30rem,100%);background:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:1.1rem;padding:1.2rem; }
+  .modal h3{ margin:0 0 .8rem;font-size:1rem;font-weight:800; }
+  .modal p{ font-size:.82rem;color:#CFC9D6;line-height:1.6;margin:.5rem 0; }
+  .toast{ position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);z-index:100;background:#fff;color:#0a0a0a;font-weight:700;font-size:.85rem;padding:.7rem 1.1rem;border-radius:9999px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis; }
+  .toast.show{ opacity:1; }
+  .spin{ width:.9rem;height:.9rem;border:2px solid rgba(0,0,0,.25);border-top-color:#0a0a0a;border-radius:50%;display:inline-block;animation:sp .8s linear infinite; }
+  @keyframes sp{ to{ transform:rotate(360deg); } }
+
+  /* ── 인쇄: 선택한 행사 한 장 ── */
+  @media print{
+    @page{ size:A4;margin:12mm; }
+    html,body{ background:#fff;color:#111; }
+    .topbar,#side,.actions,.editbar,.no-print,.suggest,.toast{ display:none !important; }
+    .wrap{ display:block;padding:0;max-width:none; }
+    #main{ display:block !important; }
+    .card{ background:none;border:none;padding:0;border-radius:0; }
+    .head h1{ color:#111;font-size:18pt; } .head .meta,.head .meta b{ color:#333; }
+    h2.sec{ color:#111;font-size:11pt;margin:6mm 0 2mm;break-after:avoid; } h2.sec small{ color:#666; }
+    .kv dt{ color:#555; } .kv dd{ color:#111; }
+    table.t{ font-size:9pt; } table.t th{ color:#fff;background:#111;border:none;padding:1.5mm 2mm; }
+    table.t td{ border-bottom:1px solid #DDD;color:#111;padding:1.5mm 2mm; }
+    table.t td.part,table.t td.time{ color:#111; } table.t td.note,table.t td.num{ color:#555; }
+    table.t tr.done td{ color:#777; }
+    .badge{ border:1px solid #333;color:#111 !important;background:none !important; }
+    .contract-box{ border-color:#999;background:none;color:#111; } .contract-box b{ color:#111; }
+    .memo{ color:#111; } .foot{ color:#666; } .dday{ color:#111; }
+    .progress{ display:none; }
+    tr{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html"><img src="logo-kgm-transparent.png" alt="큰길이벤트기획"><span>큰길이벤트기획</span><small>행사 일정 대장</small></a>
+    <div class="tools">
+      <button class="pill" id="pill-server" title="서버 연결 설정"><span class="dot"></span><span id="pill-text">확인 중…</span></button>
+      <button class="pill" id="pill-me" title="내 이름 (수정자 표시)">👤 <span id="me-text">이름 없음</span></button>
+      <button class="btn btn-ghost btn-sm" id="btn-reload" title="최신 내용 다시 받기">↻ 새로고침</button>
+      <button class="btn btn-ghost btn-sm" id="btn-share" title="팀에 보낼 링크 복사">🔗 공유 링크</button>
+      <button class="btn btn-primary btn-sm" id="btn-new">＋ 새 행사</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside id="side">
+    <div class="stats" id="stats"></div>
+    <div id="suggest"></div>
+    <input class="search" id="search" placeholder="행사명 · 장소 · 고객 검색" autocomplete="off">
+    <div class="filters" id="filters">
+      <button class="chip" data-f="all" aria-pressed="true">전체</button>
+      <button class="chip" data-f="확정">확정</button>
+      <button class="chip" data-f="진행">문의 · 견적</button>
+      <button class="chip" data-f="완료">완료 · 취소</button>
+    </div>
+    <div id="list"></div>
+  </aside>
+
+  <main id="main">
+    <div class="card" id="detail"></div>
+  </main>
+</div>
+
+<div class="modal" id="m-server" hidden>
+  <div class="box">
+    <h3>서버 연결</h3>
+    <p>Google Apps Script 웹앱 주소를 넣으면 팀 전원이 같은 대장을 봅니다. 비워 두면 이 기기에만 저장됩니다. (설치법: <code>apps-script/schedule/README.md</code>)</p>
+    <input class="in" id="in-api" placeholder="https://script.google.com/macros/s/…/exec">
+    <p id="api-note"></p>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem;">
+      <button class="btn btn-ghost btn-sm" id="m-server-close">닫기</button>
+      <button class="btn btn-primary btn-sm" id="m-server-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="m-me" hidden>
+  <div class="box">
+    <h3>내 이름</h3>
+    <p>저장할 때 「누가 마지막으로 고쳤는지」 표시됩니다.</p>
+    <input class="in" id="in-me" placeholder="예: 김동길" maxlength="20">
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:.8rem;">
+      <button class="btn btn-ghost btn-sm" id="m-me-close">닫기</button>
+      <button class="btn btn-primary btn-sm" id="m-me-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   설정
+═══════════════════════════════════════════════════════ */
+/* 일정 서버 주소를 여기 박아두면 누가 어디서 열어도 설정 없이 같은 대장이 보인다.
+   (apps-script/schedule/README.md 대로 배포한 웹앱 URL) */
+const 서버주소_기본 = '';
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const LS = window.localStorage;
+const STATUSES = ['문의','견적','확정','완료','취소'];
+
+let EVENTS = [];      // 화면에 보이는 행사 전체
+let CONTRACTS = [];   // 서명완료 계약 (서버가 계약 대장에서 읽어옴)
+let SEL = '';         // 선택한 행사 id
+let EDIT = null;      // 편집 중인 사본 (null 이면 보기 모드)
+let FILTER = 'all';
+let QUERY = '';
+let SERVER_OK = false;
+
+/* ── 서버 주소 ── */
+function deployId(u){ const m=String(u||'').match(/\/macros\/s\/([A-Za-z0-9_-]+)\/exec/); return m?m[1]:''; }
+function apiFromDeploy(id){ return id ? 'https://script.google.com/macros/s/'+id+'/exec' : ''; }
+function apiURL(){
+  if (서버주소_기본) return 서버주소_기본;
+  const s = new URLSearchParams(location.search).get('s');
+  if (s && /^[A-Za-z0-9_-]{10,}$/.test(s)) { LS.setItem('kg_sched_api', apiFromDeploy(s)); return apiFromDeploy(s); }
+  return LS.getItem('kg_sched_api') || '';
+}
+function myName(){ return LS.getItem('kg_sched_me') || ''; }
+
+/* ── 날짜 유틸 ── */
+const pad = n => String(n).padStart(2,'0');
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+const DOW = ['일','월','화','수','목','금','토'];
+function fmtDate(s){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s||'')) return s||'';
+  const d=new Date(s+'T00:00:00'); return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.(${DOW[d.getDay()]})`;
+}
+function fmtDateShort(s){ if(!/^\d{4}-\d{2}-\d{2}$/.test(s||'')) return s||''; const d=new Date(s+'T00:00:00'); return `${d.getMonth()+1}/${d.getDate()}(${DOW[d.getDay()]})`; }
+function dday(s){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s||'')) return null;
+  const a=new Date(s+'T00:00:00'), b=new Date(todayStr()+'T00:00:00');
+  return Math.round((a-b)/86400000);
+}
+function ddayText(s){ const n=dday(s); if(n===null) return ''; if(n===0) return 'D-DAY'; return n>0?`D-${n}`:`D+${-n}`; }
+function fmtTs(iso){ try{ const d=new Date(iso); if(isNaN(d)) return ''; return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }catch(e){ return ''; } }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function newId(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s='EV'; for(let i=0;i<8;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* ═══════════════════════════════════════════════════════
+   행사 데이터
+═══════════════════════════════════════════════════════ */
+function blankEvent(){
+  return { id:newId(), title:'', date:todayStr(), time:'', place:'', people:'', host:'', org:'', summary:'',
+           status:'문의', owner:'', client:{org:'',name:'',tel:''}, contractNo:'',
+           program:[], items:[], memo:'', createdAt:new Date().toISOString(), updatedAt:'', updatedBy:'' };
+}
+function normalize(ev){
+  const b = blankEvent();
+  const o = Object.assign(b, ev||{});
+  o.client = Object.assign({org:'',name:'',tel:''}, ev && ev.client || {});
+  o.program = Array.isArray(o.program)? o.program.map(r=>Object.assign({part:'',time:'',dur:'',content:'',note:''}, r)) : [];
+  o.items   = Array.isArray(o.items)?   o.items.map(r=>Object.assign({name:'',spec:'',qty:'',owner:'',done:false}, r)) : [];
+  if(!STATUSES.includes(o.status)) o.status='문의';
+  return o;
+}
+
+/* 첫 행사 — 견적서 · 행사 추진계획에서 옮긴 2026 충청미래경제포럼 */
+function seedEvent(){
+  return normalize({
+    id:'EVCHUNG2026', title:'2026년 충청미래경제포럼', date:'2026-09-17', time:'15:00',
+    place:'천안 독립기념관 (겨레누리관 컨벤션홀)',
+    people:'150명 (연합장, 연합의장, 충청권 시도지사, 경제인, 시도민 등)',
+    host:'충청광역연합', org:'충청광역연합',
+    summary:'공동대응 협약, 주제강연, 주제발표 및 토론, 네트워크',
+    status:'견적', owner:'', client:{org:'충청광역연합', name:'', tel:''}, contractNo:'',
+    program:[
+      {part:'식전', time:'14:40~15:00', dur:'30′', content:'사전등록 및 식전공연', note:'행사장'},
+      {part:'식전', time:'14:40~15:00', dur:'30′', content:'사전환담 (충청광역연합협의회 연계추진)', note:'사전환담장 · 주요내빈'},
+      {part:'개회', time:'15:00~15:30', dur:'3′',  content:'개회 및 주요내빈 소개', note:'아나운서'},
+      {part:'개회', time:'', dur:'15′', content:'인사말씀\n- 개회사 : 연합장(충남지사)\n- 인사말씀 : 연합의장, 대전시장, 세종시장, 충북지사', note:''},
+      {part:'개회', time:'', dur:'12′', content:'퍼포먼스 및 기념촬영\n① 초광역 경제동맹 공동선언(4) : 충청권 시·도지사\n② 초광역 경제공동체 퍼포먼스(9) : 시·도지사 4, 연합의장 1, 충청권 상의 회장 4', note:'터치대 · 단상 · 포그'},
+      {part:'휴식', time:'15:30~15:40', dur:'10′', content:'휴식 및 장내정리', note:'무대 전환'},
+      {part:'포럼', time:'15:40~16:30', dur:'50′', content:'주제강연 — 김광석 한국경제산업연구원 실장\n- 2027년 경제전망 : 충청의 기회와 대응', note:''},
+      {part:'포럼', time:'16:30~17:30', dur:'15′', content:'주제발표 — 마강래 중앙대 교수\n- 초광역 경제통합 시대, 충청권의 공간전략', note:''},
+      {part:'포럼', time:'', dur:'45′', content:'종합토론\n- 주제 : 충청권 경제통합이 기업에게 주는 기회\n- 좌장 : 마강래 중앙대 교수\n- 토론자 : 이동욱 케이엠피 대표, 윤영모 국토연구원 연구위원, 김은영 대전연구원 책임연구원', note:'토론 셋트 5'},
+    ],
+    items:[
+      {name:'음향 (중형)', spec:'FBT 라인어레이 · 콘솔 · 무선마이크 외', qty:'1식', owner:'', done:false},
+      {name:'기본 조명', spec:'파라이트 세트 · 빔 · 워시 · 스트로브 외', qty:'1식', owner:'', done:false},
+      {name:'LED 전광판', spec:'대형 행사용 12m × 4m', qty:'1식', owner:'', done:false},
+      {name:'레이어 구조물', spec:'LED 거치용 시스템 비계 · 설치 · 철수', qty:'1식', owner:'', done:false},
+      {name:'업포그 머신', spec:'무대 연기 연출', qty:'', owner:'', done:false},
+      {name:'의자', spec:'행사용 팔걸이 의자 (참석 150명 기준)', qty:'', owner:'', done:false},
+      {name:'원형테이블', spec:'내빈용 원형 테이블', qty:'', owner:'', done:false},
+      {name:'퍼포먼스용 단상', spec:'단상 포디움, 포맥스 출력', qty:'', owner:'', done:false},
+      {name:'퍼포먼스용 터치패드', spec:'터치 패드', qty:'', owner:'', done:false},
+      {name:'퍼포먼스용 터치대', spec:'터치 버튼 + 터치 대 (퍼포먼스 9명)', qty:'', owner:'', done:false},
+      {name:'토론용 의자 테이블 셋트', spec:'1인 의자 + 테이블 셋트 (좌장 1 · 토론자 3 · 발표자)', qty:'', owner:'', done:false},
+      {name:'포토존 현수막 배너', spec:'포토존 미니 트러스 외', qty:'', owner:'', done:false},
+      {name:'중계 카메라', spec:'현장 중계용 카메라 외', qty:'', owner:'', done:false},
+    ],
+    memo:'견적서 13개 품목 기준. 수량 · 담당은 확정 후 채울 것.\n주최 · 주관 : 충청광역연합 / 사전환담은 충청광역연합협의회 연계.',
+    createdAt:new Date().toISOString(),
+  });
+}
+
+/* ── 저장소 (서버 + 이 기기) ── */
+function loadLocal(){ try{ return (JSON.parse(LS.getItem('kg_sched_events')||'[]')||[]).map(normalize); }catch(e){ return []; } }
+function saveLocal(list){ LS.setItem('kg_sched_events', JSON.stringify(list.map(e=>{ const o=Object.assign({},e); delete o._local; return o; }))); }
+
+async function apiGet(params){
+  const u = apiURL()+'?'+new URLSearchParams(Object.assign({t:Date.now()}, params)).toString();
+  const r = await fetch(u, {cache:'no-store'}); const t = await r.text();
+  let j; try{ j=JSON.parse(t); }catch(e){ throw new Error('서버 응답을 읽을 수 없습니다: '+t.slice(0,100)); }
+  if(!j.ok) throw new Error(j.error||'서버 오류'); return j;
+}
+async function apiPost(body){
+  const r = await fetch(apiURL(), { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body) });
+  const t = await r.text(); let j; try{ j=JSON.parse(t); }catch(e){ throw new Error('서버 응답을 읽을 수 없습니다: '+t.slice(0,100)); }
+  if(!j.ok) throw new Error(j.error||'서버 오류'); return j;
+}
+
+async function loadAll(){
+  const local = loadLocal();
+  SERVER_OK = false;
+  if(apiURL()){
+    setPill('확인 중…','');
+    try{
+      const j = await apiGet({action:'list'});
+      SERVER_OK = true;
+      const server = (j.events||[]).map(normalize);
+      CONTRACTS = j.contracts||[];
+      const ids = new Set(server.map(e=>e.id));
+      /* 서버에 없는데 이 기기에만 있는 행사는 표시해 두고, 저장하면 서버로 올라간다 */
+      const onlyLocal = local.filter(e=>!ids.has(e.id)).map(e=>Object.assign(e,{_local:true}));
+      EVENTS = server.concat(onlyLocal);
+      saveLocal(server);  // 서버 사본을 캐시 (오프라인 보기용)
+      if(onlyLocal.length) { LS.setItem('kg_sched_events', JSON.stringify(server.concat(onlyLocal))); }
+      setPill('서버 연결됨','on');
+    }catch(err){
+      EVENTS = local; CONTRACTS = [];
+      setPill('서버 오류 · 이 기기 사본','off');
+      toast('서버 연결 실패: '+err.message);
+    }
+  } else {
+    EVENTS = local;
+    setPill('이 기기에만 저장','off');
+  }
+  if(!EVENTS.length && !LS.getItem('kg_sched_seeded')){
+    const s = seedEvent(); EVENTS = [s]; LS.setItem('kg_sched_seeded','1');
+    await persist(s, true);
+  }
+  applyContracts();
+  if(!SEL || !EVENTS.find(e=>e.id===SEL)){
+    const up = sorted().find(e=>dday(e.date)!==null && dday(e.date)>=0 && e.status!=='취소');
+    SEL = (up||sorted()[0]||{}).id||'';
+  }
+  render();
+}
+
+async function persist(ev, quiet){
+  ev.updatedAt = new Date().toISOString();
+  if(myName()) ev.updatedBy = myName();
+  const local = loadLocal(); const i = local.findIndex(e=>e.id===ev.id);
+  const copy = Object.assign({}, ev); delete copy._local;
+  if(i>=0) local[i]=copy; else local.push(copy);
+  saveLocal(local);
+  if(apiURL()){
+    try{ await apiPost({action:'save', event:copy, by:myName()}); delete ev._local; SERVER_OK=true; setPill('서버 연결됨','on'); if(!quiet) toast('저장했습니다 (팀 공유)'); }
+    catch(err){ ev._local=true; setPill('서버 오류 · 이 기기 사본','off'); toast('서버 저장 실패, 이 기기에만 저장됨: '+err.message); }
+  } else if(!quiet) toast('이 기기에 저장했습니다');
+}
+async function removeEvent(id){
+  saveLocal(loadLocal().filter(e=>e.id!==id));
+  EVENTS = EVENTS.filter(e=>e.id!==id);
+  if(apiURL()){ try{ await apiPost({action:'delete', id}); }catch(err){ toast('서버 삭제 실패: '+err.message); } }
+}
+
+/* ── 계약 대장과 맞춰 「확정」 ── */
+function norm(s){ return String(s||'').replace(/\s+/g,'').replace(/[()（）\-–—·.,'"]/g,'').toLowerCase(); }
+function dateIn(text, ymd){
+  if(!ymd) return false;
+  const t = String(text||'');
+  if(t.includes(ymd)) return true;
+  const [y,m,d] = ymd.split('-').map(Number);
+  const re = new RegExp('(^|[^0-9])'+m+'\\s*[./월]\\s*'+d+'(?![0-9])');
+  return re.test(t) && (t.includes(String(y)) || !/\d{4}/.test(t));
+}
+function contractFor(ev){
+  if(!CONTRACTS.length) return null;
+  if(ev.contractNo){ const c = CONTRACTS.find(c=>c.no && c.no===ev.contractNo.trim()); if(c) return c; }
+  return CONTRACTS.find(c=> norm(c.title)===norm(ev.title) && norm(ev.title) && dateIn(c.date, ev.date)) || null;
+}
+function applyContracts(){
+  for(const ev of EVENTS){
+    const c = contractFor(ev);
+    ev._contract = c||null;
+    if(c && !['완료','취소'].includes(ev.status)) ev.status='확정';
+  }
+}
+function unmatchedContracts(){
+  const used = new Set(EVENTS.map(e=>e._contract&&e._contract.docId).filter(Boolean));
+  return CONTRACTS.filter(c=>!used.has(c.docId));
+}
+async function importContract(docId){
+  let c;
+  try{ c = await apiGet({action:'contract', id:docId}); }catch(err){ toast('계약서를 불러오지 못했습니다: '+err.message); return; }
+  const ev = blankEvent();
+  ev.title = c.ev.title||''; ev.place = c.ev.place||''; ev.people = c.ev.people||''; ev.summary = c.ev.scope||'';
+  const m = String(c.ev.date||'').match(/\d{4}-\d{2}-\d{2}/); ev.date = m?m[0]:todayStr();
+  if(!m) ev.memo = '행사 일시(계약서) : '+(c.ev.date||'');
+  ev.client = {org:c.cl.org||'', name:c.cl.name||'', tel:c.cl.tel||''};
+  ev.contractNo = c.no||''; ev.status='확정';
+  ev.items = (c.items||[]).filter(it=>it.name).map(it=>({ name:it.name, spec:it.spec||'', qty:[it.qty, it.unit].filter(Boolean).join('')+(it.days&&+it.days>1?` × ${it.days}일`:''), owner:'', done:false }));
+  EVENTS.push(ev); await persist(ev); applyContracts(); SEL=ev.id; EDIT=null; render();
+  toast('계약서 내용으로 확정 행사를 추가했습니다');
+}
+
+/* ═══════════════════════════════════════════════════════
+   화면
+═══════════════════════════════════════════════════════ */
+function setPill(text, cls){ const p=$('#pill-server'); p.className='pill '+(cls||''); $('#pill-text').textContent=text; }
+function sorted(){ return EVENTS.slice().sort((a,b)=> (a.date||'').localeCompare(b.date||'') || (a.time||'').localeCompare(b.time||'')); }
+function visible(){
+  const q = norm(QUERY);
+  return sorted().filter(e=>{
+    if(FILTER==='확정' && e.status!=='확정') return false;
+    if(FILTER==='진행' && !['문의','견적'].includes(e.status)) return false;
+    if(FILTER==='완료' && !['완료','취소'].includes(e.status)) return false;
+    if(q && !norm([e.title,e.place,e.client.org,e.client.name,e.host,e.owner].join(' ')).includes(q)) return false;
+    return true;
+  });
+}
+
+function render(){
+  document.body.classList.toggle('has-sel', !!SEL);
+  $('#me-text').textContent = myName()||'이름 없음';
+  renderStats(); renderSuggest(); renderList(); renderDetail();
+}
+
+function renderStats(){
+  const up = EVENTS.filter(e=>dday(e.date)!==null && dday(e.date)>=0 && !['완료','취소'].includes(e.status));
+  const conf = up.filter(e=>e.status==='확정').length;
+  const prog = up.filter(e=>['문의','견적'].includes(e.status)).length;
+  const next = sorted().find(e=>dday(e.date)!==null && dday(e.date)>=0 && e.status==='확정');
+  $('#stats').innerHTML = `
+    <div class="stat ok"><b>${conf}</b><span>확정 (예정)</span></div>
+    <div class="stat amber"><b>${prog}</b><span>문의 · 견적</span></div>
+    <div class="stat"><b>${next?ddayText(next.date):'—'}</b><span>다음 확정 행사</span></div>`;
+}
+
+function renderSuggest(){
+  const list = unmatchedContracts();
+  const box = $('#suggest');
+  if(!list.length){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="suggest"><h3>✅ 서명완료 계약 — 일정에 없음 (${list.length})</h3>` +
+    list.slice(0,8).map(c=>`<div class="row"><div><b>${esc(c.title||'(행사명 없음)')}</b><small>${esc(c.date||'')} · ${esc(c.org||'')}</small></div>
+      <button class="btn btn-ghost btn-sm" data-import="${esc(c.docId)}">일정에 추가</button></div>`).join('') + `</div>`;
+}
+
+function renderList(){
+  const list = visible();
+  if(!list.length){ $('#list').innerHTML = `<div class="empty">${EVENTS.length?'조건에 맞는 행사가 없습니다.':'등록된 행사가 없습니다. 「새 행사」로 시작하세요.'}</div>`; return; }
+  let html='', lastMonth='';
+  for(const e of list){
+    const mo = (e.date||'').slice(0,7);
+    if(mo!==lastMonth){ lastMonth=mo; const [y,m]=mo.split('-'); html += `<div class="month">${y?`${y}년 ${+m}월`:'날짜 미정'}</div>`; }
+    const d = dday(e.date); const past = d!==null && d<0;
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(e.date||'') ? +e.date.slice(8,10) : '–';
+    const dow = /^\d{4}-\d{2}-\d{2}$/.test(e.date||'') ? DOW[new Date(e.date+'T00:00:00').getDay()] : '';
+    html += `<button class="ev ${past?'past':''}" data-id="${esc(e.id)}" aria-current="${e.id===SEL}">
+      <div class="d"><b>${day}</b><span>${dow}${e.time?' '+esc(e.time):''}</span></div>
+      <div class="t"><b>${esc(e.title||'(행사명 없음)')}</b>
+        <small><span class="badge s-${esc(e.status)}">${esc(e.status)}</span>${e._local?'<span class="badge local">이 기기만</span>':''}${!past&&d!==null&&!['완료','취소'].includes(e.status)?`<span class="dday ${d===0?'today':''}">${ddayText(e.date)}</span>`:''}<span style="overflow:hidden;text-overflow:ellipsis;">${esc(e.place||'')}</span></small></div>
+    </button>`;
+  }
+  $('#list').innerHTML = html;
+}
+
+function renderDetail(){
+  const box = $('#detail');
+  if(EDIT){ box.innerHTML = editForm(EDIT); wireEdit(); return; }
+  const e = EVENTS.find(x=>x.id===SEL);
+  if(!e){ box.innerHTML = `<div class="empty">왼쪽에서 행사를 고르거나 「새 행사」를 누르세요.</div>`; return; }
+  const d = dday(e.date); const c = e._contract;
+  const v = (s, cls='') => s ? `<dd class="${cls}">${esc(s)}</dd>` : `<dd class="empty-v">—</dd>`;
+  const doneN = e.items.filter(i=>i.done).length;
+  box.innerHTML = `
+    <div class="head">
+      <div>
+        <div style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;">
+          <span class="badge s-${esc(e.status)}">${esc(e.status)}</span>
+          ${e._local?'<span class="badge local">이 기기에만 저장됨</span>':''}
+          ${d!==null&&!['완료','취소'].includes(e.status)?`<span class="dday ${d===0?'today':''}">${ddayText(e.date)}</span>`:''}
+        </div>
+        <h1>${esc(e.title||'(행사명 없음)')}</h1>
+        <div class="meta"><b>${esc(fmtDate(e.date))}${e.time?' '+esc(e.time):''}</b>${e.place?` · ${esc(e.place)}`:''}</div>
+      </div>
+      <div class="actions no-print">
+        <button class="btn btn-ghost btn-sm" id="btn-back" style="display:none">← 목록</button>
+        <button class="btn btn-ghost btn-sm" id="btn-print">🖨 인쇄</button>
+        <button class="btn btn-primary btn-sm" id="btn-edit">✏️ 편집</button>
+      </div>
+    </div>
+
+    <h2 class="sec">행사개요</h2>
+    <dl class="kv">
+      <dt>행 사 명</dt>${v(e.title)}
+      <dt>일시 / 장소</dt>${v([fmtDate(e.date)+(e.time?' '+e.time:''), e.place].filter(Boolean).join(' / '))}
+      <dt>참석대상</dt>${v(e.people)}
+      <dt>주최 / 주관</dt>${v([e.host, e.org].filter(Boolean).filter((x,i,a)=>a.indexOf(x)===i).join(' / '))}
+      <dt>주요내용</dt>${v(e.summary)}
+      <dt>고객 · 담당</dt>${v([e.client.org, e.client.name, e.client.tel].filter(Boolean).join(' · '))}
+      <dt>우리 담당</dt>${v(e.owner)}
+    </dl>
+    ${c ? `<div class="contract-box"><b>✅ 전자계약 서명완료</b> — 계약번호 ${esc(c.no||'')} · ${esc(c.org||'')} ${c.signer?`(서명 ${esc(c.signer)})`:''} · ${esc(fmtTs(c.signedAt)||'')}${c.total?` · ${Number(c.total).toLocaleString('ko-KR')}원`:''}
+        ${c.pdfUrl?` · <a href="${esc(c.pdfUrl)}" target="_blank" rel="noopener">계약서 PDF</a>`:''}</div>`
+      : (e.contractNo ? `<div class="contract-box" style="border-color:rgba(255,255,255,.15);background:none;"><b style="color:#CFC9D6">계약번호</b> ${esc(e.contractNo)} — 계약 대장에서 서명완료 기록을 찾지 못했습니다${apiURL()?'':' (서버 미연결)'}</div>` : '')}
+
+    <h2 class="sec">행사일정 <small>${e.program.length}개 순서</small></h2>
+    ${e.program.length ? `<div class="tbl-wrap"><table class="t">
+      <thead><tr><th>구분</th><th>시간</th><th>소요</th><th>주요 내용</th><th>비고</th></tr></thead>
+      <tbody>${e.program.map(r=>`<tr><td class="part">${esc(r.part)}</td><td class="time">${esc(r.time)}</td><td class="num">${esc(r.dur)}</td><td>${esc(r.content)}</td><td class="note">${esc(r.note)}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty">아직 일정표가 없습니다. 「편집」에서 순서를 추가하세요.</div>`}
+
+    <h2 class="sec">필요 품목 <small>준비 ${doneN} / ${e.items.length}</small></h2>
+    ${e.items.length ? `<div class="progress no-print"><i style="width:${e.items.length?Math.round(doneN/e.items.length*100):0}%"></i></div>
+    <div class="tbl-wrap"><table class="t">
+      <thead><tr><th>No</th><th>품목</th><th>규격 · 비고</th><th>수량</th><th>담당</th><th>준비</th></tr></thead>
+      <tbody>${e.items.map((it,i)=>`<tr class="${it.done?'done':''}"><td class="num">${i+1}</td><td class="name"><b>${esc(it.name)}</b></td><td>${esc(it.spec)}</td><td class="time">${esc(it.qty)}</td><td class="note">${esc(it.owner)}</td>
+        <td class="num"><input type="checkbox" class="chk" data-done="${i}" ${it.done?'checked':''} title="준비 완료"></td></tr>`).join('')}</tbody>
+    </table></div>` : `<div class="empty">필요 품목이 없습니다. 「편집」에서 견적서 품목을 옮겨 적으세요.</div>`}
+
+    ${e.memo ? `<h2 class="sec">메모</h2><div class="memo">${esc(e.memo)}</div>` : ''}
+    <div class="foot">${e.updatedAt?`마지막 수정 ${esc(fmtTs(e.updatedAt))}${e.updatedBy?' · '+esc(e.updatedBy):''}`:''}${e.contractNo?` · 계약번호 ${esc(e.contractNo)}`:''} · 큰길이벤트기획 행사 일정 대장</div>`;
+
+  $('#btn-edit').addEventListener('click', ()=>{ EDIT = JSON.parse(JSON.stringify(e)); delete EDIT._contract; renderDetail(); window.scrollTo({top:0}); });
+  $('#btn-print').addEventListener('click', ()=>window.print());
+  const back = $('#btn-back'); if(window.matchMedia('(max-width:900px)').matches){ back.style.display=''; back.addEventListener('click', ()=>{ SEL=''; render(); }); }
+  $$('[data-done]').forEach(cb=>cb.addEventListener('change', async ()=>{
+    e.items[+cb.dataset.done].done = cb.checked; await persist(e, true); renderDetail();
+  }));
+}
+
+/* ── 편집 폼 ── */
+function editForm(e){
+  const opt = (arr, cur) => arr.map(s=>`<option ${s===cur?'selected':''}>${s}</option>`).join('');
+  const inp = (k, v, ph='', type='text') => `<input class="in" type="${type}" data-k="${k}" value="${esc(v)}" placeholder="${esc(ph)}">`;
+  return `
+    <div class="head">
+      <div><h1 style="font-size:1.15rem;">${e.title?'행사 편집':'새 행사'}</h1><div class="meta" style="font-size:.8rem;">고친 뒤 아래 「저장」을 누르면 ${apiURL()?'팀 전원에게':'이 기기에'} 반영됩니다.</div></div>
+    </div>
+    <h2 class="sec">행사개요</h2>
+    <div class="fld"><label class="f">행사명</label>${inp('title', e.title, '2026년 충청미래경제포럼')}</div>
+    <div class="grid3">
+      <div class="fld"><label class="f">행사일</label>${inp('date', e.date, '', 'date')}</div>
+      <div class="fld"><label class="f">시작 시간</label>${inp('time', e.time, '15:00', 'time')}</div>
+      <div class="fld"><label class="f">상태</label><select class="in" data-k="status">${opt(STATUSES, e.status)}</select></div>
+    </div>
+    <div class="fld"><label class="f">장소</label>${inp('place', e.place, '천안 독립기념관 (겨레누리관 컨벤션홀)')}</div>
+    <div class="grid2">
+      <div class="fld"><label class="f">참석대상</label>${inp('people', e.people, '150명 (연합장, 시도지사, 경제인 등)')}</div>
+      <div class="fld"><label class="f">주최 / 주관</label>${inp('host', e.host, '충청광역연합')}</div>
+    </div>
+    <div class="fld"><label class="f">주요내용</label>${inp('summary', e.summary, '공동대응 협약, 주제강연, 주제발표 및 토론, 네트워크')}</div>
+    <div class="grid3">
+      <div class="fld"><label class="f">고객 단체</label>${inp('client.org', e.client.org, '')}</div>
+      <div class="fld"><label class="f">고객 담당자</label>${inp('client.name', e.client.name, '')}</div>
+      <div class="fld"><label class="f">고객 연락처</label>${inp('client.tel', e.client.tel, '', 'tel')}</div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label class="f">우리 담당</label>${inp('owner', e.owner, '현장 총괄 이름')}</div>
+      <div class="fld"><label class="f">계약번호 <span style="font-weight:500;color:#6B6675">(전자계약서 KG-… · 넣으면 서명완료 시 자동 확정)</span></label>${inp('contractNo', e.contractNo, 'KG-20260917-ABC')}</div>
+    </div>
+
+    <h2 class="sec">행사일정 <small>구분 · 시간 · 소요 · 내용 · 비고</small></h2>
+    <div class="tbl-wrap"><table class="e" id="e-program">
+      <thead><tr><th style="width:5.5rem">구분</th><th style="width:8rem">시간</th><th style="width:4.2rem">소요</th><th>주요 내용</th><th style="width:9rem">비고</th><th style="width:4.6rem"></th></tr></thead>
+      <tbody>${e.program.map((r,i)=>rowProgram(r,i)).join('')}</tbody>
+    </table></div>
+    <div style="margin-top:.5rem;"><button class="btn btn-ghost btn-sm" id="add-program">＋ 순서 추가</button></div>
+
+    <h2 class="sec">필요 품목 <small>견적서 품목을 그대로</small></h2>
+    <div class="tbl-wrap"><table class="e" id="e-items">
+      <thead><tr><th style="width:2rem">No</th><th style="width:11rem">품목</th><th>규격 · 비고</th><th style="width:5.5rem">수량</th><th style="width:6rem">담당</th><th style="width:2.4rem">준비</th><th style="width:4.6rem"></th></tr></thead>
+      <tbody>${e.items.map((r,i)=>rowItem(r,i)).join('')}</tbody>
+    </table></div>
+    <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" id="add-item">＋ 품목 추가</button><button class="btn btn-ghost btn-sm" id="paste-items" title="한 줄에 한 품목. 「품목 [탭 또는 |] 규격 [탭 또는 |] 수량」">📋 여러 줄 붙여넣기</button></div>
+
+    <h2 class="sec">메모</h2>
+    <textarea class="in" data-k="memo" placeholder="주의사항, 연락처, 반입 시간 등">${esc(e.memo)}</textarea>
+
+    <div class="editbar">
+      <span class="note">${e.updatedAt?`마지막 수정 ${esc(fmtTs(e.updatedAt))}${e.updatedBy?' · '+esc(e.updatedBy):''}`:''}</span>
+      ${EVENTS.find(x=>x.id===e.id)?`<button class="btn btn-danger btn-sm" id="btn-del">삭제</button>`:''}
+      <button class="btn btn-ghost" id="btn-cancel">취소</button>
+      <button class="btn btn-primary" id="btn-save">저장</button>
+    </div>`;
+}
+function rowProgram(r,i){
+  return `<tr data-i="${i}">
+    <td><input class="in" data-r="program.${i}.part" value="${esc(r.part)}" placeholder="식전"></td>
+    <td><input class="in" data-r="program.${i}.time" value="${esc(r.time)}" placeholder="14:40~15:00"></td>
+    <td><input class="in" data-r="program.${i}.dur" value="${esc(r.dur)}" placeholder="30′"></td>
+    <td><textarea class="in" data-r="program.${i}.content" placeholder="사전등록 및 식전공연">${esc(r.content)}</textarea></td>
+    <td><input class="in" data-r="program.${i}.note" value="${esc(r.note)}" placeholder="아나운서"></td>
+    <td style="white-space:nowrap"><button class="ic" data-up="program" title="위로">↑</button><button class="ic" data-down="program" title="아래로">↓</button><button class="ic del" data-del="program" title="삭제">✕</button></td>
+  </tr>`;
+}
+function rowItem(r,i){
+  return `<tr data-i="${i}">
+    <td style="padding-top:.55rem;color:#8A8494;text-align:center">${i+1}</td>
+    <td><input class="in" data-r="items.${i}.name" value="${esc(r.name)}" placeholder="음향 (중형)"></td>
+    <td><input class="in" data-r="items.${i}.spec" value="${esc(r.spec)}" placeholder="FBT 라인어레이 콘솔 무선마이크 외"></td>
+    <td><input class="in" data-r="items.${i}.qty" value="${esc(r.qty)}" placeholder="1식"></td>
+    <td><input class="in" data-r="items.${i}.owner" value="${esc(r.owner)}" placeholder="담당"></td>
+    <td style="text-align:center;padding-top:.5rem"><input type="checkbox" class="chk" data-r="items.${i}.done" ${r.done?'checked':''}></td>
+    <td style="white-space:nowrap"><button class="ic" data-up="items" title="위로">↑</button><button class="ic" data-down="items" title="아래로">↓</button><button class="ic del" data-del="items" title="삭제">✕</button></td>
+  </tr>`;
+}
+function setPath(obj, path, val){ const ks=path.split('.'); let o=obj; for(let i=0;i<ks.length-1;i++){ o=o[ks[i]]; } o[ks[ks.length-1]]=val; }
+function readForm(){
+  $$('#detail [data-k]').forEach(el=>setPath(EDIT, el.dataset.k, el.value));
+  $$('#detail [data-r]').forEach(el=>setPath(EDIT, el.dataset.r, el.type==='checkbox'?el.checked:el.value));
+}
+function wireEdit(){
+  const box=$('#detail');
+  const rerenderTables = ()=>{ readForm(); $('#e-program tbody').innerHTML = EDIT.program.map(rowProgram).join(''); $('#e-items tbody').innerHTML = EDIT.items.map(rowItem).join(''); };
+  $('#add-program').addEventListener('click', ()=>{ readForm(); const last=EDIT.program[EDIT.program.length-1]; EDIT.program.push({part:last?last.part:'',time:'',dur:'',content:'',note:''}); rerenderTables(); const t=$$('#e-program textarea').pop(); t&&t.focus(); });
+  $('#add-item').addEventListener('click', ()=>{ readForm(); EDIT.items.push({name:'',spec:'',qty:'',owner:'',done:false}); rerenderTables(); const t=$$('#e-items input[data-r$=".name"]').pop(); t&&t.focus(); });
+  $('#paste-items').addEventListener('click', ()=>{
+    const txt = prompt('한 줄에 한 품목씩 붙여넣으세요.\n형식: 품목 | 규격 | 수량   (구분은 탭 또는 |)\n\n예)\n음향 (중형) | FBT 라인어레이 콘솔 무선마이크 외 | 1식');
+    if(!txt) return; readForm();
+    txt.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
+      const p = l.split(/\t|\|/).map(s=>s.trim());
+      if(/^\d+$/.test(p[0])) p.shift();            // 앞에 번호가 있으면 뺀다
+      if(!p[0]) return;
+      EDIT.items.push({name:p[0], spec:p[1]||'', qty:p[2]||'', owner:p[3]||'', done:false});
+    });
+    rerenderTables();
+  });
+  box.addEventListener('click', (ev)=>{
+    const b = ev.target.closest('button[data-up],button[data-down],button[data-del]'); if(!b) return;
+    const key = b.dataset.up||b.dataset.down||b.dataset.del; const tr=b.closest('tr'); const i=+tr.dataset.i;
+    readForm(); const arr=EDIT[key];
+    if(b.dataset.del){ arr.splice(i,1); }
+    else if(b.dataset.up && i>0){ [arr[i-1],arr[i]]=[arr[i],arr[i-1]]; }
+    else if(b.dataset.down && i<arr.length-1){ [arr[i+1],arr[i]]=[arr[i],arr[i+1]]; }
+    rerenderTables();
+  });
+  $('#btn-cancel').addEventListener('click', ()=>{ const isNew=!EVENTS.find(x=>x.id===EDIT.id); EDIT=null; if(isNew) SEL=(sorted()[0]||{}).id||''; render(); });
+  $('#btn-save').addEventListener('click', async ()=>{
+    readForm();
+    if(!EDIT.title.trim()){ toast('행사명을 입력해 주세요'); $('#detail [data-k="title"]').focus(); return; }
+    EDIT.program = EDIT.program.filter(r=>r.part||r.time||r.content||r.note);
+    EDIT.items = EDIT.items.filter(r=>r.name||r.spec);
+    const btn=$('#btn-save'); btn.disabled=true; btn.innerHTML='<span class="spin"></span> 저장 중…';
+    const i = EVENTS.findIndex(x=>x.id===EDIT.id);
+    const saved = normalize(EDIT);
+    if(i>=0) EVENTS[i]=saved; else EVENTS.push(saved);
+    await persist(saved);
+    applyContracts(); SEL=saved.id; EDIT=null; render();
+  });
+  const del=$('#btn-del'); if(del) del.addEventListener('click', async ()=>{
+    if(!confirm(`「${EDIT.title||'이 행사'}」를 삭제할까요? 팀 전원에게서 지워집니다.`)) return;
+    await removeEvent(EDIT.id); EDIT=null; SEL=(sorted()[0]||{}).id||''; render(); toast('삭제했습니다');
+  });
+}
+
+/* ── 상단 · 목록 이벤트 ── */
+$('#btn-new').addEventListener('click', ()=>{ EDIT = blankEvent(); if(myName()) EDIT.owner=myName(); SEL=EDIT.id; render(); window.scrollTo({top:0}); });
+$('#btn-reload').addEventListener('click', ()=>{ if(EDIT && !confirm('편집 중인 내용이 사라집니다. 새로고침할까요?')) return; EDIT=null; loadAll(); });
+$('#btn-share').addEventListener('click', async ()=>{
+  const dep = deployId(apiURL());
+  const url = location.href.replace(/[?#].*$/,'') + (dep && !서버주소_기본 ? '?s='+dep : '');
+  try{ await navigator.clipboard.writeText(url); toast(dep?'공유 링크를 복사했습니다 (받는 쪽 설정 불필요)':'링크를 복사했습니다 — 서버가 없어 각자 기기에만 저장됩니다'); }
+  catch(e){ prompt('이 링크를 팀에 보내세요', url); }
+});
+$('#list').addEventListener('click', (ev)=>{ const b=ev.target.closest('.ev'); if(!b) return; if(EDIT && !confirm('편집 중인 내용이 사라집니다. 이동할까요?')) return; EDIT=null; SEL=b.dataset.id; render(); });
+$('#suggest').addEventListener('click', (ev)=>{ const b=ev.target.closest('[data-import]'); if(!b) return; b.disabled=true; importContract(b.dataset.import); });
+$('#filters').addEventListener('click', (ev)=>{ const b=ev.target.closest('.chip'); if(!b) return; FILTER=b.dataset.f; $$('#filters .chip').forEach(c=>c.setAttribute('aria-pressed', c===b)); renderList(); });
+$('#search').addEventListener('input', (ev)=>{ QUERY=ev.target.value; renderList(); });
+
+/* 서버 설정 */
+$('#pill-server').addEventListener('click', ()=>{
+  $('#in-api').value = apiURL(); $('#in-api').disabled = !!서버주소_기본;
+  $('#api-note').innerHTML = 서버주소_기본 ? '<b style="color:#86EFAC">파일에 고정된 서버</b>를 쓰고 있습니다.' : (apiURL() ? (SERVER_OK?'<b style="color:#86EFAC">연결됨</b>':'<b style="color:#FCA5A5">응답 없음</b> — 배포 액세스 권한이 「모든 사용자」인지 확인') : '<b style="color:#FCA5A5">비어 있음</b> — 이 기기에만 저장됩니다.');
+  $('#m-server').hidden=false;
+});
+$('#m-server-close').addEventListener('click', ()=>{ $('#m-server').hidden=true; });
+$('#m-server-save').addEventListener('click', ()=>{
+  const v=$('#in-api').value.trim();
+  if(v && !/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(v)){ toast('웹앱 URL 형식이 아닙니다 (…/exec 로 끝나야 합니다)'); return; }
+  if(v) LS.setItem('kg_sched_api', v); else LS.removeItem('kg_sched_api');
+  history.replaceState(null,'', location.pathname);
+  $('#m-server').hidden=true; loadAll();
+});
+/* 내 이름 */
+$('#pill-me').addEventListener('click', ()=>{ $('#in-me').value=myName(); $('#m-me').hidden=false; $('#in-me').focus(); });
+$('#m-me-close').addEventListener('click', ()=>{ $('#m-me').hidden=true; });
+$('#m-me-save').addEventListener('click', ()=>{ const v=$('#in-me').value.trim(); if(v) LS.setItem('kg_sched_me', v); else LS.removeItem('kg_sched_me'); $('#m-me').hidden=true; render(); });
+$$('.modal').forEach(m=>m.addEventListener('click', (ev)=>{ if(ev.target===m) m.hidden=true; }));
+window.addEventListener('beforeunload', (ev)=>{ if(EDIT){ ev.preventDefault(); ev.returnValue=''; } });
+
+loadAll();
+</script>
+</body>
+</html>
