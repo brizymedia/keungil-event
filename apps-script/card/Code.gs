@@ -12,11 +12,12 @@
  *
  * ── 설치 ────────────────────────────────────────────────
  * 1. script.google.com → 새 프로젝트 → 이 파일 내용을 붙여넣기
- * 2. 프로젝트 설정 → 스크립트 속성에 세 가지를 넣습니다
- *      UPLOAD_PW      명함을 발행할 때 넣을 비밀번호 (아무 문자열)
+ * 2. 프로젝트 설정 → 스크립트 속성에 두 가지를 넣습니다
  *      GITHUB_TOKEN   깃허브 토큰 (Contents 쓰기 권한)
  *      GITHUB_REPO    brizymedia/keungil-event
  *    ※ 갤러리 스크립트에 넣어둔 값과 같은 것을 쓰면 됩니다.
+ *    UPLOAD_PW 는 명함을 「지울 때」만 씁니다. 발행에는 비밀번호가 없습니다 —
+ *    이름·휴대폰을 신청명단에 남기면 바로 만들어집니다.
  * 3. 배포 → 새 배포 → 웹 앱
  *      실행 사용자: 나
  *      액세스 권한: 모든 사용자
@@ -41,12 +42,14 @@ function doPost(e) {
   try {
     const 요청 = JSON.parse(e.postData.contents);
 
-    if (요청.pw !== 설정('UPLOAD_PW')) {
-      return 응답({ ok: false, error: '비밀번호가 다릅니다' });
-    }
-
+    // 발행은 비밀번호 없이 — 이름·휴대폰(신청명단)만 받고 바로 만든다
     if (요청.action === 'card')   return 응답(잠그고(function () { return 명함발행(요청); }));
-    if (요청.action === 'delete') return 응답(잠그고(function () { return 명함삭제(요청); }));
+
+    // 지우기는 남의 명함을 내릴 수 있으니 비밀번호를 그대로 둔다
+    if (요청.action === 'delete') {
+      if (!비밀번호맞나_(요청.pw)) return 응답({ ok: false, error: '비밀번호가 다릅니다' });
+      return 응답(잠그고(function () { return 명함삭제(요청); }));
+    }
 
     return 응답({ ok: false, error: '알 수 없는 요청입니다: ' + 요청.action });
 
@@ -74,6 +77,22 @@ function 명함발행(요청) {
     return { ok: false, error: '명함이 너무 큽니다' };
   }
 
+  // 비밀번호 대신 신청명단 — 이름·휴대폰이 있어야 만든다
+  const 신청 = 요청.lead || {};
+  const 이름 = 다듬기_(신청.name, 40), 전화 = 전화정리_(신청.tel);
+  if (!이름 || !전화) {
+    return { ok: false, error: '이름과 휴대폰 번호를 넣어주세요. 명함은 신청명단에 남긴 뒤 바로 만들어집니다' };
+  }
+
+  // 이미 있는 주소는 처음 만든 사람(같은 휴대폰)만 고칠 수 있다. 남의 명함을 덮어쓰지 못하게.
+  if (깃허브('card/' + 주소 + '/index.html', 'get').getResponseCode() === 200) {
+    let 주인 = '';
+    try { 주인 = 주소주인_(주소); } catch (err) { 주인 = ''; }
+    if (주인 !== 전화) {
+      return { ok: false, error: '「' + 주소 + '」 는 이미 다른 분이 쓰고 있는 주소입니다. 다른 주소로 해주세요' };
+    }
+  }
+
   // 사진부터 올린다. 사진이 없는 채로 명함이 먼저 뜨면 깨져 보인다.
   if (요청.photo) {
     const r = 깃허브에올리기('card/img/' + 주소 + '.jpg', 요청.photo, '명함 인물: ' + 주소);
@@ -91,14 +110,14 @@ function 명함발행(요청) {
   const r = 깃허브에올리기('card/' + 주소 + '/index.html', base64(요청.html), '명함 발행: ' + 주소);
   if (!r.ok) return r;
 
-  // 명단 — 누가 명함을 만들었는지 시트에 남긴다. 여기서 실패해도 발행은 된 것이다.
-  let 명단 = null;
-  if (요청.lead) {
-    try { 명단 = 명단남기기(요청.lead, 주소); }
-    catch (err) { 명단 = { ok: false, error: String(err && err.message ? err.message : err) }; }
-  }
+  // 신청명단 — 누가 어떤 주소로 만들었는지 시트에 남긴다. 여기서 실패해도 발행은 된 것이다.
+  let 신청기록 = null, 명단 = null;
+  try { 신청기록 = 명함기록_(주소, 신청, 이름, 전화); }
+  catch (err) { 신청기록 = { ok: false, error: String(err && err.message ? err.message : err) }; }
+  try { 명단 = 명단남기기(신청, 주소); }
+  catch (err) { 명단 = { ok: false, error: String(err && err.message ? err.message : err) }; }
 
-  return { ok: true, slug: 주소, lead: 명단 };
+  return { ok: true, slug: 주소, 신청: 신청기록, lead: 명단 };
 }
 
 function 명함삭제(요청) {
@@ -187,6 +206,12 @@ function 설정(키) {
   return v;
 }
 
+/** 지우기 전용. UPLOAD_PW 가 비어 있으면 웹에서는 아무도 지울 수 없다 (편집기에서 명함삭제 를 직접 부르면 된다) */
+function 비밀번호맞나_(pw) {
+  const 정답 = PropertiesService.getScriptProperties().getProperty('UPLOAD_PW');
+  return !!정답 && typeof pw === 'string' && pw.trim() === 정답.trim();
+}
+
 /** 같은 주소에 두 사람이 동시에 발행하면 하나가 사라진다. 순서대로 처리한다. */
 function 잠그고(일) {
   const 자물쇠 = LockService.getScriptLock();
@@ -219,9 +244,10 @@ function 권한받기() {
 
 function 점검() {
   const 속성 = PropertiesService.getScriptProperties();
-  ['UPLOAD_PW', 'GITHUB_TOKEN', 'GITHUB_REPO'].forEach(function (k) {
+  ['GITHUB_TOKEN', 'GITHUB_REPO'].forEach(function (k) {
     Logger.log(k + ': ' + (속성.getProperty(k) ? '있음' : '── 없음 ──'));
   });
+  Logger.log('UPLOAD_PW: ' + (속성.getProperty('UPLOAD_PW') ? '있음 (지우기에만 씁니다)' : '없음 — 발행에는 필요 없습니다'));
   try {
     const 응 = 깃허브('card', 'get');
     const 코드 = 응.getResponseCode();
@@ -276,6 +302,37 @@ function 명단남기기(l, slug) {
   }
   sh.appendRow([new Date(), 이름, 전화, 직군, '', '명함', 동의, new Date(), 메모, '']);
   return { ok: true, new: true };
+}
+
+/* ── 신청명단 「명함」 시트: 발행시각 · 주소 · 이름 · 전화 · 회사 · 직군 · 문자동의 ── */
+function 명함기록_(slug, l, 이름, 전화) {
+  const sh = 명함시트_();
+  sh.appendRow([new Date(), slug, 이름, 전화, 다듬기_(l.co, 60), 다듬기_(l.job, 30),
+                l.consent === true || l.consent === 'Y' ? 'Y' : 'N']);
+  return { ok: true };
+}
+
+/** 그 주소로 맨 처음 발행한 사람의 휴대폰. 기록이 없으면 빈 값 */
+function 주소주인_(slug) {
+  const sh = 명함시트_();
+  const 끝 = sh.getLastRow();
+  if (끝 < 2) return '';
+  const 값 = sh.getRange(2, 2, 끝 - 1, 3).getValues();
+  for (let i = 0; i < 값.length; i++) {
+    if (String(값[i][0]) === slug) return String(값[i][2]);
+  }
+  return '';
+}
+
+function 명함시트_() {
+  const ss = 명단시트_().getParent();
+  let sh = ss.getSheetByName('명함');
+  if (sh) return sh;
+  sh = ss.insertSheet('명함');
+  sh.appendRow(['발행시각', '주소', '이름', '전화', '회사', '직군', '문자동의']);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, 7).setFontWeight('bold').setBackground('#E1EAE2');
+  return sh;
 }
 
 function 명단시트_() {
