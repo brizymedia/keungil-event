@@ -592,6 +592,11 @@
         <iconify-icon icon="solar:pen-new-square-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
         이 견적으로 계약서 작성
       </button>
+      <button type="button" class="btn-ghost" id="btn-stmt" hidden
+              style="padding:.85rem 1.5rem;font-size:.95rem;border-color:rgba(245,158,11,.5);">
+        <iconify-icon icon="solar:bill-list-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
+        이 견적으로 거래명세서 작성
+      </button>
     </div>
 
     <p class="no-print" id="stamp-note"
@@ -1504,6 +1509,27 @@ $('#btn-contract').addEventListener('click', () => {
   const url  = location.href.replace(/[?#].*$/, '').replace(/quote\.html$/, 'contract.html') + '?admin=1#c=' + code;
   window.open(url, '_blank');
 });
+/* ── 이 견적으로 거래명세서 작성 → statement.html?admin=1#t=… ── */
+$('#btn-stmt').addEventListener('click', () => {
+  if (!rows.length) { toast('견적 항목을 먼저 선택해 주세요'); return; }
+  const g = (k) => $('#q-' + k).value.trim();
+  const d = new Date();
+  const 오늘 = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const st = {
+    v: 1,
+    no: 'KG-' + 오늘.replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 5).toUpperCase(),
+    issued: 오늘,
+    cl: { org: g('org'), name: g('name'), tel: g('tel'), email: g('email'), biz: '', addr: '' },
+    ev: { title: g('title'), date: g('date'), place: g('place') },
+    rows: rows.map((r) => ({ on: true, name: r.name, spec: r.spec, qty: r.qty, unit: r.unit, days: r.days, price: r.price })),
+    vat: '별도', paid: 0, memo: '',
+  };
+  const 할인 = +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0;
+  if (할인) st.rows.push({ on: true, name: '할인', spec: '견적서 할인', qty: 1, unit: '식', days: 1, price: -할인 });
+  const url = location.href.replace(/[?#].*$/, '').replace(/quote\.html$/, 'statement.html') + '?admin=1#t=' + b64u(JSON.stringify(st));
+  window.open(url, '_blank');
+});
+
 $('#send-close').addEventListener('click',   () => { $('#send-modal').hidden = true; });
 $('#send-modal').addEventListener('click', (e) => { if (e.target.id === 'send-modal') $('#send-modal').hidden = true; });
 $('#send-gmail').addEventListener('click',   () => { window.open(지메일URL(), '_blank', 'noopener'); });
@@ -1716,6 +1742,7 @@ function 관리자표시() {
   $('#admin-bar').hidden = false;
   $('#btn-to-customer').hidden = false;
   $('#btn-contract').hidden = false;
+  $('#btn-stmt').hidden = false;
   const to = $('#q-email').value.trim();
   $('#admin-to').textContent = to || '고객 이메일 (미입력)';
 }
