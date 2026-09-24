@@ -103,11 +103,27 @@ export function buildNaver(옵션 = {}) {
       글목록.set(f, JSON.parse(readFileSync(resolve(글폴더, f), 'utf8')));
     }
   }
+  // 생활정보 · 행사 이야기(/life/) 글의 네이버 원고 — _column/naver/<원글과 같은 파일 이름>
+  const 칼럼원고 = resolve(ROOT, '_column', 'naver');
+  if (existsSync(칼럼원고)) {
+    for (const f of readdirSync(칼럼원고).filter((x) => x.endsWith('.json'))) {
+      const n = JSON.parse(readFileSync(resolve(칼럼원고, f), 'utf8'));
+      Object.defineProperty(n, '_파일', { value: f, enumerable: false });
+      const 원글파일 = resolve(ROOT, '_column', 'posts', f);
+      if (existsSync(원글파일)) {
+        const 원글 = JSON.parse(readFileSync(원글파일, 'utf8'));
+        Object.defineProperty(n, '_주소', { value: `/life/${원글.slug}/`, enumerable: false });
+      }
+      원고들.push(n);
+    }
+    원고들.sort((a, b) => (a._파일 < b._파일 ? 1 : -1));
+  }
   const 사진주소 = (p) => CDN + String(p || '').split('/').map(encodeURIComponent).join('/');
 
   const 카드들 = 원고들.slice(0, 20).map((n, k) => {
-    const 원글 = 글목록.get(n._파일);
-    const 주소 = 원글 ? 한글사이트 + decodeURIComponent(글주소(원글.slug)) : 한글사이트 + '/blog/';
+    const 원글 = n._주소 ? null : 글목록.get(n._파일);
+    const 원글경로 = n._주소 || (원글 ? 글주소(원글.slug) : '');
+    const 주소 = 원글경로 ? 한글사이트 + decodeURIComponent(원글경로) : 한글사이트 + '/blog/';
     const 본문 = 복사본문(n, 주소);
     const 사진들 = 네이버사진들(n);
     const 그림 = 사진들.map((s, i) => `
@@ -121,7 +137,7 @@ export function buildNaver(옵션 = {}) {
       <article class="card">
         <div class="meta">
           <span>${esc(날짜글(n.날짜 || (n._파일 || '').slice(0, 10)))}</span>
-          ${원글 ? `<a href="${글주소(원글.slug)}" target="_blank" rel="noopener">홈페이지 원글 보기</a>` : ''}
+          ${원글경로 ? `<a href="${원글경로}" target="_blank" rel="noopener">홈페이지 원글 보기</a>` : ''}
         </div>
         <div class="row"><h2 id="t${k}">${esc(n.제목 || '')}</h2><button data-copy="t${k}">제목 복사</button></div>
         <div class="row"><b>본문 · 링크 · 태그</b><button data-copy="b${k}">본문 복사</button></div>

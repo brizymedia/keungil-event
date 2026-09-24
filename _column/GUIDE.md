@@ -87,3 +87,8 @@
 - 회사 사실은 `_blog/GUIDE.md` 4장 목록만 쓴다(견적은 [자동 견적서](/quote.html) · 1533-7295). "광주광역시" 대신 "광주"(검사기가 막는다).
 - 내부 링크 후보: `/quote.html` · `/blog/` · `/gallery.html` · 지역 페이지(`/suncheon/` 등).
 - 이 저장소의 main 은 갤러리 봇이 자주 커밋한다. push 가 거절되면 pull --rebase 후 다시 build · push 한다.
+
+## 7. 네이버 블로그용 원고 (요청이 있을 때)
+
+- `_column/naver/<원글과 똑같은 파일 이름>` 에 `_blog/GUIDE.md` 9장 형식으로 쓴다. 원글과 25% 넘게 겹치지 않게, 원글에 없는 숫자는 쓰지 않는다.
+- 사진은 `_blog/photos.json` 에서 고른다. 결과는 https://큰길이벤트.com/naver/ 에 `_blog/naver` 원고와 함께 복사 단추로 나온다(갤러리 워크플로가 다시 만든다).

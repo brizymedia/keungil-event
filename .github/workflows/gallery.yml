@@ -17,6 +17,7 @@ on:
       - 'scripts/build-naver.mjs'
       - '_blog/posts/**'
       - '_blog/naver/**'
+      - '_column/naver/**'
       - '_blog/regions.json'
       - '.github/workflows/gallery.yml'
 
