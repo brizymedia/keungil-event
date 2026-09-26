@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계약금 결제 — 큰길브리지 홈페이지 제작</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="https://www.ai-make.co.kr/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../funnel.css">
+<style>
+main{max-width:640px;margin:0 auto;padding:10px 20px 60px}
+.panel{background:var(--ink-3);border:1px solid var(--line);border-radius:18px;padding:24px 20px;margin-top:16px}
+.ln{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:.9rem;color:var(--dim);border-bottom:1px solid var(--line)}
+.ln b{color:var(--txt);font-weight:600;text-align:right}
+.amt{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px}
+.amt b{font-size:1.8rem;color:var(--gold);font-weight:800}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#0E1320;border-radius:12px;padding:5px;margin-top:18px}
+.tabs button{font:inherit;font-weight:700;font-size:.9rem;padding:11px;border-radius:9px;border:0;background:transparent;color:var(--dim);cursor:pointer}
+.tabs button.on{background:var(--gold);color:var(--ink)}
+.toss{background:#fff;border-radius:14px;margin-top:14px;overflow:hidden;min-height:120px}
+.bank{margin-top:14px}
+.bank .acc{font-size:1.05rem;font-weight:800;color:var(--txt);background:#0E1320;border:1px dashed var(--line-2);border-radius:12px;padding:16px;text-align:center;margin:10px 0;word-break:break-all}
+.state{text-align:center;padding:36px 10px}
+.state .ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;background:rgba(63,211,198,.12);color:var(--teal)}
+.state .ic svg{width:32px;height:32px}
+.state p{color:var(--dim);margin-top:10px}
+.next{display:grid;gap:10px;margin-top:22px;text-align:left}
+.next a{display:flex;gap:12px;align-items:center;border:1px solid var(--line-2);border-radius:14px;padding:14px 16px;text-decoration:none}
+.next a b{display:block}
+.next a span{font-size:.84rem;color:var(--dim)}
+.next a i{font-style:normal;margin-left:auto;color:var(--gold)}
+.hide{display:none!important}
+.test{display:inline-block;font-size:.72rem;font-weight:800;color:var(--coral);border:1px solid rgba(255,107,74,.5);border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="https://www.ai-make.co.kr/"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M2 30 C 10 12, 30 12, 38 30" stroke="#E8B84B" stroke-width="2.4" stroke-linecap="round"/><path d="M2 30 H38" stroke="#3FD3C6" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="17" r="2.8" fill="#E8B84B"/></svg>큰길브리지</a>
+  <a class="tel" href="tel:1533-7295">결제 문의 <b>1533-7295</b></a>
+</div></header>
+
+<main>
+  <div class="steps"><span class="done">③ 견적</span><span class="done">④ 전자계약</span><span class="on">⑤ 결제 · 착수</span></div>
+
+  <!-- 불러오는 중 / 오류 / 완료 -->
+  <div class="panel state" id="st-load"><span class="spin" style="width:28px;height:28px"></span><p>계약서를 확인하고 있습니다…</p></div>
+  <div class="panel state hide" id="st-msg"><div class="ic" id="msg-ic"></div><h2 id="msg-h" style="font-size:1.4rem"></h2><p id="msg-p"></p><div class="next" id="msg-next"></div></div>
+
+  <!-- 결제 -->
+  <section id="st-pay" class="hide">
+    <div class="panel">
+      <h2 style="font-size:1.35rem"><span id="stage-name">계약금</span> 결제<span class="test hide" id="test">테스트 결제</span></h2>
+      <p class="dim" style="font-size:.88rem;margin:4px 0 12px">서명이 완료된 계약입니다. 결제가 확인되면 영업일 2일 이내 착수합니다.</p>
+      <div class="ln"><span>계약번호</span><b id="v-no"></b></div>
+      <div class="ln"><span>계약 명의</span><b id="v-org"></b></div>
+      <div class="ln"><span>제작 내용</span><b id="v-title"></b></div>
+      <div class="ln"><span>계약 합계 (부가세 포함)</span><b id="v-total"></b></div>
+      <div class="ln"><span id="v-split-l">계약금 / 잔금</span><b id="v-split"></b></div>
+      <div class="amt"><span>이번 결제 금액</span><b id="v-amt"></b></div>
+      <p style="margin-top:10px;font-size:.8rem"><a id="v-contract" href="#" target="_blank" rel="noopener" style="color:var(--dim)">서명한 계약서 다시 보기 →</a></p>
+    </div>
+
+    <div class="panel">
+      <div class="tabs" role="tablist"><button type="button" class="on" data-t="online" role="tab">카드 · 계좌이체 · 간편결제</button><button type="button" data-t="bank" role="tab">무통장 입금</button></div>
+
+      <div id="t-online">
+        <div class="toss"><div id="payment-method"></div><div id="agreement"></div></div>
+        <div class="err" id="err" role="alert"></div>
+        <button class="btn gold block" type="button" id="pay-btn" disabled>결제하기</button>
+        <p class="mute center" style="font-size:.76rem;margin-top:10px">결제는 토스페이먼츠로 안전하게 처리됩니다 · 법인카드 · 세금계산서 가능</p>
+      </div>
+
+      <div id="t-bank" class="bank hide">
+        <p class="dim" style="font-size:.9rem">아래 계좌로 <b style="color:var(--gold)" id="b-amt"></b>을 보내 주세요. 입금자명은 <b style="color:var(--txt)">계약 명의(상호)</b>로 해 주시면 빨리 확인됩니다.</p>
+        <div class="acc" id="b-acc"></div>
+        <button class="btn block" type="button" id="b-copy">계좌번호 복사</button>
+        <label class="f" for="b-name">입금자명</label><input class="in" id="b-name">
+        <button class="btn gold block" type="button" id="b-done" style="margin-top:14px">입금했습니다 — 확인 요청</button>
+        <p class="mute" style="font-size:.78rem;margin-top:10px">사업자 계좌입니다. 입금 확인 후 세금계산서 · 현금영수증을 발행해 드립니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="center mute" style="font-size:.76rem;margin-top:26px;line-height:1.9">취소 · 환불: 착수 전 계약금 전액 환급 · 시안 제시 전 계약금 50% 공제 · 시안 제시 후 계약금 환급 없음 (계약서 제12조)</p>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <span>(주)브리지미디어</span><span>큰길브리지</span><span>대표 김효민</span><span>사업자등록번호 813-81-02252</span><span>대표번호 1533-7295</span><br>
+  <span>전남광주통합특별시 광양시 광양읍 강변동길 1, 2층</span><span>gilauto325@gmail.com</span>
+</div></footer>
+<div class="toast" id="toast"></div>
+
+<script src="https://js.tosspayments.com/v2/standard"></script>
+<script src="../config.js"></script>
+<script>
+(function(){
+'use strict';
+var B = window.BRIDGE, $ = function(s){ return document.querySelector(s); };
+var Q = new URLSearchParams(location.search);
+var cid = (Q.get('c') || '').replace(/[^A-Z0-9]/gi, '').toUpperCase();
+var stage = Q.get('stage') === 'bal' ? 'bal' : 'dep';
+var lead = B.leadId();
+var R = null, M = null;   // 계약 원본, 금액
+
+function toast(m){ var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ t.classList.remove('on'); }, 2600); }
+var 아이콘 = {
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>'
+};
+function 알림화면(kind, h, p, next){
+  $('#st-load').classList.add('hide'); $('#st-pay').classList.add('hide'); $('#st-msg').classList.remove('hide');
+  $('#msg-ic').innerHTML = 아이콘[kind === 'ok' ? 'ok' : 'x'];
+  $('#msg-ic').style.cssText = kind === 'ok' ? '' : 'background:rgba(255,107,74,.12);color:var(--coral)';
+  $('#msg-h').textContent = h; $('#msg-p').innerHTML = p;
+  $('#msg-next').innerHTML = (next || []).map(function(n){ return '<a href="' + B.esc(n[0]) + '"' + (n[3] ? ' target="_blank" rel="noopener"' : '') + '><div><b>' + B.esc(n[1]) + '</b><span>' + B.esc(n[2]) + '</span></div><i>→</i></a>'; }).join('');
+}
+
+/* contract.html · 계약 서버의 calcTotal_ 과 같은 계산 */
+function 금액(c){
+  var num = function(v){ return +String(v == null ? '' : v).replace(/[^0-9.-]/g, '') || 0; };
+  var sub = 0; (c.items || []).forEach(function(it){ sub += num(it.q) * num(it.p); });
+  var total = sub + ((c.fin && c.fin.vat) === 'excl' ? Math.round(sub * 0.1) : 0);
+  var d = Number((c.fin && c.fin.deposit) || 0), dep = Math.round(total * d / 100);
+  return { total: total, d: d, dep: dep, bal: total - dep };
+}
+function 이번금액(){ return stage === 'bal' ? M.bal : (M.d === 0 ? M.total : M.dep); }
+function 단계이름(){ return stage === 'bal' ? '잔금' : (M.d === 100 || M.d === 0 ? '대금 전액' : '계약금'); }
+function 다음단계들(){
+  return [
+    [B.SITE + '/start/', '자료 제출서 보내기', '로고 · 사진 · 소개글을 한 번에 보내 주시면 바로 시안 작업에 들어갑니다', 1],
+    [(R && R.pdfUrl) || (B.SITE + '/contract.html?c=' + cid + '&s=' + B.CONTRACT_DEPLOY), '서명한 계약서 PDF', '이메일로도 보내 드렸습니다', 1],
+    ['tel:1533-7295', '담당자와 통화', '평일 09:00–18:00 · 1533-7295', 0]
+  ];
+}
+
+/* ── 1) 결제 완료로 돌아온 경우 (토스가 paymentKey · orderId · amount 를 붙여 돌려보낸다) ── */
+if(Q.get('paymentKey')){
+  var pk = Q.get('paymentKey'), oid = Q.get('orderId'), amt = Number(Q.get('amount'));
+  B.api({ action: 'confirm', paymentKey: pk, orderId: oid, amount: amt, c: cid, stage: stage, lead: lead }).then(function(r){
+    if(!r || !r.ok) throw new Error((r && r.error) || '결제 확인 실패');
+    history.replaceState(null, '', location.pathname + '?c=' + cid + '&stage=' + stage);
+    if(r.waiting){
+      B.track('pay_click', { contract: cid, stage: stage, amount: amt });
+      알림화면('ok', '입금 계좌가 발급되었습니다', '안내된 가상계좌로 ' + B.won(amt) + '을 입금해 주세요. 계좌 정보는 이메일로도 보내 드렸습니다.<br>입금되면 자동으로 확인되고 제작이 시작됩니다.', 다음단계들());
+      return;
+    }
+    B.track('paid', { contract: cid, stage: stage, amount: amt });
+    알림화면('ok', '결제가 완료되었습니다', B.won(amt) + ' 결제가 확인되었습니다.' + (r.receipt ? ' <a href="' + B.esc(r.receipt) + '" target="_blank" rel="noopener" style="color:var(--teal)">영수증 보기</a>' : '') +
+      '<br>영업일 2일 이내에 담당자가 연락드리고 제작을 시작합니다.', 다음단계들());
+  }).catch(function(e){
+    알림화면('x', '결제 확인 중 문제가 생겼습니다', '카드 승인은 되었을 수 있습니다. 중복 결제를 막기 위해 다시 결제하지 마시고 <b>1533-7295</b> 로 연락 주세요.<br><span class="mute" style="font-size:.8rem">주문번호 ' + B.esc(oid) + ' · ' + B.esc(e.message) + '</span>');
+  });
+  return;
+}
+if(Q.get('fail')){
+  /* 실패 · 취소 — 결제 화면을 다시 띄운다 */
+  setTimeout(function(){ toast(Q.get('message') || '결제가 취소되었습니다'); }, 600);
+  history.replaceState(null, '', location.pathname + '?c=' + cid + '&stage=' + stage);
+}
+
+/* ── 2) 계약서 불러오기 ── */
+if(!cid){ 알림화면('x', '계약서 정보가 없습니다', '이메일로 받으신 결제 링크로 다시 들어와 주세요.', [['../go/', '자동 견적부터 시작', '요금제 선택 → 전자계약 → 결제', 0]]); return; }
+
+fetch(B.contractApi() + '?id=' + encodeURIComponent(cid)).then(function(r){ return r.json(); }).then(function(r){
+  if(!r || !r.ok) throw new Error((r && r.error) || '계약서를 찾을 수 없습니다');
+  R = r; M = 금액(r.contract);
+  var 계약서주소 = B.SITE + '/contract.html?c=' + cid + '&s=' + B.CONTRACT_DEPLOY;
+  if(r.status !== 'signed'){
+    알림화면('x', '먼저 계약서에 서명해 주세요', '서명이 끝나면 이 화면에서 결제할 수 있습니다.', [[계약서주소, '계약서 열고 서명하기', '맨 아래 서명란에 서명 → 「서명하고 계약서 보내기」', 1]]);
+    return;
+  }
+  if(이번금액() <= 0){ 알림화면('ok', '지금 결제할 금액이 없습니다', stage === 'bal' ? '대금 전액이 이미 계약금으로 결제되는 계약입니다.' : '이 계약은 오픈 후 일시불 조건입니다. 오픈 확인 뒤 잔금 결제 링크를 보내 드립니다.', 다음단계들()); return; }
+  /* 이미 결제됐는지 서버에 확인 (새로고침 · 메일 링크 재방문) */
+  return (B.FUNNEL_API ? B.api({ action: 'status', c: cid, stage: stage }).catch(function(){ return null; }) : Promise.resolve(null)).then(function(s){
+    if(s && s.ok && s.paid){ 알림화면('ok', '이미 결제가 완료된 계약입니다', 단계이름() + ' ' + B.won(s.amount) + ' · ' + B.esc(s.at || '') + (s.method ? ' · ' + B.esc(s.method) : ''), 다음단계들()); return; }
+    결제화면(계약서주소);
+  });
+}).catch(function(e){
+  알림화면('x', '계약서를 불러오지 못했습니다', B.esc(e.message) + '<br>잠시 뒤 다시 열어 보시거나 1533-7295 로 연락 주세요.');
+});
+
+/* ── 3) 결제 화면 ── */
+function 결제화면(계약서주소){
+  var c = R.contract, amt = 이번금액();
+  $('#st-load').classList.add('hide'); $('#st-pay').classList.remove('hide');
+  $('#stage-name').textContent = 단계이름();
+  $('#v-no').textContent = (c.meta && c.meta.no) || cid;
+  $('#v-org').textContent = (c.cl && (c.cl.org || c.cl.name)) || '-';
+  $('#v-title').textContent = (c.pj && (c.pj.planName ? c.pj.planName + ' · ' : '') + (c.pj.title || '')) || '홈페이지 제작';
+  $('#v-total').textContent = B.won(M.total);
+  $('#v-split').textContent = M.d === 0 ? '오픈 후 일시불' : (M.d === 100 ? '전액 선결제' : B.won(M.dep) + ' / ' + B.won(M.bal));
+  $('#v-amt').textContent = B.won(amt);
+  $('#v-contract').href = 계약서주소;
+  $('#b-amt').textContent = B.won(amt);
+  $('#b-acc').textContent = (c.fin && c.fin.bank) || B.BANK;
+  $('#b-name').value = (c.cl && (c.cl.org || c.cl.name)) || '';
+  B.track('pay_view', { contract: cid, stage: stage, amount: amt });
+
+  /* 탭 */
+  document.querySelectorAll('.tabs button').forEach(function(b){ b.addEventListener('click', function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on', x === b); });
+    $('#t-online').classList.toggle('hide', b.dataset.t !== 'online'); $('#t-bank').classList.toggle('hide', b.dataset.t !== 'bank');
+  }); });
+
+  /* 온라인 결제는 서버(결제 승인 · 금액 검증)가 있어야 연다. 없으면 무통장만 */
+  if(!B.FUNNEL_API || !window.TossPayments){
+    document.querySelector('.tabs button[data-t="bank"]').click();
+    document.querySelector('.tabs button[data-t="online"]').disabled = true;
+    document.querySelector('.tabs button[data-t="online"]').title = '온라인 결제 준비 중';
+  } else 토스(c, amt);
+
+  $('#b-copy').addEventListener('click', function(){
+    var t = B.BANK.match(/[0-9-]{8,}/); t = t ? t[0] : B.BANK;
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(function(){ toast('계좌번호를 복사했습니다'); });
+  });
+  $('#b-done').addEventListener('click', function(){
+    var who = $('#b-name').value.trim(); if(!who){ toast('입금자명을 적어 주세요'); $('#b-name').focus(); return; }
+    var btn = this; btn.disabled = true; btn.innerHTML = '<span class="spin"></span> 보내는 중…';
+    var 본문 = { action: 'bank', c: cid, stage: stage, amount: amt, depositor: who, lead: lead, no: (c.meta && c.meta.no) || '', org: (c.cl && c.cl.org) || '', tel: (c.cl && c.cl.tel) || '', email: (c.cl && c.cl.email) || '' };
+    var 보내기 = B.FUNNEL_API ? B.api(본문) : fetch(B.INQUIRY_API, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({
+      name: 본문.org + ' / ' + who, phone: 본문.tel, email: 본문.email, service: '[자동계약] 무통장 입금 확인 요청',
+      message: '계약 ' + cid + ' (' + 본문.no + ') · ' + 단계이름() + ' ' + B.won(amt) + ' · 입금자명 ' + who, at: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }), page: location.href, website: '' }) });
+    Promise.resolve(보내기).catch(function(){}).then(function(){
+      B.track('bank_claim', { contract: cid, stage: stage, amount: amt });
+      알림화면('ok', '입금 확인 요청을 받았습니다', '입금이 확인되면 문자 · 이메일로 알려 드리고 제작을 시작합니다. 보통 1~2시간 안에 확인됩니다(영업시간 기준).', 다음단계들());
+    });
+  });
+}
+
+function 토스(c, amt){
+  var clientKey = B.TOSS_CLIENT_KEY;
+  if(/^test_/.test(clientKey)) $('#test').classList.remove('hide');
+  var tp = TossPayments(clientKey);
+  /* 손님 구분 키 — 계약 ID 기반 (결제수단 기억용, 개인정보 아님) */
+  var widgets = tp.widgets({ customerKey: 'KB_' + cid + '_' + (c.cl && c.cl.tel ? B.digits(c.cl.tel).slice(-4) : '0000') });
+  widgets.setAmount({ currency: 'KRW', value: amt }).then(function(){
+    return Promise.all([
+      widgets.renderPaymentMethods({ selector: '#payment-method', variantKey: 'DEFAULT' }),
+      widgets.renderAgreement({ selector: '#agreement', variantKey: 'AGREEMENT' })
+    ]);
+  }).then(function(){ $('#pay-btn').disabled = false; }).catch(function(e){ $('#err').textContent = '결제창을 불러오지 못했습니다 — 무통장 입금을 이용해 주세요 (' + e.message + ')'; });
+
+  $('#pay-btn').addEventListener('click', function(){
+    $('#err').textContent = '';
+    var base = location.origin + location.pathname + '?c=' + cid + '&stage=' + stage + (lead ? '&l=' + encodeURIComponent(lead) : '');
+    /* 주문번호 — 서버가 여기서 계약 ID · 단계를 읽어 금액을 다시 계산해 대조한다 */
+    var orderId = 'KB_' + cid + '_' + stage + '_' + Date.now().toString(36).toUpperCase();
+    var tel = B.digits(c.cl && c.cl.tel);
+    B.track('pay_click', { contract: cid, stage: stage, amount: amt });
+    widgets.requestPayment({
+      orderId: orderId,
+      orderName: '큰길브리지 홈페이지 제작 ' + 단계이름() + ' (' + ((c.meta && c.meta.no) || cid) + ')',
+      successUrl: base, failUrl: base + '&fail=1',
+      customerName: (c.cl && (c.cl.org || c.cl.name)) || undefined,
+      customerEmail: (c.cl && c.cl.email) || undefined,
+      customerMobilePhone: /^01[0-9]{8,9}$/.test(tel) ? tel : undefined
+    }).catch(function(e){ if(e && e.code !== 'USER_CANCEL') $('#err').textContent = e.message || '결제를 시작하지 못했습니다'; });
+  });
+}
+})();
+</script>
+</body>
+</html>

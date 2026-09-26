@@ -1,0 +1,4 @@
+node_modules
+.cache
+cards/*/short.mp4
+cards/*/s[0-9]*.jpg
