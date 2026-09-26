@@ -36,6 +36,9 @@ jobs:
 
       - name: 안드로이드 SDK 준비
         uses: android-actions/setup-android@v3
+        with:
+          # 기본값은 옛 「tools」 패키지까지 깔려 해서 2026-09 부터 실패한다. 필요한 것만 짚어 준다.
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
 
       - name: 그레이들 준비
         uses: gradle/actions/setup-gradle@v4
