@@ -1,0 +1,41 @@
+# GitHub Actions 예약 발행 — 이 파일을 "비공개 저장소"의 .github/workflows/ 에 넣어 사용하세요.
+# 저장소 Settings → Secrets and variables → Actions 에
+#   THREADS_ACCESS_TOKEN (필수), THREADS_USER_ID (선택) 를 등록합니다.
+# 도구 파일(threads-autopost.mjs, package.json, posts.json)은 저장소 최상위에 둡니다.
+name: 스레드 예약 발행
+
+on:
+  schedule:
+    # 한국시간 08:15 · 12:45 · 20:35 (UTC 기준으로 적습니다. 깃허브 사정으로 몇 분 늦을 수 있음)
+    - cron: '15 23 * * *'
+    - cron: '45 3 * * *'
+    - cron: '35 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: threads-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: 발행
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+        run: node threads-autopost.mjs publish
+      - name: 발행 기록 저장(중복 발행 방지)
+        if: always()
+        run: |
+          git config user.name "threads-bot"
+          git config user.email "threads-bot@users.noreply.github.com"
+          git add published.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "발행 기록 갱신" && git push)

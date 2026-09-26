@@ -1,0 +1,5 @@
+node_modules/
+# 유료 원고 · 완성본은 공개 저장소에 올리지 않는다(비공개 드라이브에 보관)
+ebook.md
+ebook.html
+*.pdf
