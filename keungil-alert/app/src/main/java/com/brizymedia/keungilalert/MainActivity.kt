@@ -64,6 +64,18 @@ class MainActivity : AppCompatActivity() {
         scroll.addView(root)
         setContentView(scroll)
 
+        /* 안드로이드 15(targetSdk 35) 부터 앱이 상태바·홈 막대 밑까지 그린다(edge-to-edge).
+           그 높이만큼 안쪽 여백을 주지 않으면 첫 줄은 시계 밑에, 마지막 단추는 홈 막대 밑에 깔린다. */
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(scroll) { v, insets ->
+            val 막대 = insets.getInsets(
+                androidx.core.view.WindowInsetsCompat.Type.systemBars() or
+                    androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+            v.setPadding(막대.left, 막대.top, 막대.right, 막대.bottom)
+            insets
+        }
+        // 바탕이 어두우니 상태바의 시계·아이콘은 밝게
+        androidx.core.view.WindowCompat.getInsetsController(window, scroll).isAppearanceLightStatusBars = false
+
         // 서비스가 아직 안 켜졌어도 채널이 있어야 설정 화면이 제대로 열린다
         AlertListenerService.ensureChannel(this)
         BidWorker.ensureChannel(this)

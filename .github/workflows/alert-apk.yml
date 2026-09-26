@@ -1,10 +1,18 @@
 name: 큰길행사알림 APK 만들기
 
-# 안드로이드 스튜디오를 깔지 않고 여기서 APK 를 만든다.
-# 다 만들어지면 Actions 탭의 실행 기록 맨 아래 Artifacts 에서 내려받으면 된다.
+# 안드로이드 스튜디오를 깔지 않고 여기서 APK(직접 설치용)와 AAB(플레이스토어 제출용)를 만든다.
+# 서명은 GitHub 비밀(secrets) KEUNGIL_KEYSTORE_B64 · KEUNGIL_KEYSTORE_PW 의 업로드 열쇠로 한다.
+#
+# push 마다:  app/keungil-alert-test.apk 만 새로 올린다 (형님이 폰에서 시험하는 판).
+# 손으로 실행 + 「publish」 켬:  시험이 끝난 판을 app/keungil-alert.apk (손님이 받는 판)로도 올린다.
 
 on:
   workflow_dispatch:            # Actions 탭에서 손으로 실행
+    inputs:
+      publish:
+        description: '손님이 받는 app/keungil-alert.apk 도 이 판으로 바꾼다 (폰에서 시험해 본 뒤에만)'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -31,32 +39,61 @@ jobs:
 
       - name: 그레이들 준비
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # 러너에 깔린 그레이들은 버전이 계속 바뀐다(9.x). AGP 8.13 과 맞는 판으로 고정한다.
+          gradle-version: '8.14.3'
 
-      - name: APK 만들기
+      # 열쇠는 비밀에 base64 로 들어 있다. 파일로 풀어 경로만 다음 단계에 넘긴다. 내용은 로그에 찍지 않는다.
+      - name: 서명 열쇠 꺼내기
+        env:
+          KS_B64: ${{ secrets.KEUNGIL_KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KS_B64" ]; then
+            echo "::warning::서명 열쇠 비밀(KEUNGIL_KEYSTORE_B64)이 없다 — 디버그 열쇠로 서명한다. 이 판은 배포하면 안 된다."
+            exit 0
+          fi
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/keungil-upload.p12"
+          echo "KEUNGIL_KEYSTORE=$RUNNER_TEMP/keungil-upload.p12" >> "$GITHUB_ENV"
+
+      - name: APK · AAB 만들기
         working-directory: keungil-alert
-        run: gradle assembleDebug --no-daemon --stacktrace
+        env:
+          KEUNGIL_KEYSTORE_PW: ${{ secrets.KEUNGIL_KEYSTORE_PW }}
+        run: gradle assembleRelease bundleRelease --no-daemon --stacktrace
 
-      - name: APK 올리기
+      - name: 만든 것 올리기 (Actions 아티팩트)
         uses: actions/upload-artifact@v4
         with:
-          name: 큰길행사알림-apk
-          path: keungil-alert/app/build/outputs/apk/debug/*.apk
+          name: 큰길행사알림-release
+          path: |
+            keungil-alert/app/build/outputs/apk/release/*.apk
+            keungil-alert/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
           retention-days: 90
 
       # Actions 아티팩트는 깃허브에 로그인해야 받아진다. 폰에서는 그게 안 되므로
-      # 홈페이지 /app/ 에도 같이 올려둔다. robots.txt 로 검색에서는 빼놨다.
+      # 홈페이지 /app/ 에도 올려둔다. robots.txt 로 검색에서는 빼놨다.
       - name: 홈페이지 /app/ 에 올리기
+        env:
+          PUBLISH: ${{ github.event.inputs.publish }}
+          BRANCH: ${{ github.ref_name }}
         run: |
-          cp keungil-alert/app/build/outputs/apk/debug/app-debug.apk app/keungil-alert.apk
-          if git diff --quiet -- app/keungil-alert.apk; then
+          cp keungil-alert/app/build/outputs/apk/release/app-release.apk app/keungil-alert-test.apk
+          msg="큰길행사알림 시험판 APK 새로 올림 ($GITHUB_SHA)"
+          if [ "$PUBLISH" = "true" ]; then
+            cp app/keungil-alert-test.apk app/keungil-alert.apk
+            msg="큰길행사알림 APK 새로 올림 — 손님 배포판 ($GITHUB_SHA)"
+          fi
+          git add app/keungil-alert-test.apk app/keungil-alert.apk
+          if git diff --cached --quiet; then
             echo "APK 가 그대로다 — 올릴 것 없음"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/keungil-alert.apk
-          git commit -m "큰길행사알림 APK 새로 올림 ($GITHUB_SHA)"
-          # checkout 은 브랜치가 아니라 SHA 를 받아오므로(detached HEAD)
-          # 그냥 git push 하면 "현재 브랜치가 없다" 며 실패한다.
-          git push origin HEAD:${{ github.ref_name }}
+          git commit -m "$msg"
+          # 블로그·갤러리 워크플로가 그 사이 main 에 커밋을 넣었을 수 있다. 그 위로 다시 얹은 뒤 밀어 넣는다.
+          # checkout 은 SHA 를 받아오므로(detached HEAD) 그냥 git push 하면 실패한다 → HEAD:브랜치 로 명시.
+          git fetch origin "$BRANCH"
+          git rebase "origin/$BRANCH"
+          git push origin "HEAD:$BRANCH"

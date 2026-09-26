@@ -1,0 +1,9 @@
+# 서명 열쇠는 절대 저장소에 넣지 않는다 (GitHub Actions 비밀에만)
+*.p12
+*.jks
+*.keystore
+# 안드로이드 빌드 부산물
+keungil-alert/.gradle/
+keungil-alert/build/
+keungil-alert/app/build/
+keungil-alert/local.properties
