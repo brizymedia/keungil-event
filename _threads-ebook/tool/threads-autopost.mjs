@@ -9,6 +9,8 @@
 //   node threads-autopost.mjs publish [--dry]   발행 시각이 지난 글만 발행(중복 발행 없음)
 //   node threads-autopost.mjs replies --post <게시물ID> [--dry]   키워드 답글에 자동 답글
 //   node threads-autopost.mjs insights [--limit 10]              최근 게시물 성과
+//   node threads-autopost.mjs analyze --topic "주제" [--top 5] [--days 7] [--refs 참고글.txt]
+//                                                              잘 된 글 패턴 분석 → 변형 원고
 //
 // 설정은 .env(또는 환경 변수)에서 읽는다. .env.example 참고.
 
@@ -241,110 +243,214 @@ async function replies(opts) {
 
 // ── 성과 ────────────────────────────────────────────────
 
-async function insights(opts) {
+const METRICS = 'views,likes,replies,reposts,quotes,shares';
+
+async function recentWithInsights(limit) {
   const { data = [] } = await call('GET', `${VER}/${USER_ID}/threads`, {
-    fields: 'id,text,timestamp,permalink', limit: Number(opts.limit || 10),
+    fields: 'id,text,timestamp,permalink,is_quote_post', limit,
   });
   const rows = [];
   for (const p of data) {
-    const row = { id: p.id, 날짜: (p.timestamp || '').slice(0, 10), 첫줄: (p.text || '').split('\n')[0].slice(0, 20) };
+    const row = { ...p, views: 0, likes: 0, replies: 0, reposts: 0, quotes: 0, shares: 0 };
     try {
-      const ins = await call('GET', `${VER}/${p.id}/insights`, { metric: 'views,likes,replies,reposts,quotes,shares' });
+      const ins = await call('GET', `${VER}/${p.id}/insights`, { metric: METRICS });
       for (const m of ins.data || []) row[m.name] = m.values?.[0]?.value ?? m.total_value?.value ?? 0;
-      row['답글률%'] = row.views ? ((row.replies / row.views) * 100).toFixed(2) : '-';
     } catch (e) {
-      row.오류 = e.message.slice(0, 40);
+      row.error = e.message;
     }
     rows.push(row);
   }
-  console.table(rows);
+  return rows;
 }
 
-// ── AI 원고 생성(Claude API) ──────────────────────────────
+async function insights(opts) {
+  const rows = await recentWithInsights(Number(opts.limit || 10));
+  console.table(rows.map(r => ({
+    id: r.id, 날짜: (r.timestamp || '').slice(0, 10), 첫줄: (r.text || '').split('\n')[0].slice(0, 20),
+    views: r.views, likes: r.likes, replies: r.replies, reposts: r.reposts, shares: r.shares,
+    '답글률%': r.views ? ((r.replies / r.views) * 100).toFixed(2) : '-',
+    ...(r.error ? { 오류: r.error.slice(0, 40) } : {}),
+  })));
+}
 
-async function generate(opts) {
-  const { default: Anthropic } = await import('@anthropic-ai/sdk');
-  const topic = opts.topic || env.ACCOUNT_TOPIC;
-  if (!topic) throw new Error('--topic "계정 주제" 또는 .env 의 ACCOUNT_TOPIC 이 필요합니다.');
-  const days = Number(opts.days || 7);
-  const perDay = Number(opts.perDay || 3);
-  const start = opts.start ? new Date(`${opts.start}T00:00:00+09:00`) : nextKstMidnight();
-  const slots = (env.POST_TIMES || '08:10,12:40,20:30').split(',').map(s => s.trim()).slice(0, perDay);
+// ── AI(Claude API) 공통 ──────────────────────────────────
 
-  const client = new Anthropic();
-  const system = [
+const POSTS_SCHEMA = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      type: { type: 'string' },
+      text: { type: 'string' },
+      topic: { type: 'string' },
+    },
+    required: ['type', 'text', 'topic'],
+    additionalProperties: false,
+  },
+};
+
+const WRITING_RULES = [
+  '규칙:',
+  '- 글 하나는 200~450자, 모바일에서 읽기 쉽게 줄바꿈을 자주 한다.',
+  '- 첫 줄은 12~25자의 훅.',
+  '- 공감형 · 리스트형 · 전후비교형 · 반전형 · 질문형을 골고루 섞는다.',
+  '- 10개 중 3개는 질문으로 끝나 답글을 유도한다.',
+  '- 10개 중 1개만 상품이나 무료 자료를 언급한다.',
+  '- 지어낸 수익 금액, 가짜 후기, 과장 광고 표현은 절대 쓰지 않는다.',
+  '- 해시태그는 쓰지 않는다. topic 필드에 주제 태그로 쓸 단어 1개를 넣는다.',
+];
+
+function accountBrief(topic) {
+  return [
     '너는 한국 스레드(Threads)에서 팔로워를 모은 SNS 카피라이터다.',
     `계정 대상: ${env.ACCOUNT_AUDIENCE || '직장인'}`,
     `계정 주제: ${topic}`,
     `팔 상품(가끔만 자연스럽게 언급): ${env.PRODUCT_NAME || '없음'}`,
-    '규칙:',
-    '- 글 하나는 200~450자, 모바일에서 읽기 쉽게 줄바꿈을 자주 한다.',
-    '- 첫 줄은 12~25자의 훅.',
-    '- 공감형 · 리스트형 · 전후비교형 · 반전형 · 질문형을 골고루 섞는다.',
-    '- 10개 중 3개는 질문으로 끝나 답글을 유도한다.',
-    '- 10개 중 1개만 상품이나 무료 자료를 언급한다.',
-    '- 지어낸 수익 금액, 가짜 후기, 과장 광고 표현은 절대 쓰지 않는다.',
-    '- 해시태그는 쓰지 않는다. topic 필드에 주제 태그로 쓸 단어 1개를 넣는다.',
-  ].join('\n');
+  ];
+}
 
-  const schema = {
-    type: 'object',
-    properties: {
-      posts: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            type: { type: 'string' },
-            text: { type: 'string' },
-            topic: { type: 'string' },
-          },
-          required: ['type', 'text', 'topic'],
-          additionalProperties: false,
-        },
-      },
-    },
-    required: ['posts'],
-    additionalProperties: false,
-  };
+async function askClaude(system, content, schema) {
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const client = new Anthropic();
+  const stream = client.beta.messages.stream({
+    model: env.CLAUDE_MODEL || 'claude-opus-5',
+    max_tokens: 64000,
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema } },
+    system,
+    messages: [{ role: 'user', content }],
+  });
+  const msg = await stream.finalMessage();
+  if (msg.stop_reason === 'refusal') throw new Error('요청이 거절되었습니다. 문구를 바꿔 다시 시도하세요.');
+  if (msg.stop_reason === 'max_tokens') throw new Error('응답이 잘렸습니다. 개수를 줄여 다시 시도하세요.');
+  return JSON.parse(msg.content.find(b => b.type === 'text').text);
+}
 
-  const posts = readJson(POSTS_FILE, []);
+// 새 원고를 start 날짜부터 하루 slots.length 개씩 배치해 posts 에 붙인다.
+function schedule(posts, out, start, slots, dayOffset = 0) {
   const ids = new Set(posts.map(p => p.id));
+  out.forEach((p, i) => {
+    const slot = slots[i % slots.length];
+    const at = atKst(start, dayOffset + Math.floor(i / slots.length), slot);
+    let id = `${at.slice(0, 10)}-${slot.replace(':', '')}`;
+    while (ids.has(id)) id += 'b';
+    ids.add(id);
+    posts.push({ id, at, type: p.type, topic: p.topic, text: [...p.text].slice(0, MAX_TEXT).join('') });
+  });
+}
+
+function postSlots(perDay) {
+  return (env.POST_TIMES || '08:10,12:40,20:30').split(',').map(s => s.trim()).slice(0, perDay);
+}
+
+function startDate(opts, posts) {
+  if (opts.start) return new Date(`${opts.start}T00:00:00+09:00`);
+  // 이미 예약된 글이 있으면 마지막 예약일 다음 날부터 잇는다.
+  const last = Math.max(0, ...posts.map(p => Date.parse(p.at)));
+  const next = nextKstMidnight();
+  if (last < next.getTime()) return next;
+  const kst = new Date(last + 9 * 3600e3);
+  kst.setUTCHours(0, 0, 0, 0);
+  return new Date(kst.getTime() + 86400e3 - 9 * 3600e3);
+}
+
+// ── AI 원고 생성 ─────────────────────────────────────────
+
+async function generate(opts) {
+  const topic = opts.topic || env.ACCOUNT_TOPIC;
+  if (!topic) throw new Error('--topic "계정 주제" 또는 .env 의 ACCOUNT_TOPIC 이 필요합니다.');
+  const days = Number(opts.days || 7);
+  const slots = postSlots(Number(opts.perDay || 3));
+  const posts = readJson(POSTS_FILE, []);
+  const start = startDate(opts, posts);
+  const system = [...accountBrief(topic), ...WRITING_RULES].join('\n');
+  const schema = { type: 'object', properties: { posts: POSTS_SCHEMA }, required: ['posts'], additionalProperties: false };
+
   const CHUNK = 10;   // 한 번 요청에 10일 치씩
   for (let d0 = 0; d0 < days; d0 += CHUNK) {
     const n = Math.min(CHUNK, days - d0) * slots.length;
     console.log(`${d0 + 1}~${d0 + n / slots.length}일 차 원고 ${n}개 생성 중…`);
-    const stream = client.beta.messages.stream({
-      model: env.CLAUDE_MODEL || 'claude-opus-5',
-      max_tokens: 64000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema } },
-      system,
-      messages: [{
-        role: 'user',
-        content: `서로 겹치지 않는 스레드 글 ${n}개를 만들어 줘.` +
-          (posts.length ? ` 이미 만든 글의 첫 줄과 겹치지 않게 해:\n${posts.slice(-30).map(p => '- ' + p.text.split('\n')[0]).join('\n')}` : ''),
-      }],
-    });
-    const msg = await stream.finalMessage();
-    if (msg.stop_reason === 'refusal') throw new Error('요청이 거절되었습니다. 주제 문구를 바꿔 다시 시도하세요.');
-    if (msg.stop_reason === 'max_tokens') throw new Error('응답이 잘렸습니다. --days 를 줄여 다시 시도하세요.');
-    const textBlock = msg.content.find(b => b.type === 'text');
-    const out = JSON.parse(textBlock.text).posts;
-
-    out.slice(0, n).forEach((p, i) => {
-      const day = d0 + Math.floor(i / slots.length);
-      const slot = slots[i % slots.length];
-      const at = atKst(start, day, slot);
-      let id = `${at.slice(0, 10)}-${slot.replace(':', '')}`;
-      while (ids.has(id)) id += 'b';
-      ids.add(id);
-      posts.push({ id, at, type: p.type, topic: p.topic, text: [...p.text].slice(0, MAX_TEXT).join('') });
-    });
+    const { posts: out } = await askClaude(system,
+      `서로 겹치지 않는 스레드 글 ${n}개를 만들어 줘.` +
+      (posts.length ? ` 이미 만든 글의 첫 줄과 겹치지 않게 해:\n${posts.slice(-30).map(p => '- ' + p.text.split('\n')[0]).join('\n')}` : ''),
+      schema);
+    schedule(posts, out.slice(0, n), start, slots, d0);
     writeJson(POSTS_FILE, posts);
   }
   console.log(`✓ ${POSTS_FILE} 에 저장했습니다. 발행 전에 꼭 읽고 내 말투 · 경험으로 고쳐 주세요.`);
+}
+
+// ── 잘 된 글 분석 → 변형 원고 ─────────────────────────────
+// 내 최근 글 중 성과 상위 글(+ 선택: 참고 글 파일)을 분석해 "왜 잘 됐는지"를 정리하고,
+// 그 패턴으로 내 주제의 새 원고를 만든다. 결과 보고서는 analysis.md 에 남긴다.
+
+async function analyze(opts) {
+  const topic = opts.topic || env.ACCOUNT_TOPIC;
+  if (!topic) throw new Error('--topic "계정 주제" 또는 .env 의 ACCOUNT_TOPIC 이 필요합니다.');
+  const top = Number(opts.top || 5);
+  const days = Number(opts.days || 7);
+  const slots = postSlots(Number(opts.perDay || 3));
+
+  const samples = [];
+  if (!opts.refs || opts.mine) {
+    const rows = (await recentWithInsights(Number(opts.scan || 50))).filter(r => r.text && !r.error);
+    // 조회수만 보면 자극적인 글이 올라오므로 답글 · 공유(대화와 저장 신호)에 가중치를 준다.
+    const score = r => r.views + 30 * r.replies + 20 * (r.reposts + r.quotes + r.shares);
+    rows.sort((a, b) => score(b) - score(a));
+    for (const r of rows.slice(0, top)) {
+      samples.push(`[내 글 · 조회 ${r.views} · 답글 ${r.replies} · 공유 ${r.reposts + r.quotes + r.shares}]\n${r.text}`);
+    }
+  }
+  if (opts.refs) {
+    // 참고 글: 다른 계정의 잘 된 글을 한 편씩 --- 로 구분해 붙여 넣은 텍스트 파일(구조 분석용, 문장 복사 금지)
+    const refs = fs.readFileSync(path.resolve(opts.refs), 'utf8').split(/\n-{3,}\n/).map(t => t.trim()).filter(Boolean);
+    for (const t of refs) samples.push(`[참고 글]\n${t}`);
+  }
+  if (!samples.length) throw new Error('분석할 글이 없습니다. 발행한 글이 쌓인 뒤 실행하거나 --refs 파일을 주세요.');
+
+  const n = days * slots.length;
+  const system = [
+    ...accountBrief(topic),
+    '너는 먼저 잘 된 글들을 분석하는 편집자 역할을 하고, 그다음 카피라이터로서 새 글을 쓴다.',
+    '분석: 각 글의 훅 유형, 구조(줄 수 · 전개 순서), 감정 포인트, 답글을 부른 장치를 짧게 정리하고, 공통 패턴을 3~6개로 뽑는다.',
+    '작성: 그 패턴을 내 계정 주제에 옮겨 새 글을 쓴다. [참고 글]의 문장 · 고유 표현 · 수치를 그대로 쓰지 않는다(구조만 빌린다).',
+    ...WRITING_RULES,
+  ].join('\n');
+  const schema = {
+    type: 'object',
+    properties: {
+      patterns: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: { name: { type: 'string' }, why: { type: 'string' }, how: { type: 'string' } },
+          required: ['name', 'why', 'how'],
+          additionalProperties: false,
+        },
+      },
+      posts: POSTS_SCHEMA,
+    },
+    required: ['patterns', 'posts'],
+    additionalProperties: false,
+  };
+
+  console.log(`잘 된 글 ${samples.length}개 분석 → 새 원고 ${n}개 생성 중…`);
+  const out = await askClaude(system,
+    `아래 글들을 분석하고, 찾은 패턴으로 새 스레드 글 ${n}개를 써 줘.\n\n${samples.join('\n\n---\n\n')}`, schema);
+
+  const posts = readJson(POSTS_FILE, []);
+  const start = startDate(opts, posts);
+  schedule(posts, out.posts.slice(0, n), start, slots);
+  writeJson(POSTS_FILE, posts);
+
+  const report = [
+    `# 잘 된 글 분석 — ${new Date().toISOString().slice(0, 10)}`, '',
+    ...out.patterns.flatMap(p => [`## ${p.name}`, `- 왜 먹혔나: ${p.why}`, `- 내 글에 쓰는 법: ${p.how}`, '']),
+    `새 원고 ${Math.min(n, out.posts.length)}개를 ${POSTS_FILE} 에 추가했습니다.`,
+  ].join('\n');
+  fs.writeFileSync(path.join(DIR, 'analysis.md'), report + '\n');
+  console.log(report);
 }
 
 function nextKstMidnight() {
@@ -364,7 +470,7 @@ function atKst(start, dayOffset, hhmm) {
 // ── 실행 ────────────────────────────────────────────────
 
 const COMMANDS = {
-  whoami, list, publish, replies, insights, generate,
+  whoami, list, publish, replies, insights, generate, analyze,
   'token:exchange': tokenExchange,
   'token:refresh': tokenRefresh,
 };
@@ -372,7 +478,7 @@ const COMMANDS = {
 const opts = args();
 const cmd = COMMANDS[opts._[0]];
 if (!cmd) {
-  console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 13).join('\n'));
+  console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 15).join('\n'));
   process.exit(opts._[0] ? 1 : 0);
 }
 try {

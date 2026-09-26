@@ -4,7 +4,9 @@
   "private": true,
   "description": "공식 Threads API 로 스레드 글을 예약 발행하는 도구",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "whoami": "node threads-autopost.mjs whoami",
     "token:exchange": "node threads-autopost.mjs token:exchange",
@@ -13,7 +15,8 @@
     "list": "node threads-autopost.mjs list",
     "publish": "node threads-autopost.mjs publish",
     "replies": "node threads-autopost.mjs replies",
-    "insights": "node threads-autopost.mjs insights"
+    "insights": "node threads-autopost.mjs insights",
+    "analyze": "node threads-autopost.mjs analyze"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest"
