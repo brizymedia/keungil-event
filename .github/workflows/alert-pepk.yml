@@ -1,0 +1,65 @@
+name: 큰길행사알림 서명 키 내보내기 (플레이 앱 서명용)
+
+# 플레이 콘솔에서 「앱 서명 키를 기존 업로드 키로 쓰기」를 고르면 구글이 「암호화 공개 키」를 보여 준다.
+# 구글의 pepk 도구로 우리 열쇠(비밀 KEUNGIL_KEYSTORE_B64)를 그 공개 키로 암호화한 zip 을 만들어 콘솔에 올린다.
+# 이 PC 에는 자바가 없어서 여기(GitHub)에서 대신 돌린다. 결과 zip 은 구글만 풀 수 있게 잠겨 있다.
+#
+# 쓰는 법: Actions → 이 워크플로 → Run workflow → 콘솔 화면의 암호화 키를 붙여 넣기(16진수 한 줄 또는 PEM 전체)
+#          → 끝나면 아티팩트 「플레이-앱서명-키」 안의 pepk-output.zip 을 콘솔에 올린다.
+
+on:
+  workflow_dispatch:
+    inputs:
+      encryption_key:
+        description: '플레이 콘솔 「앱 서명」 화면의 암호화 공개 키 — 16진수 한 줄(eb10fe8f…) 또는 PEM(-----BEGIN PUBLIC KEY----- …) 전체'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  pepk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 자바 준비
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: 우리 열쇠 꺼내기 (비밀)
+        env:
+          KS_B64: ${{ secrets.KEUNGIL_KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KS_B64" ]; then echo "::error::비밀 KEUNGIL_KEYSTORE_B64 가 없습니다"; exit 1; fi
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/keungil-upload.p12"
+
+      - name: 구글 pepk 도구 받기
+        run: curl -sSL -o pepk.jar https://www.gstatic.com/play-apps-publisher-rapid/signing-tool/prod/pepk.jar && ls -la pepk.jar
+
+      - name: 열쇠 암호화 (구글 공개 키로)
+        env:
+          KEY: ${{ inputs.encryption_key }}
+          KS_PW: ${{ secrets.KEUNGIL_KEYSTORE_PW }}
+        run: |
+          KEY_TRIM="$(printf '%s' "$KEY" | tr -d '[:space:]')"
+          if printf '%s' "$KEY" | grep -q "BEGIN"; then
+            printf '%s\n' "$KEY" > key.pem
+            java -jar pepk.jar --keystore="$RUNNER_TEMP/keungil-upload.p12" --alias=upload --output=pepk-output.zip \
+              --include-cert --rsa-aes-encryption --encryption-key-path=key.pem \
+              --keystore-pass="$KS_PW" --key-pass="$KS_PW"
+          else
+            java -jar pepk.jar --keystore="$RUNNER_TEMP/keungil-upload.p12" --alias=upload --output=pepk-output.zip \
+              --include-cert --encryptionkey="$KEY_TRIM" \
+              --keystore-pass="$KS_PW" --key-pass="$KS_PW"
+          fi
+          ls -la pepk-output.zip
+
+      - name: 결과 올리기 (3일 보관)
+        uses: actions/upload-artifact@v4
+        with:
+          name: 플레이-앱서명-키
+          path: pepk-output.zip
+          if-no-files-found: error
+          retention-days: 3
