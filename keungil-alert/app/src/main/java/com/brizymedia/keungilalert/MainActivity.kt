@@ -2,6 +2,7 @@ package com.brizymedia.keungilalert
 
 import android.Manifest
 import android.app.NotificationManager
+import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -106,14 +107,19 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(code, perms, results)
         if (code == 200) {
-            // 문자와 통화기록이 있어야 보낼 수 있다.
-            // 주소록은 없어도 되지만, 그러면 「모르는 번호에만」을 못 가린다.
-            val 필수 =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-            if (필수) { store.callbackOn = true; CallWatcher.ensureChannel(this) }
-            else android.widget.Toast.makeText(this,
-                "문자와 통화기록 권한이 있어야 켤 수 있습니다", android.widget.Toast.LENGTH_LONG).show()
+            if (BuildConfig.PLAY) {
+                // 스토어판 — 통화 상태 권한만 필요하다. 번호는 전화 확인 앱 역할로 받는다.
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) 콜백켜기시도()
+                else toast("통화 상태 권한이 있어야 켤 수 있습니다")
+            } else {
+                // 직접 설치판 — 문자와 통화기록이 있어야 보낼 수 있다.
+                // 주소록은 없어도 되지만, 그러면 「모르는 번호에만」을 못 가린다.
+                val 필수 =
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
+                if (필수) { store.callbackOn = true; CallWatcher.ensureChannel(this) }
+                else toast("문자와 통화기록 권한이 있어야 켤 수 있습니다")
+            }
             refreshCallback()
         }
         refreshStatus()
@@ -254,12 +260,23 @@ class MainActivity : AppCompatActivity() {
     /**
      * 콜백 문자 — 전화를 받고 끊으면 내 전자명함 링크를 문자로 보낸다.
      * 문자는 요금이 붙고 되돌릴 수 없다. 그래서 기본값은 「물어보고 보내기」다.
+     *
+     * 스토어판(BuildConfig.PLAY): 구글 정책상 문자 보내기 · 통화기록 권한을 못 쓴다.
+     *   번호는 「전화 확인(스팸 차단) 앱」 역할로 받고, 「보내기」를 누르면 문자앱이 번호 · 글이 채워진 채 열린다.
+     *   그래서 항상 물어보고, 주소록에 있는 번호는 아예 오지 않는다(모르는 번호에만).
      */
+    private var roleBtn: Button? = null
+    private var roleState: TextView? = null
+
     private fun callbackSection() {
         root.addView(sectionTitle("콜백 문자"))
         root.addView(text(
-            "전화를 받고 끊으면 내 명함을 문자로 보내드립니다. 통화 중에 이름·번호를 " +
-                "받아적지 않아도 상대 폰에 내 연락처가 남습니다.",
+            if (BuildConfig.PLAY)
+                "전화를 받고 끊으면 「명함 보낼까요?」 창이 뜹니다. 보내기를 누르면 문자앱이 상대 번호와 " +
+                    "명함 글이 채워진 채 열리고, 전송 한 번만 누르면 됩니다. 상대 폰에 내 연락처가 남습니다."
+            else
+                "전화를 받고 끊으면 내 명함을 문자로 보내드립니다. 통화 중에 이름·번호를 " +
+                    "받아적지 않아도 상대 폰에 내 연락처가 남습니다.",
             13f, ink2, top = 2
         ))
 
@@ -268,7 +285,7 @@ class MainActivity : AppCompatActivity() {
         card.addView(text("① 내 전자명함 주소", 13f, ink, bold = true))
         val 주소칸 = EditText(this).apply {
             setText(store.cardUrl)
-            hint = "큰길이벤트.com/card/#c=..."
+            hint = "www.ai-make.co.kr/card/..."
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             setTextColor(ink); setHintTextColor(ink3)
             setSingleLine(true)
@@ -277,7 +294,7 @@ class MainActivity : AppCompatActivity() {
         }
         card.addView(주소칸)
         card.addView(text(
-            "큰길이벤트.com/card 에서 명함을 만들고 「링크 복사」를 누른 뒤 여기 붙여넣으세요.",
+            "www.ai-make.co.kr/card 에서 명함을 만들고 「명함 링크 공유」로 주소를 복사한 뒤 여기 붙여넣으세요.",
             11f, ink3, top = 4
         ))
         card.addView(Button(this).apply {
@@ -320,10 +337,21 @@ class MainActivity : AppCompatActivity() {
 
         card.addView(text("③ 어떻게 보낼까요", 13f, ink, bold = true, top = 14))
         val grid = GridLayout(this).apply { columnCount = 2 }
-        grid.addView(toggle("보내기 전에 물어보기", store.cbAsk) { on -> store.cbAsk = on; refreshCallback() })
+        if (!BuildConfig.PLAY) grid.addView(toggle("보내기 전에 물어보기", store.cbAsk) { on -> store.cbAsk = on; refreshCallback() })
         grid.addView(toggle("걸려온 전화만", store.cbIncomingOnly) { on -> store.cbIncomingOnly = on })
-        grid.addView(toggle("모르는 번호에만", store.cbSkipKnown) { on -> store.cbSkipKnown = on })
+        if (!BuildConfig.PLAY) grid.addView(toggle("모르는 번호에만", store.cbSkipKnown) { on -> store.cbSkipKnown = on })
         card.addView(grid)
+        if (BuildConfig.PLAY) card.addView(text(
+            "스토어판은 항상 물어보고 보내며, 주소록에 있는 번호에는 보내지 않습니다.", 11f, ink3, top = 4
+        ))
+
+        if (BuildConfig.PLAY) {
+            /* 번호를 받으려면 안드로이드의 「전화 확인 앱」 자리를 이 앱이 맡아야 한다. 고르는 창은 안드로이드가 띄운다. */
+            roleBtn = Button(this).apply { setOnClickListener { 확인앱요청() } }
+            card.addView(roleBtn)
+            roleState = text("", 12f, ink3, top = 6)
+            card.addView(roleState)
+        }
 
         /* 이 권한이 없으면 통화 뒤에 알림만 스쳐 지나가 놓친다.
            켜두면 화면 한가운데에 창이 떠서 안 놓친다. */
@@ -351,10 +379,17 @@ class MainActivity : AppCompatActivity() {
     private fun toggleCallback() {
         if (store.callbackOn) { store.callbackOn = false; refreshCallback(); return }
 
-        if (store.cardUrl.isBlank()) {
-            android.widget.Toast.makeText(this, "먼저 명함 주소를 넣어주세요", android.widget.Toast.LENGTH_SHORT).show()
+        if (store.cardUrl.isBlank()) { toast("먼저 명함 주소를 넣어주세요"); return }
+
+        if (BuildConfig.PLAY) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) { toast("이 기능은 안드로이드 10 이상에서 됩니다"); return }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), 200); return
+            }
+            콜백켜기시도()
             return
         }
+
         val 필요 = listOf(
             Manifest.permission.SEND_SMS,
             Manifest.permission.READ_CALL_LOG,
@@ -369,13 +404,54 @@ class MainActivity : AppCompatActivity() {
         refreshCallback()
     }
 
+    /** 스토어판 — 통화 상태 권한은 있다. 전화 확인 앱 역할까지 있어야 켜진다. 없으면 안드로이드에 요청한다 */
+    private fun 콜백켜기시도() {
+        if (!CallWatcher.확인앱역할(this)) { 확인앱요청(); return }
+        store.callbackOn = true
+        CallWatcher.ensureChannel(this)
+        refreshCallback()
+    }
+
+    private fun 확인앱요청() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) { toast("안드로이드 10 이상에서만 됩니다"); return }
+        if (CallWatcher.확인앱역할(this)) { toast("이미 이 앱이 전화 확인 앱입니다"); return }
+        try {
+            val rm = getSystemService(RoleManager::class.java)
+            if (rm == null || !rm.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
+                toast("이 폰에서는 전화 확인 앱을 지정할 수 없습니다"); return
+            }
+            @Suppress("DEPRECATION")
+            startActivityForResult(rm.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING), 300)
+        } catch (e: Exception) { toast("설정 창을 열지 못했습니다") }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 300) {
+            if (CallWatcher.확인앱역할(this)) {
+                if (store.cardUrl.isNotBlank() &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    store.callbackOn = true
+                    CallWatcher.ensureChannel(this)
+                }
+            } else {
+                toast("전화 확인 앱으로 지정되지 않았습니다. 다시 눌러 「기본으로 설정」을 눌러 주세요")
+            }
+            refreshCallback()
+        }
+    }
+
+    private fun toast(s: String) = android.widget.Toast.makeText(this, s, android.widget.Toast.LENGTH_LONG).show()
+
     /** 화면 위에 띄울 수 있나 — 이게 꺼져 있으면 통화 뒤 알림만 스쳐 지나간다 */
     private fun canDrawOverlay(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)
 
     private fun openOverlaySettings() {
         if (canDrawOverlay()) {
-            android.widget.Toast.makeText(this, "이미 켜져 있습니다", android.widget.Toast.LENGTH_SHORT).show()
+            toast("이미 켜져 있습니다")
             return
         }
         try {
@@ -397,18 +473,34 @@ class MainActivity : AppCompatActivity() {
             overlayState?.setTextColor(if (켜짐) ink3 else bad)
         }
 
+        roleBtn?.let { b ->
+            val 됨 = CallWatcher.확인앱역할(this)
+            b.text = if (됨) "전화 확인 앱 — 이 앱으로 지정됨" else "전화 확인 앱으로 지정하기"
+            roleState?.text = if (됨)
+                "통화가 끝나면 상대 번호를 받아 「명함 보낼까요?」 하고 묻습니다."
+            else
+                "안드로이드가 스팸 차단(전화 확인) 앱으로 쓸 앱을 묻습니다. 이 앱을 고르면 상대 번호를 받을 수 있습니다. " +
+                    "전화를 막거나 조용히 하지는 않습니다."
+            roleState?.setTextColor(if (됨) ink3 else bad)
+        }
+
         val btn = cbOnBtn ?: return
         val 켜짐 = store.callbackOn
         btn.text = if (켜짐) "콜백 문자 끄기" else "콜백 문자 켜기"
 
-        val 권한 = listOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_CALL_LOG)
-            .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+        val 권한 = if (BuildConfig.PLAY)
+            CallWatcher.확인앱역할(this) &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+        else
+            listOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_CALL_LOG)
+                .all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 
         cbState?.text = when {
             store.cardUrl.isBlank() -> "명함 주소를 넣어야 켤 수 있습니다."
             !켜짐 -> "꺼져 있습니다."
-            !권한 -> "권한이 빠져 있어 보내지 못합니다. 껐다 다시 켜주세요."
-            store.cbAsk -> "켜짐 · 통화가 끝나면 알림으로 물어봅니다. 오늘 " + store.sentToday() + "건 보냄"
+            !권한 -> if (BuildConfig.PLAY) "전화 확인 앱 지정이 풀려 있어 번호를 받지 못합니다. 위에서 다시 지정해 주세요."
+                     else "권한이 빠져 있어 보내지 못합니다. 껐다 다시 켜주세요."
+            BuildConfig.PLAY || store.cbAsk -> "켜짐 · 통화가 끝나면 물어봅니다. 오늘 " + store.sentToday() + "건"
             else -> "켜짐 · 통화가 끝나면 바로 보냅니다. 오늘 " + store.sentToday() + "건 보냄"
         }
     }
@@ -569,6 +661,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openListenerSettings() {
+        if (!isListenerEnabled()) {
+            /* 다른 앱의 알림을 읽는 권한은, 켜기 전에 무엇을 · 왜 · 어디까지 하는지 먼저 알리고 동의를 받는다 (구글 플레이 사용자 데이터 정책) */
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("카톡 알림 읽기 권한")
+                .setMessage(
+                    "이 앱은 카카오톡 알림의 방 이름과 글을 읽어, 내가 고른 직군의 구인 글만 골라 다시 알려 드립니다.\n\n" +
+                        "· 읽은 내용은 이 폰 안에서만 대조하고 어디로도 보내지 않습니다.\n" +
+                        "· 폰 안에 최근 울린 글 200개까지만 남기고, 「목록 비우기」나 앱 삭제로 지워집니다.\n" +
+                        "· 카카오톡 말고 다른 앱의 알림은 읽지 않습니다.\n\n" +
+                        "계속하면 안드로이드 설정의 「알림 접근」 화면이 열립니다. 목록에서 큰길행사알림을 켜 주세요."
+                )
+                .setPositiveButton("동의하고 계속") { _, _ -> 알림접근설정열기() }
+                .setNegativeButton("취소", null)
+                .show()
+            return
+        }
+        알림접근설정열기()
+    }
+
+    private fun 알림접근설정열기() {
         val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS else "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"
         try {

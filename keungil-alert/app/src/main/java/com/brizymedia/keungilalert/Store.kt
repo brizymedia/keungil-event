@@ -101,6 +101,28 @@ class Store(context: Context) {
         return cbText.trim() + "\n" + url
     }
 
+    // ── 통화 상태 · 마지막 전화 (스토어판의 번호 받기) ──────────
+    // CallWatcher 가 울림 → 통화 → 끊김을 기억하고, CallScreen(전화 확인 앱 역할)이 상대 번호와 방향을 기억한다.
+    // 안 받은 전화(울리기만 함)는 「통화」 상태를 거치지 않아 걸러진다.
+
+    var callRinging: Boolean
+        get() = sp.getBoolean("call_ringing", false)
+        set(v) = sp.edit().putBoolean("call_ringing", v).apply()
+    var callOffhook: Boolean
+        get() = sp.getBoolean("call_offhook", false)
+        set(v) = sp.edit().putBoolean("call_offhook", v).apply()
+
+    data class LastCall(val number: String, val incoming: Boolean, val at: Long)
+
+    fun rememberCall(number: String, incoming: Boolean) =
+        sp.edit().putString("call_num", number).putBoolean("call_in", incoming).putLong("call_at", System.currentTimeMillis()).apply()
+    fun lastCall(): LastCall? {
+        val n = sp.getString("call_num", "") ?: ""
+        if (n.isBlank()) return null
+        return LastCall(n, sp.getBoolean("call_in", true), sp.getLong("call_at", 0L))
+    }
+    fun clearLastCall() = sp.edit().remove("call_num").remove("call_in").remove("call_at").apply()
+
     // ── 최근 걸린 목록 ─────────────────────────────
     // 줄바꿈으로 구분해 통째로 저장한다. 건수가 적어 이 정도면 충분하다.
 

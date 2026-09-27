@@ -3,8 +3,9 @@ name: 큰길행사알림 APK 만들기
 # 안드로이드 스튜디오를 깔지 않고 여기서 APK(직접 설치용)와 AAB(플레이스토어 제출용)를 만든다.
 # 서명은 GitHub 비밀(secrets) KEUNGIL_KEYSTORE_B64 · KEUNGIL_KEYSTORE_PW 의 업로드 열쇠로 한다.
 #
-# push 마다:  app/keungil-alert-test.apk 만 새로 올린다 (형님이 폰에서 시험하는 판).
-# 손으로 실행 + 「publish」 켬:  시험이 끝난 판을 app/keungil-alert.apk (손님이 받는 판)로도 올린다.
+# 두 판을 만든다: 직접 설치판(direct, 홈페이지 APK) · 스토어판(play, AAB 는 플레이스토어 제출용 · APK 는 시험용).
+# push 마다:  app/keungil-alert-test.apk (직접 설치판 시험) · app/keungil-alert-play-test.apk (스토어판 시험) 만 새로 올린다.
+# 손으로 실행 + 「publish」 켬:  시험이 끝난 직접 설치판을 app/keungil-alert.apk (손님이 받는 판)로도 올린다.
 
 on:
   workflow_dispatch:            # Actions 탭에서 손으로 실행
@@ -62,15 +63,16 @@ jobs:
         working-directory: keungil-alert
         env:
           KEUNGIL_KEYSTORE_PW: ${{ secrets.KEUNGIL_KEYSTORE_PW }}
-        run: gradle assembleRelease bundleRelease --no-daemon --stacktrace
+        run: gradle assembleRelease bundlePlayRelease --no-daemon --stacktrace
 
       - name: 만든 것 올리기 (Actions 아티팩트)
         uses: actions/upload-artifact@v4
         with:
           name: 큰길행사알림-release
           path: |
-            keungil-alert/app/build/outputs/apk/release/*.apk
-            keungil-alert/app/build/outputs/bundle/release/*.aab
+            keungil-alert/app/build/outputs/apk/direct/release/*.apk
+            keungil-alert/app/build/outputs/apk/play/release/*.apk
+            keungil-alert/app/build/outputs/bundle/playRelease/*.aab
           if-no-files-found: error
           retention-days: 90
 
@@ -81,13 +83,14 @@ jobs:
           PUBLISH: ${{ github.event.inputs.publish }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          cp keungil-alert/app/build/outputs/apk/release/app-release.apk app/keungil-alert-test.apk
-          msg="큰길행사알림 시험판 APK 새로 올림 ($GITHUB_SHA)"
+          cp keungil-alert/app/build/outputs/apk/direct/release/app-direct-release.apk app/keungil-alert-test.apk
+          cp keungil-alert/app/build/outputs/apk/play/release/app-play-release.apk app/keungil-alert-play-test.apk
+          msg="큰길행사알림 시험판 APK 새로 올림 — 직접 설치판 · 스토어판 ($GITHUB_SHA)"
           if [ "$PUBLISH" = "true" ]; then
             cp app/keungil-alert-test.apk app/keungil-alert.apk
             msg="큰길행사알림 APK 새로 올림 — 손님 배포판 ($GITHUB_SHA)"
           fi
-          git add app/keungil-alert-test.apk app/keungil-alert.apk
+          git add app/keungil-alert-test.apk app/keungil-alert-play-test.apk app/keungil-alert.apk
           if git diff --cached --quiet; then
             echo "APK 가 그대로다 — 올릴 것 없음"
             exit 0

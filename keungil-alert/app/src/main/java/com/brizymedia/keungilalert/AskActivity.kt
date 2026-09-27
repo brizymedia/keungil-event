@@ -48,6 +48,8 @@ class AskActivity : AppCompatActivity() {
         getSystemService(NotificationManager::class.java)?.cancel(ASK_ID)
 
         if (number.isBlank()) { finish(); return }
+        // 알림의 「보내기」 — 창을 보이지 않고 바로 보낸다 (스토어판은 여기서 문자앱이 열린다)
+        if (intent?.getBooleanExtra(CallWatcher.EXTRA_AUTO, false) == true) { CallWatcher.보내기(this, number); finish(); return }
         setContentView(화면())
     }
 
@@ -89,8 +91,10 @@ class AskActivity : AppCompatActivity() {
             ).also { layoutParams = it }).topMargin = dp(6)
         })
 
+        if (BuildConfig.PLAY) 카드.addView(글("보내기를 누르면 문자앱이 열립니다. 「전송」만 누르시면 됩니다.", 11f, "#8A8171", top = 10))
+
         카드.addView(Button(this).apply {
-            text = "보내기"
+            text = if (BuildConfig.PLAY) "문자앱 열어 보내기" else "보내기"
             setTextColor(Color.parseColor("#12100C"))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             background = GradientDrawable().apply {
@@ -126,10 +130,7 @@ class AskActivity : AppCompatActivity() {
     }
 
     private fun 보내고닫기() {
-        sendBroadcast(Intent(this, CallWatcher::class.java)
-            .setAction(CallWatcher.ACTION_SEND)
-            .putExtra(CallWatcher.EXTRA_NUMBER, number)
-            .setPackage(packageName))
+        CallWatcher.보내기(this, number)     // 직접 설치판: 바로 발송 · 스토어판: 문자앱을 열어 준다
         finish()
     }
 

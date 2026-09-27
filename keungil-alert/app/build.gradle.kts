@@ -23,8 +23,28 @@ android {
         applicationId = "com.brizymedia.keungilalert"
         minSdk = 26          // 안드로이드 8.0 — 알림 채널이 이때 생겼다
         targetSdk = 36       // 플레이스토어: 2026-08-31 부터 새 앱은 36(안드로이드 16) 이상이어야 올릴 수 있다
-        versionCode = 3      // 올릴 때마다 1 씩 올린다 (플레이스토어는 같은 번호를 두 번 받지 않는다)
-        versionName = "0.3"
+        versionCode = 4      // 올릴 때마다 1 씩 올린다 (플레이스토어는 같은 번호를 두 번 받지 않는다)
+        versionName = "0.4"
+    }
+
+    /*
+     * 두 판 (한 코드에서 만든다. 다른 것은 권한과 콜백 문자 방식뿐)
+     *   play    스토어판. 문자 보내기 · 통화기록 · 연락처 권한이 없다. 번호는 전화 확인 앱 역할로, 문자는 문자앱을 열어 준다.
+     *   direct  직접 설치판(홈페이지 APK). 지금까지처럼 통화기록을 읽고 문자를 앱이 바로 보낸다.
+     * 코드에서는 BuildConfig.PLAY 로 가른다.
+     */
+    buildFeatures { buildConfig = true }
+    flavorDimensions += "channel"
+    productFlavors {
+        create("play") {
+            dimension = "channel"
+            buildConfigField("boolean", "PLAY", "true")
+        }
+        create("direct") {
+            dimension = "channel"
+            buildConfigField("boolean", "PLAY", "false")
+            versionNameSuffix = "-direct"
+        }
     }
 
     signingConfigs {
