@@ -122,6 +122,16 @@ class MainActivity : AppCompatActivity() {
             }
             refreshCallback()
         }
+        if (code == 400) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+                store.cbSkipKnown = false
+            } else {
+                store.cbSkipKnown = true
+                @Suppress("UNCHECKED_CAST")
+                (skipKnownBtn?.tag as? (Boolean) -> Unit)?.invoke(true)
+                toast("연락처 권한이 없어 모르는 번호에만 물어봅니다")
+            }
+        }
         refreshStatus()
     }
 
@@ -263,10 +273,11 @@ class MainActivity : AppCompatActivity() {
      *
      * 스토어판(BuildConfig.PLAY): 구글 정책상 문자 보내기 · 통화기록 권한을 못 쓴다.
      *   번호는 「전화 확인(스팸 차단) 앱」 역할로 받고, 「보내기」를 누르면 문자앱이 번호 · 글이 채워진 채 열린다.
-     *   그래서 항상 물어보고, 주소록에 있는 번호는 아예 오지 않는다(모르는 번호에만).
+     *   그래서 항상 물어본다. 주소록 번호에도 물으려면 연락처 권한을 받는다(그래야 그 전화가 앱에 온다).
      */
     private var roleBtn: Button? = null
     private var roleState: TextView? = null
+    private var skipKnownBtn: Button? = null
 
     private fun callbackSection() {
         root.addView(sectionTitle("콜백 문자"))
@@ -339,10 +350,16 @@ class MainActivity : AppCompatActivity() {
         val grid = GridLayout(this).apply { columnCount = 2 }
         if (!BuildConfig.PLAY) grid.addView(toggle("보내기 전에 물어보기", store.cbAsk) { on -> store.cbAsk = on; refreshCallback() })
         grid.addView(toggle("걸려온 전화만", store.cbIncomingOnly) { on -> store.cbIncomingOnly = on })
-        if (!BuildConfig.PLAY) grid.addView(toggle("모르는 번호에만", store.cbSkipKnown) { on -> store.cbSkipKnown = on })
+        skipKnownBtn = toggle("모르는 번호에만", store.cbSkipKnown) { on -> 모르는번호에만(on) }
+        grid.addView(skipKnownBtn)
+        grid.addView(toggle("보낸 번호도 다시 묻기", store.cbReask) { on -> store.cbReask = on })
         card.addView(grid)
-        if (BuildConfig.PLAY) card.addView(text(
-            "스토어판은 항상 물어보고 보내며, 주소록에 있는 번호에는 보내지 않습니다.", 11f, ink3, top = 4
+        card.addView(text(
+            (if (BuildConfig.PLAY) "스토어판은 항상 물어보고 보냅니다. " else "") +
+                "「모르는 번호에만」을 끄면 주소록에 있는 분에게도 물어봅니다(연락처 권한 필요). " +
+                "「보낸 번호도 다시 묻기」를 켜면 30일 안에 보낸 번호라도 통화 뒤 다시 물어봅니다" +
+                (if (BuildConfig.PLAY) "." else " (「보내기 전에 물어보기」가 켜져 있을 때만)."),
+            11f, ink3, top = 4
         ))
 
         if (BuildConfig.PLAY) {
@@ -402,6 +419,18 @@ class MainActivity : AppCompatActivity() {
         store.callbackOn = true
         CallWatcher.ensureChannel(this)
         refreshCallback()
+    }
+
+    /**
+     * 「모르는 번호에만」 — 끄면(주소록 번호에도 묻기) 연락처 권한이 필요하다.
+     * 스토어판은 그 권한이 있어야 주소록 번호의 전화가 앱(전화 확인 앱)에 오기도 한다. 권한을 거절하면 다시 켠다.
+     */
+    private fun 모르는번호에만(on: Boolean) {
+        if (on) { store.cbSkipKnown = true; return }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            store.cbSkipKnown = false; return
+        }
+        requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS), 400)
     }
 
     /** 스토어판 — 통화 상태 권한은 있다. 전화 확인 앱 역할까지 있어야 켜진다. 없으면 안드로이드에 요청한다 */
@@ -764,6 +793,7 @@ class MainActivity : AppCompatActivity() {
             }
             paint()
             setOnClickListener { on = !on; paint(); onChange(on) }
+            tag = { v: Boolean -> on = v; paint() }        // 밖에서 되돌릴 때 (권한 거절 등)
 
             val lp = GridLayout.LayoutParams().apply {
                 width = 0

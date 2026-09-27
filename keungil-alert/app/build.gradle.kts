@@ -23,8 +23,8 @@ android {
         applicationId = "com.brizymedia.keungilalert"
         minSdk = 26          // 안드로이드 8.0 — 알림 채널이 이때 생겼다
         targetSdk = 36       // 플레이스토어: 2026-08-31 부터 새 앱은 36(안드로이드 16) 이상이어야 올릴 수 있다
-        versionCode = 4      // 올릴 때마다 1 씩 올린다 (플레이스토어는 같은 번호를 두 번 받지 않는다)
-        versionName = "0.4"
+        versionCode = 5      // 올릴 때마다 1 씩 올린다 (플레이스토어는 같은 번호를 두 번 받지 않는다)
+        versionName = "0.5"
     }
 
     /*

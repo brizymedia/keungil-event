@@ -74,6 +74,8 @@ class AskActivity : AppCompatActivity() {
         카드.addView(글("통화 끝났습니다", 13f, "#F5A524", bold = true))
         카드.addView(글("명함을 보낼까요?", 23f, "#F6F1E7", bold = true, top = 6))
         카드.addView(글(보기좋은번호(number), 17f, "#F6F1E7", bold = true, top = 14))
+        val 전 = store.sentDaysAgo(number)
+        if (전 >= 0) 카드.addView(글(if (전 == 0) "오늘 이미 보낸 번호입니다" else 전 + "일 전에 보낸 번호입니다", 12f, "#F08A72", bold = true, top = 6))
 
         카드.addView(글("보낼 내용", 11f, "#8A8171", bold = true, top = 18))
         카드.addView(TextView(this).apply {

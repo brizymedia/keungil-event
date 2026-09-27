@@ -65,6 +65,11 @@ class Store(context: Context) {
         get() = sp.getBoolean(KEY_CB_IN, true)
         set(v) = sp.edit().putBoolean(KEY_CB_IN, v).apply()
 
+    /** 30일 안에 보낸 번호라도 통화 뒤 다시 물어본다 — 물어보는 방식일 때만 뜻이 있다(자동 발송에는 안 쓴다) */
+    var cbReask: Boolean
+        get() = sp.getBoolean("cb_reask", false)
+        set(v) = sp.edit().putBoolean("cb_reask", v).apply()
+
     var cbDailyCap: Int
         get() = sp.getInt(KEY_CB_CAP, 30)
         set(v) = sp.edit().putInt(KEY_CB_CAP, v).apply()
@@ -87,6 +92,13 @@ class Store(context: Context) {
     }
     fun markSent(number: String) =
         sp.edit().putLong(KEY_CB_SENT + number, System.currentTimeMillis()).apply()
+
+    /** 이 번호에 마지막으로 보낸 지 며칠 됐나. 보낸 적 없으면 -1 */
+    fun sentDaysAgo(number: String): Int {
+        val at = sp.getLong(KEY_CB_SENT + number, 0L)
+        if (at <= 0L) return -1
+        return ((System.currentTimeMillis() - at) / 86_400_000L).toInt()
+    }
 
     private fun 날짜도장(): String {
         val c = java.util.Calendar.getInstance()

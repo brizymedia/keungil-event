@@ -38,8 +38,8 @@ import androidx.core.content.ContextCompat
  * 문자는 통신사 요금이 붙고, 잘못 보내면 되돌릴 수 없다. 그래서 여러 겹으로 막는다.
  *   ① 기능을 켰는가 · 명함 주소가 있는가
  *   ② 걸려온 전화인가 (내가 건 전화 제외 — 켜져 있을 때)
- *   ③ 주소록에 있는 사람인가 (아는 사이엔 안 보냄 — 켜져 있을 때. 스토어판은 주소록 번호가 아예 오지 않는다)
- *   ④ 최근 30일 안에 이미 보낸 번호인가
+ *   ③ 주소록에 있는 사람인가 (「모르는 번호에만」이 켜져 있을 때. 끄면 연락처 권한을 받아 주소록 번호에도 묻는다)
+ *   ④ 최근 30일 안에 이미 보낸 번호인가 (「보낸 번호도 다시 묻기」를 켜면 물어보는 방식에서는 다시 묻는다)
  *   ⑤ 오늘 보낸 건수가 한도를 넘었는가
  *   ⑥ 「보내기 전에 물어보기」가 켜져 있으면(스토어판은 항상) 창 · 알림으로 확인받는다
  */
@@ -84,12 +84,14 @@ class CallWatcher : BroadcastReceiver() {
         val (number, 걸려온것) = 마지막
         if (number.isBlank()) return                                  // 발신번호 표시제한
         if (store.cbIncomingOnly && !걸려온것) return
-        if (store.sentRecently(number)) return
+        // 스토어판은 문자앱을 열어야 하므로 반드시 물어본다 (뒤에서 몰래 열 수도 없고, 열어서도 안 된다)
+        val 물어봄 = store.cbAsk || !직접
+        // 30일 안에 보낸 번호는 건너뛴다 — 「보낸 번호도 다시 묻기」를 켰고 물어보는 방식이면 다시 묻는다(자동 발송은 절대 다시 안 보낸다)
+        if (store.sentRecently(number) && !(물어봄 && store.cbReask)) return
         if (store.sentToday() >= store.cbDailyCap) return
         if (store.cbSkipKnown && 주소록에있나(context, number)) return
 
-        // 스토어판은 문자앱을 열어야 하므로 반드시 물어본다 (뒤에서 몰래 열 수도 없고, 열어서도 안 된다)
-        if (store.cbAsk || !직접) 물어보기(context, number) else 보내기(context, number)
+        if (물어봄) 물어보기(context, number) else 보내기(context, number)
     }
 
     /** 직접 설치판 — 문자 보내기와 통화기록 권한이 둘 다 있는 판 */
@@ -189,11 +191,13 @@ class CallWatcher : BroadcastReceiver() {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
+        val 전 = Store(context).sentDaysAgo(number)
+        val 번호줄 = number + (if (전 < 0) "" else if (전 == 0) " · 오늘 이미 보낸 번호" else " · " + 전 + "일 전에 보낸 번호")
         val b = Notification.Builder(context, CH_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_email)
             .setContentTitle("명함을 보낼까요?")
-            .setContentText(number)
-            .setStyle(Notification.BigTextStyle().bigText(number + "\n\n" + Store(context).cbMessage()))
+            .setContentText(번호줄)
+            .setStyle(Notification.BigTextStyle().bigText(번호줄 + "\n\n" + Store(context).cbMessage()))
             .setAutoCancel(true)
             .setContentIntent(열기)
             .setCategory(Notification.CATEGORY_REMINDER)

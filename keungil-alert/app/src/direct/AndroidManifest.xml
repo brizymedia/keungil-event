@@ -10,8 +10,6 @@
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <!-- 명함 링크 문자를 앱이 직접 보낸다 (스토어판은 문자앱을 열어 준다) -->
     <uses-permission android:name="android.permission.SEND_SMS" />
-    <!-- 「모르는 번호에만」 — 주소록에 있는 사람에게는 보내지 않기 위해 번호를 대조만 한다 -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <!-- 통화 직후 알림으로 물을 때 화면을 덮어 보려는 시도. 안드로이드 14+ 는 전화·알람 앱이 아니면 사용자가 켜 줘야 한다 -->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
