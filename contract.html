@@ -55,6 +55,10 @@
   .in{ width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.6rem;padding:.6rem .75rem;color:#fff;font-size:.88rem;outline:none;transition:border-color .2s; }
   .in:focus{ border-color:rgba(245,158,11,.6); }
   .in::placeholder{ color:#6B6675; }
+  /* 고르는 칸 — 반투명 배경이면 목록이 열릴 때 흰 바탕에 흰 글씨가 되어 안 보인다.
+     바탕색을 고정하고 color-scheme 을 어둡게 줘야 목록까지 어둡게 나온다. */
+  select.in{ color-scheme:dark;background-color:#1C1A24;appearance:none;-webkit-appearance:none;padding-right:2.1rem;cursor:pointer;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A9A3B4' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;background-size:11px 8px; }
+  select.in option{ background:#1C1A24;color:#fff; }
   textarea.in{ resize:vertical;min-height:70px;line-height:1.55; }
 
   /* 계약 종류 · 출연자 구분 고르기 */
@@ -309,11 +313,11 @@
       </div>
       <div><label class="f">부가세</label>
         <select class="in" data-k="m.vat">
-          <option value="포함">부가세 포함 — 계약금액에 10% 더함</option>
-          <option value="별도">부가세 별도 — 계약금액은 공급가액, 부가세는 따로 청구</option>
+          <option value="별도">부가세 별도 — 항목 금액에 10% 를 더한다 (기본)</option>
+          <option value="포함">부가세 포함 — 항목 금액에 이미 들어 있다</option>
         </select>
       </div>
-      <div class="vat-only"><label class="f">부가세 별도일 때 입금 계좌</label><input class="in" data-k="co.bank2" placeholder="비우면 「우리 회사 정보」의 기본 계좌를 씁니다">
+      <div class="vat-only"><label class="f">부가세 별도 계약에 쓸 입금 계좌</label><input class="in" data-k="co.bank2" placeholder="비우면 「우리 회사 정보」의 기본 계좌를 씁니다">
         <p class="hint" style="margin-top:6px">부가세 별도로 계약할 때만 이 계좌가 계약서 제4조에 들어갑니다. 한 번 넣으면 이 브라우저에 기억됩니다.</p></div>
       <div><label class="f">계약금 지급 시기</label><input class="in" data-k="m.depDue"></div>
       <div><label class="f">잔금 지급 시기</label><input class="in" data-k="m.balDue"></div>
@@ -483,7 +487,7 @@ const DEF = () => ({
   cl:{ org:'', name:'', tel:'', email:'', addr:'' },
   ev:{ title:'', date:'', place:'', people:'', scope:'' },
   items:[],
-  m:{ disc:0, depPct:30, vat:'포함', depDue:'계약 체결일로부터 3일 이내', balDue:'행사 종료일로부터 7일 이내' },
+  m:{ disc:0, depPct:30, vat:'별도', depDue:'계약 체결일로부터 3일 이내', balDue:'행사 종료일로부터 7일 이내' },
   cancel: CANCEL_DEF.service.map(r => r.slice()),
   sp:'', photo:true,
 });
@@ -492,8 +496,8 @@ const DEF = () => ({
 const 우리딱지 = () => C.kind === 'cast' ? '갑' : '을';
 const 상대딱지 = () => C.kind === 'cast' ? '을' : '갑';
 const 출연계약 = () => C.kind === 'cast';
-/* 부가세 별도로 계약하면 계약금액에 10% 를 더하지 않고, 입금 계좌도 따로 쓸 수 있다 */
-const 부가세별도 = () => C.m.vat === '별도';
+/* 부가세 별도 = 항목 금액에 10% 를 더한다(기본). 포함 = 이미 들어 있어 역산한다. 별도 계약은 입금 계좌도 따로 쓸 수 있다 */
+const 부가세별도 = () => (C.m.vat || '별도') !== '포함';   // 예전 링크에 칸이 없으면 별도로 본다
 const 입금계좌 = () => (부가세별도() && (C.co.bank2 || '').trim()) ? C.co.bank2.trim() : (C.co.bank || '');
 const 개인출연 = () => 출연계약() && C.cast.who === 'person';
 let C = DEF();
@@ -537,11 +541,12 @@ function calc(){
     return { supply, disc, base, vat:0, tax, net: base - tax, total: base, dep, bal: base-dep, tbd };
   }
 
-  const vat = Math.round(base*0.1);
-  const 별도 = 부가세별도();                       // 계약금액은 공급가액, 부가세는 따로 청구
-  const total = 별도 ? base : base + vat;
+  const 별도 = 부가세별도();
+  const vat = 별도 ? Math.round(base * 0.1) : Math.round(base / 11);   // 별도면 더하고, 포함이면 역산
+  const 공급 = 별도 ? base : base - vat;
+  const total = 별도 ? base + vat : base;
   const dep = Math.round(total * (num(C.m.depPct)/100));
-  return { supply, disc, base, vat, 별도, tax:0, net:total, total, dep, bal: total-dep, tbd };
+  return { supply, disc, base, 공급, vat, 별도, tax:0, net:total, total, dep, bal: total-dep, tbd };
 }
 function 한글금액(n){
   n = Math.round(n); if(!n) return '영';
@@ -616,13 +621,14 @@ function render(){
       <thead><tr><th class="c" style="width:7%">No</th><th>항목 · 규격</th><th class="c" style="width:16%">수량</th><th class="r" style="width:16%">단가</th><th class="r" style="width:18%">금액</th></tr></thead>
       <tbody>${rows}</tbody>
       <tfoot class="sum">
-        <tr><td colspan="4" class="r">공급가액</td><td class="r">${won(t.supply)}</td></tr>
-        ${t.disc?`<tr><td colspan="4" class="r">할인</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
-        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${t.별도 ? `별도 (${won(t.vat)})` : won(t.vat)}</td></tr>
-        <tr class="tot"><td colspan="4" class="r">계약금액 (부가세 ${t.별도?'별도':'포함'})</td><td class="r">${won(t.total)}</td></tr>
+        ${t.disc?`<tr><td colspan="4" class="r">항목 합계</td><td class="r">${won(t.supply)}</td></tr>
+        <tr><td colspan="4" class="r">할인</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
+        <tr><td colspan="4" class="r">공급가액</td><td class="r">${won(t.공급)}</td></tr>
+        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${won(t.vat)}</td></tr>
+        <tr class="tot"><td colspan="4" class="r">계약금액 (부가세 포함)</td><td class="r">${won(t.total)}</td></tr>
       </tfoot>
     </table>
-    <div class="amount-box"><span>계약금액 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>부가세 ${t.별도?`별도 (부가세 ${won(t.vat)}은 계약금액에 포함되지 않는다)`:'포함'}${t.tbd?` · 협의 항목 ${t.tbd}건은 별도 정산`:''}</small></div>
+    <div class="amount-box"><span>계약금액 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>${t.별도?`부가세 별도 기준 — 공급가액 ${won(t.공급)} + 부가세 ${won(t.vat)}`:`부가세 포함 — 항목 금액에 부가세 ${won(t.vat)}이 들어 있다`}${t.tbd?` · 협의 항목 ${t.tbd}건은 별도 정산`:''}</small></div>
     <ol>
       <li>계약금액은 제3조의 항목을 기준으로 하며, 갑의 요청에 의한 항목·수량·일정 변경으로 비용이 증감하는 경우 양 당사자가 협의하여 서면(전자문서 포함)으로 조정한다.</li>
       <li>단가는 현장 여건(전원·진입로·설치 시간)에 따른 추가 인력·장비가 필요한 경우 사전 협의 후 조정할 수 있다.</li>
@@ -632,7 +638,7 @@ function render(){
     <ol>
       <li>계약금 : 계약금액의 ${num(C.m.depPct)}% (${won(t.dep)})를 ${esc(C.m.depDue)}에 지급한다.</li>
       <li>잔금 : 나머지 ${won(t.bal)}을 ${esc(C.m.balDue)}에 지급한다.</li>
-      <li>지급은 을이 지정한 계좌${입금계좌()?` (${esc(입금계좌())})`:''}로 입금하며, 을은 갑의 요청에 따라 세금계산서를 발행한다.${t.별도?' 부가세(10%)는 계약금액과 별도로 청구하며, 갑은 이를 함께 지급한다.':''}</li>
+      <li>지급은 을이 지정한 계좌${입금계좌()?` (${esc(입금계좌())})`:''}로 입금하며, 을은 갑의 요청에 따라 세금계산서를 발행한다.${t.별도?' 계약금액은 단가(부가세 별도 기준)에 부가세 10%를 더한 금액이다.':''}</li>
       <li>갑이 지급기일을 경과한 경우 연 6%의 지연이자를 가산할 수 있다.</li>
     </ol>
 
@@ -767,11 +773,11 @@ function renderCast(t, rows, cancelRows, signedBlock){
       <tfoot class="sum">
         <tr><td colspan="4" class="r">공급가액</td><td class="r">${won(t.supply)}</td></tr>
         ${t.disc?`<tr><td colspan="4" class="r">조정</td><td class="r">- ${won(t.disc)}</td></tr>`:''}
-        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${t.별도 ? `별도 (${won(t.vat)})` : won(t.vat)}</td></tr>
-        <tr class="tot"><td colspan="4" class="r">출연료 (부가세 ${t.별도?'별도':'포함'})</td><td class="r">${won(t.total)}</td></tr>
+        <tr><td colspan="4" class="r">부가세 (10%)</td><td class="r">${won(t.vat)}</td></tr>
+        <tr class="tot"><td colspan="4" class="r">출연료 (부가세 포함)</td><td class="r">${won(t.total)}</td></tr>
       </tfoot>
     </table>
-    <div class="amount-box"><span>출연료 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>부가세 ${t.별도?'별도':'포함'} · 을이 세금계산서를 발행한다${t.tbd?` · 협의 항목 ${t.tbd}건 별도`:''}</small></div>`;
+    <div class="amount-box"><span>출연료 : 금 ${한글금액(t.total)}원정 (₩${Math.round(t.total).toLocaleString('ko-KR')})</span><small>${t.별도?'부가세 별도 기준으로 10% 를 더한 금액':'부가세 포함 금액'} · 을이 세금계산서를 발행한다${t.tbd?` · 협의 항목 ${t.tbd}건 별도`:''}</small></div>`;
 
   $('#paper').innerHTML = `
     <h1>출연 계약서</h1>
@@ -881,9 +887,10 @@ function renderSum(t){
   const 세금줄 = 개인출연()
     ? `<div class="kv"><span>원천징수 3.3%</span><b>- ${won(t.tax)}</b></div>
        <div class="kv"><span>실지급액</span><b>${won(t.net)}</b></div>`
-    : `<div class="kv"><span>부가세${t.별도?' (별도)':''}</span><b>${won(t.vat)}</b></div>`;
-  b.innerHTML = `<div class="kv"><span>${개인출연()?'출연료':'공급가액'}</span><b>${won(t.supply)}</b></div>`
+    : `<div class="kv"><span>${t.별도?'부가세 10% (더함)':'부가세 (포함분)'}</span><b>${won(t.vat)}</b></div>`;
+  b.innerHTML = `<div class="kv"><span>${개인출연()?'출연료':'항목 합계'}</span><b>${won(t.supply)}</b></div>`
     + (t.disc?`<div class="kv"><span>${출연계약()?'조정':'할인'}</span><b>- ${won(t.disc)}</b></div>`:'')
+    + (개인출연()?'':`<div class="kv"><span>공급가액</span><b>${won(t.공급)}</b></div>`)
     + 세금줄
     + `<div class="kv" style="font-size:.95rem;"><span>${출연계약()?'출연료 총액':'계약금액'}</span><b style="color:#FCD34D;">${won(t.total)}</b></div>`
     + `<div class="kv"><span>계약금 ${num(C.m.depPct)}% / 잔금</span><b>${won(t.dep)} / ${won(t.bal)}</b></div>`;

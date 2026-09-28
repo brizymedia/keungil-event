@@ -33,7 +33,9 @@
   label.f{display:block;font-size:.74rem;color:#a1a1aa;margin-bottom:.28rem}
   .in{width:100%;background:#131317;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.6rem .7rem;color:#fff;font-size:.88rem;outline:none}
   .in:focus{border-color:#F59E0B}
-  select.in{appearance:auto}
+  /* 고르는 칸 — color-scheme 을 어둡게 안 주면 목록이 흰 바탕에 흰 글씨로 나온다 */
+  select.in{color-scheme:dark;background-color:#131317;appearance:none;-webkit-appearance:none;padding-right:2.1rem;cursor:pointer;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A9A3B4' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;background-size:11px 8px;}
+  select.in option{background:#131317;color:#fff}
   .hint{font-size:.76rem;color:#71717a;line-height:1.7;margin-top:.5rem}
 
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:9999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;padding:.6rem 1.1rem;font-size:.85rem;font-weight:700;cursor:pointer;transition:.2s}
