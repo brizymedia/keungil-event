@@ -1,11 +1,11 @@
 {
- "updated": "2026-08-24T00:04:14.742Z",
+ "updated": "2026-09-28T13:11:32.804Z",
  "categories": [
   {
    "slug": "festival",
    "name": "지역축제 & 공연행사",
    "desc": "수만 명이 함께 숨 쉬는 축제 현장입니다. 무대·트러스 설치부터 라인어레이 음향, 무빙헤드 조명, LED 영상까지 큰길이벤트기획이 종합 대행했습니다.",
-   "count": 26
+   "count": 41
   },
   {
    "slug": "conference",
@@ -57,6 +57,141 @@
   }
  ],
  "photos": [
+  {
+   "path": "photos/festival/20260928-8d4x-015.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-014.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-013.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-012.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-011.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-010.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-009.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-008.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-007.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-006.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-005.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-004.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-003.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-002.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
+  {
+   "path": "photos/festival/20260928-8d4x-001.jpg",
+   "cat": "festival",
+   "event": "녹동바다축제",
+   "date": "2026-09-28",
+   "place": "녹동항 일원",
+   "caption": "녹동바다축제",
+   "desc": "녹동항 일원에서 유명가수들 초대하고 행사에 대한 전반적인 부분을 맡아서 수행하게 되었습니다."
+  },
   {
    "path": "photos/sports/20260824-4ll6-014.jpg",
    "cat": "broadcast",
