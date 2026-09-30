@@ -685,7 +685,7 @@
     <div id="send-ok" style="margin-top:.9rem;font-size:.88rem;color:#d4d4d8;line-height:1.85;">
       메일 쓰기 창을 연 뒤 <strong style="color:#FCD34D;">본문에 붙여넣기</strong> 하시면
       표와 색이 그대로 들어갑니다.<br>
-      <span style="color:#a1a1aa;font-size:.82rem;">붙여넣기 &nbsp;Windows <b style="color:#d4d4d8;">Ctrl + V</b> &nbsp;·&nbsp; Mac <b style="color:#d4d4d8;">⌘ + V</b></span>
+      <span id="send-tip" style="color:#a1a1aa;font-size:.82rem;">붙여넣기 &nbsp;Windows <b style="color:#d4d4d8;">Ctrl + V</b> &nbsp;·&nbsp; Mac <b style="color:#d4d4d8;">⌘ + V</b></span>
     </div>
     <div id="send-fail" hidden style="margin-top:.9rem;font-size:.88rem;color:#FCA5A5;line-height:1.85;">
       이 브라우저에서 복사가 막혀 있습니다.
@@ -716,6 +716,11 @@
       </div>
     </div>
 
+    <p id="send-phone-note" hidden style="margin-top:.9rem;padding:.7rem .85rem;border-radius:.7rem;
+       background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);font-size:.8rem;color:#FCD34D;line-height:1.8;">
+      폰에서는 <b>메일 앱으로 열기</b>를 누르고 목록에서 <b>Gmail</b> 을 고르세요.
+      쓰기 창이 열리면 본문을 길게 눌러 붙여넣기 하시면 됩니다.
+    </p>
     <p style="margin-top:1rem;font-size:.76rem;color:#52525b;line-height:1.8;">
       네이버 · 다음 메일을 쓰신다면 평소처럼 쓰기 창을 열고 붙여넣기만 하시면 됩니다.<br>
       PDF 견적서를 함께 보내시려면 <strong style="color:#71717a;">「인쇄 · PDF 저장」</strong> 파일을 첨부해 주세요.
@@ -1494,9 +1499,25 @@ function 지메일URL() {
        + '&su=' + encodeURIComponent(고객메일제목());
 }
 
+/* 폰의 지메일 웹(mail.google.com)은 쓰기 창 대신 「앱을 쓰세요」 안내를 띄운다 — 폰에서는 메일 앱으로 보낸다 */
+const 폰인가 = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 function openSendModal(복사됨) {
   $('#send-to').textContent   = $('#q-email').value.trim();
   $('#send-subj').textContent = 고객메일제목();
+
+  const 폰 = 폰인가();
+  $('#send-gmail').hidden = 폰;
+  $('#send-phone-note').hidden = !폰;
+  const 앱단추 = $('#send-mailapp');
+  앱단추.className = 폰 ? 'btn-primary' : 'btn-ghost';
+  앱단추.style.padding = 폰 ? '.85rem 1rem' : '.8rem 1rem';
+  앱단추.innerHTML = 폰
+    ? '<iconify-icon icon="solar:letter-bold" style="font-size:18px;"></iconify-icon> 메일 앱으로 열기 (Gmail 고르기)'
+    : '기본 메일 앱 열기';
+  $('#send-tip').innerHTML = 폰
+    ? '붙여넣기 — 본문 칸을 <b style="color:#d4d4d8;">길게 눌러</b> 「붙여넣기」'
+    : '붙여넣기 &nbsp;Windows <b style="color:#d4d4d8;">Ctrl + V</b> &nbsp;·&nbsp; Mac <b style="color:#d4d4d8;">⌘ + V</b>';
   $('#send-ok').hidden   = !복사됨;
   $('#send-fail').hidden = !!복사됨;
   $('#send-modal').hidden = false;
