@@ -498,6 +498,19 @@ const 상대딱지 = () => C.kind === 'cast' ? '을' : '갑';
 const 출연계약 = () => C.kind === 'cast';
 /* 부가세 별도 = 항목 금액에 10% 를 더한다(기본). 포함 = 이미 들어 있어 역산한다. 별도 계약은 입금 계좌도 따로 쓸 수 있다 */
 const 부가세별도 = () => (C.m.vat || '별도') !== '포함';   // 예전 링크에 칸이 없으면 별도로 본다
+
+/* 문의 접수 서버 — 2026-09-30 FormSubmit 이 CORS 응답을 끊어 전송이 막혔다. 이쪽을 먼저 쓴다 */
+const 문의서버 = 'https://script.google.com/macros/s/AKfycbwvQ4UJRZklRX7bZB6C0s1yZgSvBAMCVccT580L_1BtiVDyh0DIxShCAvN9McZIB0b7FA/exec';
+async function 서버접수(정보) {
+  const res = await fetch(문의서버, {
+    method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ name: 정보.name || '이름 없음', phone: 정보.phone || '', email: 정보.email || '',
+      service: 정보.service || '문의', message: 정보.message || '',
+      at: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }), page: location.href, website: '' }),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || j.ok !== true) throw new Error(j.error || ('서버 응답 ' + res.status));
+}
 const 입금계좌 = () => (부가세별도() && (C.co.bank2 || '').trim()) ? C.co.bank2.trim() : (C.co.bank || '');
 const 개인출연 = () => 출연계약() && C.cast.who === 'person';
 let C = DEF();
@@ -1128,15 +1141,23 @@ $('#btn-sign').addEventListener('click', async ()=>{
       $('#done-msg').textContent = '서명이 반영된 계약서 PDF를 ' + [payload.to.company, payload.to.customer].filter(Boolean).join(', ') + ' 로 보내드렸습니다.';
       if(j.pdfUrl){ $('#done-pdf').href=j.pdfUrl; $('#done-pdf').hidden=false; }
     } else {
-      // 폴백: FormSubmit 으로 회사에 서명 정보 전달 (PDF는 고객이 화면 인쇄로 저장)
+      // 폴백: 문의 서버로 회사에 서명 정보 전달 (PDF는 고객이 화면 인쇄로 저장)
       const t=calc();
+      try {
+        await 서버접수({ name: `${name} / ${C.cl.org}`, phone: tel, email: email || '',
+          service: '[큰길이벤트] 계약서 서명 통보',
+          message: [payload.subject, `계약 ${C.ev.title} / ${C.cl.org} / 계약금액 ${won(t.total)} / 계약번호 ${C.no}`,
+            `서명자 ${name} / ${tel} / ${email||'-'}`, `서명 시각 ${ts}`, `문서 확인 코드 ${hash}`,
+            '계약서 열기: ' + customerBase()+'?admin=1#c='+packState()].join('\n') });
+      } catch (서버오류) {
       const r = await fetch('https://formsubmit.co/ajax/'+회사_수신_이메일, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
         body: JSON.stringify({ _subject: payload.subject, _template:'box', _replyto: email||'',
           '계약': `${C.ev.title} / ${C.cl.org} / 계약금액 ${won(t.total)} / 계약번호 ${C.no}`,
           '서명자': `${name} / ${tel} / ${email||'-'}`, '서명 시각': ts, '문서 확인 코드': hash,
           '계약서 열기 (서명 전 원문)': customerBase()+'?admin=1#c='+packState(),
           '서명 이미지(data URI · 브라우저 주소창에 붙여넣으면 보임)': sig }) });
-      if(!r.ok) throw new Error('메일 전송 실패 '+r.status);
+      if(!r.ok) throw new Error(서버오류.message || ('메일 전송 실패 '+r.status));
+      }
       $('#done-msg').textContent = '서명 내용을 큰길이벤트기획에 전달했습니다. 아래 버튼으로 서명된 계약서를 PDF로 저장해 보관해 주세요.';
     }
     $('#sign').hidden=true; $('#cta').hidden=true; $('#done').hidden=false; $('#mode-pill').className='pill signed'; $('#mode-pill').innerHTML='<iconify-icon icon="solar:check-circle-bold"></iconify-icon> 서명 완료';

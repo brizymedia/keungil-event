@@ -1480,9 +1480,47 @@ function openInquiryModal(){ document.getElementById('inquiry-overlay').classLis
 function closeInquiryModal(){ document.getElementById('inquiry-overlay').classList.remove('open'); document.body.style.overflow=''; }
 document.getElementById('inquiry-overlay').addEventListener('click',function(e){ if(e.target===this) closeInquiryModal(); });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInquiryModal(); });
-document.getElementById('inquiry-form').addEventListener('submit',function(){
+/* 문의 접수 서버 — 큰길브리지와 같은 앱스 스크립트. 2026-09-30 FormSubmit 이 CORS 응답을 끊어
+   견적 문의가 「Failed to fetch」로 막혔다. 이제 이쪽으로 먼저 보내고, 안 되면 예전 경로로 간다. */
+const 문의서버 = 'https://script.google.com/macros/s/AKfycbwvQ4UJRZklRX7bZB6C0s1yZgSvBAMCVccT580L_1BtiVDyh0DIxShCAvN9McZIB0b7FA/exec';
+async function 서버접수(정보) {
+  const res = await fetch(문의서버, {
+    method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      name: 정보.name || '이름 없음', phone: 정보.phone || '', email: 정보.email || '',
+      service: 정보.service || '문의', message: 정보.message || '',
+      at: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }), page: location.href, website: '',
+    }),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || j.ok !== true) throw new Error(j.error || ('서버 응답 ' + res.status));
+}
+
+document.getElementById('inquiry-form').addEventListener('submit', async function (e) {
   this.querySelector('[name="_next"]').value = window.location.href.split('?')[0] + '?sent=1';
   this.querySelector('[name="_replyto"]').value = document.getElementById('inq-email').value.trim();
+  const 폼 = this;
+  if (폼.dataset.보냄) return;              /* 예전 경로로 다시 보내는 중 */
+  e.preventDefault();
+  const v = (id) => (document.getElementById(id).value || '').trim();
+  const 단추 = 폼.querySelector('button[type="submit"]');
+  const 옛 = 단추.innerHTML;
+  단추.disabled = true; 단추.textContent = '보내는 중…';
+  try {
+    await 서버접수({
+      name: v('inq-name'), phone: v('inq-phone'), email: v('inq-email'),
+      service: '[큰길이벤트] 홈페이지 견적문의',
+      message: v('inq-content') + '\n\n개인정보 동의: ' + ((폼.querySelector('[name="개인정보동의"]:checked') || {}).value || '-'),
+    });
+    단추.innerHTML = 옛; 단추.disabled = false;
+    폼.reset();
+    if (typeof closeInquiryModal === 'function') closeInquiryModal();
+    alert('문의가 접수되었습니다!\n빠른 시간 안에 연락드리겠습니다. 감사합니다.');
+  } catch (err) {
+    단추.innerHTML = 옛; 단추.disabled = false;
+    폼.dataset.보냄 = '1';                   /* 서버가 안 되면 예전 방식으로 보낸다 */
+    폼.submit();
+  }
 });
 (function(){
   if(window.location.search.includes('sent=1')){
