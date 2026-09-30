@@ -8,6 +8,11 @@
  *                                              → 서명 접수, PDF 생성, 드라이브 저장, 양측 메일, 대장 기록
  *   POST {action:'ping'}                       → 상태 확인
  *
+ *   견적서 보관함 (quote.html 이 부른다 — 폰과 PC 가 같은 목록을 본다)
+ *   POST {action:'boxList', pw, 목록?}          → 보관함 목록. 목록을 같이 보내면 합친 뒤 돌려준다
+ *   POST {action:'boxPut',  pw, 항목}           → 견적서 하나 담기 (같은 코드는 새것으로 바뀐다)
+ *   POST {action:'boxDel',  pw, 코드}           → 견적서 하나 빼기
+ *
  * 설치 방법은 README.md 참고.
  */
 
@@ -17,12 +22,15 @@ const SHEET_NAME       = '계약 대장';               // 루트 폴더 안에 
 const COMPANY_NAME     = '큰길이벤트기획';
 const COMPANY_EMAIL    = 'gilauto325@gmail.com';    // 서명본 사본을 항상 받을 주소 (계약서의 co.email 과 별개로 무조건 수신)
 const ALLOW_RESIGN     = false;                     // true 면 이미 서명된 계약에 다시 서명 허용
+const BOX_FILE         = '견적서-보관함.json';       // 보관함 파일 (위 폴더의 _data 안)
+const BOX_MAX          = 100;                       // 보관함에 둘 견적서 수
+const VERSION          = '2026-09-30a';             // 배포 확인용 — 고칠 때마다 올린다
 
 // ── 진입점 ──────────────────────────────────────────────
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.id) return json_(getContract_(p.id));
-  return json_({ ok: true, service: 'keungil-contract', version: 1, time: new Date().toISOString() });
+  return json_({ ok: true, service: 'keungil-contract', version: VERSION, box: boxPw_() ? 'ready' : 'no-pw', time: new Date().toISOString() });
 }
 
 function doPost(e) {
@@ -37,6 +45,9 @@ function doPost(e) {
       case 'ping':  return json_({ ok: true, version: 1 });
       case 'store': return json_(storeContract_(body));
       case 'sign':  return json_(signContract_(body));
+      case 'boxList': return json_(boxList_(body));
+      case 'boxPut':  return json_(boxPut_(body));
+      case 'boxDel':  return json_(boxDel_(body));
       default:      return json_({ ok: false, error: '알 수 없는 action' });
     }
   } catch (err) {
@@ -179,6 +190,87 @@ function logSheet_() {
     sh.setFrozenRows(1); sh.getRange(1,1,1,17).setFontWeight('bold').setBackground('#F5F3EE');
   }
   return ss.getSheets()[0];
+}
+
+// ── 견적서 보관함 ─────────────────────────────────────────
+// 견적서는 서버에 저장할 것이 없다. 주소 안에 통째로 담기는 짧은 코드 하나가 견적서다.
+// 그 코드와 제목 · 고객 · 금액만 한 파일에 모아 두면, 폰에서 담은 것을 PC 에서도 볼 수 있다.
+// 암호는 코드에 적지 않는다 — 프로젝트 설정 → 스크립트 속성에 BOX_PW 로 넣는다.
+function boxPw_() {
+  try { return String(PropertiesService.getScriptProperties().getProperty('BOX_PW') || ''); }
+  catch (e) { return ''; }
+}
+function boxCheck_(pw) {
+  const 참 = boxPw_();
+  if (!참) throw new Error('보관함 암호가 아직 설정되지 않았습니다 (스크립트 속성 BOX_PW)');
+  if (String(pw || '') !== 참) throw new Error('암호가 맞지 않습니다');
+}
+function boxRead_() {
+  const it = dataFolder_().getFilesByName(BOX_FILE);
+  if (!it.hasNext()) return [];
+  try {
+    const v = JSON.parse(it.next().getBlob().getDataAsString());
+    return Array.isArray(v) ? v : [];
+  } catch (e) { return []; }
+}
+function boxWrite_(목록) {
+  const 자른 = boxSort_(목록).slice(0, BOX_MAX);
+  const s = JSON.stringify(자른);
+  const it = dataFolder_().getFilesByName(BOX_FILE);
+  if (it.hasNext()) it.next().setContent(s);
+  else dataFolder_().createFile(BOX_FILE, s, 'application/json');
+  return 자른;
+}
+function boxSort_(목록) { return 목록.slice().sort((a, b) => (+b.때 || 0) - (+a.때 || 0)); }
+
+/* 들어온 항목을 쓸 만한 것만 남기고 다듬는다 */
+function boxClean_(q) {
+  if (!q || typeof q !== 'object') return null;
+  const 코드 = String(q.코드 || '');
+  if (!코드 || 코드.length > 20000) return null;
+  const 짧게 = (v, n) => String(v == null ? '' : v).slice(0, n);
+  return {
+    코드: 코드,
+    제목:   짧게(q.제목, 120),
+    고객:   짧게(q.고객, 120),
+    행사일: 짧게(q.행사일, 40),
+    금액:   짧게(q.금액, 40),
+    항목:   Math.max(0, Math.min(999, parseInt(q.항목, 10) || 0)),
+    때:     Math.max(0, parseInt(q.때, 10) || Date.now()),
+  };
+}
+
+/* 같은 견적서(코드가 같은 것)는 하나만 — 나중에 담은 것을 남긴다 */
+function boxMerge_(목록, q) {
+  const 새것 = boxClean_(q);
+  if (!새것) return 목록;
+  const i = 목록.findIndex(x => x && x.코드 === 새것.코드);
+  if (i < 0) { 목록.push(새것); return 목록; }
+  if ((+목록[i].때 || 0) <= 새것.때) 목록[i] = 새것;
+  return 목록;
+}
+
+function boxList_(body) {
+  boxCheck_(body.pw);
+  let 목록 = boxRead_();
+  const 들어온 = Array.isArray(body.목록) ? body.목록.slice(0, BOX_MAX) : [];
+  if (들어온.length) {
+    들어온.forEach(q => { 목록 = boxMerge_(목록, q); });
+    return { ok: true, 목록: boxWrite_(목록) };
+  }
+  return { ok: true, 목록: boxSort_(목록) };
+}
+function boxPut_(body) {
+  boxCheck_(body.pw);
+  const 새것 = boxClean_(body.항목);
+  if (!새것) throw new Error('담을 견적서가 비어 있습니다');
+  return { ok: true, 목록: boxWrite_(boxMerge_(boxRead_(), 새것)) };
+}
+function boxDel_(body) {
+  boxCheck_(body.pw);
+  const 코드 = String(body.코드 || '');
+  if (!코드) throw new Error('뺄 견적서를 알 수 없습니다');
+  return { ok: true, 목록: boxWrite_(boxRead_().filter(x => x && x.코드 !== 코드)) };
 }
 
 // ── 드라이브 유틸 ─────────────────────────────────────────
