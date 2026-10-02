@@ -341,12 +341,34 @@
               width:15mm!important;margin-left:1.5mm!important;transform:translateY(-42%)!important; }
     }
     .print-only{ display:none; }
+
+    /* 손님 화면 — 못 고치는 칸은 글자만 보이게 (테두리 · 커서 없이) */
+    .q-table input.locked{ background:transparent;border-color:transparent;cursor:default;color:#d4d4d8; }
+    .q-table input.locked:focus{ border-color:transparent;box-shadow:none; }
+
+    /* 손님 화면에서는 인쇄가 안 나간다 — 확정 견적서는 담당자가 보낸다 */
+    .cust-print{ display:none; }
+    @media print{
+      body.cust header,body.cust main,body.cust footer,body.cust .noise-overlay{ display:none!important; }
+      body.cust .cust-print{ display:block!important;padding:28mm 10mm;text-align:center;color:#111; }
+      body.cust .cust-print h2{ font-size:15pt;font-weight:800;margin-bottom:6mm; }
+      body.cust .cust-print p{ font-size:10.5pt;line-height:1.9;color:#333; }
+      body.cust .cust-print b{ font-size:12pt;color:#111; }
+    }
   </style>
   <script defer src="https://www.ai-make.co.kr/stats/stats.js" data-site="keungil"></script>
   <!-- 견적 품목표 · 견적 코드 읽기 — schedule.html 과 함께 쓴다 -->
   <script src="/quote-catalog.js"></script>
 </head>
 <body>
+
+<!-- 손님이 Ctrl+P 로 인쇄를 걸었을 때만 종이에 나오는 쪽지 -->
+<div class="cust-print">
+  <h2>견적서는 담당자 확인 뒤에 보내드립니다</h2>
+  <p>화면의 <b>「이 견적으로 문의 보내기」</b> 를 눌러 주시면<br>
+     현장 여건을 확인하고 <b>확정 견적서</b>를 메일로 보내드립니다.</p>
+  <p style="margin-top:8mm;">큰길이벤트기획 · <b>1533-7295</b> · 큰길이벤트.com</p>
+</div>
 
 <div class="noise-overlay"></div>
 
@@ -397,7 +419,7 @@
       <h1 style="font-size:clamp(2.1rem,5.5vw,3.4rem);font-weight:900;letter-spacing:-.045em;margin:1.1rem 0 1rem;">
         자동 견적서
       </h1>
-      <p style="color:#a1a1aa;font-size:1.02rem;line-height:1.8;">
+      <p id="hero-lead" style="color:#a1a1aa;font-size:1.02rem;line-height:1.8;">
         필요한 항목을 고르면 견적서가 자동으로 만들어집니다.
         <strong style="color:#fff;">수량 · 단가 · 항목명은 직접 고치실 수 있고</strong>, 필요한 항목을 새로 추가하셔도 됩니다.<br>
         <span style="color:#71717a;font-size:.92rem;">완성한 견적서는 인쇄(PDF 저장)하거나 그대로 문의로 보내실 수 있습니다.</span>
@@ -489,7 +511,7 @@
 
     <div class="block-title no-print" style="margin:2.25rem 0 1rem;">
       <span class="n">03</span>견적서
-      <span class="block-note">표 안의 값을 눌러 바로 수정하실 수 있습니다</span>
+      <span class="block-note" id="doc-note">표 안의 값을 눌러 바로 수정하실 수 있습니다</span>
     </div>
 
     <section class="glass doc" id="doc">
@@ -913,6 +935,44 @@ $('#add-row').addEventListener('click', () => {
   if (last) last.querySelector('input').focus();
 });
 
+/* ── 손님 화면 ────────────────────────────────────────────
+   주소에 admin=1 이 없으면 손님이다. 손님 화면에서는
+   직인 · 품목명 · 규격 · 단가 · 할인 · 인쇄를 막는다 —
+   우리 양식 그대로 값만 바꿔 다른 데 비교견적으로 쓰이지 않게. */
+const 손님화면 = new URLSearchParams(location.search).get('admin') !== '1';
+const 잠근칸 = ['name', 'spec', 'unit', 'price'];
+
+function 손님가리기() {
+  if (!손님화면) return;
+  document.body.classList.add('cust');
+
+  const 직인 = document.querySelector('.co-name .stamp');
+  if (직인) 직인.remove();
+  const 직인안내 = $('#stamp-note');
+  if (직인안내) 직인안내.hidden = true;
+
+  ['#btn-print', '#add-row'].forEach((sel) => { const el = $(sel); if (el) el.hidden = true; });
+
+  const 할인줄 = $('#s-discount') && $('#s-discount').closest('.sum-row');
+  if (할인줄) 할인줄.hidden = true;
+
+  const 표안내 = $('#doc-note');
+  if (표안내) 표안내.textContent = '수량과 일수는 표에서 바로 고치실 수 있습니다';
+
+  const 머리글 = $('#hero-lead');
+  if (머리글) 머리글.innerHTML =
+    '필요한 항목을 고르면 견적서가 자동으로 만들어집니다. ' +
+    '<strong style="color:#fff;">수량과 일수는 직접 고치실 수 있습니다.</strong><br>' +
+    '<span style="color:#71717a;font-size:.92rem;">단가는 현장 여건(전원 · 진입로 · 설치 시간)에 따라 달라집니다. ' +
+    '아래 「이 견적으로 문의 보내기」 를 눌러 주시면 담당자가 확인하고 확정 견적서를 보내드립니다.</span>';
+
+  const 빈칸 = $('#q-empty');
+  if (빈칸) 빈칸.innerHTML =
+    '위에서 필요한 항목을 체크하시면 견적서가 채워집니다.<br>' +
+    '목록에 없는 항목은 <strong style="color:#a1a1aa;">문의하실 때 적어</strong> 주시면 됩니다.';
+}
+손님가리기();
+
 function render() {
   const body = $('#q-body');
   body.textContent = '';
@@ -939,7 +999,18 @@ function render() {
     tr.querySelector('[data-f="days"]').value  = r.days;
     tr.querySelector('[data-f="price"]').value = (r.price === null ? '' : r.price.toLocaleString('ko-KR'));
 
+    if (손님화면) {
+      잠근칸.forEach((f) => {
+        const el = tr.querySelector('[data-f="' + f + '"]');
+        if (!el) return;
+        el.readOnly = true;
+        el.tabIndex = -1;
+        el.classList.add('locked');
+      });
+    }
+
     tr.querySelectorAll('input').forEach((inp) => {
+      if (손님화면 && 잠근칸.indexOf(inp.dataset.f) >= 0) return;   /* 손님은 수량 · 일수만 고친다 */
       inp.addEventListener('input', () => {
         const f = inp.dataset.f;
         if (f === 'price') {
