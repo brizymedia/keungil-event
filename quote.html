@@ -597,6 +597,11 @@
         <iconify-icon icon="solar:bill-list-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
         이 견적으로 거래명세서 작성
       </button>
+      <button type="button" class="btn-ghost" id="btn-sched" hidden
+              style="padding:.85rem 1.5rem;font-size:.95rem;border-color:rgba(245,158,11,.5);">
+        <iconify-icon icon="solar:checklist-minimalistic-bold" style="font-size:18px;color:#FBBF24;"></iconify-icon>
+        이 견적으로 행사 일정 만들기
+      </button>
     </div>
 
     <p class="no-print" id="stamp-note"
@@ -1591,6 +1596,25 @@ $('#btn-stmt').addEventListener('click', () => {
   window.open(url, '_blank');
 });
 
+/* 견적 품목을 행사 체크리스트로 넘긴다 — 현장에서 「이거 실었나」 를 확인하는 목록이 된다 */
+$('#btn-sched').addEventListener('click', () => {
+  if (!rows.length) { toast('견적 항목을 먼저 선택해 주세요'); return; }
+  const g = (k) => $('#q-' + k).value.trim();
+  const d = {
+    제목: g('title') || (g('org') ? g('org') + ' 행사' : ''),
+    날짜: g('date'), 장소: g('place'), 고객: g('org'),
+    담당: [g('name'), g('tel')].filter(Boolean).join(' · '),
+    인원: g('people'), 비고: g('memo'),
+    항목: rows.map((r) => ({
+      이름: r.name,
+      메모: [r.spec, (+r.qty > 1 ? r.qty + (r.unit || '') : ''), (+r.days > 1 ? r.days + '일' : '')]
+              .filter(Boolean).join(' · '),
+    })),
+  };
+  const url = location.href.replace(/[?#].*$/, '').replace(/quote\.html$/, 'schedule.html') + '#new=' + b64u(JSON.stringify(d));
+  window.open(url, '_blank');
+});
+
 $('#send-close').addEventListener('click',   () => { $('#send-modal').hidden = true; });
 $('#send-modal').addEventListener('click', (e) => { if (e.target.id === 'send-modal') $('#send-modal').hidden = true; });
 $('#send-gmail').addEventListener('click',   () => { window.open(지메일URL(), '_blank', 'noopener'); });
@@ -1913,6 +1937,7 @@ function 관리자표시() {
   $('#btn-to-customer').hidden = false;
   $('#btn-contract').hidden = false;
   $('#btn-stmt').hidden = false;
+  $('#btn-sched').hidden = false;
   const to = $('#q-email').value.trim();
   $('#admin-to').textContent = to || '고객 이메일 (미입력)';
 }

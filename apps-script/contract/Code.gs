@@ -13,6 +13,12 @@
  *   POST {action:'boxPut',  pw, 항목}           → 견적서 하나 담기 (같은 코드는 새것으로 바뀐다)
  *   POST {action:'boxDel',  pw, 코드}           → 견적서 하나 빼기
  *
+ *   행사 일정 · 체크리스트 (schedule.html — 형님과 직원이 같이 본다)
+ *   POST {action:'schedList',  pw}                        → 행사 전부
+ *   POST {action:'schedSave',  pw, 행사, 누가}            → 행사 하나 만들기/고치기
+ *   POST {action:'schedCheck', pw, id, 항목, 됨, 누가}    → 품목 하나 체크만 (서로 안 덮어쓰게)
+ *   POST {action:'schedDel',   pw, id}                    → 행사 하나 지우기
+ *
  * 설치 방법은 README.md 참고.
  */
 
@@ -24,13 +30,15 @@ const COMPANY_EMAIL    = 'gilauto325@gmail.com';    // 서명본 사본을 항�
 const ALLOW_RESIGN     = false;                     // true 면 이미 서명된 계약에 다시 서명 허용
 const BOX_FILE         = '견적서-보관함.json';       // 보관함 파일 (위 폴더의 _data 안)
 const BOX_MAX          = 100;                       // 보관함에 둘 견적서 수
-const VERSION          = '2026-09-30a';             // 배포 확인용 — 고칠 때마다 올린다
+const SCHED_FILE       = '행사일정.json';            // 행사 일정 (위 폴더의 _data 안)
+const SCHED_MAX        = 300;                       // 보관할 행사 수
+const VERSION          = '2026-10-02a';             // 배포 확인용 — 고칠 때마다 올린다
 
 // ── 진입점 ──────────────────────────────────────────────
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.id) return json_(getContract_(p.id));
-  return json_({ ok: true, service: 'keungil-contract', version: VERSION, box: boxPw_() ? 'ready' : 'no-pw', time: new Date().toISOString() });
+  return json_({ ok: true, service: 'keungil-contract', version: VERSION, box: boxPw_() ? 'ready' : 'no-pw', sched: crewPw_() ? 'ready' : 'no-pw', time: new Date().toISOString() });
 }
 
 function doPost(e) {
@@ -48,6 +56,10 @@ function doPost(e) {
       case 'boxList': return json_(boxList_(body));
       case 'boxPut':  return json_(boxPut_(body));
       case 'boxDel':  return json_(boxDel_(body));
+      case 'schedList':  return json_(schedList_(body));
+      case 'schedSave':  return json_(schedSave_(body));
+      case 'schedCheck': return json_(schedCheck_(body));
+      case 'schedDel':   return json_(schedDel_(body));
       default:      return json_({ ok: false, error: '알 수 없는 action' });
     }
   } catch (err) {
@@ -271,6 +283,130 @@ function boxDel_(body) {
   const 코드 = String(body.코드 || '');
   if (!코드) throw new Error('뺄 견적서를 알 수 없습니다');
   return { ok: true, 목록: boxWrite_(boxRead_().filter(x => x && x.코드 !== 코드)) };
+}
+
+// ── 행사 일정 · 체크리스트 ────────────────────────────────
+// 형님과 직원이 같은 목록을 본다. 직원 암호는 스크립트 속성 CREW_PW,
+// 형님 암호(BOX_PW)로도 열린다. 직원 암호로는 견적서 보관함이 열리지 않는다.
+function crewPw_() {
+  try { return String(PropertiesService.getScriptProperties().getProperty('CREW_PW') || ''); }
+  catch (e) { return ''; }
+}
+function crewCheck_(pw) {
+  const 직원 = crewPw_(), 사장 = boxPw_();
+  if (!직원 && !사장) throw new Error('일정 암호가 아직 설정되지 않았습니다 (스크립트 속성 CREW_PW)');
+  const 넣은 = String(pw || '');
+  if (넣은 && (넣은 === 직원 || 넣은 === 사장)) return;
+  throw new Error('암호가 맞지 않습니다');
+}
+function schedRead_() {
+  const it = dataFolder_().getFilesByName(SCHED_FILE);
+  if (!it.hasNext()) return [];
+  try {
+    const v = JSON.parse(it.next().getBlob().getDataAsString());
+    return Array.isArray(v) ? v : [];
+  } catch (e) { return []; }
+}
+function schedWrite_(목록) {
+  const 자른 = schedSort_(목록).slice(0, SCHED_MAX);
+  const s = JSON.stringify(자른);
+  const it = dataFolder_().getFilesByName(SCHED_FILE);
+  if (it.hasNext()) it.next().setContent(s);
+  else dataFolder_().createFile(SCHED_FILE, s, 'application/json');
+  return 자른;
+}
+/* 날짜가 빠른 행사부터. 날짜가 없는 것은 맨 뒤 */
+function schedSort_(목록) {
+  return 목록.slice().sort((a, b) => String(a.날짜 || '9999').localeCompare(String(b.날짜 || '9999')));
+}
+
+function 글_(v, n) { return String(v == null ? '' : v).slice(0, n); }
+
+function schedItem_(x, i) {
+  if (!x || typeof x !== 'object') return null;
+  const 이름 = 글_(x.이름, 120).trim();
+  if (!이름) return null;
+  return {
+    id:   글_(x.id, 24) || ('i' + i + Math.random().toString(36).slice(2, 6)),
+    이름: 이름,
+    메모: 글_(x.메모, 160),
+    출처: 글_(x.출처, 20),
+    됨:   !!x.됨,
+    누가: 글_(x.누가, 40),
+    때:   Math.max(0, parseInt(x.때, 10) || 0),
+  };
+}
+
+function schedClean_(e) {
+  if (!e || typeof e !== 'object') throw new Error('행사 내용이 비어 있습니다');
+  const 제목 = 글_(e.제목, 120).trim();
+  if (!제목) throw new Error('행사명을 적어 주세요');
+  return {
+    id:       글_(e.id, 24) || newId_(),
+    제목:     제목,
+    날짜:     글_(e.날짜, 20),
+    집합:     글_(e.집합, 20),
+    시작:     글_(e.시작, 20),
+    장소:     글_(e.장소, 160),
+    고객:     글_(e.고객, 120),
+    담당:     글_(e.담당, 120),
+    우리담당: 글_(e.우리담당, 120),
+    인원:     글_(e.인원, 40),
+    비고:     글_(e.비고, 2000),
+    끝났나:   !!e.끝났나,
+  };
+}
+
+function schedList_(body) {
+  crewCheck_(body.pw);
+  return { ok: true, 목록: schedSort_(schedRead_()) };
+}
+
+/* 개요를 덮어쓴다. 항목을 같이 보내면 항목도 통째로 바꾼다(추가·삭제·순서) */
+function schedSave_(body) {
+  crewCheck_(body.pw);
+  const 새것 = schedClean_(body.행사);
+  const 목록 = schedRead_();
+  const i = 목록.findIndex(x => x && x.id === 새것.id);
+  const 이제 = Date.now();
+  const 누가 = 글_(body.누가, 40);
+  if (i < 0) {
+    새것.항목 = (Array.isArray(body.행사.항목) ? body.행사.항목 : []).map(schedItem_).filter(Boolean).slice(0, 200);
+    새것.만든때 = 이제; 새것.고친때 = 이제; 새것.고친이 = 누가;
+    목록.push(새것);
+  } else {
+    const 옛 = 목록[i];
+    새것.항목 = Array.isArray(body.행사.항목)
+      ? body.행사.항목.map(schedItem_).filter(Boolean).slice(0, 200)
+      : (옛.항목 || []);
+    새것.만든때 = 옛.만든때 || 이제;
+    새것.고친때 = 이제; 새것.고친이 = 누가;
+    목록[i] = 새것;
+  }
+  return { ok: true, id: 새것.id, 목록: schedWrite_(목록) };
+}
+
+/* 체크 하나만 바꾼다 — 둘이 동시에 만져도 서로의 글을 안 덮어쓴다 */
+function schedCheck_(body) {
+  crewCheck_(body.pw);
+  const id = 글_(body.id, 24), 항목 = 글_(body.항목, 24);
+  const 목록 = schedRead_();
+  const e = 목록.filter(x => x && x.id === id)[0];
+  if (!e) throw new Error('행사를 찾을 수 없습니다');
+  const it = (e.항목 || []).filter(x => x && x.id === 항목)[0];
+  if (!it) throw new Error('품목을 찾을 수 없습니다');
+  it.됨   = !!body.됨;
+  it.누가 = 글_(body.누가, 40);
+  it.때   = Date.now();
+  e.고친때 = it.때; e.고친이 = it.누가;
+  return { ok: true, 목록: schedWrite_(목록) };
+}
+
+function schedDel_(body) {
+  crewCheck_(body.pw);
+  const id = 글_(body.id, 24);
+  if (!id) throw new Error('지울 행사를 알 수 없습니다');
+  return { ok: true, 목록: schedWrite_(schedRead_().filter(x => x && x.id !== id)) };
 }
 
 // ── 드라이브 유틸 ─────────────────────────────────────────

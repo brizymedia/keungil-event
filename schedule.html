@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>행사 일정 · 체크리스트 — 큰길이벤트기획</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body,h1,h2,h3,p{margin:0}
+  button,input,select,textarea{font:inherit}
+  *{font-family:'Pretendard',system-ui,'Malgun Gothic','Apple SD Gothic Neo',sans-serif;word-break:keep-all}
+  body{background:#09090b;color:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+
+  .top{position:sticky;top:0;z-index:30;background:rgba(9,9,11,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+  .top-in{max-width:56rem;margin:0 auto;padding:.8rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+  .brand{display:flex;align-items:center;gap:.6rem;font-weight:800;text-decoration:none}
+  .brand i{display:grid;place-items:center;width:28px;height:28px;background:#F59E0B;color:#09090b;font-size:12px;font-weight:900;font-style:normal}
+  .who{display:flex;align-items:center;gap:.55rem;font-size:.8rem;color:#a1a1aa}
+  .who b{color:#e4e4e7;font-weight:700}
+
+  .wrap{max-width:56rem;margin:0 auto;padding:1.4rem 1.25rem 5rem}
+  .panel{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.1rem 1.15rem;margin-bottom:1.1rem}
+  .panel h2{font-size:.95rem;font-weight:800;margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem}
+  .panel h2 span{color:#71717a;font-size:.76rem;font-weight:500;margin-left:auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}
+  label.f{display:block;font-size:.74rem;color:#a1a1aa;margin-bottom:.28rem}
+  .in{width:100%;background:#131317;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.6rem .7rem;color:#fff;font-size:.88rem;outline:none}
+  .in:focus{border-color:#F59E0B}
+  textarea.in{min-height:4.5rem;resize:vertical;line-height:1.7}
+  .hint{font-size:.76rem;color:#71717a;line-height:1.75}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:9999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;padding:.6rem 1.1rem;font-size:.85rem;font-weight:700;cursor:pointer;transition:.18s}
+  .btn:hover{border-color:rgba(245,158,11,.5)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .btn.pri{background:linear-gradient(100deg,#F59E0B,#D97706);color:#09090b;border:none}
+  .btn.sm{padding:.45rem .8rem;font-size:.8rem}
+  .btn.danger:hover{border-color:rgba(248,113,113,.6);color:#FCA5A5}
+  .bar{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center}
+
+  /* ── 행사 카드 ── */
+  .card{display:block;width:100%;text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+        border-radius:12px;padding:.9rem 1rem;cursor:pointer;transition:.18s;color:inherit}
+  .card:hover{border-color:rgba(245,158,11,.45);background:rgba(255,255,255,.06)}
+  .card + .card{margin-top:.6rem}
+  .card .r1{display:flex;align-items:center;gap:.6rem}
+  .card .nm{font-size:.95rem;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dday{flex:none;font-size:.73rem;font-weight:800;padding:.2rem .5rem;border-radius:9999px;
+        background:rgba(245,158,11,.14);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+  .dday.soon{background:rgba(248,113,113,.14);color:#FCA5A5;border-color:rgba(248,113,113,.35)}
+  .dday.done{background:rgba(255,255,255,.06);color:#71717a;border-color:rgba(255,255,255,.1)}
+  .card .r2{margin-top:.35rem;font-size:.79rem;color:#a1a1aa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .card .r3{margin-top:.6rem;display:flex;align-items:center;gap:.55rem}
+  .prog{flex:1;height:6px;border-radius:9999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,#F59E0B,#FBBF24);transition:width .3s}
+  .prog i.full{background:linear-gradient(90deg,#34D399,#6EE7B7)}
+  .cnt{flex:none;font-size:.74rem;color:#71717a;font-variant-numeric:tabular-nums}
+  .cnt.full{color:#6EE7B7}
+
+  /* ── 체크리스트 ── */
+  .item{display:flex;align-items:flex-start;gap:.65rem;padding:.6rem .15rem;border-bottom:1px solid rgba(255,255,255,.06)}
+  .item:last-child{border-bottom:0}
+  .item .ck{flex:none;width:21px;height:21px;margin-top:.15rem;accent-color:#F59E0B;cursor:pointer}
+  .item .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:.25rem}
+  .item input.nm{width:100%;background:transparent;border:0;border-bottom:1px dashed transparent;color:#e4e4e7;font-size:.9rem;font-weight:700;padding:.1rem 0;outline:none}
+  .item input.me{width:100%;background:transparent;border:0;border-bottom:1px dashed transparent;color:#a1a1aa;font-size:.76rem;padding:.1rem 0;outline:none}
+  .item input:hover{border-bottom-color:rgba(255,255,255,.14)}
+  .item input:focus{border-bottom-color:#F59E0B}
+  .item.on input.nm{color:#71717a;text-decoration:line-through}
+  .item .by{font-size:.7rem;color:#52525b}
+  .item .rm{flex:none;background:none;border:0;color:#52525b;cursor:pointer;font-size:1rem;line-height:1;padding:.25rem}
+  .item .rm:hover{color:#F87171}
+  .tag{flex:none;font-size:.65rem;color:#71717a;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:.05rem .4rem;align-self:flex-start}
+
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+  .chip{font-size:.78rem;padding:.35rem .7rem;border-radius:9999px;border:1px dashed rgba(255,255,255,.18);
+        background:transparent;color:#a1a1aa;cursor:pointer}
+  .chip:hover{border-color:#F59E0B;color:#FCD34D;border-style:solid}
+
+  .empty{padding:1.6rem 1rem;text-align:center;font-size:.86rem;color:#52525b;line-height:1.85;
+         border:1px dashed rgba(255,255,255,.12);border-radius:12px}
+
+  .toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(1rem);background:#18181b;
+         border:1px solid rgba(245,158,11,.4);color:#fff;padding:.7rem 1.2rem;border-radius:9999px;font-size:.85rem;
+         opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:88vw;text-align:center}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+
+  .lock{max-width:23rem;margin:3.5rem auto 0;text-align:center}
+  .lock h1{font-size:1.15rem;font-weight:900;margin-bottom:.5rem}
+
+  @media (max-width:640px){
+    .wrap{padding:1rem .9rem 5rem}
+    .panel{padding:.95rem .9rem}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="/"><i>KG</i> 행사 일정</a>
+    <div class="who" id="who-box" hidden>
+      <iconify-icon icon="solar:user-bold" style="font-size:15px;color:#71717a;"></iconify-icon>
+      <b id="who-name"></b>
+      <button type="button" class="btn sm" id="btn-who" style="padding:.3rem .6rem;font-size:.72rem;">바꾸기</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ── 잠금 ── -->
+  <section id="lock" class="lock" hidden>
+    <iconify-icon icon="solar:lock-keyhole-bold" style="font-size:38px;color:#F59E0B;"></iconify-icon>
+    <h1>행사 일정</h1>
+    <p class="hint" style="margin-bottom:1.2rem;">큰길이벤트기획 내부 화면입니다.<br>암호와 이름을 한 번만 넣으면 이 기기는 기억합니다.</p>
+    <div style="text-align:left;">
+      <label class="f">암호</label>
+      <input class="in" id="lk-pw" type="password" autocomplete="current-password" placeholder="회사에서 받은 암호">
+      <label class="f" style="margin-top:.8rem;">이름</label>
+      <input class="in" id="lk-who" placeholder="예: 김동길" autocomplete="name">
+      <p class="hint" style="margin-top:.5rem;">누가 체크했는지 남기려고 받습니다.</p>
+      <button type="button" class="btn pri" id="lk-go" style="width:100%;margin-top:1rem;padding:.8rem;">들어가기</button>
+    </div>
+  </section>
+
+  <!-- ── 목록 ── -->
+  <section id="list-view" hidden>
+    <div class="bar" style="margin-bottom:1rem;">
+      <button type="button" class="btn pri" id="btn-new">
+        <iconify-icon icon="solar:add-circle-bold" style="font-size:17px;"></iconify-icon> 새 행사
+      </button>
+      <button type="button" class="btn sm" id="btn-reload">
+        <iconify-icon icon="solar:refresh-bold" style="font-size:15px;"></iconify-icon> 새로고침
+      </button>
+      <span class="hint" id="list-when" style="margin-left:auto;"></span>
+    </div>
+
+    <div class="panel">
+      <h2><iconify-icon icon="solar:calendar-mark-bold" style="font-size:18px;color:#FCD34D;"></iconify-icon>
+        다가오는 행사 <span id="cnt-soon"></span></h2>
+      <div id="list-soon"></div>
+    </div>
+
+    <div class="panel">
+      <h2><iconify-icon icon="solar:archive-bold" style="font-size:18px;color:#71717a;"></iconify-icon>
+        지난 행사 <span id="cnt-past"></span></h2>
+      <div id="list-past"></div>
+    </div>
+  </section>
+
+  <!-- ── 행사 하나 ── -->
+  <section id="one-view" hidden>
+    <div class="bar" style="margin-bottom:1rem;">
+      <button type="button" class="btn sm" id="btn-back">
+        <iconify-icon icon="solar:arrow-left-bold" style="font-size:15px;"></iconify-icon> 목록
+      </button>
+      <span class="hint" id="one-when" style="margin-left:auto;"></span>
+    </div>
+
+    <div class="panel">
+      <h2><iconify-icon icon="solar:clipboard-text-bold" style="font-size:18px;color:#FCD34D;"></iconify-icon> 행사 개요</h2>
+      <div style="margin-bottom:.7rem;">
+        <label class="f">행사명</label>
+        <input class="in" id="f-제목" placeholder="예: 2026 진향제">
+      </div>
+      <div class="grid">
+        <div><label class="f">행사 날짜</label><input class="in" id="f-날짜" type="date"></div>
+        <div><label class="f">집합 시간 (셋팅)</label><input class="in" id="f-집합" type="time"></div>
+        <div><label class="f">행사 시작</label><input class="in" id="f-시작" type="time"></div>
+      </div>
+      <div style="margin-top:.7rem;">
+        <label class="f">장소</label>
+        <input class="in" id="f-장소" placeholder="예: 광양읍 공설운동장">
+      </div>
+      <div class="grid" style="margin-top:.7rem;">
+        <div><label class="f">주최 · 고객</label><input class="in" id="f-고객" placeholder="예: 한국항만물류고등학교"></div>
+        <div><label class="f">고객 담당자</label><input class="in" id="f-담당" placeholder="이름 · 연락처"></div>
+        <div><label class="f">우리 담당</label><input class="in" id="f-우리담당" placeholder="현장 책임자"></div>
+        <div><label class="f">예상 인원</label><input class="in" id="f-인원" placeholder="예: 500명"></div>
+      </div>
+      <div style="margin-top:.7rem;">
+        <label class="f">비고 · 현장 메모</label>
+        <textarea class="in" id="f-비고" placeholder="진입로 · 전원 위치 · 리허설 시간 · 주차 같은 현장 메모"></textarea>
+      </div>
+      <div class="bar" style="margin-top:.9rem;">
+        <button type="button" class="btn pri" id="btn-save">
+          <iconify-icon icon="solar:diskette-bold" style="font-size:16px;"></iconify-icon> 저장
+        </button>
+        <label class="hint" style="display:flex;align-items:center;gap:.4rem;cursor:pointer;">
+          <input type="checkbox" id="f-끝났나" style="width:16px;height:16px;accent-color:#F59E0B;"> 끝난 행사로 두기
+        </label>
+        <button type="button" class="btn sm danger" id="btn-del" style="margin-left:auto;">
+          <iconify-icon icon="solar:trash-bin-trash-bold" style="font-size:15px;"></iconify-icon> 행사 지우기
+        </button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2><iconify-icon icon="solar:checklist-minimalistic-bold" style="font-size:18px;color:#FCD34D;"></iconify-icon>
+        챙길 품목 <span id="one-cnt"></span></h2>
+      <div id="items"></div>
+
+      <div class="bar" style="margin-top:.9rem;">
+        <input class="in" id="add-name" placeholder="항목 이름 (예: 발전기 15kW)" style="flex:1;min-width:11rem;">
+        <input class="in" id="add-memo" placeholder="수량 · 비고" style="flex:1;min-width:8rem;">
+        <button type="button" class="btn" id="btn-add">
+          <iconify-icon icon="solar:add-square-bold" style="font-size:16px;color:#FBBF24;"></iconify-icon> 추가
+        </button>
+      </div>
+
+      <p class="hint" style="margin-top:.9rem;">자주 챙기는 것 — 눌러서 바로 넣기</p>
+      <div class="chips" id="chips"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+  ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const b64u   = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u = (s) => { let t = String(s).replace(/-/g,'+').replace(/_/g,'/'); while (t.length % 4) t += '='; return decodeURIComponent(escape(atob(t))); };
+
+let 토스트t;
+function toast(m) {
+  const t = $('#toast');
+  t.textContent = m; t.classList.add('on');
+  clearTimeout(토스트t); 토스트t = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+/* ── 서버 ──────────────────────────────────────────────────
+   계약 서버에 행사 일정 파일 하나를 둔다. 형님과 직원이 같은 것을 본다.
+   암호는 이 기기에만 저장한다. */
+const 서버 = 'https://script.google.com/macros/s/AKfycbwgO5RyEllYeUuugmr9r4wuLjJv8FX02onvcK9JSmejs_nb0J7YrhyL5tN4p_ruS061/exec';
+const 열쇠키 = 'keungil-sched-pw';
+const 이름키 = 'keungil-sched-who';
+
+const 읽기 = (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } };
+const 쓰기 = (k, v) => { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} };
+const 암호 = () => 읽기(열쇠키);
+const 나   = () => 읽기(이름키);
+
+async function 부르기(action, 더) {
+  const res = await fetch(서버, {
+    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(Object.assign({ action: action, pw: 암호(), 누가: 나() }, 더 || {})),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || j.ok !== true) throw new Error(j.error || ('서버 응답 ' + res.status));
+  return j;
+}
+
+/* ── 상태 ── */
+let 전체 = [];          // 서버에서 받은 행사 전부
+let 보는중 = '';        // 지금 열어 둔 행사 id
+let 새행사 = null;      // 아직 저장 안 한 새 행사
+let 항목바뀜 = false;   // 품목을 더하거나 뺐거나 글자를 고쳤나 (안 바뀌었으면 안 올린다)
+let 받은때 = 0;
+
+const 공통품목 = [
+  '차량 배차', '발전기 · 전원 확인', '전선 · 멀티탭', '공구함', '사다리',
+  '우천 대비 (천막 · 비닐)', '현장 답사', '큐시트 · 진행표', '인력 명단',
+  '리허설 시간 확인', '주차 확인', '식대 · 간식', '안전 · 보험', '현장 정리 · 철수',
+];
+
+/* ── 날짜 ── */
+function 오늘글() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function 디데이(날짜) {
+  if (!날짜) return null;
+  const a = new Date(날짜 + 'T00:00:00'), b = new Date(오늘글() + 'T00:00:00');
+  if (isNaN(a)) return null;
+  return Math.round((a - b) / 86400000);
+}
+function 날짜글(날짜) {
+  if (!날짜) return '날짜 미정';
+  const d = new Date(날짜 + 'T00:00:00');
+  if (isNaN(d)) return 날짜;
+  const 요일 = ['일','월','화','수','목','금','토'][d.getDay()];
+  return (d.getMonth() + 1) + '/' + d.getDate() + '(' + 요일 + ')';
+}
+function 때글(t) {
+  if (!t) return '';
+  const d = new Date(+t);
+  if (isNaN(d)) return '';
+  const 둘 = (x) => String(x).padStart(2, '0');
+  return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + 둘(d.getHours()) + ':' + 둘(d.getMinutes());
+}
+
+/* ── 화면 고르기 ── */
+function 화면() {
+  const 들어옴 = !!암호() && !!나();
+  $('#lock').hidden     = 들어옴;
+  $('#who-box').hidden  = !들어옴;
+  $('#who-name').textContent = 나();
+  if (!들어옴) { $('#list-view').hidden = true; $('#one-view').hidden = true; return; }
+
+  const h = location.hash;
+  const 옛보던 = 보는중;
+  if (새행사 || /^#e=/.test(h)) {
+    보는중 = 새행사 ? '' : decodeURIComponent(h.slice(3));
+    if (보는중 !== 옛보던) 항목바뀜 = false;
+    $('#list-view').hidden = true;
+    $('#one-view').hidden  = false;
+    하나그리기();
+  } else {
+    보는중 = ''; 새행사 = null;
+    $('#list-view').hidden = false;
+    $('#one-view').hidden  = true;
+    목록그리기();
+  }
+}
+
+/* ── 목록 ── */
+function 진행(e) {
+  const it = e.항목 || [];
+  return { 다: it.length, 됨: it.filter((x) => x.됨).length };
+}
+function 카드(e) {
+  const p = 진행(e);
+  const d = 디데이(e.날짜);
+  const 끝 = e.끝났나 || (d !== null && d < 0);
+  const 다됨 = p.다 > 0 && p.됨 === p.다;
+  const 뱃지 = 끝 ? '지난 행사'
+             : d === null ? '날짜 미정'
+             : d === 0 ? '오늘'
+             : d === 1 ? '내일'
+             : 'D-' + d;
+  const 급 = !끝 && d !== null && d <= 3;
+  return '<button type="button" class="card" data-id="' + esc(e.id) + '">' +
+    '<div class="r1"><div class="nm">' + esc(e.제목 || '이름 없는 행사') + '</div>' +
+      '<div class="dday' + (끝 ? ' done' : 급 ? ' soon' : '') + '">' + esc(뱃지) + '</div></div>' +
+    '<div class="r2">' + [날짜글(e.날짜), e.집합 ? '집합 ' + esc(e.집합) : '', esc(e.장소), esc(e.우리담당)]
+        .filter(Boolean).join(' · ') + '</div>' +
+    '<div class="r3"><div class="prog"><i class="' + (다됨 ? 'full' : '') + '" style="width:' +
+        (p.다 ? Math.round(p.됨 / p.다 * 100) : 0) + '%"></i></div>' +
+      '<div class="cnt' + (다됨 ? ' full' : '') + '">' + p.됨 + ' / ' + p.다 + '</div></div>' +
+  '</button>';
+}
+function 목록그리기() {
+  const 끝남 = (e) => e.끝났나 || (디데이(e.날짜) !== null && 디데이(e.날짜) < 0);
+  const 앞 = 전체.filter((e) => !끝남(e));
+  const 뒤 = 전체.filter(끝남).reverse();
+
+  $('#list-soon').innerHTML = 앞.length ? 앞.map(카드).join('') :
+    '<div class="empty">다가오는 행사가 없습니다.<br>위 <b style="color:#a1a1aa;">새 행사</b> 로 만들거나, 견적서에서 바로 넘기세요.</div>';
+  $('#list-past').innerHTML = 뒤.length ? 뒤.map(카드).join('') :
+    '<div class="empty">지난 행사가 없습니다.</div>';
+  $('#cnt-soon').textContent = 앞.length ? 앞.length + '건' : '';
+  $('#cnt-past').textContent = 뒤.length ? 뒤.length + '건' : '';
+  $('#list-when').textContent = 받은때 ? 때글(받은때) + ' 기준' : '';
+}
+
+/* ── 행사 하나 ── */
+const 칸들 = ['제목','날짜','집합','시작','장소','고객','담당','우리담당','인원','비고'];
+function 지금행사() {
+  return 새행사 || 전체.filter((e) => e.id === 보는중)[0] || null;
+}
+function 하나그리기() {
+  const e = 지금행사();
+  if (!e) { location.hash = ''; return; }
+  칸들.forEach((k) => { $('#f-' + k).value = e[k] || ''; });
+  $('#f-끝났나').checked = !!e.끝났나;
+  $('#btn-del').hidden = !!새행사;
+  $('#one-when').textContent = 새행사 ? '아직 저장 전입니다'
+    : (e.고친때 ? '마지막 수정 ' + 때글(e.고친때) + (e.고친이 ? ' · ' + e.고친이 : '') : '');
+  항목그리기();
+}
+function 항목그리기() {
+  const e = 지금행사();
+  const it = (e && e.항목) || [];
+  const p = 진행(e || { 항목: [] });
+  $('#one-cnt').textContent = it.length ? p.됨 + ' / ' + p.다 + ' 챙김' : '';
+  $('#items').innerHTML = it.length ? it.map((x) =>
+    '<div class="item' + (x.됨 ? ' on' : '') + '" data-id="' + esc(x.id) + '">' +
+      '<input type="checkbox" class="ck"' + (x.됨 ? ' checked' : '') + '>' +
+      '<div class="tx">' +
+        '<input class="nm" value="' + esc(x.이름) + '" placeholder="항목 이름">' +
+        '<input class="me" value="' + esc(x.메모) + '" placeholder="수량 · 비고">' +
+        (x.됨 && x.누가 ? '<div class="by">' + esc(x.누가) + ' · ' + 때글(x.때) + '</div>' : '') +
+      '</div>' +
+      (x.출처 === '견적' ? '<div class="tag">견적</div>' : '') +
+      '<button type="button" class="rm" title="빼기">' +
+        '<iconify-icon icon="solar:close-circle-bold"></iconify-icon></button>' +
+    '</div>').join('')
+    : '<div class="empty">챙길 품목이 없습니다.<br>아래에서 적어 넣거나, 자주 챙기는 것을 눌러 담으세요.</div>';
+}
+
+/* 화면의 칸 → 행사 자료 */
+function 칸읽기() {
+  const e = 지금행사();
+  if (!e) return null;
+  칸들.forEach((k) => { e[k] = $('#f-' + k).value.trim(); });
+  e.끝났나 = $('#f-끝났나').checked;
+  return e;
+}
+
+let 저장중 = false;
+async function 저장(말) {
+  const e = 칸읽기();
+  if (!e) return false;
+  if (!e.제목) { toast('행사명을 적어 주세요'); $('#f-제목').focus(); return false; }
+  if (저장중) return false;
+  저장중 = true;
+  $('#btn-save').disabled = true;
+  try {
+    /* 품목을 안 건드렸으면 빼고 보낸다. 그 사이 직원이 체크한 것을 덮어쓰지 않게 */
+    const 보낼것 = Object.assign({}, e);
+    if (!새행사 && !항목바뀜) delete 보낼것.항목;
+    const j = await 부르기('schedSave', { 행사: 보낼것 });
+    전체 = j.목록 || [];
+    항목바뀜 = false;
+    if (새행사) { 새행사 = null; location.hash = '#e=' + j.id; }
+    else 하나그리기();
+    toast(말 || '저장했습니다');
+    return true;
+  } catch (err) {
+    toast('저장하지 못했습니다 — ' + err.message);
+    return false;
+  } finally {
+    저장중 = false;
+    $('#btn-save').disabled = false;
+  }
+}
+
+/* ── 서버에서 받아오기 ── */
+async function 받아오기(조용히) {
+  try {
+    const j = await 부르기('schedList');
+    전체 = j.목록 || [];
+    받은때 = Date.now();
+    if (!$('#one-view').hidden) {
+      if (새행사) return true;                       /* 아직 저장 전인 새 행사는 건드리지 않는다 */
+      const 쓰는중 = document.activeElement &&
+        document.activeElement.closest &&
+        document.activeElement.closest('#one-view input, #one-view textarea');
+      if (조용히 && (쓰는중 || 항목바뀜)) return true; /* 고치는 중이면 화면을 안 바꾼다 */
+      if (조용히) 항목그리기();                       /* 저절로 받을 땐 체크 상태만 */
+      else 하나그리기();
+    } else 목록그리기();
+    return true;
+  } catch (err) {
+    if (/암호/.test(err.message)) { 쓰기(열쇠키, ''); 화면(); toast('암호가 맞지 않습니다'); return false; }
+    if (!조용히) toast('불러오지 못했습니다 — ' + err.message);
+    return false;
+  }
+}
+
+/* ── 잠금 ── */
+$('#lk-go').addEventListener('click', async () => {
+  const pw = $('#lk-pw').value.trim(), who = $('#lk-who').value.trim();
+  if (!pw)  { toast('암호를 넣어 주세요'); return; }
+  if (!who) { toast('이름을 넣어 주세요'); return; }
+  쓰기(열쇠키, pw); 쓰기(이름키, who);
+  if (await 받아오기()) { $('#lk-pw').value = ''; 화면(); }
+});
+$('#lk-pw').addEventListener('keydown',  (e) => { if (e.key === 'Enter') $('#lk-who').focus(); });
+$('#lk-who').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#lk-go').click(); });
+
+$('#btn-who').addEventListener('click', () => {
+  const who = (prompt('이름을 적어 주세요. 누가 체크했는지 남습니다.', 나()) || '').trim();
+  if (!who) return;
+  쓰기(이름키, who);
+  $('#who-name').textContent = who;
+  toast(who + ' 님으로 바꿨습니다');
+});
+
+/* ── 목록 움직임 ── */
+$('#btn-reload').addEventListener('click', async () => { if (await 받아오기()) toast('새로 받았습니다'); });
+$('#btn-new').addEventListener('click', () => {
+  새행사 = { id: '', 제목: '', 날짜: '', 집합: '', 시작: '', 장소: '', 고객: '', 담당: '',
+             우리담당: 나(), 인원: '', 비고: '', 항목: [] };
+  화면();
+  $('#f-제목').focus();
+});
+['#list-soon', '#list-past'].forEach((sel) => {
+  $(sel).addEventListener('click', (ev) => {
+    const c = ev.target.closest('.card');
+    if (c) location.hash = '#e=' + c.dataset.id;
+  });
+});
+$('#btn-back').addEventListener('click', () => {
+  새행사 = null; 항목바뀜 = false;
+  if (location.hash) location.hash = '';
+  else 화면();                                     /* 주소가 이미 비어 있으면 직접 */
+});
+
+/* ── 행사 하나 움직임 ── */
+$('#btn-save').addEventListener('click', () => 저장());
+
+$('#btn-del').addEventListener('click', async () => {
+  const e = 지금행사();
+  if (!e || !e.id) return;
+  if (!confirm('「' + (e.제목 || '이 행사') + '」 를 지울까요?\n직원들 화면에서도 같이 사라집니다.')) return;
+  try {
+    const j = await 부르기('schedDel', { id: e.id });
+    전체 = j.목록 || [];
+    location.hash = '';
+    toast('지웠습니다');
+  } catch (err) { toast('지우지 못했습니다 — ' + err.message); }
+});
+
+/* 체크 — 바로 서버에 (글자 수정과 안 부딪히게 이 항목만 바꾼다) */
+$('#items').addEventListener('change', async (ev) => {
+  const ck = ev.target.closest('.ck');
+  if (!ck) return;
+  const e = 지금행사();
+  const 줄 = ck.closest('.item');
+  const 항목 = 줄.dataset.id;
+  if (새행사) {   /* 아직 저장 전이면 화면에서만 */
+    const x = (e.항목 || []).filter((v) => v.id === 항목)[0];
+    if (x) { x.됨 = ck.checked; x.누가 = 나(); x.때 = Date.now(); }
+    항목그리기();
+    return;
+  }
+  줄.classList.toggle('on', ck.checked);
+  try {
+    const j = await 부르기('schedCheck', { id: e.id, 항목: 항목, 됨: ck.checked });
+    전체 = j.목록 || [];
+    항목그리기();
+  } catch (err) {
+    ck.checked = !ck.checked;
+    줄.classList.toggle('on', ck.checked);
+    toast('체크를 못 보냈습니다 — ' + err.message);
+  }
+});
+
+/* 항목 글자 고치기 — 칸을 벗어나면 저장 */
+$('#items').addEventListener('change', (ev) => {
+  const inp = ev.target.closest('input.nm, input.me');
+  if (!inp) return;
+  const e = 지금행사();
+  const 항목 = inp.closest('.item').dataset.id;
+  const x = (e.항목 || []).filter((v) => v.id === 항목)[0];
+  if (!x) return;
+  if (inp.classList.contains('nm')) x.이름 = inp.value.trim();
+  else x.메모 = inp.value.trim();
+  항목바뀜 = true;
+  if (!새행사) 저장('고쳤습니다');
+});
+
+function 항목더하기(이름, 메모) {
+  const e = 지금행사();
+  if (!e) return;
+  이름 = String(이름 || '').trim();
+  if (!이름) { toast('항목 이름을 적어 주세요'); return; }
+  e.항목 = e.항목 || [];
+  e.항목.push({ id: 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+                이름: 이름, 메모: String(메모 || '').trim(), 출처: '', 됨: false, 누가: '', 때: 0 });
+  항목바뀜 = true;
+  항목그리기();
+  if (!새행사) 저장('넣었습니다');
+}
+
+$('#btn-add').addEventListener('click', () => {
+  항목더하기($('#add-name').value, $('#add-memo').value);
+  $('#add-name').value = ''; $('#add-memo').value = '';
+  $('#add-name').focus();
+});
+$('#add-name').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#add-memo').focus(); });
+$('#add-memo').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('#btn-add').click(); });
+
+$('#items').addEventListener('click', (ev) => {
+  const rm = ev.target.closest('.rm');
+  if (!rm) return;
+  const e = 지금행사();
+  const 항목 = rm.closest('.item').dataset.id;
+  e.항목 = (e.항목 || []).filter((v) => v.id !== 항목);
+  항목바뀜 = true;
+  항목그리기();
+  if (!새행사) 저장('뺐습니다');
+});
+
+$('#chips').innerHTML = 공통품목.map((n) =>
+  '<button type="button" class="chip" data-n="' + esc(n) + '">＋ ' + esc(n) + '</button>').join('');
+$('#chips').addEventListener('click', (ev) => {
+  const c = ev.target.closest('.chip');
+  if (c) 항목더하기(c.dataset.n, '');
+});
+
+/* ── 견적서에서 넘어온 새 행사 ── */
+function 넘어온것() {
+  const m = location.hash.match(/^#new=(.+)$/);
+  if (!m) return null;
+  try {
+    const d = JSON.parse(unb64u(m[1]));
+    return {
+      id: '', 제목: d.제목 || '', 날짜: d.날짜 || '', 집합: '', 시작: '',
+      장소: d.장소 || '', 고객: d.고객 || '', 담당: d.담당 || '',
+      우리담당: 나(), 인원: d.인원 || '', 비고: d.비고 || '',
+      항목: (d.항목 || []).map((x, i) => ({
+        id: 'q' + i + Math.random().toString(36).slice(2, 5),
+        이름: x.이름 || '', 메모: x.메모 || '', 출처: '견적', 됨: false, 누가: '', 때: 0,
+      })).filter((x) => x.이름),
+    };
+  } catch (e) { return null; }
+}
+
+/* ── 시작 ── */
+window.addEventListener('hashchange', () => {
+  const 넘 = 넘어온것();
+  if (넘) { 새행사 = 넘; history.replaceState(null, '', location.pathname + location.search); }
+  화면();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && 암호() && 나() && !새행사) 받아오기(true);
+});
+setInterval(() => {
+  if (document.visibilityState === 'visible' && 암호() && 나() && !새행사) 받아오기(true);
+}, 60000);
+
+(async function 시작() {
+  const 넘 = 넘어온것();
+  if (넘) { 새행사 = 넘; history.replaceState(null, '', location.pathname + location.search); }
+  화면();
+  if (암호() && 나()) { await 받아오기(true); 화면(); }
+  else $('#lk-pw').focus();
+})();
+</script>
+</body>
+</html>
