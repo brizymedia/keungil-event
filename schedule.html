@@ -36,6 +36,32 @@
   .in{width:100%;background:#131317;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.6rem .7rem;color:#fff;font-size:.88rem;outline:none}
   .in:focus{border-color:#F59E0B}
   textarea.in{min-height:4.5rem;resize:vertical;line-height:1.7}
+  /* 날짜 · 시간 칸 — color-scheme 을 어둡게 안 주면 달력 아이콘이 까매서 어두운 바탕에서 안 보인다 */
+  input[type="date"],input[type="time"]{color-scheme:dark}
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator{opacity:.9;cursor:pointer}
+
+  /* ── 월간 일정표 ── */
+  .cal-h{display:flex;align-items:center;gap:.4rem;margin-bottom:.8rem}
+  .cal-h b{font-size:.95rem;font-weight:800;min-width:7rem;text-align:center;font-variant-numeric:tabular-nums}
+  .cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+  .cal-w{font-size:.7rem;color:#71717a;text-align:center;padding:.1rem 0 .25rem}
+  .cal-w.sun{color:#FCA5A5}.cal-w.sat{color:#93C5FD}
+  .cal-d{min-height:4.4rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);
+         border-radius:7px;padding:.22rem .18rem;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+  .cal-d.off{opacity:.3}
+  .cal-d.today{border-color:rgba(245,158,11,.55);background:rgba(245,158,11,.08)}
+  .cal-d > i{font-style:normal;font-size:.72rem;color:#a1a1aa;text-align:center;font-variant-numeric:tabular-nums}
+  .cal-d > i.sun{color:#FCA5A5}.cal-d > i.sat{color:#93C5FD}
+  .cal-d.today > i{color:#FCD34D;font-weight:800}
+  .ev{display:block;width:100%;text-align:left;font-size:.66rem;line-height:1.55;padding:.08rem .28rem;
+      background:rgba(245,158,11,.22);color:#FCD34D;border:0;border-radius:4px;cursor:pointer;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.1rem}
+  .ev:hover{background:rgba(245,158,11,.38)}
+  .ev.l0{border-top-left-radius:0;border-bottom-left-radius:0}
+  .ev.r0{border-top-right-radius:0;border-bottom-right-radius:0}
+  .ev.done{background:rgba(255,255,255,.07);color:#71717a}
+  @media (max-width:640px){ .cal-d{min-height:3.3rem;padding:.18rem .12rem} .ev{font-size:.56rem;padding:.05rem .16rem} .cal-h b{min-width:5.6rem} }
   .hint{font-size:.76rem;color:#71717a;line-height:1.75}
 
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:9999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;padding:.6rem 1.1rem;font-size:.85rem;font-weight:700;cursor:pointer;transition:.18s}
@@ -148,6 +174,17 @@
     </div>
 
     <div class="panel">
+      <div class="cal-h">
+        <button type="button" class="btn sm" id="cal-prev" aria-label="지난 달" style="padding:.35rem .7rem;">‹</button>
+        <b id="cal-title"></b>
+        <button type="button" class="btn sm" id="cal-next" aria-label="다음 달" style="padding:.35rem .7rem;">›</button>
+        <button type="button" class="btn sm" id="cal-today" style="margin-left:auto;">이번 달</button>
+      </div>
+      <div class="cal-g" id="cal-grid"></div>
+      <p class="hint" style="margin-top:.7rem;">막대를 누르면 그 행사로 들어갑니다. 여러 날 하는 행사는 기간만큼 이어집니다.</p>
+    </div>
+
+    <div class="panel">
       <h2><iconify-icon icon="solar:calendar-mark-bold" style="font-size:18px;color:#FCD34D;"></iconify-icon>
         다가오는 행사 <span id="cnt-soon"></span></h2>
       <div id="list-soon"></div>
@@ -176,7 +213,9 @@
         <input class="in" id="f-제목" placeholder="예: 2026 진향제">
       </div>
       <div class="grid">
-        <div><label class="f">행사 날짜</label><input class="in" id="f-날짜" type="date"></div>
+        <div><label class="f">행사 시작일</label><input class="in" id="f-날짜" type="date"></div>
+        <div><label class="f">종료일 <span style="color:#52525b;">하루면 비워 두세요</span></label>
+             <input class="in" id="f-끝날짜" type="date"></div>
         <div><label class="f">집합 시간 (셋팅)</label><input class="in" id="f-집합" type="time"></div>
         <div><label class="f">행사 시작</label><input class="in" id="f-시작" type="time"></div>
       </div>
@@ -201,6 +240,9 @@
         <label class="hint" style="display:flex;align-items:center;gap:.4rem;cursor:pointer;">
           <input type="checkbox" id="f-끝났나" style="width:16px;height:16px;accent-color:#F59E0B;"> 끝난 행사로 두기
         </label>
+        <button type="button" class="btn sm" id="btn-quote" hidden>
+          <iconify-icon icon="solar:bill-list-bold" style="font-size:15px;color:#FBBF24;"></iconify-icon> 이 행사 견적서 열기
+        </button>
         <button type="button" class="btn sm danger" id="btn-del" style="margin-left:auto;">
           <iconify-icon icon="solar:trash-bin-trash-bold" style="font-size:15px;"></iconify-icon> 행사 지우기
         </button>
@@ -309,6 +351,12 @@ function 오늘글() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
+/* 여러 날 하는 행사 — 끝날이 없으면 하루짜리 */
+const 끝날 = (e) => (e && (e.끝날짜 || e.날짜)) || '';
+const 끝남 = (e) => !!(e && (e.끝났나 || (끝날(e) && 끝날(e) < 오늘글())));
+function 날짜키(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 function 디데이(날짜) {
   if (!날짜) return null;
   const a = new Date(날짜 + 'T00:00:00'), b = new Date(오늘글() + 'T00:00:00');
@@ -321,6 +369,11 @@ function 날짜글(날짜) {
   if (isNaN(d)) return 날짜;
   const 요일 = ['일','월','화','수','목','금','토'][d.getDay()];
   return (d.getMonth() + 1) + '/' + d.getDate() + '(' + 요일 + ')';
+}
+/* 10/3(토) · 10/3(토) ~ 10/5(월) */
+function 기간글(e) {
+  const 끝 = 끝날(e);
+  return 날짜글(e.날짜) + (끝 && 끝 !== e.날짜 ? ' ~ ' + 날짜글(끝) : '');
 }
 function 때글(t) {
   if (!t) return '';
@@ -362,18 +415,19 @@ function 진행(e) {
 function 카드(e) {
   const p = 진행(e);
   const d = 디데이(e.날짜);
-  const 끝 = e.끝났나 || (d !== null && d < 0);
+  const 끝 = 끝남(e);
   const 다됨 = p.다 > 0 && p.됨 === p.다;
   const 뱃지 = 끝 ? '지난 행사'
              : d === null ? '날짜 미정'
              : d === 0 ? '오늘'
+             : d < 0 ? '진행 중'
              : d === 1 ? '내일'
              : 'D-' + d;
   const 급 = !끝 && d !== null && d <= 3;
   return '<button type="button" class="card" data-id="' + esc(e.id) + '">' +
     '<div class="r1"><div class="nm">' + esc(e.제목 || '이름 없는 행사') + '</div>' +
       '<div class="dday' + (끝 ? ' done' : 급 ? ' soon' : '') + '">' + esc(뱃지) + '</div></div>' +
-    '<div class="r2">' + [날짜글(e.날짜), e.집합 ? '집합 ' + esc(e.집합) : '', esc(e.장소), esc(e.우리담당)]
+    '<div class="r2">' + [기간글(e), e.집합 ? '집합 ' + esc(e.집합) : '', esc(e.장소), esc(e.우리담당)]
         .filter(Boolean).join(' · ') + '</div>' +
     '<div class="r3"><div class="prog"><i class="' + (다됨 ? 'full' : '') + '" style="width:' +
         (p.다 ? Math.round(p.됨 / p.다 * 100) : 0) + '%"></i></div>' +
@@ -381,7 +435,7 @@ function 카드(e) {
   '</button>';
 }
 function 목록그리기() {
-  const 끝남 = (e) => e.끝났나 || (디데이(e.날짜) !== null && 디데이(e.날짜) < 0);
+  달력그리기();
   const 앞 = 전체.filter((e) => !끝남(e));
   const 뒤 = 전체.filter(끝남).reverse();
 
@@ -394,8 +448,60 @@ function 목록그리기() {
   $('#list-when').textContent = 받은때 ? 때글(받은때) + ' 기준' : '';
 }
 
+/* ── 월간 일정표 ───────────────────────────────────────────
+   한 달을 한눈에. 여러 날 하는 행사는 날마다 막대가 이어져 보인다. */
+let 보는달 = null;
+const 요일글 = ['일','월','화','수','목','금','토'];
+
+function 달력그리기() {
+  if (!보는달) { const t = new Date(); 보는달 = { y: t.getFullYear(), m: t.getMonth() }; }
+  const 첫날 = new Date(보는달.y, 보는달.m, 1);
+  const 그달수 = new Date(보는달.y, 보는달.m + 1, 0).getDate();
+  const 칸수 = Math.ceil((첫날.getDay() + 그달수) / 7) * 7;
+  const 시작 = new Date(첫날);
+  시작.setDate(1 - 첫날.getDay());
+  const 오늘키 = 오늘글();
+
+  $('#cal-title').textContent = 보는달.y + '년 ' + (보는달.m + 1) + '월';
+
+  let html = 요일글.map((w, i) => '<div class="cal-w' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '') + '">' + w + '</div>').join('');
+
+  for (let n = 0; n < 칸수; n++) {
+    const d = new Date(시작);
+    d.setDate(시작.getDate() + n);
+    const 키 = 날짜키(d), 요일 = d.getDay(), 밖 = d.getMonth() !== 보는달.m;
+    const 그날 = 전체.filter((e) => e.날짜 && 키 >= e.날짜 && 키 <= 끝날(e));
+
+    html += '<div class="cal-d' + (밖 ? ' off' : '') + (키 === 오늘키 ? ' today' : '') + '">' +
+      '<i class="' + (요일 === 0 ? 'sun' : 요일 === 6 ? 'sat' : '') + '">' + d.getDate() + '</i>' +
+      그날.map((e) => {
+        const 처음   = 키 === e.날짜 || 요일 === 0;
+        const 마지막 = 키 === 끝날(e) || 요일 === 6;
+        return '<button type="button" class="ev' + (끝남(e) ? ' done' : '') +
+          (처음 ? '' : ' l0') + (마지막 ? '' : ' r0') + '" data-id="' + esc(e.id) + '"' +
+          ' title="' + esc(e.제목) + '">' + (처음 ? esc(e.제목) : '&nbsp;') + '</button>';
+      }).join('') +
+    '</div>';
+  }
+  $('#cal-grid').innerHTML = html;
+}
+
+function 달옮기기(걸음) {
+  if (!보는달) 달력그리기();
+  const d = new Date(보는달.y, 보는달.m + 걸음, 1);
+  보는달 = { y: d.getFullYear(), m: d.getMonth() };
+  달력그리기();
+}
+$('#cal-prev').addEventListener('click',  () => 달옮기기(-1));
+$('#cal-next').addEventListener('click',  () => 달옮기기(1));
+$('#cal-today').addEventListener('click', () => { 보는달 = null; 달력그리기(); });
+$('#cal-grid').addEventListener('click', (ev) => {
+  const b = ev.target.closest('.ev');
+  if (b) location.hash = '#e=' + b.dataset.id;
+});
+
 /* ── 행사 하나 ── */
-const 칸들 = ['제목','날짜','집합','시작','장소','고객','담당','우리담당','인원','비고'];
+const 칸들 = ['제목','날짜','끝날짜','집합','시작','장소','고객','담당','우리담당','인원','비고'];
 function 지금행사() {
   return 새행사 || 전체.filter((e) => e.id === 보는중)[0] || null;
 }
@@ -405,6 +511,7 @@ function 하나그리기() {
   칸들.forEach((k) => { $('#f-' + k).value = e[k] || ''; });
   $('#f-끝났나').checked = !!e.끝났나;
   $('#btn-del').hidden = !!새행사;
+  $('#btn-quote').hidden = !e.견적코드;
   $('#one-when').textContent = 새행사 ? '아직 저장 전입니다'
     : (e.고친때 ? '마지막 수정 ' + 때글(e.고친때) + (e.고친이 ? ' · ' + e.고친이 : '') : '');
   항목그리기();
@@ -515,8 +622,8 @@ $('#btn-who').addEventListener('click', () => {
 /* ── 목록 움직임 ── */
 $('#btn-reload').addEventListener('click', async () => { if (await 받아오기()) toast('새로 받았습니다'); });
 $('#btn-new').addEventListener('click', () => {
-  새행사 = { id: '', 제목: '', 날짜: '', 집합: '', 시작: '', 장소: '', 고객: '', 담당: '',
-             우리담당: 나(), 인원: '', 비고: '', 항목: [] };
+  새행사 = { id: '', 제목: '', 날짜: '', 끝날짜: '', 집합: '', 시작: '', 장소: '', 고객: '', 담당: '',
+             우리담당: 나(), 인원: '', 비고: '', 견적코드: '', 항목: [] };
   화면();
   $('#f-제목').focus();
 });
@@ -534,6 +641,13 @@ $('#btn-back').addEventListener('click', () => {
 
 /* ── 행사 하나 움직임 ── */
 $('#btn-save').addEventListener('click', () => 저장());
+
+$('#btn-quote').addEventListener('click', () => {
+  const e = 지금행사();
+  if (!e || !e.견적코드) return;
+  window.open(location.href.replace(/[?#].*$/, '').replace(/schedule\.html$/, 'quote.html') +
+              '?admin=1#q=' + e.견적코드, '_blank');
+});
 
 $('#btn-del').addEventListener('click', async () => {
   const e = 지금행사();
@@ -679,10 +793,11 @@ $('#pick-list').addEventListener('click', (e) => {
   if (!d) { toast('이 견적서를 읽지 못했습니다'); return; }
   const i = d.정보;
   새행사 = {
-    id: '', 제목: i.title || (i.org ? i.org + ' 행사' : q.제목 || ''),
+    id: '', 제목: i.title || (i.org ? i.org + ' 행사' : q.제목 || ''), 끝날짜: '',
     날짜: i.date || '', 집합: '', 시작: '', 장소: i.place || '',
     고객: i.org || '', 담당: [i.name, i.tel].filter(Boolean).join(' · '),
     우리담당: 나(), 인원: i.people || '', 비고: i.memo || '',
+    견적코드: q.코드,
     항목: d.줄.map((r, n) => ({
       id: 'q' + n + Math.random().toString(36).slice(2, 5),
       이름: r.name || '', 메모: 견적줄설명(r), 출처: '견적', 됨: false, 누가: '', 때: 0,
@@ -701,9 +816,10 @@ function 넘어온것() {
   try {
     const d = JSON.parse(unb64u(m[1]));
     return {
-      id: '', 제목: d.제목 || '', 날짜: d.날짜 || '', 집합: '', 시작: '',
+      id: '', 제목: d.제목 || '', 날짜: d.날짜 || '', 끝날짜: d.끝날짜 || '', 집합: '', 시작: '',
       장소: d.장소 || '', 고객: d.고객 || '', 담당: d.담당 || '',
       우리담당: 나(), 인원: d.인원 || '', 비고: d.비고 || '',
+      견적코드: d.코드 || '',
       항목: (d.항목 || []).map((x, i) => ({
         id: 'q' + i + Math.random().toString(36).slice(2, 5),
         이름: x.이름 || '', 메모: x.메모 || '', 출처: '견적', 됨: false, 누가: '', 때: 0,

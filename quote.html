@@ -1528,6 +1528,7 @@ $('#btn-sched').addEventListener('click', () => {
     날짜: g('date'), 장소: g('place'), 고객: g('org'),
     담당: [g('name'), g('tel')].filter(Boolean).join(' · '),
     인원: g('people'), 비고: g('memo'),
+    코드: encodeState(),
     항목: rows.map((r) => ({
       이름: r.name,
       메모: [r.spec, (+r.qty > 1 ? r.qty + (r.unit || '') : ''), (+r.days > 1 ? r.days + '일' : '')]
