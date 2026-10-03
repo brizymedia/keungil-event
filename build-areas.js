@@ -486,7 +486,7 @@ function 만들기(c) {
          esc(이름) + ' 무대설치 · MC · 가수 섭외</div>');
   H.push('  <div>' + 지역들.map(x => esc(x.이름)).join(' · ') + ' 당일 세팅 · 수도권 · 충청권 대형 행사 출장</div>');
   H.push('  <div style="margin-top:.6rem"><a href="/">홈</a> · <a href="/areas.html">서비스 지역</a> · ' +
-         '<a href="/gallery.html">갤러리</a> · <a href="/blog/">블로그</a> · <a href="/quote.html">자동 견적서</a></div>');
+         '<a href="/gallery.html">갤러리</a> · <a href="/blog/">블로그</a> · <a href="/quote.html">자동 견적서</a> · <a href="/office.html" rel="nofollow">관리자 모드</a></div>');
   H.push('</footer>');
   H.push('</body>');
   H.push('</html>');
