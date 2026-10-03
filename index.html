@@ -219,6 +219,55 @@
     .photo-lift{ filter:saturate(1.22) contrast(1.06) brightness(1.06); }
     .photo-lift-strong{ filter:saturate(1.3) contrast(1.1) brightness(1.14); }
 
+    /* ── 3D 도면 · 행사장 도면 ── */
+    .plan-hero{ display:grid;grid-template-columns:1.2fr 1fr;gap:3rem;align-items:center;margin-bottom:3.5rem; }
+    .plan-shot{ display:block;width:100%;padding:0;text-align:left;font:inherit;color:inherit;cursor:zoom-in;
+                border:1px solid var(--card-line);background:var(--card);border-radius:4px;overflow:hidden;
+                position:relative;box-shadow:var(--shadow);
+                transition:transform .45s cubic-bezier(.16,1,.3,1),box-shadow .45s cubic-bezier(.16,1,.3,1); }
+    .plan-shot:hover{ transform:translateY(-3px);
+                      box-shadow:0 1px 2px rgba(22,20,28,.05),0 26px 60px -22px rgba(22,20,28,.32); }
+    .plan-shot img{ display:block;width:100%;height:auto; }
+    .plan-tag{ position:absolute;bottom:.85rem;left:.85rem;font-size:.7rem;font-weight:700;letter-spacing:.02em;color:#fff;
+               padding:.3rem .8rem;border-radius:9999px;background:rgba(11,10,16,.62);backdrop-filter:blur(8px);
+               border:1px solid rgba(255,255,255,.18); }
+    .plan-zoom{ position:absolute;right:.85rem;top:.85rem;display:inline-flex;align-items:center;gap:.3rem;
+                font-size:.72rem;font-weight:700;color:#fff;padding:.32rem .75rem;border-radius:9999px;
+                background:rgba(11,10,16,.62);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);
+                opacity:0;transform:translateY(-.25rem);transition:opacity .3s,transform .3s; }
+    .plan-shot:hover .plan-zoom,.plan-shot:focus-visible .plan-zoom{ opacity:1;transform:translateY(0); }
+    .plan-points{ display:flex;flex-direction:column;gap:1.7rem; }
+    .pp{ display:flex;gap:1rem;align-items:flex-start; }
+    .pp > b{ flex:none;font-size:.78rem;font-weight:800;color:var(--amber-ink);letter-spacing:.06em;
+             padding-top:.3rem;font-variant-numeric:tabular-nums; }
+    .pp h3{ font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem; }
+    .pp p{ font-size:.93rem;line-height:1.75; }
+    /* 도면은 커야 치수가 읽힌다 — 넓은 화면에서도 두 칸까지만 */
+    .plan-grid{ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem; }
+    @media (max-width:760px){ .plan-grid{ grid-template-columns:1fr; } }
+    .plan-im{ display:block;position:relative; }
+    .plan-cap{ padding:.9rem 1.05rem 1.05rem; }
+    .plan-cap b{ display:block;font-size:.95rem;font-weight:800;letter-spacing:-.01em;margin-bottom:.3rem; }
+    .plan-cap span{ display:block;font-size:.8rem;line-height:1.7;color:var(--fg-3); }
+    .plan-cta{ margin-top:3.5rem;text-align:center; }
+    .plan-cta p{ font-size:.98rem;line-height:1.8;max-width:56ch;margin:0 auto 1.6rem; }
+    .plan-btns{ display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap; }
+    @media (max-width:900px){ .plan-hero{ grid-template-columns:1fr;gap:2.2rem; } }
+
+    /* 도면 크게 보기 — 갤러리 라이트박스와 따로 돈다(도면은 확대가 생명이라 흰 바탕을 깐다) */
+    #plan-lb{ display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.93);backdrop-filter:blur(8px);
+              align-items:center;justify-content:center;flex-direction:column;gap:1rem;padding:1rem; }
+    #plan-lb.on{ display:flex; }
+    #plan-lb img{ max-width:94vw;max-height:80vh;object-fit:contain;border-radius:4px;background:#fff; }
+    #plan-lb .cap{ font-size:.86rem;color:#D4CFDA;text-align:center;line-height:1.7;max-width:62ch;padding:0 1rem; }
+    #plan-lb .rnd{ position:absolute;background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:50%;
+                   cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit; }
+    #plan-lb .rnd:hover{ background:rgba(255,255,255,.2); }
+    #plan-lb .pv{ left:1rem;top:50%;transform:translateY(-50%);width:2.75rem;height:2.75rem;font-size:1.4rem; }
+    #plan-lb .nx{ right:1rem;top:50%;transform:translateY(-50%);width:2.75rem;height:2.75rem;font-size:1.4rem; }
+    #plan-lb .cl{ top:1rem;right:1rem;width:2.2rem;height:2.2rem;font-size:1.1rem; }
+    #plan-lb .num{ position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.8rem;color:#B9B3C2; }
+
     /* ── 포트폴리오 사진 → 해당 갤러리로 ── */
     .portfolio-img{ display:block;text-decoration:none;cursor:pointer; }
     .portfolio-img img{ transform:scale(var(--zoom,1));transition:transform .7s ease; }
@@ -921,6 +970,147 @@
     </p>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════════
+     PLAN — 3D 도면 · 행사장 도면
+══════════════════════════════════════════════════ -->
+<section id="plan" class="sec-light alt" style="padding:7rem 1.5rem 6rem;border-top:1px solid var(--line);">
+  <div style="max-width:80rem;margin:0 auto;">
+
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      <div class="section-eyebrow">Design &amp; Drawings</div>
+      <h2 class="sec-title" style="margin-bottom:1rem;">3D 도면 · 행사장 도면 제공</h2>
+      <p class="t2" style="font-size:1.1rem;max-width:60ch;line-height:1.8;" data-e="plan-sub"><!--e:plan-sub-->행사는 한 번 세우면 당일에 고칠 수 없습니다. 그래서 큰길은 현장에 들어가기 전에 <strong style="color:var(--fg);font-weight:700;">그림부터 드립니다.</strong> 무대가 어떻게 서는지, 게이트가 어디에 놓이는지, 현수막이 몇 미터인지 — 숫자가 들어간 도면으로 먼저 확인하십시오.<!--/e:plan-sub--></p>
+    </div>
+
+    <div class="reveal plan-hero">
+      <button type="button" class="plan-shot" data-cap="2026 스포츠 가치데이 페스티벌 · 무대 3D 시안 — 외줄 트러스에 LED 백드롭, 조명 12대, 스피커, 객석까지 실제 치수로 세웠습니다.">
+        <span class="plan-im">
+          <img src="plan/3d-stage.webp" alt="2026 스포츠 가치데이 페스티벌 무대 3D 시안 — 트러스 · LED 백드롭 · 조명 · 스피커 · 객석 배치" loading="lazy" decoding="async">
+        <span class="plan-tag">3D 무대 시안</span>
+        <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+      <div class="plan-points">
+        <div class="pp"><b>01</b><div>
+          <h3>무대 3D 시안</h3>
+          <p class="t2">트러스 · LED · 조명 · 스피커 자리를 실제 자재 치수로 세웁니다. 「여기 서면 이렇게 보인다」를 행사 전에 눈으로 확인하실 수 있습니다.</p>
+        </div></div>
+        <div class="pp"><b>02</b><div>
+          <h3>정면도 · 치수 도면</h3>
+          <p class="t2">가로대 길이, 타워 간격, 현수막 크기, 무대 높이까지 숫자로 적습니다. 현수막 제작 업체에 그대로 넘기실 수 있는 도면입니다.</p>
+        </div></div>
+        <div class="pp"><b>03</b><div>
+          <h3>행사장 배치 · 게이트</h3>
+          <p class="t2">메인게이트 · 유료존 입구 · 동선을 배치도로 잡고, 현장 사진 위에 얹어 그 자리에 실제로 어떻게 보일지까지 보여 드립니다.</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="reveal plan-grid">
+
+      <button type="button" class="plan-shot" data-cap="정면도 (객석에서 본 모습) — 외줄 트러스 좌우 3m 연장 + 세로 현수막. 가로대 전체 21m, 타워 간격 15m, 높이 6.4m, 세로 현수막 2m × 4.8m, 무대 10m × 0.9m.">
+        <span class="plan-im">
+          <img src="plan/elevation.webp" alt="무대 정면도 — 가로대 21m, 타워 간격 15m, 높이 6.4m, 세로 현수막 2m × 4.8m 치수 도면" loading="lazy" decoding="async">
+        <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+        <span class="plan-cap"><b>무대 정면도</b><span>가로대 21m · 높이 6.4m · 세로 현수막 2m × 4.8m — 치수까지 적힌 도면</span></span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="메인게이트 입면도와 3D — 통과 폭 9.5m, 양쪽 기둥 2.1m씩, 전체 13.7m, 높이 6m. 레이허로 세우고 전면을 현수막으로 감쌉니다.">
+        <span class="plan-im">
+          <img src="plan/gate-drawing.webp" alt="메인게이트 도면 — 통과 폭 9.5m, 전체 13.7m, 높이 6m 입면도와 3D" loading="lazy" decoding="async">
+        <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+        <span class="plan-cap"><b>메인게이트 입면 · 3D</b><span>통과 폭 9.5m · 전체 13.7m · 높이 6m — 세우기 전에 치수부터</span></span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="메인게이트를 실제 진입로 사진 위에 얹은 시안. 차량 동선과 눈높이에서 어떻게 보이는지 그 자리에서 확인하실 수 있습니다.">
+        <span class="plan-im">
+          <img src="plan/gate-site.webp" alt="메인게이트 현장 합성 시안 — 실제 진입로 사진 위에 게이트를 얹은 모습" loading="lazy" decoding="async">
+        <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+        <span class="plan-cap"><b>메인게이트 현장 합성</b><span>실제 진입로 사진에 얹어 — 그 자리에 서면 이렇게 보입니다</span></span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="유료존 입구 게이트 — 폭 9m, 높이 4.5m, 통과 높이 3m. 건물 출입구에 맞춰 트러스로 세우고 현수막을 감싼 시안입니다.">
+        <span class="plan-im">
+          <img src="plan/zone-gate.webp" alt="유료존 입구 게이트 시안 — 폭 9m, 높이 4.5m 트러스 게이트" loading="lazy" decoding="async">
+        <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+        <span class="plan-cap"><b>유료존 입구</b><span>폭 9m · 높이 4.5m — 건물 출입구에 맞춘 트러스 게이트</span></span>
+      </button>
+
+    </div>
+
+    <div class="reveal plan-cta">
+      <p class="t2" data-e="plan-cta"><!--e:plan-cta-->행사 규모와 현장 여건에 맞춰 시안과 도면을 만들어 드립니다. 문의하실 때 <strong style="color:var(--fg);font-weight:700;">「도면도 필요합니다」</strong> 한마디만 남겨 주세요.<!--/e:plan-cta--></p>
+      <div class="plan-btns">
+        <a href="stage3d/" class="btn-primary" style="padding:.85rem 1.7rem;font-size:.92rem;">
+          <iconify-icon icon="solar:box-minimalistic-bold" style="font-size:18px;"></iconify-icon>
+          3D 무대 시안 직접 잡아보기
+        </a>
+        <button type="button" onclick="openInquiryModal()" class="btn-ghost" style="padding:.85rem 1.7rem;font-size:.92rem;font-family:inherit;">
+          <iconify-icon icon="solar:ruler-cross-pen-bold" style="font-size:18px;color:var(--amber-ink);"></iconify-icon>
+          도면 상담 요청
+        </button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 도면 크게 보기 -->
+<div id="plan-lb" aria-hidden="true">
+  <button type="button" class="rnd pv" id="plan-lb-prev" aria-label="이전 도면">‹</button>
+  <img id="plan-lb-img" src="" alt="">
+  <div class="cap" id="plan-lb-cap"></div>
+  <button type="button" class="rnd nx" id="plan-lb-next" aria-label="다음 도면">›</button>
+  <button type="button" class="rnd cl" id="plan-lb-x" aria-label="닫기">✕</button>
+  <div class="num" id="plan-lb-num"></div>
+</div>
+
+<script>
+/* 도면은 확대해 봐야 치수가 읽힌다 — 갤러리 라이트박스와 따로 둔다 */
+(function () {
+  const 장 = Array.from(document.querySelectorAll('#plan .plan-shot'));
+  if (!장.length) return;
+  const 창 = document.getElementById('plan-lb');
+  const 그림 = document.getElementById('plan-lb-img');
+  const 글 = document.getElementById('plan-lb-cap');
+  const 쪽 = document.getElementById('plan-lb-num');
+  let 지금 = 0;
+
+  function 열기(n) {
+    지금 = (n + 장.length) % 장.length;
+    const b = 장[지금], im = b.querySelector('img');
+    그림.src = im.src;
+    그림.alt = im.alt;
+    글.textContent = b.dataset.cap || im.alt;
+    쪽.textContent = (지금 + 1) + ' / ' + 장.length;
+    창.classList.add('on');
+    창.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function 닫기() {
+    창.classList.remove('on');
+    창.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  장.forEach((b, n) => b.addEventListener('click', () => 열기(n)));
+  창.addEventListener('click', (e) => { if (e.target === 창) 닫기(); });
+  document.getElementById('plan-lb-x').addEventListener('click', 닫기);
+  document.getElementById('plan-lb-prev').addEventListener('click', () => 열기(지금 - 1));
+  document.getElementById('plan-lb-next').addEventListener('click', () => 열기(지금 + 1));
+  document.addEventListener('keydown', (e) => {
+    if (!창.classList.contains('on')) return;
+    if (e.key === 'Escape')     닫기();
+    if (e.key === 'ArrowLeft')  열기(지금 - 1);
+    if (e.key === 'ArrowRight') 열기(지금 + 1);
+  });
+})();
+</script>
 
 <!-- ══════════════════════════════════════════════════
      GALLERY — 밝은 섹션
