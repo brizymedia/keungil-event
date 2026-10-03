@@ -247,6 +247,13 @@
     @media (max-width:760px){ .plan-grid{ grid-template-columns:1fr; } }
     .plan-im{ display:block;position:relative; }
 
+    /* 처음엔 대표 시안 + 도면 두 장만 — 나머지는 「도면 더 보기」 를 눌러야 나온다 */
+    #plan:not(.open) .plan-extra{ display:none!important; }
+    .plan-more-wrap{ text-align:center;margin-top:1.8rem; }
+    #plan-more b{ font-weight:800;color:var(--amber-ink);font-variant-numeric:tabular-nums; }
+    #plan-more iconify-icon{ transition:transform .35s cubic-bezier(.16,1,.3,1); }
+    #plan.open #plan-more iconify-icon{ transform:rotate(180deg); }
+
     /* 물놀이 행사장 — 위에서 본 배치를 크게, 정면 · 입구 쪽을 오른쪽에 쌓는다 */
     .plan-pool-head{ margin:3.5rem 0 1.3rem;display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap; }
     .plan-pool-head h3{ font-size:clamp(1.25rem,2.2vw,1.6rem);font-weight:800;letter-spacing:-.02em; }
@@ -1040,7 +1047,7 @@
         <span class="plan-cap"><b>메인게이트 입면 · 3D</b><span>통과 폭 9.5m · 전체 13.7m · 높이 6m — 세우기 전에 치수부터</span></span>
       </button>
 
-      <button type="button" class="plan-shot" data-cap="메인게이트를 실제 진입로 사진 위에 얹은 시안. 차량 동선과 눈높이에서 어떻게 보이는지 그 자리에서 확인하실 수 있습니다.">
+      <button type="button" class="plan-shot plan-extra" data-cap="메인게이트를 실제 진입로 사진 위에 얹은 시안. 차량 동선과 눈높이에서 어떻게 보이는지 그 자리에서 확인하실 수 있습니다.">
         <span class="plan-im">
           <img src="plan/gate-site.webp" alt="메인게이트 현장 합성 시안 — 실제 진입로 사진 위에 게이트를 얹은 모습" loading="lazy" decoding="async">
         <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
@@ -1048,7 +1055,7 @@
         <span class="plan-cap"><b>메인게이트 현장 합성</b><span>실제 진입로 사진에 얹어 — 그 자리에 서면 이렇게 보입니다</span></span>
       </button>
 
-      <button type="button" class="plan-shot" data-cap="유료존 입구 게이트 — 폭 9m, 높이 4.5m, 통과 높이 3m. 건물 출입구에 맞춰 트러스로 세우고 현수막을 감싼 시안입니다.">
+      <button type="button" class="plan-shot plan-extra" data-cap="유료존 입구 게이트 — 폭 9m, 높이 4.5m, 통과 높이 3m. 건물 출입구에 맞춰 트러스로 세우고 현수막을 감싼 시안입니다.">
         <span class="plan-im">
           <img src="plan/zone-gate.webp" alt="유료존 입구 게이트 시안 — 폭 9m, 높이 4.5m 트러스 게이트" loading="lazy" decoding="async">
         <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
@@ -1058,12 +1065,12 @@
 
     </div>
 
-    <div class="reveal plan-pool-head">
+    <div class="reveal plan-pool-head plan-extra">
       <h3><span>PROJECT 02</span>물놀이 행사장 3D 시안</h3>
       <p class="t2">수영장 · 그늘막 객석 · 안전 펜스 · 입구 장식까지 — 위에서, 정면에서, 입구 쪽에서 세 방향으로 미리 봅니다.</p>
     </div>
 
-    <div class="reveal plan-pool">
+    <div class="reveal plan-pool plan-extra">
 
       <button type="button" class="plan-shot big" data-cap="물놀이 행사장 전체 배치 (위에서 본 모습) — 수영장 둘레로 그늘막 객석을 두르고, 안전 펜스 · 구명 튜브 · 입구 WELCOME 글자 · 대형 볼 장식까지 자리를 잡았습니다.">
         <span class="plan-im">
@@ -1089,6 +1096,14 @@
         </span>
       </button>
 
+    </div>
+
+    <div class="plan-more-wrap">
+      <button type="button" id="plan-more" class="btn-ghost" aria-expanded="false"
+              style="padding:.85rem 1.8rem;font-size:.92rem;font-family:inherit;">
+        <span id="plan-more-text">도면 더 보기</span> <b id="plan-more-n"></b>
+        <iconify-icon icon="solar:alt-arrow-down-linear" style="font-size:18px;"></iconify-icon>
+      </button>
     </div>
 
     <div class="reveal plan-cta">
@@ -1119,6 +1134,33 @@
 </div>
 
 <script>
+/* 도면 더 보기 — 숨겨 둔 장수를 세어 단추에 적고, 펼치면 「접기」 로 바뀐다 */
+(function () {
+  const 칸 = document.getElementById('plan');
+  const 단추 = document.getElementById('plan-more');
+  if (!칸 || !단추) return;
+  const 숨긴장 = 칸.querySelectorAll('.plan-shot.plan-extra, .plan-extra .plan-shot').length;
+  const 글 = document.getElementById('plan-more-text'), 수 = document.getElementById('plan-more-n');
+  function 그리기() {
+    const 펼침 = 칸.classList.contains('open');
+    글.textContent = 펼침 ? '접기' : '도면 더 보기';
+    수.textContent = 펼침 ? '' : '+' + 숨긴장;
+    단추.setAttribute('aria-expanded', 펼침 ? 'true' : 'false');
+  }
+  단추.addEventListener('click', () => {
+    const 펼침 = 칸.classList.toggle('open');
+    if (펼침) {
+      /* 숨어 있던 칸은 나타나는 효과를 못 받았다 — 바로 보이게 */
+      칸.querySelectorAll('.plan-extra.reveal').forEach((el) => el.classList.add('visible'));
+    } else {
+      /* 접으면 단추가 위로 올라가니 단추 자리로 따라간다 */
+      단추.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    그리기();
+  });
+  그리기();
+})();
+
 /* 도면은 확대해 봐야 치수가 읽힌다 — 갤러리 라이트박스와 따로 둔다 */
 (function () {
   const 장 = Array.from(document.querySelectorAll('#plan .plan-shot'));
