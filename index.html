@@ -246,6 +246,21 @@
     .plan-grid{ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem; }
     @media (max-width:760px){ .plan-grid{ grid-template-columns:1fr; } }
     .plan-im{ display:block;position:relative; }
+
+    /* 물놀이 행사장 — 위에서 본 배치를 크게, 정면 · 입구 쪽을 오른쪽에 쌓는다 */
+    .plan-pool-head{ margin:3.5rem 0 1.3rem;display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap; }
+    .plan-pool-head h3{ font-size:clamp(1.25rem,2.2vw,1.6rem);font-weight:800;letter-spacing:-.02em; }
+    .plan-pool-head h3 span{ display:block;font-size:.76rem;font-weight:800;color:var(--amber-ink);letter-spacing:.06em;margin-bottom:.45rem; }
+    .plan-pool-head p{ font-size:.93rem;line-height:1.75;max-width:46ch; }
+    .plan-pool{ display:grid;grid-template-columns:2fr 1fr;gap:1.1rem; }
+    .plan-pool .big{ grid-row:span 2; }
+    .plan-pool .big .plan-im,.plan-pool .big img{ height:100%; }
+    .plan-pool .big img{ object-fit:cover; }
+    @media (max-width:760px){
+      .plan-pool{ grid-template-columns:1fr; }
+      .plan-pool .big{ grid-row:auto; }
+      .plan-pool .big .plan-im,.plan-pool .big img{ height:auto; }
+    }
     .plan-cap{ padding:.9rem 1.05rem 1.05rem; }
     .plan-cap b{ display:block;font-size:.95rem;font-weight:800;letter-spacing:-.01em;margin-bottom:.3rem; }
     .plan-cap span{ display:block;font-size:.8rem;line-height:1.7;color:var(--fg-3); }
@@ -1039,6 +1054,39 @@
         <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
         </span>
         <span class="plan-cap"><b>유료존 입구</b><span>폭 9m · 높이 4.5m — 건물 출입구에 맞춘 트러스 게이트</span></span>
+      </button>
+
+    </div>
+
+    <div class="reveal plan-pool-head">
+      <h3><span>PROJECT 02</span>물놀이 행사장 3D 시안</h3>
+      <p class="t2">수영장 · 그늘막 객석 · 안전 펜스 · 입구 장식까지 — 위에서, 정면에서, 입구 쪽에서 세 방향으로 미리 봅니다.</p>
+    </div>
+
+    <div class="reveal plan-pool">
+
+      <button type="button" class="plan-shot big" data-cap="물놀이 행사장 전체 배치 (위에서 본 모습) — 수영장 둘레로 그늘막 객석을 두르고, 안전 펜스 · 구명 튜브 · 입구 WELCOME 글자 · 대형 볼 장식까지 자리를 잡았습니다.">
+        <span class="plan-im">
+          <img src="plan/pool-top.webp" alt="물놀이 행사장 3D 시안 — 위에서 본 전체 배치: 수영장, 그늘막 객석, 안전 펜스, 대형 볼 장식" loading="lazy" decoding="async">
+          <span class="plan-tag">전체 배치 · 위에서</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="정면에서 본 모습 — 안전 펜스 너머로 수영장과 띄운 대형 볼, 양옆 그늘막 아래 테이블 객석이 보입니다.">
+        <span class="plan-im">
+          <img src="plan/pool-front.webp" alt="물놀이 행사장 3D 시안 — 정면에서 본 수영장과 대형 볼 장식, 양옆 그늘막 객석" loading="lazy" decoding="async">
+          <span class="plan-tag">정면</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="입구 쪽에서 본 모습 — WELCOME 입체 글자, 구명 튜브를 건 안전 펜스, 그늘막 아래 테이블 좌석까지 실제 동선대로 확인합니다.">
+        <span class="plan-im">
+          <img src="plan/pool-angle.webp" alt="물놀이 행사장 3D 시안 — 입구 쪽에서 본 WELCOME 글자와 구명 튜브 펜스" loading="lazy" decoding="async">
+          <span class="plan-tag">입구 쪽에서</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
       </button>
 
     </div>
