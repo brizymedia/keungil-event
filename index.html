@@ -261,6 +261,11 @@
     .plan-pool-head p{ font-size:.93rem;line-height:1.75;max-width:46ch; }
     .plan-pool{ display:grid;grid-template-columns:2fr 1fr;gap:1.1rem; }
     .plan-pool .big{ grid-row:span 2; }
+    /* 다른 곳에서 받은 그림은 오른쪽 아래에 출처를 적는다 */
+    .plan-credit{ position:absolute;right:.7rem;bottom:.7rem;font-size:.66rem;font-weight:700;letter-spacing:.02em;
+                  color:rgba(255,255,255,.92);padding:.22rem .62rem;border-radius:9999px;background:rgba(11,10,16,.55);
+                  backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);pointer-events:none; }
+    .plan-pool-head.next{ margin-top:2.8rem; }
     .plan-pool .big .plan-im,.plan-pool .big img{ height:100%; }
     .plan-pool .big img{ object-fit:cover; }
     @media (max-width:760px){
@@ -1072,26 +1077,62 @@
 
     <div class="reveal plan-pool plan-extra">
 
-      <button type="button" class="plan-shot big" data-cap="물놀이 행사장 전체 배치 (위에서 본 모습) — 수영장 둘레로 그늘막 객석을 두르고, 안전 펜스 · 구명 튜브 · 입구 WELCOME 글자 · 대형 볼 장식까지 자리를 잡았습니다.">
+      <button type="button" class="plan-shot big" data-cap="물놀이 행사장 전체 배치 (위에서 본 모습) — 수영장 둘레로 그늘막 객석을 두르고, 안전 펜스 · 구명 튜브 · 입구 WELCOME 글자 · 대형 볼 장식까지 자리를 잡았습니다. (3D 시안 · 기획사 제공)">
         <span class="plan-im">
           <img src="plan/pool-top.webp" alt="물놀이 행사장 3D 시안 — 위에서 본 전체 배치: 수영장, 그늘막 객석, 안전 펜스, 대형 볼 장식" loading="lazy" decoding="async">
           <span class="plan-tag">전체 배치 · 위에서</span>
+          <span class="plan-credit">기획사 제공</span>
           <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
         </span>
       </button>
 
-      <button type="button" class="plan-shot" data-cap="정면에서 본 모습 — 안전 펜스 너머로 수영장과 띄운 대형 볼, 양옆 그늘막 아래 테이블 객석이 보입니다.">
+      <button type="button" class="plan-shot" data-cap="정면에서 본 모습 — 안전 펜스 너머로 수영장과 띄운 대형 볼, 양옆 그늘막 아래 테이블 객석이 보입니다. (3D 시안 · 기획사 제공)">
         <span class="plan-im">
           <img src="plan/pool-front.webp" alt="물놀이 행사장 3D 시안 — 정면에서 본 수영장과 대형 볼 장식, 양옆 그늘막 객석" loading="lazy" decoding="async">
           <span class="plan-tag">정면</span>
+          <span class="plan-credit">기획사 제공</span>
           <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
         </span>
       </button>
 
-      <button type="button" class="plan-shot" data-cap="입구 쪽에서 본 모습 — WELCOME 입체 글자, 구명 튜브를 건 안전 펜스, 그늘막 아래 테이블 좌석까지 실제 동선대로 확인합니다.">
+      <button type="button" class="plan-shot" data-cap="입구 쪽에서 본 모습 — WELCOME 입체 글자, 구명 튜브를 건 안전 펜스, 그늘막 아래 테이블 좌석까지 실제 동선대로 확인합니다. (3D 시안 · 기획사 제공)">
         <span class="plan-im">
           <img src="plan/pool-angle.webp" alt="물놀이 행사장 3D 시안 — 입구 쪽에서 본 WELCOME 글자와 구명 튜브 펜스" loading="lazy" decoding="async">
           <span class="plan-tag">입구 쪽에서</span>
+          <span class="plan-credit">기획사 제공</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+
+    </div>
+
+    <div class="reveal plan-pool-head next plan-extra">
+      <h3>물놀이 행사장 완성 예상도</h3>
+      <p class="t2">위 3D 시안대로 세웠을 때의 모습입니다 — 해 질 녘, 조명까지 켠 완성 예상도.</p>
+    </div>
+
+    <div class="reveal plan-pool plan-extra">
+
+      <button type="button" class="plan-shot big" data-cap="물놀이 행사장 완성 예상도 (위에서 본 모습) — 수영장 둘레의 그늘막 객석, 안전 펜스와 구명 튜브, WELCOME 입체 글자, 대형 볼 장식에 해 질 녘 조명까지 켠 모습입니다.">
+        <span class="plan-im">
+          <img src="plan/pool-after-top.webp" alt="물놀이 행사장 완성 예상도 — 위에서 본 수영장, 그늘막 객석, 대형 볼 장식, 해 질 녘 조명" loading="lazy" decoding="async">
+          <span class="plan-tag">완성 예상 · 위에서</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="물놀이 행사장 완성 예상도 (정면) — 안전 펜스 너머로 대형 볼이 뜬 수영장, 양옆 그늘막 아래 전구 조명과 테이블 객석.">
+        <span class="plan-im">
+          <img src="plan/pool-after-front.webp" alt="물놀이 행사장 완성 예상도 — 정면에서 본 수영장과 대형 볼, 노을빛 하늘과 전구 조명" loading="lazy" decoding="async">
+          <span class="plan-tag">완성 예상 · 정면</span>
+          <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
+        </span>
+      </button>
+
+      <button type="button" class="plan-shot" data-cap="물놀이 행사장 완성 예상도 (입구 쪽) — 앞 난간의 WELCOME 입체 글자와 구명 튜브, 그늘막 아래 테이블 좌석까지.">
+        <span class="plan-im">
+          <img src="plan/pool-after-angle.webp" alt="물놀이 행사장 완성 예상도 — 입구 쪽에서 본 WELCOME 글자와 구명 튜브 난간" loading="lazy" decoding="async">
+          <span class="plan-tag">완성 예상 · 입구 쪽</span>
           <span class="plan-zoom"><iconify-icon icon="solar:magnifer-zoom-in-bold" style="font-size:13px;"></iconify-icon> 크게 보기</span>
         </span>
       </button>
