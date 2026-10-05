@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-03T15:40:22.475Z",
+ "updated": "2026-10-05T12:54:48.773Z",
  "categories": [
   {
    "slug": "festival",
@@ -11,7 +11,7 @@
    "slug": "conference",
    "name": "컨퍼런스 · 포럼 · 기념식",
    "desc": "기관·기업 컨퍼런스와 포럼, 기념식 현장입니다. 회의 음향과 LED 영상, 의전 세팅과 진행까지 한 팀이 맡아 운영했습니다.",
-   "count": 54
+   "count": 60
   },
   {
    "slug": "ceremony",
@@ -57,6 +57,60 @@
   }
  ],
  "photos": [
+  {
+   "path": "photos/conference/20261005-ciua-006.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
+  {
+   "path": "photos/conference/20261005-ciua-005.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
+  {
+   "path": "photos/conference/20261005-ciua-004.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
+  {
+   "path": "photos/conference/20261005-ciua-003.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
+  {
+   "path": "photos/conference/20261005-ciua-002.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
+  {
+   "path": "photos/conference/20261005-ciua-001.jpg",
+   "cat": "conference",
+   "event": "충청경제포럼",
+   "date": "2026-10-05",
+   "place": "천안 독립기념관",
+   "caption": "충청경제포럼",
+   "desc": "세종, 대전, 충청 광역 단체장이 모여 충청권 경제 발전을 위한 포럼을 하였습니다."
+  },
   {
    "path": "photos/busking/20260914-ezd7-015.jpg",
    "cat": "busking",
