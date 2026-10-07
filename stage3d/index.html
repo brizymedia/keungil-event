@@ -413,20 +413,25 @@ function 육발기둥(len, w = 1.7, d = .62){
     for (let i=0;i<6;i+=2){ const [x0,z0]=발[i], [x1,z1]=발[(i+1)%6]; g.add(잇기(x0,y0,z0, x1,y1,z1, .013)); } }
   return g;
 }
-/* 레이허 구조물 — LED 뒤를 받치는 비계 틀 */
-function layherFrame(w, h, d=1.1){
+/* 레이허 구조물 — LED 뒤를 받치는 비계 틀
+   규격 프레임: 높이 1.7m · 폭 1.265m (내부 1.17) · 길이 1.87m (내부 1.78) — 이 모듈 단위로 쌓는다 */
+const 비계 = { 높이:1.7, 폭:1.265, 길이:1.87 };
+function layherFrame(w, h){
   const g = new THREE.Group();
-  const nx = Math.max(2, Math.round(w/1.8)+1), ny = Math.max(2, Math.round(h/1.9));
+  const d = 비계.폭;
+  const nb = Math.max(1, Math.round(w/비계.길이)), ny = Math.max(1, Math.ceil(h/비계.높이 - .05));
+  const W = nb*비계.길이, H = ny*비계.높이;
   const xs = [], ys = [];
-  for (let i=0;i<nx;i++) xs.push(-w/2 + i*w/(nx-1));
-  for (let j=0;j<=ny;j++) ys.push(j*h/ny);
-  for (const x of xs) for (const z of [-d/2, d/2]) g.add(잇기(x,0,z, x,h,z, .032));
+  for (let i=0;i<=nb;i++) xs.push(-W/2 + i*비계.길이);
+  for (let j=0;j<=ny;j++) ys.push(j*비계.높이);
+  for (const x of xs) for (const z of [-d/2, d/2]) g.add(잇기(x,0,z, x,H,z, .032));
   for (const y of ys){
-    for (const z of [-d/2, d/2]) g.add(잇기(-w/2,y,z, w/2,y,z, .026));
-    for (const x of [xs[0], xs[nx-1]]) g.add(잇기(x,y,-d/2, x,y,d/2, .024));
+    for (const z of [-d/2, d/2]) g.add(잇기(-W/2,y,z, W/2,y,z, .026));
+    for (const x of xs) g.add(잇기(x,y,-d/2, x,y,d/2, .024));
   }
-  for (let i=0;i<nx-1;i++) for (let j=0;j<ny;j++){ if ((i+j)%2) continue; g.add(잇기(xs[i],ys[j],d/2, xs[i+1],ys[j+1],d/2, .02)); }
+  for (let i=0;i<nb;i++) for (let j=0;j<ny;j++){ if ((i+j)%2) continue; g.add(잇기(xs[i],ys[j],d/2, xs[i+1],ys[j+1],d/2, .02)); }
   for (const x of xs) for (const z of [-d/2, d/2]){ const b = box(.28,.06,.28,M.black); b.position.set(x,.03,z); g.add(b); }
+  g.userData.size = { w:W, h:H, d };
   return g;
 }
 
@@ -617,14 +622,14 @@ function rebuild(){
     };
     if (k === 'layher'){
       /* 트러스 없이 레이허(비계)만 세운 구조물 — 양쪽 타워에 조명 바를 단다 */
-      const tw2 = 2.2, ht = th + 1.4;
-      [-1,1].forEach(sd=>{ const t = layherFrame(tw2, ht, 1.6); t.position.set(sd*(W/2 + 1.2 + tw2/2), 0, zt); root.add(t);
+      const tw2 = 비계.길이, ht = th + 1.4;
+      [-1,1].forEach(sd=>{ const t = layherFrame(tw2, ht); t.position.set(sd*(W/2 + 1.2 + tw2/2), 0, zt); root.add(t);
         if (night){ const l = new THREE.PointLight(accent, 8, 12, 2); l.position.set(sd*(W/2 + 1.2 + tw2/2), ht*.7, zt); lightsGroup.add(l); } });
       [th - .2, th - 2.3].forEach(y=>{ const bar = truss(W + 2.4 + tw2, 'x'); bar.position.set(0, y, zt); root.add(bar); });
     } else if (k === 'line'){
       /* 외줄 트러스 — 타워 두 본 사이에 가로대 한 줄 (무대와 따로 선다) */
-      [-1,1].forEach(sd=>{ const t = layherFrame(.9, th, .9); t.position.set(sd*(tw/2 + .5), 0, zt); root.add(t);
-        const base = box(1.1,.1,1.1,M.black); base.position.set(sd*(tw/2 + .5), .05, zt); root.add(base); });
+      [-1,1].forEach(sd=>{ const t = layherFrame(비계.길이, th); t.position.set(sd*(tw/2 + .5 - .45 + 비계.길이/2), 0, zt); root.add(t);
+        const base = box(비계.길이+.2,.1,비계.폭+.2,M.black); base.position.set(sd*(tw/2 + .5 - .45 + 비계.길이/2), .05, zt); root.add(base); });
       가로대(tw + 1, th - .3, zt);
     } else {
     [-1,1].forEach(s=> 기둥세우기(s*tw/2, zt));
