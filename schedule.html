@@ -61,6 +61,13 @@
   .ev.l0{border-top-left-radius:0;border-bottom-left-radius:0}
   .ev.r0{border-top-right-radius:0;border-bottom-right-radius:0}
   .ev.done{background:rgba(255,255,255,.07);color:#71717a}
+  /* 설치하는 날 — 행사 막대와 갈리게 점선 테두리만 */
+  .ev.setup{background:transparent;border:1px dashed rgba(245,158,11,.65);color:#FCD34D}
+  .ev.setup.done{border-color:rgba(255,255,255,.18);color:#71717a}
+  /* 설치 줄과 행사 줄의 칸이 위아래로 맞게 — 네 칸(폰은 두 칸) */
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem}
+  @media (max-width:640px){ .grid4{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .grp{font-size:.7rem;font-weight:800;letter-spacing:.08em;color:#71717a;margin:.2rem 0 .45rem}
   @media (max-width:640px){ .cal-d{min-height:3.3rem;padding:.18rem .12rem} .ev{font-size:.56rem;padding:.05rem .16rem} .cal-h b{min-width:5.6rem} }
   .hint{font-size:.76rem;color:#71717a;line-height:1.75}
 
@@ -132,7 +139,7 @@
 
 <header class="top">
   <div class="top-in">
-    <a class="brand" href="/"><i>KG</i> 행사 일정</a>
+    <a class="brand" href="schedule.html" title="행사 일정 처음 화면"><i>KG</i> 행사 일정</a>
     <div class="who" id="who-box" hidden>
       <iconify-icon icon="solar:user-bold" style="font-size:15px;color:#71717a;"></iconify-icon>
       <b id="who-name"></b>
@@ -212,7 +219,14 @@
         <label class="f">행사명</label>
         <input class="in" id="f-제목" placeholder="예: 2026 진향제">
       </div>
-      <div class="grid">
+      <div class="grp">설치</div>
+      <div class="grid4" style="margin-bottom:.9rem;">
+        <div><label class="f">설치일 <span style="color:#52525b;">전날 설치면 넣으세요</span></label>
+             <input class="in" id="f-설치일" type="date"></div>
+        <div><label class="f">설치 시작</label><input class="in" id="f-설치시간" type="time"></div>
+      </div>
+      <div class="grp">행사</div>
+      <div class="grid4">
         <div><label class="f">행사 시작일</label><input class="in" id="f-날짜" type="date"></div>
         <div><label class="f">종료일 <span style="color:#52525b;">하루면 비워 두세요</span></label>
              <input class="in" id="f-끝날짜" type="date"></div>
@@ -370,6 +384,13 @@ function 날짜글(날짜) {
   const 요일 = ['일','월','화','수','목','금','토'][d.getDay()];
   return (d.getMonth() + 1) + '/' + d.getDate() + '(' + 요일 + ')';
 }
+/* 설치 10/15(목) 13:00 — 행사 첫날에 설치하면 시간만 */
+function 설치글(e) {
+  if (!e || (!e.설치일 && !e.설치시간)) return '';
+  const 날 = e.설치일 && e.설치일 !== e.날짜 ? 날짜글(e.설치일) : '';
+  return '설치 ' + [날, e.설치시간 || ''].filter(Boolean).join(' ');
+}
+
 /* 10/3(토) · 10/3(토) ~ 10/5(월) */
 function 기간글(e) {
   const 끝 = 끝날(e);
@@ -427,7 +448,7 @@ function 카드(e) {
   return '<button type="button" class="card" data-id="' + esc(e.id) + '">' +
     '<div class="r1"><div class="nm">' + esc(e.제목 || '이름 없는 행사') + '</div>' +
       '<div class="dday' + (끝 ? ' done' : 급 ? ' soon' : '') + '">' + esc(뱃지) + '</div></div>' +
-    '<div class="r2">' + [기간글(e), e.집합 ? '집합 ' + esc(e.집합) : '', esc(e.장소), esc(e.우리담당)]
+    '<div class="r2">' + [기간글(e), esc(설치글(e)), e.집합 ? '집합 ' + esc(e.집합) : '', esc(e.장소), esc(e.우리담당)]
         .filter(Boolean).join(' · ') + '</div>' +
     '<div class="r3"><div class="prog"><i class="' + (다됨 ? 'full' : '') + '" style="width:' +
         (p.다 ? Math.round(p.됨 / p.다 * 100) : 0) + '%"></i></div>' +
@@ -471,9 +492,15 @@ function 달력그리기() {
     d.setDate(시작.getDate() + n);
     const 키 = 날짜키(d), 요일 = d.getDay(), 밖 = d.getMonth() !== 보는달.m;
     const 그날 = 전체.filter((e) => e.날짜 && 키 >= e.날짜 && 키 <= 끝날(e));
+    /* 행사 기간 밖에서 미리 세우는 날만 따로 그린다 (행사 첫날 설치는 행사 막대로 충분) */
+    const 설치날 = 전체.filter((e) => e.설치일 === 키 && (!e.날짜 || e.설치일 < e.날짜));
 
     html += '<div class="cal-d' + (밖 ? ' off' : '') + (키 === 오늘키 ? ' today' : '') + '">' +
       '<i class="' + (요일 === 0 ? 'sun' : 요일 === 6 ? 'sat' : '') + '">' + d.getDate() + '</i>' +
+      설치날.map((e) =>
+        '<button type="button" class="ev setup' + (끝남(e) ? ' done' : '') + '" data-id="' + esc(e.id) + '"' +
+        ' title="설치 · ' + esc(e.제목) + (e.설치시간 ? ' ' + esc(e.설치시간) : '') + '">설치 · ' + esc(e.제목) + '</button>'
+      ).join('') +
       그날.map((e) => {
         const 처음   = 키 === e.날짜 || 요일 === 0;
         const 마지막 = 키 === 끝날(e) || 요일 === 6;
@@ -501,7 +528,7 @@ $('#cal-grid').addEventListener('click', (ev) => {
 });
 
 /* ── 행사 하나 ── */
-const 칸들 = ['제목','날짜','끝날짜','집합','시작','장소','고객','담당','우리담당','인원','비고'];
+const 칸들 = ['제목','설치일','설치시간','날짜','끝날짜','집합','시작','장소','고객','담당','우리담당','인원','비고'];
 function 지금행사() {
   return 새행사 || 전체.filter((e) => e.id === 보는중)[0] || null;
 }
@@ -560,6 +587,10 @@ async function 저장(말) {
     const j = await 부르기('schedSave', { 행사: 보낼것 });
     전체 = j.목록 || [];
     항목바뀜 = false;
+    const 저장된것 = 전체.filter((x) => x.id === j.id)[0];
+    if (저장된것 && (e.설치일 || e.설치시간) && !저장된것.설치일 && !저장된것.설치시간) {
+      setTimeout(() => toast('설치일이 저장되지 않았습니다 — 계약 서버를 새 버전으로 배포해야 합니다'), 2700);
+    }
     if (새행사) { 새행사 = null; location.hash = '#e=' + j.id; }
     else 하나그리기();
     toast(말 || '저장했습니다');
@@ -622,7 +653,7 @@ $('#btn-who').addEventListener('click', () => {
 /* ── 목록 움직임 ── */
 $('#btn-reload').addEventListener('click', async () => { if (await 받아오기()) toast('새로 받았습니다'); });
 $('#btn-new').addEventListener('click', () => {
-  새행사 = { id: '', 제목: '', 날짜: '', 끝날짜: '', 집합: '', 시작: '', 장소: '', 고객: '', 담당: '',
+  새행사 = { id: '', 제목: '', 설치일: '', 설치시간: '', 날짜: '', 끝날짜: '', 집합: '', 시작: '', 장소: '', 고객: '', 담당: '',
              우리담당: 나(), 인원: '', 비고: '', 견적코드: '', 항목: [] };
   화면();
   $('#f-제목').focus();
@@ -633,6 +664,16 @@ $('#btn-new').addEventListener('click', () => {
     if (c) location.hash = '#e=' + c.dataset.id;
   });
 });
+document.querySelector('.brand').addEventListener('click', (ev) => {
+  if (ev.button !== 0 || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;   /* 새 탭으로 여는 건 그대로 */
+  ev.preventDefault();
+  새행사 = null; 항목바뀜 = false;
+  if (location.hash) history.pushState(null, '', location.pathname + location.search);
+  화면();
+  window.scrollTo({ top: 0 });
+  if (암호() && 나()) 받아오기(true);
+});
+
 $('#btn-back').addEventListener('click', () => {
   새행사 = null; 항목바뀜 = false;
   if (location.hash) location.hash = '';
