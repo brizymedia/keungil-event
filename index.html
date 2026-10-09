@@ -446,6 +446,21 @@
     .area-card h3{ font-size:1.05rem;font-weight:800;margin:0 0 .3rem;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between; }
     .area-card h3 span{ font-size:.72rem;font-weight:700;color:var(--amber-ink);letter-spacing:.02em; }
     .area-card p{ margin:0;font-size:.85rem;line-height:1.6;color:var(--fg-2); }
+    /* 공모사업 */
+    #grants[hidden]{ display:none!important; }
+    .grant-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem; }
+    @media (max-width:900px){ .grant-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:560px){ .grant-grid{ grid-template-columns:1fr; } }
+    .grant-card{ display:flex;flex-direction:column;gap:.55rem;text-decoration:none;color:inherit;padding:1.2rem 1.3rem 1.1rem;border-radius:1rem;background:var(--card);border:1px solid var(--card-line);transition:all .3s cubic-bezier(.16,1,.3,1); }
+    .grant-card:hover{ transform:translateY(-2px);border-color:rgba(245,158,11,.45);background:var(--card-hover); }
+    .grant-card .gc-top{ display:flex;align-items:center;justify-content:space-between;gap:.6rem; }
+    .grant-card .gc-d{ font-size:.78rem;font-weight:800;letter-spacing:.02em;color:#0B0A10;background:var(--amber-2);border-radius:999px;padding:.18rem .6rem;white-space:nowrap; }
+    .grant-card .gc-d.soon{ background:var(--magenta);color:#fff; }
+    .grant-card .gc-d.plain{ background:var(--chip);color:var(--fg-2); }
+    .grant-card .gc-org{ font-size:.72rem;color:var(--fg-3);text-align:right; }
+    .grant-card h3{ margin:0;font-size:1.02rem;font-weight:800;line-height:1.45;letter-spacing:-.01em;text-wrap:balance; }
+    .grant-card p{ margin:0;font-size:.82rem;line-height:1.6;color:var(--fg-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+    .grant-card .gc-foot{ margin-top:auto;padding-top:.4rem;font-size:.78rem;font-weight:700;color:var(--amber-2); }
     .faq{ max-width:52rem;margin:0 auto;display:flex;flex-direction:column;gap:.6rem; }
     .faq details{ background:var(--card);border:1px solid var(--card-line);border-radius:1rem;box-shadow:var(--shadow); }
     .faq summary{ list-style:none;cursor:pointer;padding:1.05rem 1.25rem;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;letter-spacing:-.01em; }
@@ -1391,6 +1406,57 @@
     </div>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════════
+     GRANTS — 지금 접수 중인 공모사업 (행사 고시 알림판 · 이벤트 코리아와 같은 자료)
+     자료가 없으면 구역째 감춘다. 마감이 지난 공모는 화면에서 알아서 빠진다.
+══════════════════════════════════════════════════ -->
+<section id="grants" class="sec-dark" style="padding:6rem 1.5rem;border-top:1px solid var(--line);" hidden>
+  <div style="max-width:80rem;margin:0 auto;">
+    <div class="reveal" style="margin-bottom:2.5rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+      <div>
+        <div class="section-eyebrow">Grants</div>
+        <h2 class="sec-title" style="margin-bottom:.75rem;">행사·공연 지원금,<br>지금 접수 중인 공모사업</h2>
+        <p class="t2" style="font-size:1rem;max-width:54ch;line-height:1.7;">문예진흥기금처럼 문화예술·공연·행사 단체가 신청하는 공모를 모았습니다. 한국문화예술위원회 등 공식 공고에서 확인한 것만 올리고, 마감이 지나면 자동으로 내려갑니다.</p>
+      </div>
+      <a href="/life/" class="btn-ghost" style="padding:.8rem 1.5rem;font-size:.9rem;">공모사업 글 보기 <iconify-icon icon="solar:arrow-right-linear" style="font-size:16px;"></iconify-icon></a>
+    </div>
+    <div class="grant-grid reveal" id="grantGrid"></div>
+    <p class="t3" style="font-size:.8rem;margin-top:1.1rem;line-height:1.7;">신청 자격과 정확한 마감 시각은 반드시 공고 원문에서 확인하세요. 카드를 누르면 공식 공고로 이동합니다 · 자료 갱신 <span id="grantUpd">—</span></p>
+  </div>
+</section>
+<script>
+(function(){
+  var SRC='https://brizymedia.github.io/haengsa-board/data/events.json';
+  var sec=document.getElementById('grants'), grid=document.getElementById('grantGrid');
+  if(!sec||!grid) return;
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function p2(n){ return (n<10?'0':'')+n; }
+  function today(){ var d=new Date(); return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()); }
+  function dd(a,b){ var x=new Date(a+'T00:00:00'), y=new Date(b+'T00:00:00'); return Math.round((y-x)/864e5); }
+  function md(s){ var m=/(\d{4})-(\d{2})-(\d{2})/.exec(s||''); return m?(+m[2])+'.'+(+m[3]):''; }
+  function hm(s){ var m=/(\d{2}):(\d{2})/.exec(s||''); return m?m[0]:''; }
+  function left(g){ var m=/(\d{4}-\d{2}-\d{2})/.exec(g.deadline||''); return m?dd(today(),m[1]):null; }
+  function upcoming(g){ return !!(g.start_date && g.start_date>today()); }
+  function rank(g){ var n=left(g); if(upcoming(g)) return 1000+(n==null?0:n); return n==null?2000:n; }
+  function card(g){
+    var n=left(g), up=upcoming(g), badge, cls='gc-d', foot;
+    if(up){ badge=md(g.start_date)+' 접수 예정'; cls+=' plain'; foot=(md(g.deadline)?md(g.deadline)+(hm(g.deadline)?' '+hm(g.deadline):'')+' 마감 예정':'일정은 공고 확인'); }
+    else if(n==null){ badge='일정 미정'; cls+=' plain'; foot='아르코 누리집 공모 메뉴에서 확인'; }
+    else { badge=n===0?'오늘 마감':'D-'+n; if(n<=7) cls+=' soon'; foot=md(g.deadline)+(hm(g.deadline)?' '+hm(g.deadline):'')+' 마감'; }
+    return '<a class="grant-card" href="'+esc(g.url)+'" target="_blank" rel="noopener"><div class="gc-top"><span class="'+cls+'">'+esc(badge)+'</span><span class="gc-org">'+esc(g.org||'')+'</span></div><h3>'+esc(g.title)+'</h3>'+(g.summary?'<p>'+esc(g.summary)+'</p>':'')+'<div class="gc-foot">'+esc(foot)+' · 공식 공고 ↗</div></a>';
+  }
+  fetch(SRC,{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+    var gs=(j.items||[]).filter(function(x){ return x.kind==='grant' && /^https:/.test(x.url||''); })
+      .filter(function(x){ var n=left(x); return n==null||n>=0; })
+      .sort(function(a,b){ return rank(a)-rank(b); }).slice(0,6);
+    if(!gs.length) return;
+    grid.innerHTML=gs.map(card).join('');
+    document.getElementById('grantUpd').textContent=(j.generated_at||'').replace('T',' ').slice(0,16)||'—';
+    sec.hidden=false;
+  }).catch(function(){});
+})();
+</script>
 
 <!-- ══════════════════════════════════════════════════
      AREAS — 서비스 지역 (지역 검색용 · 밝은 섹션)
