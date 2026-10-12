@@ -196,6 +196,8 @@
   }
 </style>
   <script defer src="https://www.ai-make.co.kr/stats/stats.js" data-site="keungil"></script>
+<!-- 관리자 화면(?admin=1) 잠금 — 대표 암호(계약 서버 BOX_PW)로 연다 -->
+<script src="admin-lock.js" data-server='https://script.google.com/macros/s/AKfycbwgO5RyEllYeUuugmr9r4wuLjJv8FX02onvcK9JSmejs_nb0J7YrhyL5tN4p_ruS061/exec' data-key='keungil-quote-box-pw' data-name='큰길이벤트기획'></script>
 </head>
 <body>
 
@@ -1217,7 +1219,7 @@ async function init(){
       $('#s-name').value=C.cl.name||''; $('#s-tel').value=C.cl.tel||''; $('#s-email').value=C.cl.email||''; }
     else { $('#mode-pill').innerHTML='<iconify-icon icon="solar:eye-bold"></iconify-icon> 고객 화면 미리보기'; $('#sign').hidden=false; padResize(); }
     // 고객 화면: 하단 CTA는 서명 패널이 보이면 숨김
-    if(!isPreview){ new IntersectionObserver(([e])=>{ $('#cta').hidden = e.isIntersecting; }).observe($('#sign')); }
+    if(!isPreview){ new IntersectionObserver(([e])=>{ $('#cta').hidden = e.isIntersecting || $('#sign').hidden; }).observe($('#sign')); }   // 서명이 끝나 서명 칸이 숨겨지면 단추도 계속 숨김
   }
 }
 init();

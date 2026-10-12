@@ -724,6 +724,9 @@ function 정보갱신() {
 const 메가 = (n) => n < 1048576 ? Math.round(n / 1024) + 'KB'
                                 : (n / 1048576).toFixed(1) + 'MB';
 
+// 사진은 올라갔는데 갤러리 목록 갱신(finish)만 실패한 것 — 다음에 누르면 이것부터 다시 보낸다
+let 못다한목록 = null;
+
 $('#go').addEventListener('click', async () => {
   if (!서버주소)          { $('#setup').hidden = false; toast('웹 앱 주소를 먼저 넣어주세요'); return; }
   if (!사진들.length)     { toast('사진을 먼저 골라주세요'); return; }
@@ -747,7 +750,8 @@ $('#go').addEventListener('click', async () => {
   버튼.disabled = true;
   $('#bar').hidden = false;
   const 게이지 = $('#bar > i');
-  const 남길것 = [];
+  const 남길것 = 못다한목록 ? 못다한목록.slice() : [];
+  const 다시하기 = !!못다한목록;
   let 성공 = 0, 실패 = 0, 실패사유 = '', 경고 = '';
 
   const 대기목록 = 사진들.filter((p) => p.state !== '완료');
@@ -786,7 +790,7 @@ $('#go').addEventListener('click', async () => {
 
   // 대표 썸네일 — 실패해도 사진은 이미 올라갔으므로 업로드를 되돌리지 않는다
   let 표지 = null;
-  if (남길것.length && 썸네일.sq && 썸네일.wide) {
+  if (성공 && 썸네일.sq && 썸네일.wide) {
     $('#status').className = 'note';
     $('#status').textContent = '대표 썸네일 올리는 중…';
     try {
@@ -800,14 +804,16 @@ $('#go').addEventListener('click', async () => {
     } catch (err) {
       경고 = '대표 썸네일 실패: ' + (err.message || err);
     }
-    if (표지) 남길것.forEach((p) => { p.thumb = 표지.sq; p.cover = 표지.wide; });
+    if (표지) 남길것.forEach((p) => { if (!p.thumb) { p.thumb = 표지.sq; p.cover = 표지.wide; } });
   }
 
   if (남길것.length) {
     try {
       const 마무리 = await 보내기({ pw: pw, action: 'finish', photos: 남길것, cat: 항목 });
       if (!마무리.ok) throw new Error(마무리.error || '알 수 없는 오류');
+      못다한목록 = null;
     } catch (err) {
+      못다한목록 = 남길것.slice();
       $('#status').className = 'note warn';
       $('#status').textContent =
         '사진은 올라갔지만 갤러리 목록 갱신에 실패했습니다: ' + (err.message || err) +
@@ -822,7 +828,8 @@ $('#go').addEventListener('click', async () => {
   if (성공) 말.push(성공 + '장 올렸습니다.');
   if (실패) 말.push(실패 + '장 실패 — ' + (실패사유 || '사유 알 수 없음'));
   if (경고) 말.push('(' + 경고 + ')');
-  if (성공 && !실패) 말.push('갤러리에서 바로 확인하실 수 있습니다.');
+  if (다시하기 && !성공 && !실패) 말.push('갤러리 목록을 갱신했습니다.');
+  if ((성공 || 다시하기) && !실패) 말.push('갤러리에서 바로 확인하실 수 있습니다.');
   $('#status').className = 'note ' + (실패 ? 'warn' : 'ok');
   $('#status').textContent = 말.join(' ');
 
