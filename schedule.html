@@ -292,7 +292,7 @@
       <iconify-icon icon="solar:folder-with-files-bold" style="font-size:20px;color:#FCD34D;"></iconify-icon>
       견적서에서 가져오기
     </div>
-    <p class="hint" style="margin-top:.6rem;">담아 둔 견적서를 고르면 행사 개요와 품목이 그대로 들어옵니다.</p>
+    <p class="hint" style="margin-top:.6rem;">보낸 견적서가 최근 것부터 모여 있습니다. 고르면 행사 개요와 품목이 그대로 들어옵니다.</p>
 
     <div style="margin-top:.9rem;position:relative;">
       <iconify-icon icon="solar:magnifer-bold" style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);
@@ -798,21 +798,24 @@ function 견적목록그리기() {
     const i = 견적목록.indexOf(q);
     return '<button type="button" class="card" data-i="' + i + '">' +
       '<div class="r1"><div class="nm">' + esc(q.제목 || '이름 없는 견적서') + '</div></div>' +
-      '<div class="r2">' + [esc(q.고객), esc(q.행사일), q.항목 ? '항목 ' + q.항목 + '건' : '']
+      '<div class="r2">' + [esc(q.고객), q.행사일 ? '행사 ' + esc(날짜글(q.행사일)) : '', (+String(q.금액 || '').replace(/[^0-9]/g, '') > 0) ? esc(q.금액) : '', q.때 ? 때글(q.때).split(' ')[0] + ' 견적' : '']
           .filter(Boolean).join(' · ') + '</div>' +
     '</button>';
   }).join('')
     : '<div class="empty">' + (찾는말 ? '찾는 견적서가 없습니다.' :
-        '담아 둔 견적서가 없습니다.<br>견적서 화면의 <b style="color:#a1a1aa;">견적서 저장함 → 담기</b> 로 담아 두세요.') + '</div>';
+        '아직 모인 견적서가 없습니다.<br>견적서를 메일로 보내면 여기 저절로 쌓입니다.') + '</div>';
 }
 
 $('#btn-pick').addEventListener('click', async () => {
   $('#pick-find').value = '';
-  $('#pick-list').innerHTML = '<div class="empty">불러오는 중…</div>';
+  $('#pick-list').innerHTML = '<div class="empty">보낸 견적 메일까지 모으는 중입니다…<br>처음엔 몇 초 걸립니다.</div>';
   $('#pick-found').textContent = '';
   $('#pick-modal').hidden = false;
   try {
-    const j = await 부르기('boxList');
+    /* 이 기기의 견적서 저장함(같은 사이트라 읽힌다)에 담긴 것도 같이 올려 합친다 */
+    let 이기기 = [];
+    try { 이기기 = JSON.parse(localStorage.getItem('keungil-quote-box-v1') || '[]'); } catch (e) {}
+    const j = await 부르기('boxList', Array.isArray(이기기) && 이기기.length ? { 목록: 이기기 } : {});
     견적목록 = j.목록 || [];
     견적목록그리기();
   } catch (err) {

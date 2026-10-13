@@ -29,10 +29,11 @@ const COMPANY_NAME     = '큰길이벤트기획';
 const COMPANY_EMAIL    = 'gilauto325@gmail.com';    // 서명본 사본을 항상 받을 주소 (계약서의 co.email 과 별개로 무조건 수신)
 const ALLOW_RESIGN     = false;                     // true 면 이미 서명된 계약에 다시 서명 허용
 const BOX_FILE         = '견적서-보관함.json';       // 보관함 파일 (위 폴더의 _data 안)
-const BOX_MAX          = 100;                       // 보관함에 둘 견적서 수
+const BOX_MAX          = 300;                       // 보관함에 둘 견적서 수
+const BOX_MAIL_EVERY   = 10 * 60 * 1000;            // 목록을 열 때 10분이 지났으면 보낸 견적 메일을 다시 모은다
 const SCHED_FILE       = '행사일정.json';            // 행사 일정 (위 폴더의 _data 안)
 const SCHED_MAX        = 300;                       // 보관할 행사 수
-const VERSION          = '2026-10-09a';             // 배포 확인용 — 고칠 때마다 올린다
+const VERSION          = '2026-10-13a';             // 배포 확인용 — 고칠 때마다 올린다
 
 // ── 진입점 ──────────────────────────────────────────────
 function doGet(e) {
@@ -264,6 +265,8 @@ function boxMerge_(목록, q) {
 
 function boxList_(body) {
   boxCheck_(body.pw);
+  /* 보낸 견적 메일을 먼저 모은다. 메일 읽기 권한이 아직 없으면 그냥 넘어간다 */
+  try { boxSyncMail_(false); } catch (e) {}
   let 목록 = boxRead_();
   const 들어온 = Array.isArray(body.목록) ? body.목록.slice(0, BOX_MAX) : [];
   if (들어온.length) {
@@ -283,6 +286,81 @@ function boxDel_(body) {
   const 코드 = String(body.코드 || '');
   if (!코드) throw new Error('뺄 견적서를 알 수 없습니다');
   return { ok: true, 목록: boxWrite_(boxRead_().filter(x => x && x.코드 !== 코드)) };
+}
+
+// ── 보낸 견적 메일에서 보관함 채우기 ──────────────────────
+// 견적서를 메일로 보내면 본문 「견적서 온라인으로 보기」 링크에 견적서 원본(#q= 코드)이 통째로 들어간다.
+// 보낸편지함에서 그 링크를 모아 보관함에 넣는다 — 「담기」를 안 눌러도 보낸 견적은 다 남는다.
+// 답장(Re:)은 빼고 「[큰길이벤트기획] … 견적서」 원본만 본다. 같은 견적서는 하나로 합친다.
+function boxFromMail_() {
+  const 나 = String(Session.getEffectiveUser().getEmail() || '').toLowerCase();
+  const 스레드 = GmailApp.search('in:sent "견적서 온라인으로 보기"', 0, 300);
+  const 모은 = [];
+  스레드.forEach((t) => t.getMessages().forEach((m) => {
+    if (나 && String(m.getFrom()).toLowerCase().indexOf(나) < 0) return;
+    if (!/^\[큰길이벤트기획\]/.test(String(m.getSubject()))) return;
+    const 찾음 = String(m.getPlainBody()).match(/quote\.html\?sent=1#q=([A-Za-z0-9_-]+)/);
+    if (!찾음) return;
+    const 항목 = boxFromCode_(찾음[1], m.getDate().getTime());
+    if (항목) 모은.push(항목);
+  }));
+  return 모은;
+}
+
+/* 견적 코드 하나를 보관함 한 줄로 — 회사 · 이름 · 전화, 행사명 · 행사일, 합계(부가세 포함) */
+function boxFromCode_(코드, 때) {
+  try {
+    let b = String(코드);
+    while (b.length % 4) b += '=';
+    const s = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(b)).getDataAsString('UTF-8'));
+    const 칸 = ['org','name','tel','email','title','date','place','people','memo'];
+    const 짧게 = { org:'o', name:'n', tel:'t', email:'e', title:'m', date:'d', place:'p', people:'c', memo:'x' };
+    const 정보 = {};
+    칸.forEach((k, i) => {
+      const v = !s.i ? '' : Array.isArray(s.i) ? s.i[i] : (s.i[짧게[k]] != null ? s.i[짧게[k]] : s.i[k]);
+      정보[k] = v == null ? '' : String(v);
+    });
+    let 공급 = 0;
+    const 줄들 = s.r || [];
+    줄들.forEach((a) => {
+      if (typeof a === 'string') return;                  /* 단가 협의 */
+      const q = a.length <= 4 ? (a[1] != null ? a[1] : 1) : a[3];
+      const d = a.length <= 4 ? (a[2] != null ? a[2] : 1) : a[5];
+      const p = a.length <= 4 ? a[3] : a[6];
+      if (p == null || p === '') return;
+      공급 += (+q || 0) * (+d || 0) * (+p || 0);
+    });
+    const 기준 = Math.max(0, 공급 - (+s.d || 0));
+    const 합계 = 기준 + Math.round(기준 * 0.1);
+    return {
+      코드: String(코드),
+      제목: 정보.title,
+      고객: [정보.org, 정보.name, 정보.tel].filter(Boolean).join(' · '),
+      행사일: 정보.date,
+      금액: String(합계).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 원',
+      항목: 줄들.length,
+      때: 때 || Date.now(),
+    };
+  } catch (e) { return null; }
+}
+
+/* 10분에 한 번만 (억지로면 지금 바로). 새로 들어간 건수를 돌려준다 */
+function boxSyncMail_(억지로) {
+  const 속성 = PropertiesService.getScriptProperties();
+  const 마지막 = +속성.getProperty('BOX_MAIL_AT') || 0;
+  if (!억지로 && Date.now() - 마지막 < BOX_MAIL_EVERY) return 0;
+  let 목록 = boxRead_();
+  const 전 = 목록.length;
+  boxFromMail_().forEach((q) => { 목록 = boxMerge_(목록, q); });
+  boxWrite_(목록);
+  속성.setProperty('BOX_MAIL_AT', String(Date.now()));
+  return 목록.length - 전;
+}
+
+/** 편집기에서 한 번 실행하세요 — 메일 읽기 권한을 주고, 지금까지 보낸 견적 메일을 보관함에 모읍니다. */
+function 보낸견적모으기() {
+  const n = boxSyncMail_(true);
+  Logger.log('보관함에 ' + n + '건을 더했습니다. 지금 모두 ' + boxRead_().length + '건입니다.');
 }
 
 // ── 행사 일정 · 체크리스트 ────────────────────────────────
