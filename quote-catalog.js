@@ -117,7 +117,7 @@ function 견적풀기(코드) {
       return { id: a[0], name: a[1], spec: a[2], qty: a[3], unit: a[4], days: a[5], price: a[6] };
     });
 
-    return { 정보: 정보, 줄: 줄, 할인: +s.d || 0 };
+    return { 정보: 정보, 줄: 줄, 할인: +s.d || 0, 총액: +s.t || 0 };
   } catch (e) { return null; }
 }
 

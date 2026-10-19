@@ -568,6 +568,7 @@
 
       <div class="sum">
         <div class="sum-row"><span>공급가액</span><span class="v" id="s-supply">0 원</span></div>
+        <div class="sum-row" id="adj-row" hidden><span>협의 조정</span><span class="v" id="s-adj">0 원</span></div>
         <div class="sum-row">
           <label for="s-discount">할인</label>
           <input type="text" inputmode="numeric" id="s-discount" value="0">
@@ -579,6 +580,10 @@
         <div class="sum-total">
           <span class="k">합계 금액</span>
           <span class="v accent-grad" id="s-total">0 원</span>
+        </div>
+        <div class="sum-row no-print" id="ov-row">
+          <label for="s-total-ov">합계 금액 직접 수정 <small style="color:#71717a">(견적이 바뀐 경우 · 비우면 자동)</small></label>
+          <input type="text" inputmode="numeric" id="s-total-ov" value="" placeholder="예) 3,484,800">
         </div>
         <div class="tbd-note" id="s-tbd" hidden></div>
         <div style="font-size:.78rem;color:#52525b;text-align:right;margin-top:.7rem;line-height:1.7;">
@@ -957,6 +962,8 @@ function 손님가리기() {
 
   const 할인줄 = $('#s-discount') && $('#s-discount').closest('.sum-row');
   if (할인줄) 할인줄.hidden = true;
+  const 총액줄 = $('#ov-row');
+  if (총액줄) 총액줄.hidden = true;
 
   const 표안내 = $('#doc-note');
   if (표안내) 표안내.textContent = '수량과 일수는 표에서 바로 고치실 수 있습니다';
@@ -1071,11 +1078,23 @@ function recalc() {
 
   const discount = Math.max(0, +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0);
   const net = Math.max(0, supply - discount);
-  const vat = Math.round(net * 0.1);
+  let vat = Math.round(net * 0.1);
+  let total = net + vat;
+  /* 합계 직접 수정 — 부가세 포함 최종 금액을 넣으면 공급가액·부가세를 거꾸로 맞추고, 차이는 「협의 조정」 으로 보인다 */
+  const ov = Math.max(0, +String($('#s-total-ov').value).replace(/[^0-9]/g, '') || 0);
+  let 조정 = 0;
+  if (ov && ov !== total) {
+    const v2 = Math.round(ov / 11);
+    조정 = (ov - v2) - net;
+    vat = v2; total = ov;
+  }
+  조정액 = 조정;
+  const 조정줄 = $('#adj-row');
+  if (조정줄) { 조정줄.hidden = !조정; $('#s-adj').textContent = (조정 < 0 ? '- ' : '+ ') + won(Math.abs(조정)); }
 
   $('#s-supply').textContent = won(supply);
   $('#s-vat').textContent    = won(vat);
-  $('#s-total').textContent  = won(net + vat);
+  $('#s-total').textContent  = won(total);
 
   const note = $('#s-tbd');
   note.hidden = tbd === 0;
@@ -1084,6 +1103,14 @@ function recalc() {
   syncParty();
   saveHash();
 }
+let 조정액 = 0;
+const ovEl = $('#s-total-ov');
+ovEl.addEventListener('input', recalc);
+ovEl.addEventListener('focus', () => { ovEl.value = String(ovEl.value).replace(/[^0-9]/g, ''); });
+ovEl.addEventListener('blur',  () => {
+  const n = +String(ovEl.value).replace(/[^0-9]/g, '') || 0;
+  ovEl.value = n ? n.toLocaleString('ko-KR') : '';
+});
 const discEl = $('#s-discount');
 discEl.addEventListener('input', recalc);
 discEl.addEventListener('focus', () => { discEl.value = String(discEl.value).replace(/[^0-9]/g, ''); });
@@ -1128,6 +1155,8 @@ function encodeState() {
   const state = { i, r };
   const d = +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0;
   if (d) state.d = d;
+  const t = +String($('#s-total-ov').value).replace(/[^0-9]/g, '') || 0;
+  if (t) state.t = t;
   return b64u(JSON.stringify(state));
 }
 
@@ -1145,6 +1174,7 @@ function decodeState(str) {
       if (cb) cb.checked = true;
     });
     $('#s-discount').value = (d.할인 || 0).toLocaleString('ko-KR');
+    $('#s-total-ov').value = d.총액 ? d.총액.toLocaleString('ko-KR') : '';
     return true;
   } catch (e) { return false; }
 }
@@ -1309,6 +1339,7 @@ function 견적HTML() {
     <table cellpadding="0" cellspacing="0" border="0" align="right">
       ${합계행('공급가액', esc($('#s-supply').textContent), false)}
       ${할인 ? 합계행('할인', '- ' + 할인.toLocaleString('ko-KR') + ' 원', false) : ''}
+      ${조정액 ? 합계행('협의 조정', (조정액 < 0 ? '- ' : '+ ') + Math.abs(조정액).toLocaleString('ko-KR') + ' 원', false) : ''}
       ${합계행('부가세 (10%)', esc($('#s-vat').textContent), false)}
       <tr><td colspan="2" style="padding:5px 0 0;font-size:0;line-height:0;">&nbsp;</td></tr>
       ${합계행('합계 금액', esc($('#s-total').textContent), true)}
@@ -1565,7 +1596,8 @@ $('#btn-contract').addEventListener('click', () => {
     cl: { org: g('org'), name: g('name'), tel: g('tel'), email: g('email'), addr: '' },
     ev: { title: g('title'), date: g('date'), place: g('place'), people: g('people'), scope: g('memo') },
     items: rows.map((r) => ({ name: r.name, spec: r.spec, qty: r.qty, unit: r.unit, days: r.days, price: r.price })),
-    m: { disc: +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0 },
+    m: { disc: +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0,
+         totOv: +String($('#s-total-ov').value).replace(/[^0-9]/g, '') || 0 },
   };
   const code = b64u(JSON.stringify(contract));
   const url  = location.href.replace(/[?#].*$/, '').replace(/quote\.html$/, 'contract.html') + '?admin=1#c=' + code;
@@ -1588,6 +1620,7 @@ $('#btn-stmt').addEventListener('click', () => {
   };
   const 할인 = +String($('#s-discount').value).replace(/[^0-9]/g, '') || 0;
   if (할인) st.rows.push({ on: true, name: '할인', spec: '견적서 할인', qty: 1, unit: '식', days: 1, price: -할인 });
+  if (조정액) st.rows.push({ on: true, name: '협의 조정', spec: '견적 변경분', qty: 1, unit: '식', days: 1, price: 조정액 });
   const url = location.href.replace(/[?#].*$/, '').replace(/quote\.html$/, 'statement.html') + '?admin=1#t=' + b64u(JSON.stringify(st));
   window.open(url, '_blank');
 });
