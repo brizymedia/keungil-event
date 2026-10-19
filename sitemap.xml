@@ -506,7 +506,7 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -542,7 +542,7 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/goheung/</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -554,13 +554,13 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/namwon/</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/tongyeong/</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -569,6 +569,33 @@
     <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B3%A0%ED%9D%A5-%EC%B2%9C%EB%A7%89-%EB%8C%80%EC%97%AC-%ED%96%89%EC%82%AC-%EA%B7%9C%EB%AA%A8%EB%A1%9C-%EB%8F%99-%EC%88%98%EB%B6%80%ED%84%B0-%EC%A0%95%ED%95%A9%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/school/031.jpg</image:loc><image:title>학교 운동장 야외 무대와 현수막, 둘레에 세운 천막과 모인 관객이 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/conference/043.jpg</image:loc><image:title>대형 흰색 캐노피 천막 아래 줄지어 앉은 참석자들의 뒷모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/004.jpg</image:loc><image:title>트러스 구조물을 세우는 중인 무대와 장비 트럭이 보이는 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EB%82%A8%EC%9B%90-%EC%B6%95%EC%A0%9C-%EC%95%88%EC%A0%84%EA%B4%80%EB%A6%AC%EA%B3%84%ED%9A%8D-%EA%B0%80%EC%88%98-%EC%84%AD%EC%99%B8-%EC%A0%84%EC%97%90-%EC%8B%A0%EA%B3%A0-%EA%B8%B0%ED%95%9C%EB%B6%80%ED%84%B0-%EB%B4%85%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/026.jpg</image:loc><image:title>운동장에 세운 트러스 무대와 매달린 라인어레이 스피커, LED 화면이 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/018.jpg</image:loc><image:title>해질녘 야외 무대 위에 LED 화면과 스피커, 내빈이 서 있는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/conference/051.jpg</image:loc><image:title>체육관 무대의 LED 화면과 줄지어 놓은 의자가 보이는 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%ED%86%B5%EC%98%81-%EC%97%90%EC%96%B4%EB%B0%94%EC%9A%B4%EC%8A%A4-%EB%8C%80%EC%97%AC-%ED%95%B4%EC%95%88-%ED%96%89%EC%82%AC%EC%9E%A5%EC%9D%80-%EB%B0%94%EB%9E%8C-%EC%97%BC%EB%B6%84-%EC%A0%84%EC%9B%90%EB%B6%80%ED%84%B0-%EB%B4%85%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/026.jpg</image:loc><image:title>대형 홀의 에어 골대와 한쪽에 세팅한 음향 장비가 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/030.jpg</image:loc><image:title>에어 골대 가까이에서 공을 차는 참가자가 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/025.jpg</image:loc><image:title>대형 에어 워터슬라이드와 물놀이 풀에서 노는 아이들이 멀리서 보이는 모습</image:title><image:caption></image:caption></image:image>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B3%A0%ED%9D%A5-%EC%B6%95%EC%A0%9C-%EC%95%88%EC%A0%84%EA%B4%80%EB%A6%AC%EA%B3%84%ED%9A%8D-%EB%B6%88%EA%BD%83%EC%B6%95%EC%A0%9C-%EA%B2%BD%ED%97%98%EC%9C%BC%EB%A1%9C-%EC%88%9C%EC%84%9C%EB%A5%BC-%EC%95%95%EB%8B%88%EB%8B%A4/</loc>
