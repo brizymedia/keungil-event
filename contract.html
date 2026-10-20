@@ -441,6 +441,7 @@
       <button class="btn btn-ghost btn-sm" id="share-native"><iconify-icon icon="solar:share-bold"></iconify-icon> 카톡·문자로 보내기</button>
       <a class="btn btn-ghost btn-sm" id="share-sms" href="#"><iconify-icon icon="solar:chat-round-dots-bold"></iconify-icon> 문자 앱 열기</a>
       <a class="btn btn-ghost btn-sm" id="share-mail" href="#"><iconify-icon icon="solar:letter-bold"></iconify-icon> 이메일로 보내기</a>
+      <a class="btn btn-ghost btn-sm" id="share-naver" href="#" target="_blank" rel="noopener" hidden><iconify-icon icon="solar:letter-bold"></iconify-icon> 네이버 메일로 보내기</a>
     </div>
     <div style="text-align:right;margin-top:.9rem;"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('share-modal').hidden=true">닫기</button></div>
   </div>
@@ -1074,7 +1075,22 @@ $('#btn-share')?.addEventListener('click', async ()=>{
   const msg = `[${C.co.name}] ${C.ev.title} 계약서입니다.\n아래 링크를 열어 내용을 확인하시고 서명해 주세요.\n${url}`;
   $('#share-url').textContent=url; $('#share-note').textContent=note;
   $('#share-sms').href = 'sms:'+(C.cl.tel||'').replace(/[^0-9+]/g,'')+(/iPhone|iPad|Mac/.test(navigator.userAgent)?'&':'?')+'body='+encodeURIComponent(msg);
-  $('#share-mail').href = 'mailto:'+encodeURIComponent(C.cl.email||'')+'?subject='+encodeURIComponent(`[${C.co.name}] ${C.ev.title} 계약서 서명 요청`)+'&body='+encodeURIComponent(msg);
+  const 메일제목 = `[${C.co.name}] ${C.ev.title} 계약서 서명 요청`;
+  const 폰 = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const 메일 = $('#share-mail'), 네이버 = $('#share-naver');
+  if (폰) {
+    /* 폰: 메일 앱 고르기(mailto) — 네이버·지메일 앱이 열린다 */
+    메일.href = 'mailto:'+encodeURIComponent(C.cl.email||'')+'?subject='+encodeURIComponent(메일제목)+'&body='+encodeURIComponent(msg);
+    메일.removeAttribute('target'); 네이버.hidden = true;
+  } else {
+    /* PC: mailto 는 메일 프로그램이 없으면 「앱 열기」 만 뜬다 → 웹메일 작성창을 새 탭으로 연다 */
+    메일.innerHTML = '<iconify-icon icon="solar:letter-bold"></iconify-icon> 지메일로 보내기';
+    메일.href = 'https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(C.cl.email||'')+'&su='+encodeURIComponent(메일제목)+'&body='+encodeURIComponent(msg);
+    메일.target = '_blank'; 메일.rel = 'noopener';
+    네이버.hidden = false;
+    네이버.href = 'https://mail.naver.com/write/popup?to='+encodeURIComponent(C.cl.email||'')+'&subject='+encodeURIComponent(메일제목)+'&body='+encodeURIComponent(msg);
+    네이버.onclick = () => { try{ navigator.clipboard.writeText(msg); toast('안내 문구를 복사했습니다 · 작성창이 비어 있으면 붙여넣으세요'); }catch(e){} };
+  }
   $('#share-copy').onclick = async ()=>{ try{ await navigator.clipboard.writeText(url); toast('링크를 복사했습니다'); }catch(e){ prompt('링크를 복사하세요', url); } };
   $('#share-native').onclick = async ()=>{ if(navigator.share){ try{ await navigator.share({title:C.ev.title+' 계약서', text:msg}); }catch(e){} } else { try{ await navigator.clipboard.writeText(msg); toast('메시지를 복사했습니다 · 카톡에 붙여넣으세요'); }catch(e){ prompt('아래 내용을 복사하세요', msg); } } };
   $('#share-modal').hidden=false;
