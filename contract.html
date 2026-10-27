@@ -285,6 +285,11 @@
       </div>
       <div><label class="f">이메일 (서명본 PDF 수신)</label><input class="in" data-k="cl.email" placeholder="name@example.com" inputmode="email"></div>
       <div><label class="f">주소</label><input class="in" data-k="cl.addr" placeholder="선택"></div>
+      <div class="row2">
+        <div><label class="f">대표자 (선택)</label><input class="in" data-k="cl.rep" placeholder="사업자등록증의 대표자"></div>
+        <div><label class="f">사업자등록번호 (선택)</label><input class="in" data-k="cl.biz" placeholder="000-00-00000" inputmode="numeric"></div>
+      </div>
+      <div><label class="f">법인등록번호 (선택)</label><input class="in" data-k="cl.corp" placeholder="000000-0000000"></div>
     </div>
   </details>
 
@@ -495,7 +500,7 @@ const DEF = () => ({
   co:{ name:'주식회사 브리지미디어', brand:'큰길이벤트기획', rep:'김동길', biz:'813-81-02252', corp:'204611-0065269',
        addr:'전남광주통합특별시 광양시 광양읍 강변동길 1, 2층', tel:'1533-7295', email:'gilcaro@naver.com',
        bank:'KB국민은행 788101-01-397776 (예금주: 주식회사 브리지미디어)', bank2:'' },
-  cl:{ org:'', name:'', tel:'', email:'', addr:'' },
+  cl:{ org:'', rep:'', biz:'', corp:'', name:'', tel:'', email:'', addr:'' },
   ev:{ title:'', date:'', place:'', people:'', scope:'' },
   items:[],
   m:{ disc:0, totOv:0, depAmt:0, depPct:30, vat:'별도', depDue:'계약 체결일로부터 3일 이내', balDue:'행사 종료일로부터 7일 이내' },
@@ -727,6 +732,8 @@ function render(){
         <span class="role">갑 (발주자)</span>
         <span class="stamp-flag ${SIGNED?'ok':''}">${SIGNED?'서명 완료':'서명 대기'}</span>
         <div class="line"><span>단체·회사명</span><b>${or(C.cl.org)}</b></div>
+        ${C.cl.rep?`<div class="line"><span>대표자</span><span>${or(C.cl.rep)}</span></div>`:''}
+        ${C.cl.biz?`<div class="line"><span>사업자번호</span><span>${or(C.cl.biz)}${C.cl.corp?' · 법인 '+or(C.cl.corp):''}</span></div>`:''}
         <div class="line"><span>담당자</span><span>${or(C.cl.name)}</span></div>
         <div class="line"><span>연락처</span><span>${or(C.cl.tel)}</span></div>
         <div class="line"><span>주소</span><span>${or(C.cl.addr)}</span></div>
