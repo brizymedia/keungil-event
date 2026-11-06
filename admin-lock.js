@@ -4,7 +4,9 @@
  *
  * 암호는 이 파일에 없다. 계약 서버에 {action:'boxList', pw} 를 보내 ok 가 오면 연다
  * (대표 암호 = 계약 서버 스크립트 속성 BOX_PW — 견적서 저장함 · 관리자 모드와 같은 암호).
- * 맞으면 이 기기에 기억한다 → 다음부터는 조용히 확인만 하고 바로 열린다.
+ * 맞으면 이 기기에 기억한다 → 다음부터는 잠금 화면 없이 바로 열리고, 암호 확인은 뒤에서 조용히 한다
+ * (암호가 바뀐 게 분명할 때만 다시 묻는다 — 인터넷이 느리거나 끊겨도 기억한 암호를 지우지 않는다).
+ * 최근 6시간 안에 확인된 기기는 서버에 다시 묻지도 않는다(계약 서버가 느려서 매번 기다리게 되던 문제).
  * 계약 서버 주소가 비어 있으면(서버 없는 곳) 잠그지 않는다.
  *
  * 쓰는 법: <head> 안에 <script src="admin-lock.js" data-server='…/exec' data-key='keungil-quote-box-pw' data-name='큰길이벤트기획'></script>
@@ -18,7 +20,9 @@
   if (new URLSearchParams(location.search).get('admin') !== '1' || !서버) return;
 
   var 루트 = document.documentElement;
-  루트.classList.add('admin-locked');
+  var 확인열쇠 = 열쇠 + '-ok', 여섯시간 = 6 * 3600 * 1000;
+  var 미리저장 = ''; try { 미리저장 = localStorage.getItem(열쇠) || ''; } catch (e) {}
+  if (!미리저장) 루트.classList.add('admin-locked');   // 기억한 암호가 있으면 처음부터 열어 둔다
   var css = document.createElement('style');
   css.textContent =
     'html.admin-locked body>*:not(#admin-lock){display:none!important}' +
@@ -46,6 +50,12 @@
     루트.classList.remove('admin-locked');
     var el = document.getElementById('admin-lock'); if (el) el.remove();
   }
+  function 확인됨() { 쓰기(확인열쇠, String(Date.now())); }
+  function 방금확인() { var t = +읽기(확인열쇠) || 0; return t && Date.now() - t < 여섯시간; }
+  /* 서버(Apps Script)는 한동안 안 쓰면 깨어나는 데 몇 초가 걸린다 — 암호를 치는 동안 미리 깨워 둔다 */
+  function 깨우기() {
+    try { fetch(서버, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'ping' }) }).catch(function () {}); } catch (e) {}
+  }
 
   function 화면() {
     var box = document.createElement('div');
@@ -62,7 +72,7 @@
       e.preventDefault();
       var v = pw.value.trim(); if (!v) { err.textContent = '암호를 넣어 주세요.'; pw.focus(); return; }
       go.disabled = true; go.textContent = '확인 중…'; err.textContent = '';
-      확인(v).then(function () { 쓰기(열쇠, v); if (!읽기(일정열쇠)) 쓰기(일정열쇠, v); 열기(); })
+      확인(v).then(function () { 쓰기(열쇠, v); 확인됨(); if (!읽기(일정열쇠)) 쓰기(일정열쇠, v); 열기(); })
         .catch(function (x) { err.textContent = x.pw ? '암호가 맞지 않습니다.' : '연결이 안 됩니다 — 잠시 뒤 다시 해 주세요.'; pw.select(); })
         .then(function () { go.disabled = false; go.textContent = '들어가기'; });
     });
@@ -71,15 +81,16 @@
 
   function 시작() {
     var 저장 = 읽기(열쇠);
-    var ui = 화면();
     if (저장) {
-      ui.err.textContent = '확인 중…';
-      확인(저장).then(열기).catch(function (x) {
-        if (x.pw) { 쓰기(열쇠, ''); ui.err.textContent = '저장된 암호가 바뀌었습니다. 다시 넣어 주세요.'; }
-        else { ui.err.textContent = '연결이 안 됩니다 — 잠시 뒤 새로고침해 주세요.'; }
-        ui.pw.focus();
+      /* 기억한 암호가 있다 — 화면은 이미 열려 있다. 최근에 확인했으면 그대로 끝, 아니면 뒤에서 조용히 확인 */
+      if (방금확인()) return;
+      확인(저장).then(확인됨).catch(function (x) {
+        if (!x.pw) return;   // 인터넷이 느리거나 끊긴 것 — 암호를 지우지도, 다시 묻지도 않는다
+        쓰기(열쇠, ''); 쓰기(확인열쇠, '');
+        루트.classList.add('admin-locked');
+        var ui = 화면(); ui.err.textContent = '저장된 암호가 바뀌었습니다. 다시 넣어 주세요.'; ui.pw.focus();
       });
-    } else ui.pw.focus();
+    } else { 깨우기(); 화면().pw.focus(); }
   }
   if (document.body) 시작(); else document.addEventListener('DOMContentLoaded', 시작);
 })();

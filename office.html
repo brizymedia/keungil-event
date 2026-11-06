@@ -142,17 +142,24 @@ body.locked #gate{display:grid;min-height:100vh;place-items:center;padding:24px}
     e.preventDefault();
     var v = pw.value.trim(); if (!v) { err.textContent = '암호를 넣어 주세요.'; pw.focus(); return; }
     go.disabled = true; go.textContent = '확인 중…'; err.textContent = '';
-    확인(v).then(function () { 쓰기(열쇠, v); if (!읽기(일정열쇠)) 쓰기(일정열쇠, v); 열기(); })
+    확인(v).then(function () { 쓰기(열쇠, v); 쓰기(열쇠 + '-ok', String(Date.now())); if (!읽기(일정열쇠)) 쓰기(일정열쇠, v); 열기(); })
       .catch(function (x) { err.textContent = /맞지|암호/.test(x.message) ? '암호가 맞지 않습니다.' : '연결이 안 됩니다 — 잠시 뒤 다시 해 주세요.'; pw.select(); })
       .then(function () { go.disabled = false; go.textContent = '들어가기'; });
   });
-  /* 이 기기에 기억된 암호가 있으면 조용히 확인하고 연다 */
+  /* 이 기기에 기억된 암호가 있으면 바로 열고, 확인은 뒤에서 조용히 한다.
+     인터넷이 느리거나 끊겨도 기억한 암호를 지우지 않는다(암호가 틀렸다고 서버가 답할 때만 지운다) */
   var 저장 = 읽기(열쇠);
   if (저장) {
-    var 이번 = false; try { 이번 = sessionStorage.getItem('keungil-office') === '1'; } catch (e) {}
-    if (이번) 열기();
-    확인(저장).then(열기).catch(function () { 잠그기(); });
-  } else pw.focus();
+    열기();
+    var 최근 = +읽기(열쇠 + '-ok') || 0;
+    if (!(최근 && Date.now() - 최근 < 6 * 3600 * 1000)) {
+      확인(저장).then(function () { 쓰기(열쇠 + '-ok', String(Date.now())); })
+        .catch(function (x) { if (/맞지|암호/.test(x.message)) 잠그기(); });
+    }
+  } else {
+    try { fetch(서버, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'ping' }) }).catch(function () {}); } catch (e) {}
+    pw.focus();
+  }
 })();
 </script><!--/GATE-->
 </body>
