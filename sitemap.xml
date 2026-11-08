@@ -557,7 +557,7 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -569,25 +569,25 @@
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/suncheon/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/yeosu/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/gwangyang/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/jinju/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-11-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -620,6 +620,51 @@
     <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%96%91-%EC%8B%A0%EB%85%84%ED%9A%8C-%ED%96%89%EC%82%AC-%EC%B0%BD%EA%B3%A0%EA%B0%80-%EA%B0%80%EA%B9%8C%EC%9B%8C-%EB%B0%9C%ED%91%9C-%EC%9E%90%EB%A3%8C%EB%B6%80%ED%84%B0-%EC%B1%99%EA%B9%81%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/020.jpg</image:loc><image:title>강당 무대 LED 화면과 연단, 화환이 놓인 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/017.jpg</image:loc><image:title>체육관 무대 LED 화면과 원탁 배치, 무빙라이트가 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/conference/007.jpg</image:loc><image:title>LED 발표 화면과 카메라, 회의석 모니터가 보이는 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%96%91-%ED%8F%AC%ED%86%A0%EC%A1%B4-%EC%A0%9C%EC%9E%91-%EC%B0%BD%EA%B3%A0%EA%B0%80-%EA%B0%80%EA%B9%8C%EC%9B%8C-%EB%8B%B5%EC%82%AC%EB%B6%80%ED%84%B0-%EA%B0%91%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/023.jpg</image:loc><image:title>체육관 무대 LED 화면 전경과 앞에 놓인 좌석이 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/school/017.jpg</image:loc><image:title>강당 무대에 풍선 장식이 있고 객석이 멀리 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/busking/010.jpg</image:loc><image:title>강변 야외 좌석과 스피커가 설치된 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EC%88%9C%EC%B2%9C-%ED%95%B4%EB%A7%9E%EC%9D%B4-%ED%96%89%EC%82%AC-%EC%82%AC%EB%AC%B4%EC%86%8C%EA%B0%80-%EC%9E%88%EC%96%B4-%EC%83%88%EB%B2%BD-%EB%B0%98%EC%9E%85%EB%8F%84-%EB%B9%A0%EB%A6%85%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/015.jpg</image:loc><image:title>밤 시간 야외 무대에서 밴드가 공연하고 뒤로 LED 화면이 켜진 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/festival/017.jpg</image:loc><image:title>어두운 새벽 무대에 조명과 LED 화면이 켜진 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/003.jpg</image:loc><image:title>실내체육관 무대에 LED 전광판과 무대 조명, 현수막이 보이는 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EC%97%AC%EC%88%98-%EA%B0%80%EC%88%98-%EC%84%AD%EC%99%B8-%EB%B0%94%EB%8B%B7%EA%B0%80%EB%9D%BC%EB%A9%B4-%EC%A0%84%EC%9B%90%EB%B6%80%ED%84%B0-%ED%99%95%EC%9D%B8%ED%95%A9%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/004.jpg</image:loc><image:title>연회장 원탁 배치 앞 무대에서 색소폰과 키보드로 공연을 하는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/busking/012.jpg</image:loc><image:title>강변 야외 좌석과 스피커가 설치되고 국악 공연이 진행되는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/school/008.jpg</image:loc><image:title>강당 무대에서 학생 공연을 하고 조명이 켜진 모습</image:title><image:caption></image:caption></image:image>
+  </url>
+  <url>
+    <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EC%A7%84%EC%A3%BC-%EC%86%A1%EB%85%84%ED%9A%8C-%EA%B3%B5%EC%97%B0-%EA%B0%80%EC%88%98-mc-%EC%88%9C%EC%84%9C%EB%B6%80%ED%84%B0-%EB%82%98%EB%88%95%EB%8B%88%EB%8B%A4/</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/ceremony/008.jpg</image:loc><image:title>행사 전 무대에 LED 화면과 레드카펫, 바닥 무빙라이트가 보이는 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/conference/039.jpg</image:loc><image:title>무대 위에 보컬 마이크 스탠드와 악기가 세팅된 모습</image:title><image:caption></image:caption></image:image>
+    <image:image><image:loc>https://cdn.jsdelivr.net/gh/brizymedia/keungil-event@photos/photos/sports/006.jpg</image:loc><image:title>실내체육관에서 MC가 팀별로 앉은 참가자 앞을 오가며 진행하는 모습</image:title><image:caption></image:caption></image:image>
   </url>
   <url>
     <loc>https://xn--wk0bn7yi8h24iszc.com/blog/%EA%B4%91%EC%96%91-%ED%81%AC%EB%A6%AC%EC%8A%A4%EB%A7%88%EC%8A%A4-%ED%96%89%EC%82%AC-%EC%8B%A4%EB%82%B4%EC%99%80-%EC%95%BC%EC%99%B8%EB%A1%9C-%EB%82%98%EB%88%A0-%EC%A4%80%EB%B9%84%ED%95%A9%EB%8B%88%EB%8B%A4/</loc>
