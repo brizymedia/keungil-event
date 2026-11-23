@@ -137,13 +137,13 @@ A(f'<text {sub} fill="#fff" stroke="#fff" stroke-width="22" stroke-linejoin="rou
 A(f'<text {sub} fill="#a3159a" stroke="#7a0d73" stroke-width="2.5">꿈과 웃음 가득한 우리들의 <tspan fill="#d61f6b" stroke="#a3124f">Special Stage!</tspan></text>')
 
 title_line(560, [("끼와 ","gY"),("열정의 ","gO"),("대폭발","gY")], 205, 4)
-title_line(810, [("동면초등학교","gO"),(" 창자랑 ","gY"),("발표회","gO")], 172, 0)
+title_line(810, [("동면초등학교","gO"),(" 참자랑 ","gY"),("발표회","gO")], 172, 0)
 
 maple(165,290,.85,-15,"#e8350c")
 cosmos(1810,285,1.1,"#ff6fb0","#d23f83")
 # info pill
 A('<rect x="330" y="880" width="1340" height="104" rx="52" fill="#ffffff" fill-opacity=".88" stroke="#ff9b1a" stroke-width="6"/>')
-A('<text x="1000" y="950" text-anchor="middle" font-family="Noto Sans KR" font-weight="800" font-size="56" fill="#3b2a1a">2026. 11. 25.(화) 9:30~ <tspan fill="#ff7a00">  |  </tspan>동면초등학교 체육관</text>')
+A('<text x="1000" y="950" text-anchor="middle" font-family="Noto Sans KR" font-weight="800" font-size="56" fill="#3b2a1a">2026. 11. 25.(수) 9:30~ <tspan fill="#ff7a00">  |  </tspan>동면초등학교 체육관</text>')
 
 # PHOTO ZONE badge bottom center
 A('<g transform="translate(1000,1905)">')
